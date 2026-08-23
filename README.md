@@ -15,8 +15,14 @@ teaches Cambridge 0500 language analysis. This one sits a level below it: you ca
 **Learn.** One card per class: what it is in plain English, a check you can actually apply
 inside a sentence, a worked example, and an honest list of the exceptions.
 
-**Practice.** *Click the word* and *Click all the words*, across four difficulty levels.
-Nouns and verbs are live; adjectives and adverbs are coming.
+**Practice.** Four activities, across four difficulty levels:
+
+- **Click the word** and **Click all the words** — find the class in a real sentence.
+- **Where does it fit?** — one word, three gaps, which one takes it? This covers all four
+  classes already, so adjectives and adverbs are taught here first.
+- **Yes or no** — one word marked in its sentence, one question, a streak to beat.
+
+Nouns and verbs are scored in the click rounds; adjectives and adverbs are coming.
 
 Three things it tries to do differently:
 
@@ -26,7 +32,8 @@ Three things it tries to do differently:
   *picked the box up*. On the easier levels the app marks the whole verb for you. On the
   harder ones you have to find every part yourself, because spotting the helper word is the
   skill.
-- **The feedback teaches the check, not the answer.**
+- **The feedback teaches the check, not the answer.** Every wrong click comes back with the
+  test you should have applied, not just a cross.
 
 ## Running it
 
@@ -35,6 +42,7 @@ Open `index.html` in any browser. That is the whole thing.
 ## For developers
 
 `index.html?validate` runs the content validator and prints a report. It must show
-**0 ERRORS** after any change to the word banks.
+**0 ERRORS** after any change to the word banks. It also prints the lemma map, the pool
+sizes per activity and level, and any word carrying two classes.
 
 Built by an English teacher with Claude. All content is original.

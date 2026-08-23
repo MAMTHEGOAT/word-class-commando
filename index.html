@@ -129,6 +129,28 @@ pre{white-space:pre-wrap;word-break:break-word;background:var(--bg2);
   border:1px solid var(--line);border-radius:8px;padding:12px;font-size:.8rem;
   line-height:1.45;overflow-x:auto}
 .err{color:#ff8b80}.warn{color:#f0c36d}.good{color:#8fdc9c}
+
+/* where does it fit */
+.bigword{background:var(--paper);color:var(--ink);border-radius:12px;
+  padding:18px 16px;text-align:center;font-size:1.7rem;font-weight:700;
+  letter-spacing:.01em;margin-bottom:14px}
+.slot{display:block;width:100%;text-align:left;background:var(--paper);color:var(--ink);
+  border:2px solid #ded28f;border-radius:12px;padding:16px 16px;margin-bottom:10px;
+  font-size:1.12rem;line-height:1.5;min-height:56px}
+.slot:hover{border-color:#b39b47}
+.slot[aria-pressed="true"]{border-color:#1a3a6b;box-shadow:inset 0 0 0 2px #1a3a6b}
+.slot.s-ok{border-color:var(--ok);background:var(--okbg)}
+.slot.s-bad{border-color:var(--bad);background:var(--badbg)}
+.slot .gap{display:inline-block;min-width:74px;border-bottom:3px solid #8a7c3a;
+  margin:0 3px;vertical-align:-2px}
+.slot .filled{display:inline-block;min-width:74px;text-align:center;font-weight:700;
+  border-bottom:3px solid var(--ok);margin:0 3px}
+
+/* yes or no */
+.ynbar{display:flex;gap:18px;color:var(--dim);font-size:.86rem;margin:0 0 8px}
+.ynbar b{color:var(--txt)}
+button.yn{min-width:110px;font-size:1.05rem}
+.hl{background:#1a3a6b;color:#fff;border-radius:6px;padding:3px 6px}
 </style>
 </head>
 <body>
@@ -152,6 +174,10 @@ pre{white-space:pre-wrap;word-break:break-word;background:var(--bg2);
         <span class="sub">Nouns and verbs: one sentence, one target</span></button>
       <button class="menu-btn" onclick="start('all')">Click all the words
         <span class="sub">Nouns and verbs: find every one of them</span></button>
+      <button class="menu-btn" onclick="startFrames()">Where does it fit?
+        <span class="sub">One word, three gaps: which one takes it?</span></button>
+      <button class="menu-btn" onclick="startYN()">Yes or no
+        <span class="sub">Quickfire: is this word a noun? a verb?</span></button>
       <button class="menu-btn" disabled>Insert the word
         <span class="sub">Coming in v0.4</span></button>
       <button class="menu-btn" disabled>Transform the word
@@ -205,6 +231,49 @@ pre{white-space:pre-wrap;word-break:break-word;background:var(--bg2);
     <button onclick="copyRef()">Copy code</button>
     <span id="refMsg"></span>
   </div>
+</section>
+
+
+<!-- ========================= WHERE DOES IT FIT ===================== -->
+<section id="frames" class="screen">
+  <div class="topbar"><button class="back" onclick="go('splash')">&larr; Menu</button><img alt="" src="data:image/png;base64,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"></div>
+  <p class="lbl">Level</p>
+  <div class="chips" id="frLevels"></div>
+  <p class="prompt">Which gap does this word fit?</p>
+  <div class="bigword" id="frWord"></div>
+  <div id="frSlots"></div>
+  <div class="bar">
+    <button class="go" id="frCheck" onclick="frCheck()" disabled>Check</button>
+    <span class="score" id="frScore"></span>
+  </div>
+  <ul class="fb" id="frFb"></ul>
+  <div class="bar" id="frNextBar" style="display:none">
+    <button class="go" onclick="frNext()">Next word</button>
+  </div>
+  <div class="ref"><span>Reference: <code id="frRef">--</code></span></div>
+</section>
+
+<!-- ============================ YES OR NO ========================== -->
+<section id="yesno" class="screen">
+  <div class="topbar"><button class="back" onclick="go('splash')">&larr; Menu</button><img alt="" src="data:image/png;base64,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"></div>
+  <p class="lbl">Word class</p>
+  <div class="chips" id="ynClass"></div>
+  <div class="ynbar">
+    <span>Streak <b id="ynStreak">0</b></span>
+    <span>Best <b id="ynBest">0</b></span>
+    <span id="ynTime"></span>
+  </div>
+  <p class="prompt" id="ynPrompt"></p>
+  <div class="sent" id="ynSent"></div>
+  <div class="bar">
+    <button class="go yn" onclick="ynAnswer(true)" id="ynYes">Yes</button>
+    <button class="ghost yn" onclick="ynAnswer(false)" id="ynNo">No</button>
+  </div>
+  <ul class="fb" id="ynFb"></ul>
+  <div class="bar" id="ynNextBar" style="display:none">
+    <button class="go" onclick="ynNext()">Next word</button>
+  </div>
+  <div class="ref"><span>Reference: <code id="ynRef">--</code></span></div>
 </section>
 
 <!-- =========================== VALIDATE =========================== -->
@@ -297,19 +366,92 @@ var SENTENCES = [
 {"id":"wc-s070","level":"secure","topic":"people","words":[{"w":"He","c":"pron"},{"w":"looked","c":"verb","sub":"lex","lem":"look"},{"w":"at","c":"prep"},{"w":"the","c":"det","sub":"art"},{"w":"clock","c":"noun","sub":"common"},{"w":"and","c":"conj"},{"w":"sighed","c":"verb","sub":"lex","p":".","lem":"sigh"}],"ans":{"noun":[4],"verb":[1,6]},"eligible":{"noun":true,"verb":true,"adj":false,"adv":false},"tomorrow":"He will look at the clock and sigh tomorrow."},
 {"id":"wc-s071","level":"challenge","topic":"school","words":[{"w":"Although","c":"conj"},{"w":"the","c":"det","sub":"art"},{"w":"bell","c":"noun","sub":"common"},{"w":"rang","c":"verb","sub":"lex","p":",","lem":"ring"},{"w":"nobody","c":"pron"},{"w":"moved","c":"verb","sub":"lex","p":"."}],"ans":{"noun":[2],"verb":[3,5]},"eligible":{"noun":true,"verb":true,"adj":false,"adv":false},"tomorrow":"Although the bell rings tomorrow, nobody will move."},
 {"id":"wc-s072","level":"challenge","topic":"animals","words":[{"w":"The","c":"det","sub":"art"},{"w":"dog","c":"noun","sub":"common"},{"w":"barked","c":"verb","sub":"lex","p":",","lem":"bark"},{"w":"the","c":"det","sub":"art"},{"w":"cat","c":"noun","sub":"common"},{"w":"hissed","c":"verb","sub":"lex","lem":"hiss"},{"w":"and","c":"conj"},{"w":"the","c":"det","sub":"art"},{"w":"baby","c":"noun","sub":"common"},{"w":"cried","c":"verb","sub":"lex","p":".","lem":"cry"}],"ans":{"noun":[1,4,8],"verb":[2,5,9]},"eligible":{"noun":true,"verb":true,"adj":false,"adv":false},"tomorrow":"The dog will bark, the cat will hiss and the baby will cry tomorrow."},
-{"id":"wc-s073","level":"challenge","topic":"travel","words":[{"w":"She","c":"pron"},{"w":"has","c":"verb","sub":"aux","g":1,"lem":"have"},{"w":"packed","c":"verb","sub":"lex","g":1,"head":true,"lem":"pack"},{"w":"her","c":"det","sub":"poss"},{"w":"bag","c":"noun","sub":"common"},{"w":"and","c":"conj"},{"w":"is","c":"verb","sub":"aux","g":2,"lem":"be"},{"w":"waiting","c":"verb","sub":"lex","g":2,"head":true,"lem":"wait"},{"w":"outside","c":"adv","sub":"place","p":"."}],"ans":{"noun":[4],"verb":[1,6]},"eligible":{"noun":true,"verb":true,"adj":false,"adv":false},"neutral":{"adv":[8]},"tomorrow":"She will pack her bag and will be waiting outside tomorrow."}
+{"id":"wc-s073","level":"challenge","topic":"travel","words":[{"w":"She","c":"pron"},{"w":"has","c":"verb","sub":"aux","g":1,"lem":"have"},{"w":"packed","c":"verb","sub":"lex","g":1,"head":true,"lem":"pack"},{"w":"her","c":"det","sub":"poss"},{"w":"bag","c":"noun","sub":"common"},{"w":"and","c":"conj"},{"w":"is","c":"verb","sub":"aux","g":2,"lem":"be"},{"w":"waiting","c":"verb","sub":"lex","g":2,"head":true,"lem":"wait"},{"w":"outside","c":"adv","sub":"place","p":"."}],"ans":{"noun":[4],"verb":[1,6]},"eligible":{"noun":true,"verb":true,"adj":false,"adv":false},"neutral":{"adv":[8]},"tomorrow":"She will pack her bag and will be waiting outside tomorrow."},
+{"id":"wc-s074","level":"foundation","topic":"weather","words":[{"w":"The","c":"det","sub":"art"},{"w":"sun","c":"noun","sub":"common"},{"w":"shone","c":"verb","sub":"lex","lem":"shine"},{"w":"brightly","c":"adv","sub":"manner","p":"."}],"ans":{"noun":[1],"verb":[2],"adv":[3]},"eligible":{"noun":true,"verb":true,"adj":false,"adv":true},"tomorrow":"The sun will shine brightly tomorrow."},
+{"id":"wc-s075","level":"foundation","topic":"people","words":[{"w":"The","c":"det","sub":"art"},{"w":"girl","c":"noun","sub":"common"},{"w":"whispered","c":"verb","sub":"lex","p":".","lem":"whisper"}],"ans":{"noun":[1],"verb":[2]},"eligible":{"noun":true,"verb":true,"adj":false,"adv":false},"tomorrow":"The girl will whisper tomorrow."},
+{"id":"wc-s076","level":"foundation","topic":"nature","words":[{"w":"Three","c":"num"},{"w":"climbers","c":"noun","sub":"common","lem":"climber"},{"w":"climbed","c":"verb","sub":"lex","lem":"climb"},{"w":"the","c":"det","sub":"art"},{"w":"hill","c":"noun","sub":"common","p":"."}],"ans":{"noun":[1,4],"verb":[2]},"eligible":{"noun":true,"verb":true,"adj":false,"adv":false},"tomorrow":"Three climbers will climb the hill tomorrow."},
+{"id":"wc-s077","level":"foundation","topic":"sport","words":[{"w":"My","c":"det","sub":"poss"},{"w":"cousin","c":"noun","sub":"common"},{"w":"swam","c":"verb","sub":"lex","lem":"swim"},{"w":"slowly","c":"adv","sub":"manner","p":"."}],"ans":{"noun":[1],"verb":[2],"adv":[3]},"eligible":{"noun":true,"verb":true,"adj":false,"adv":true},"tomorrow":"My cousin will swim slowly tomorrow."},
+{"id":"wc-s078","level":"foundation","topic":"home","words":[{"w":"The","c":"det","sub":"art"},{"w":"candles","c":"noun","sub":"common","lem":"candle"},{"w":"burned","c":"verb","sub":"lex","p":"."}],"ans":{"noun":[1],"verb":[2]},"eligible":{"noun":true,"verb":true,"adj":false,"adv":false},"tomorrow":"The candles will burn tomorrow."},
+{"id":"wc-s079","level":"foundation","topic":"animals","words":[{"w":"A","c":"det","sub":"art"},{"w":"grey","c":"adj"},{"w":"wolf","c":"noun","sub":"common"},{"w":"crept","c":"verb","sub":"lex","lem":"creep"},{"w":"closer","c":"adv","sub":"place","p":"."}],"ans":{"noun":[2],"verb":[3],"adj":[1]},"eligible":{"noun":true,"verb":true,"adj":true,"adv":false},"neutral":{"adv":[4]},"tomorrow":"A grey wolf will creep closer tomorrow."},
+{"id":"wc-s080","level":"foundation","topic":"home","words":[{"w":"The","c":"det","sub":"art"},{"w":"heavy","c":"adj"},{"w":"curtains","c":"noun","sub":"common","lem":"curtain"},{"w":"blocked","c":"verb","sub":"lex"},{"w":"the","c":"det","sub":"art"},{"w":"light","c":"noun","sub":"mass","p":"."}],"ans":{"noun":[2,5],"verb":[3],"adj":[1]},"eligible":{"noun":true,"verb":true,"adj":true,"adv":false},"tomorrow":"The heavy curtains will block the light tomorrow."},
+{"id":"wc-s081","level":"foundation","topic":"people","words":[{"w":"The","c":"det","sub":"art"},{"w":"crowd","c":"noun","sub":"common"},{"w":"cheered","c":"verb","sub":"lex","lem":"cheer"},{"w":"wildly","c":"adv","sub":"manner","p":".","lem":"wild"}],"ans":{"noun":[1],"verb":[2],"adv":[3]},"eligible":{"noun":true,"verb":true,"adj":false,"adv":true},"tomorrow":"The crowd will cheer wildly tomorrow."},
+{"id":"wc-s082","level":"foundation","topic":"nature","words":[{"w":"Small","c":"adj"},{"w":"birds","c":"noun","sub":"common","lem":"bird"},{"w":"gathered","c":"verb","sub":"lex","p":".","lem":"gather"}],"ans":{"noun":[1],"verb":[2],"adj":[0]},"eligible":{"noun":true,"verb":true,"adj":true,"adv":false},"tomorrow":"Small birds will gather tomorrow."},
+{"id":"wc-s083","level":"foundation","topic":"school","words":[{"w":"My","c":"det","sub":"poss"},{"w":"friend","c":"noun","sub":"common"},{"w":"helped","c":"verb","sub":"lex","lem":"help"},{"w":"me","c":"pron","p":"."}],"ans":{"noun":[1],"verb":[2]},"eligible":{"noun":true,"verb":true,"adj":false,"adv":false},"tomorrow":"My friend will help me tomorrow."},
+{"id":"wc-s084","level":"foundation","topic":"food","words":[{"w":"The","c":"det","sub":"art"},{"w":"berries","c":"noun","sub":"common","lem":"berry"},{"w":"tasted","c":"verb","sub":"lex","lem":"taste"},{"w":"sweet","c":"adj","p":"."}],"ans":{"noun":[1],"verb":[2],"adj":[3]},"eligible":{"noun":true,"verb":true,"adj":true,"adv":false},"tomorrow":"The berries will taste sweet tomorrow."},
+{"id":"wc-s085","level":"developing","topic":"weather","words":[{"w":"A","c":"det","sub":"art"},{"w":"fierce","c":"adj"},{"w":"storm","c":"noun","sub":"common"},{"w":"battered","c":"verb","sub":"lex"},{"w":"the","c":"det","sub":"art"},{"w":"coast","c":"noun","sub":"common","p":"."}],"ans":{"noun":[2,5],"verb":[3],"adj":[1]},"eligible":{"noun":true,"verb":true,"adj":true,"adv":false},"tomorrow":"A fierce storm will batter the coast tomorrow."},
+{"id":"wc-s086","level":"developing","topic":"town","words":[{"w":"The","c":"det","sub":"art"},{"w":"narrow","c":"adj"},{"w":"streets","c":"noun","sub":"common","lem":"street"},{"w":"were","c":"verb","sub":"cop","head":true,"lem":"be"},{"w":"quiet","c":"adj","p":"."}],"ans":{"noun":[2],"verb":[3],"adj":[1,4]},"eligible":{"noun":true,"verb":true,"adj":true,"adv":false},"tomorrow":"The narrow streets will be quiet tomorrow."},
+{"id":"wc-s087","level":"developing","topic":"weather","words":[{"w":"Deep","c":"adj"},{"w":"puddles","c":"noun","sub":"common","lem":"puddle"},{"w":"covered","c":"verb","sub":"lex","lem":"cover"},{"w":"the","c":"det","sub":"art"},{"w":"playground","c":"noun","sub":"common","p":"."}],"ans":{"noun":[1,4],"verb":[2],"adj":[0]},"eligible":{"noun":true,"verb":true,"adj":true,"adv":false},"tomorrow":"Deep puddles will cover the playground tomorrow."},
+{"id":"wc-s088","level":"developing","topic":"people","words":[{"w":"The","c":"det","sub":"art"},{"w":"young","c":"adj"},{"w":"soldier","c":"noun","sub":"common"},{"w":"stared","c":"verb","sub":"lex","lem":"stare"},{"w":"bravely","c":"adv","sub":"manner","p":".","lem":"brave"}],"ans":{"noun":[2],"verb":[3],"adj":[1],"adv":[4]},"eligible":{"noun":true,"verb":true,"adj":true,"adv":true},"tomorrow":"The young soldier will stare bravely tomorrow."},
+{"id":"wc-s089","level":"developing","topic":"home","words":[{"w":"Dust","c":"noun","sub":"mass"},{"w":"gathered","c":"verb","sub":"lex","lem":"gather"},{"w":"on","c":"prep"},{"w":"the","c":"det","sub":"art"},{"w":"shelves","c":"noun","sub":"common","p":".","lem":"shelf"}],"ans":{"noun":[0,4],"verb":[1]},"eligible":{"noun":true,"verb":true,"adj":false,"adv":false},"tomorrow":"Dust will gather on the shelves tomorrow."},
+{"id":"wc-s090","level":"developing","topic":"nature","words":[{"w":"Frost","c":"noun","sub":"mass"},{"w":"glittered","c":"verb","sub":"lex","lem":"glitter"},{"w":"on","c":"prep"},{"w":"the","c":"det","sub":"art"},{"w":"branches","c":"noun","sub":"common","p":".","lem":"branch"}],"ans":{"noun":[0,4],"verb":[1]},"eligible":{"noun":true,"verb":true,"adj":false,"adv":false},"tomorrow":"Frost will glitter on the branches tomorrow."},
+{"id":"wc-s091","level":"developing","topic":"sport","words":[{"w":"The","c":"det","sub":"art"},{"w":"divers","c":"noun","sub":"common","lem":"diver"},{"w":"were","c":"verb","sub":"aux","g":1,"lem":"be"},{"w":"waiting","c":"verb","sub":"lex","g":1,"head":true,"lem":"wait"},{"w":"patiently","c":"adv","sub":"manner","p":"."}],"ans":{"noun":[1],"verb":[2],"adv":[4]},"eligible":{"noun":true,"verb":true,"adj":false,"adv":true},"tomorrow":"The divers will be waiting patiently tomorrow."},
+{"id":"wc-s092","level":"developing","topic":"animals","words":[{"w":"Two","c":"num"},{"w":"gulls","c":"noun","sub":"common","lem":"gull"},{"w":"circled","c":"verb","sub":"lex"},{"w":"the","c":"det","sub":"art"},{"w":"harbour","c":"noun","sub":"common","p":"."}],"ans":{"noun":[1,4],"verb":[2]},"eligible":{"noun":true,"verb":true,"adj":false,"adv":false},"tomorrow":"Two gulls will circle the harbour tomorrow."},
+{"id":"wc-s093","level":"developing","topic":"town","words":[{"w":"A","c":"det","sub":"art"},{"w":"long","c":"adj"},{"w":"shadow","c":"noun","sub":"common"},{"w":"fell","c":"verb","sub":"lex","lem":"fall"},{"w":"across","c":"prep"},{"w":"the","c":"det","sub":"art"},{"w":"square","c":"noun","sub":"common","p":"."}],"ans":{"noun":[2,6],"verb":[3],"adj":[1]},"eligible":{"noun":true,"verb":true,"adj":true,"adv":false},"tomorrow":"A long shadow will fall across the square tomorrow."},
+{"id":"wc-s094","level":"secure","topic":"weather","words":[{"w":"The","c":"det","sub":"art"},{"w":"flood","c":"noun","sub":"common"},{"w":"swept","c":"verb","sub":"lex","lem":"sweep"},{"w":"through","c":"prep"},{"w":"the","c":"det","sub":"art"},{"w":"village","c":"noun","sub":"common","p":"."}],"ans":{"noun":[1,5],"verb":[2]},"eligible":{"noun":true,"verb":true,"adj":false,"adv":false},"tomorrow":"The flood will sweep through the village tomorrow."},
+{"id":"wc-s095","level":"secure","topic":"people","words":[{"w":"The","c":"det","sub":"art"},{"w":"old","c":"adj"},{"w":"woman","c":"noun","sub":"common"},{"w":"hurried","c":"verb","sub":"lex","lem":"hurry"},{"w":"and","c":"conj"},{"w":"vanished","c":"verb","sub":"lex","p":".","lem":"vanish"}],"ans":{"noun":[2],"verb":[3,5],"adj":[1]},"eligible":{"noun":true,"verb":true,"adj":true,"adv":false},"tomorrow":"The old woman will hurry and vanish tomorrow."},
+{"id":"wc-s096","level":"secure","topic":"nature","words":[{"w":"Warm","c":"adj"},{"w":"sunlight","c":"noun","sub":"mass"},{"w":"melted","c":"verb","sub":"lex","lem":"melt"},{"w":"the","c":"det","sub":"art"},{"w":"thin","c":"adj"},{"w":"ice","c":"noun","sub":"mass","p":"."}],"ans":{"noun":[1,5],"verb":[2],"adj":[0,4]},"eligible":{"noun":true,"verb":true,"adj":true,"adv":false},"tomorrow":"Warm sunlight will melt the thin ice tomorrow."},
+{"id":"wc-s097","level":"secure","topic":"home","words":[{"w":"Somebody","c":"pron"},{"w":"was","c":"verb","sub":"aux","g":1,"lem":"be"},{"w":"knocking","c":"verb","sub":"lex","g":1,"head":true},{"w":"gently","c":"adv","sub":"manner","p":".","lem":"gentle"}],"ans":{"verb":[1],"adv":[3]},"eligible":{"noun":false,"verb":true,"adj":false,"adv":true},"tomorrow":"Somebody will be knocking gently tomorrow."},
+{"id":"wc-s098","level":"secure","topic":"animals","words":[{"w":"The","c":"det","sub":"art"},{"w":"frightened","c":"adj"},{"w":"horse","c":"noun","sub":"common"},{"w":"would","c":"verb","sub":"modal","g":1},{"w":"not","c":"neg"},{"w":"move","c":"verb","sub":"lex","p":".","g":1,"head":true}],"ans":{"noun":[2],"verb":[3],"adj":[1]},"eligible":{"noun":true,"verb":true,"adj":true,"adv":false},"tomorrow":"The frightened horse will not move tomorrow."},
+{"id":"wc-s099","level":"challenge","topic":"nature","words":[{"w":"Although","c":"conj"},{"w":"the","c":"det","sub":"art"},{"w":"path","c":"noun","sub":"common"},{"w":"was","c":"verb","sub":"cop","head":true,"lem":"be"},{"w":"steep","c":"adj","p":","},{"w":"the","c":"det","sub":"art"},{"w":"climbers","c":"noun","sub":"common","lem":"climber"},{"w":"pressed","c":"verb","sub":"lex"},{"w":"on","c":"part","p":"."}],"ans":{"noun":[2,6],"verb":[3,7],"adj":[4]},"eligible":{"noun":true,"verb":true,"adj":true,"adv":false},"tomorrow":"Although the path is steep tomorrow, the climbers will press on."},
+{"id":"wc-s100","level":"challenge","topic":"town","words":[{"w":"Footsteps","c":"noun","sub":"common","lem":"footstep"},{"w":"echoed","c":"verb","sub":"lex"},{"w":"and","c":"conj"},{"w":"torches","c":"noun","sub":"common","lem":"torch"},{"w":"flickered","c":"verb","sub":"lex"},{"w":"in","c":"prep"},{"w":"the","c":"det","sub":"art"},{"w":"narrow","c":"adj"},{"w":"lane","c":"noun","sub":"common","p":"."}],"ans":{"noun":[0,3,8],"verb":[1,4],"adj":[7]},"eligible":{"noun":true,"verb":true,"adj":true,"adv":false},"tomorrow":"Footsteps will echo and torches will flicker in the narrow lane tomorrow."}
 /* >>> APPEND NEW SENTENCES ABOVE THIS LINE >>> */
 ];
 /* >>> BANK:SENTENCES END >>> */
 
+/* >>> BANK:FRAMES START >>> */
+var FRAMES = [
+{"id":"wc-fr001","level":"foundation","cls":"noun","w":"teacher","slots":[{"t":"That looks very ____ .","c":"adj"},{"t":"She did it ____ .","c":"adv"},{"t":"I saw a ____ .","c":"noun","fit":true}],"why":"You can put <b>the</b> or <b>a</b> in front of it, so it is a noun."},
+{"id":"wc-fr002","level":"foundation","cls":"noun","w":"mountain","slots":[{"t":"We will ____ soon.","c":"verb"},{"t":"The ____ was there.","c":"noun","fit":true},{"t":"She did it ____ .","c":"adv"}],"why":"You can put <b>the</b> or <b>a</b> in front of it, so it is a noun."},
+{"id":"wc-fr003","level":"foundation","cls":"noun","w":"bicycle","slots":[{"t":"I saw a ____ .","c":"noun","fit":true},{"t":"We will ____ soon.","c":"verb"},{"t":"It was a very ____ day.","c":"adj"}],"why":"You can put <b>the</b> or <b>a</b> in front of it, so it is a noun."},
+{"id":"wc-fr004","level":"foundation","cls":"noun","w":"sister","slots":[{"t":"It was a very ____ day.","c":"adj"},{"t":"He walked ____ .","c":"adv"},{"t":"The ____ was there.","c":"noun","fit":true}],"why":"You can put <b>the</b> or <b>a</b> in front of it, so it is a noun."},
+{"id":"wc-fr005","level":"developing","cls":"noun","w":"window","slots":[{"t":"They ____ every day.","c":"verb"},{"t":"I saw a ____ .","c":"noun","fit":true},{"t":"He walked ____ .","c":"adv"}],"why":"You can put <b>the</b> or <b>a</b> in front of it, so it is a noun."},
+{"id":"wc-fr006","level":"developing","cls":"noun","w":"castle","slots":[{"t":"The ____ was there.","c":"noun","fit":true},{"t":"They ____ every day.","c":"verb"},{"t":"That looks very ____ .","c":"adj"}],"why":"You can put <b>the</b> or <b>a</b> in front of it, so it is a noun."},
+{"id":"wc-fr007","level":"developing","cls":"noun","w":"forest","slots":[{"t":"That looks very ____ .","c":"adj"},{"t":"She did it ____ .","c":"adv"},{"t":"I saw a ____ .","c":"noun","fit":true}],"why":"You can put <b>the</b> or <b>a</b> in front of it, so it is a noun."},
+{"id":"wc-fr008","level":"secure","cls":"noun","w":"doctor","slots":[{"t":"We will ____ soon.","c":"verb"},{"t":"The ____ was there.","c":"noun","fit":true},{"t":"She did it ____ .","c":"adv"}],"why":"You can put <b>the</b> or <b>a</b> in front of it, so it is a noun."},
+{"id":"wc-fr009","level":"secure","cls":"noun","w":"harbour","slots":[{"t":"I saw a ____ .","c":"noun","fit":true},{"t":"We will ____ soon.","c":"verb"},{"t":"It was a very ____ day.","c":"adj"}],"why":"You can put <b>the</b> or <b>a</b> in front of it, so it is a noun."},
+{"id":"wc-fr010","level":"challenge","cls":"noun","w":"courage","slots":[{"t":"It was a very ____ day.","c":"adj"},{"t":"He walked ____ .","c":"adv"},{"t":"The ____ was there.","c":"noun","fit":true}],"why":"You can put <b>the</b> or <b>a</b> in front of it, so it is a noun."},
+{"id":"wc-fr011","level":"foundation","cls":"verb","w":"listen","slots":[{"t":"The ____ was there.","c":"noun"},{"t":"We will ____ soon.","c":"verb","fit":true},{"t":"He walked ____ .","c":"adv"}],"why":"It changes when you move the sentence in time, so it is a verb."},
+{"id":"wc-fr012","level":"foundation","cls":"verb","w":"arrive","slots":[{"t":"They ____ every day.","c":"verb","fit":true},{"t":"The ____ was there.","c":"noun"},{"t":"That looks very ____ .","c":"adj"}],"why":"It changes when you move the sentence in time, so it is a verb."},
+{"id":"wc-fr013","level":"foundation","cls":"verb","w":"climb","slots":[{"t":"That looks very ____ .","c":"adj"},{"t":"She did it ____ .","c":"adv"},{"t":"We will ____ soon.","c":"verb","fit":true}],"why":"It changes when you move the sentence in time, so it is a verb."},
+{"id":"wc-fr014","level":"foundation","cls":"verb","w":"swim","slots":[{"t":"I saw a ____ .","c":"noun"},{"t":"They ____ every day.","c":"verb","fit":true},{"t":"She did it ____ .","c":"adv"}],"why":"It changes when you move the sentence in time, so it is a verb."},
+{"id":"wc-fr015","level":"developing","cls":"verb","w":"explain","slots":[{"t":"We will ____ soon.","c":"verb","fit":true},{"t":"I saw a ____ .","c":"noun"},{"t":"It was a very ____ day.","c":"adj"}],"why":"It changes when you move the sentence in time, so it is a verb."},
+{"id":"wc-fr016","level":"developing","cls":"verb","w":"remember","slots":[{"t":"It was a very ____ day.","c":"adj"},{"t":"He walked ____ .","c":"adv"},{"t":"They ____ every day.","c":"verb","fit":true}],"why":"It changes when you move the sentence in time, so it is a verb."},
+{"id":"wc-fr017","level":"developing","cls":"verb","w":"whisper","slots":[{"t":"The ____ was there.","c":"noun"},{"t":"We will ____ soon.","c":"verb","fit":true},{"t":"He walked ____ .","c":"adv"}],"why":"It changes when you move the sentence in time, so it is a verb."},
+{"id":"wc-fr018","level":"secure","cls":"verb","w":"decide","slots":[{"t":"They ____ every day.","c":"verb","fit":true},{"t":"The ____ was there.","c":"noun"},{"t":"That looks very ____ .","c":"adj"}],"why":"It changes when you move the sentence in time, so it is a verb."},
+{"id":"wc-fr019","level":"secure","cls":"verb","w":"disappear","slots":[{"t":"That looks very ____ .","c":"adj"},{"t":"She did it ____ .","c":"adv"},{"t":"We will ____ soon.","c":"verb","fit":true}],"why":"It changes when you move the sentence in time, so it is a verb."},
+{"id":"wc-fr020","level":"challenge","cls":"verb","w":"prefer","slots":[{"t":"I saw a ____ .","c":"noun"},{"t":"They ____ every day.","c":"verb","fit":true},{"t":"She did it ____ .","c":"adv"}],"why":"It changes when you move the sentence in time, so it is a verb."},
+{"id":"wc-fr021","level":"foundation","cls":"adj","w":"happy","slots":[{"t":"That looks very ____ .","c":"adj","fit":true},{"t":"I saw a ____ .","c":"noun"},{"t":"They ____ every day.","c":"verb"}],"why":"It fits after <b>very</b> and describes a thing, so it is an adjective."},
+{"id":"wc-fr022","level":"foundation","cls":"adj","w":"sunny","slots":[{"t":"They ____ every day.","c":"verb"},{"t":"He walked ____ .","c":"adv"},{"t":"It was a very ____ day.","c":"adj","fit":true}],"why":"It fits after <b>very</b> and describes a thing, so it is an adjective."},
+{"id":"wc-fr023","level":"foundation","cls":"adj","w":"noisy","slots":[{"t":"The ____ was there.","c":"noun"},{"t":"That looks very ____ .","c":"adj","fit":true},{"t":"He walked ____ .","c":"adv"}],"why":"It fits after <b>very</b> and describes a thing, so it is an adjective."},
+{"id":"wc-fr024","level":"foundation","cls":"adj","w":"lucky","slots":[{"t":"It was a very ____ day.","c":"adj","fit":true},{"t":"The ____ was there.","c":"noun"},{"t":"We will ____ soon.","c":"verb"}],"why":"It fits after <b>very</b> and describes a thing, so it is an adjective."},
+{"id":"wc-fr025","level":"developing","cls":"adj","w":"cheerful","slots":[{"t":"We will ____ soon.","c":"verb"},{"t":"She did it ____ .","c":"adv"},{"t":"That looks very ____ .","c":"adj","fit":true}],"why":"It fits after <b>very</b> and describes a thing, so it is an adjective."},
+{"id":"wc-fr026","level":"developing","cls":"adj","w":"gentle","slots":[{"t":"I saw a ____ .","c":"noun"},{"t":"It was a very ____ day.","c":"adj","fit":true},{"t":"She did it ____ .","c":"adv"}],"why":"It fits after <b>very</b> and describes a thing, so it is an adjective."},
+{"id":"wc-fr027","level":"developing","cls":"adj","w":"chilly","slots":[{"t":"That looks very ____ .","c":"adj","fit":true},{"t":"I saw a ____ .","c":"noun"},{"t":"They ____ every day.","c":"verb"}],"why":"It fits after <b>very</b> and describes a thing, so it is an adjective."},
+{"id":"wc-fr028","level":"secure","cls":"adj","w":"gloomy","slots":[{"t":"They ____ every day.","c":"verb"},{"t":"He walked ____ .","c":"adv"},{"t":"It was a very ____ day.","c":"adj","fit":true}],"why":"It fits after <b>very</b> and describes a thing, so it is an adjective."},
+{"id":"wc-fr029","level":"secure","cls":"adj","w":"peculiar","slots":[{"t":"The ____ was there.","c":"noun"},{"t":"That looks very ____ .","c":"adj","fit":true},{"t":"He walked ____ .","c":"adv"}],"why":"It fits after <b>very</b> and describes a thing, so it is an adjective."},
+{"id":"wc-fr030","level":"challenge","cls":"adj","w":"stubborn","slots":[{"t":"It was a very ____ day.","c":"adj","fit":true},{"t":"The ____ was there.","c":"noun"},{"t":"We will ____ soon.","c":"verb"}],"why":"It fits after <b>very</b> and describes a thing, so it is an adjective."},
+{"id":"wc-fr031","level":"foundation","cls":"adv","w":"quickly","slots":[{"t":"We will ____ soon.","c":"verb"},{"t":"It was a very ____ day.","c":"adj"},{"t":"He walked ____ .","c":"adv","fit":true}],"why":"It tells you HOW something was done, so it is an adverb."},
+{"id":"wc-fr032","level":"foundation","cls":"adv","w":"quietly","slots":[{"t":"I saw a ____ .","c":"noun"},{"t":"She did it ____ .","c":"adv","fit":true},{"t":"It was a very ____ day.","c":"adj"}],"why":"It tells you HOW something was done, so it is an adverb."},
+{"id":"wc-fr033","level":"foundation","cls":"adv","w":"neatly","slots":[{"t":"He walked ____ .","c":"adv","fit":true},{"t":"I saw a ____ .","c":"noun"},{"t":"They ____ every day.","c":"verb"}],"why":"It tells you HOW something was done, so it is an adverb."},
+{"id":"wc-fr034","level":"foundation","cls":"adv","w":"safely","slots":[{"t":"They ____ every day.","c":"verb"},{"t":"That looks very ____ .","c":"adj"},{"t":"She did it ____ .","c":"adv","fit":true}],"why":"It tells you HOW something was done, so it is an adverb."},
+{"id":"wc-fr035","level":"developing","cls":"adv","w":"politely","slots":[{"t":"The ____ was there.","c":"noun"},{"t":"He walked ____ .","c":"adv","fit":true},{"t":"That looks very ____ .","c":"adj"}],"why":"It tells you HOW something was done, so it is an adverb."},
+{"id":"wc-fr036","level":"developing","cls":"adv","w":"angrily","slots":[{"t":"She did it ____ .","c":"adv","fit":true},{"t":"The ____ was there.","c":"noun"},{"t":"We will ____ soon.","c":"verb"}],"why":"It tells you HOW something was done, so it is an adverb."},
+{"id":"wc-fr037","level":"developing","cls":"adv","w":"bravely","slots":[{"t":"We will ____ soon.","c":"verb"},{"t":"It was a very ____ day.","c":"adj"},{"t":"He walked ____ .","c":"adv","fit":true}],"why":"It tells you HOW something was done, so it is an adverb."},
+{"id":"wc-fr038","level":"secure","cls":"adv","w":"calmly","slots":[{"t":"I saw a ____ .","c":"noun"},{"t":"She did it ____ .","c":"adv","fit":true},{"t":"It was a very ____ day.","c":"adj"}],"why":"It tells you HOW something was done, so it is an adverb."},
+{"id":"wc-fr039","level":"secure","cls":"adv","w":"cheerfully","slots":[{"t":"He walked ____ .","c":"adv","fit":true},{"t":"I saw a ____ .","c":"noun"},{"t":"They ____ every day.","c":"verb"}],"why":"It tells you HOW something was done, so it is an adverb."},
+{"id":"wc-fr040","level":"challenge","cls":"adv","w":"reluctantly","slots":[{"t":"They ____ every day.","c":"verb"},{"t":"That looks very ____ .","c":"adj"},{"t":"She did it ____ .","c":"adv","fit":true}],"why":"It tells you HOW something was done, so it is an adverb."}
+/* >>> APPEND NEW FRAMES ABOVE THIS LINE >>> */
+];
+/* >>> BANK:FRAMES END >>> */
+
 /* >>> BANK:POLICY START >>> */
 /* lemma -> the one class it may carry anywhere in this bank. SPEC section 4. */
-var POLICY = {"bus":{"c":"noun","note":"bank sense: the vehicle. Never as a verb."},"stop":{"c":"noun","note":"bank sense: the place you wait. Never as a verb."},"fire":{"c":"noun","note":"bank sense: the thing that burns. Never as a verb."},"rain":{"c":"noun","note":"bank sense: the weather. Never as a verb."},"match":{"c":"noun","note":"bank sense: the game. Never as a verb."},"test":{"c":"noun","note":"bank sense: the exam. Never as a verb."},"play":{"c":"verb","note":"bank sense: to play. Never as a noun."},"finish":{"c":"noun","note":"bank sense: the end of a race. Never as a verb."},"garden":{"c":"noun","note":"bank sense: the place. Never as a verb."},"line":{"c":"noun","note":"bank sense: the mark. Never as a verb."},"light":{"c":"noun","note":"bank sense: the thing that shines. Never as a verb or adjective."},"taste":{"c":"verb","note":"bank sense: to taste. Never as a noun."},"ring":{"c":"verb","note":"bank sense: to ring. Never as a noun."},"cross":{"c":"verb","note":"bank sense: to cross. Never as a noun."},"damage":{"c":"verb","note":"bank sense: to damage. Never as a noun."},"answer":{"c":"verb","note":"bank sense: to answer. Never as a noun."},"bark":{"c":"verb","note":"bank sense: the sound a dog makes. Never the bark of a tree."},"wind":{"c":"noun","note":"bank sense: the weather. Never as a verb."},"snow":{"c":"noun","note":"bank sense: the weather. Never as a verb."},"smell":{"c":"verb","note":"bank sense: to smell. Never as a noun."},"close":{"c":"verb","note":"bank sense: to close. Never as an adjective."},"laugh":{"c":"verb","note":"bank sense: to laugh. Never as a noun."},"cry":{"c":"verb","note":"bank sense: to cry. Never as a noun."},"kick":{"c":"verb","note":"bank sense: to kick. Never as a noun."},"wash":{"c":"verb","note":"bank sense: to wash. Never as a noun."},"dry":{"c":"verb","note":"bank sense: to dry. Never as an adjective."},"move":{"c":"verb","note":"bank sense: to move. Never as a noun."},"drink":{"c":"verb","note":"bank sense: to drink. Never as a noun."},"shout":{"c":"verb","note":"bank sense: to shout. Never as a noun."},"smile":{"c":"verb","note":"bank sense: to smile. Never as a noun."},"pause":{"c":"verb","note":"bank sense: to pause. Never as a noun."},"cheer":{"c":"verb","note":"bank sense: to cheer. Never as a noun."},"jump":{"c":"verb","note":"bank sense: to jump. Never as a noun."},"run":{"c":"verb","note":"bank sense: to run. Never as a noun. The noun sense is reserved for the SHIFTERS bank."},"fish":{"c":"noun","note":"bank sense: the animal or the food. Never as a verb."},"wave":{"c":"verb","note":"bank sense: to wave a hand. Never a wave of the sea."},"look":{"c":"verb","note":"bank sense: to look. Never as a noun."}};
+var POLICY = {"bus":{"c":"noun","note":"bank sense: the vehicle. Never as a verb."},"stop":{"c":"noun","note":"bank sense: the place you wait. Never as a verb."},"fire":{"c":"noun","note":"bank sense: the thing that burns. Never as a verb."},"rain":{"c":"noun","note":"bank sense: the weather. Never as a verb."},"match":{"c":"noun","note":"bank sense: the game. Never as a verb."},"test":{"c":"noun","note":"bank sense: the exam. Never as a verb."},"play":{"c":"verb","note":"bank sense: to play. Never as a noun."},"finish":{"c":"noun","note":"bank sense: the end of a race. Never as a verb."},"garden":{"c":"noun","note":"bank sense: the place. Never as a verb."},"line":{"c":"noun","note":"bank sense: the mark. Never as a verb."},"light":{"c":"noun","note":"bank sense: the thing that shines. Never as a verb or adjective."},"taste":{"c":"verb","note":"bank sense: to taste. Never as a noun."},"ring":{"c":"verb","note":"bank sense: to ring. Never as a noun."},"cross":{"c":"verb","note":"bank sense: to cross. Never as a noun."},"damage":{"c":"verb","note":"bank sense: to damage. Never as a noun."},"answer":{"c":"verb","note":"bank sense: to answer. Never as a noun."},"bark":{"c":"verb","note":"bank sense: the sound a dog makes. Never the bark of a tree."},"wind":{"c":"noun","note":"bank sense: the weather. Never as a verb."},"snow":{"c":"noun","note":"bank sense: the weather. Never as a verb."},"smell":{"c":"verb","note":"bank sense: to smell. Never as a noun."},"close":{"c":"verb","note":"bank sense: to close. Never as an adjective."},"laugh":{"c":"verb","note":"bank sense: to laugh. Never as a noun."},"cry":{"c":"verb","note":"bank sense: to cry. Never as a noun."},"kick":{"c":"verb","note":"bank sense: to kick. Never as a noun."},"wash":{"c":"verb","note":"bank sense: to wash. Never as a noun."},"dry":{"c":"verb","note":"bank sense: to dry. Never as an adjective."},"move":{"c":"verb","note":"bank sense: to move. Never as a noun."},"drink":{"c":"verb","note":"bank sense: to drink. Never as a noun."},"shout":{"c":"verb","note":"bank sense: to shout. Never as a noun."},"smile":{"c":"verb","note":"bank sense: to smile. Never as a noun."},"pause":{"c":"verb","note":"bank sense: to pause. Never as a noun."},"cheer":{"c":"verb","note":"bank sense: to cheer. Never as a noun."},"jump":{"c":"verb","note":"bank sense: to jump. Never as a noun."},"run":{"c":"verb","note":"bank sense: to run. Never as a noun. The noun sense is reserved for the SHIFTERS bank."},"fish":{"c":"noun","note":"bank sense: the animal or the food. Never as a verb."},"wave":{"c":"verb","note":"bank sense: to wave a hand. Never a wave of the sea."},"look":{"c":"verb","note":"bank sense: to look. Never as a noun."},"shine":{"c":"verb","note":"bank sense: to shine. Never as a noun."},"cover":{"c":"verb","note":"bank sense: to cover. Never as a noun."},"whisper":{"c":"verb","note":"bank sense: to whisper. Never as a noun."},"climb":{"c":"verb","note":"bank sense: to climb. Never as a noun."},"swim":{"c":"verb","note":"bank sense: to swim. Never as a noun."},"sleep":{"c":"verb","note":"bank sense: to sleep. Never as a noun."},"help":{"c":"verb","note":"bank sense: to help. Never as a noun."},"cut":{"c":"verb","note":"bank sense: to cut. Never as a noun."},"flood":{"c":"noun","note":"bank sense: the water. Never as a verb."},"crowd":{"c":"noun","note":"bank sense: the people. Never as a verb."},"shadow":{"c":"noun","note":"bank sense: the dark shape. Never as a verb."},"storm":{"c":"noun","note":"bank sense: the weather. Never as a verb."}};
 /* >>> BANK:POLICY END >>> */
 
 /* >>> BANK:AMBIG START >>> */
 /* forms known to be class-ambiguous in English, independent of this bank. */
-var AMBIG = ["answer","answers","back","bark","barks","book","books","brush","brushes","bus","cheer","cheers","close","closes","cook","cooks","cries","cry","dress","dries","drink","drinks","drive","drives","dry","face","faces","fast","film","films","finish","fire","fires","fish","garden","hand","hands","hard","home","jump","jumps","just","kick","kicks","laugh","laughs","left","light","lights","like","line","match","matches","move","moves","paint","paints","park","parks","pause","pauses","place","places","plant","plants","play","plays","race","races","rain","rains","ran","rest","right","ring","rings","roll","rolls","round","run","runs","shout","shouts","sign","signs","smell","smells","smile","smiles","snow","snows","sound","sounds","still","stop","stops","taste","tastes","test","tests","touch","touches","train","trains","turn","turns","walk","walks","wash","washes","watch","watches","water","waters","wave","waves","well","wind","winds","wish","wishes","work","works"];
+var AMBIG = ["answer","answers","back","bark","barks","book","books","brush","brushes","bus","camp","camps","cheer","cheers","climb","climbs","close","closes","cook","cooks","cover","covers","cries","crowd","crowds","cry","cut","cuts","dress","dries","drink","drinks","drive","drives","dry","face","faces","fast","film","films","finish","fire","fires","fish","flood","floods","garden","guard","guards","hand","hands","hard","help","helps","home","jump","jumps","just","kick","kicks","laugh","laughs","left","light","lights","like","line","match","matches","move","moves","paint","paints","park","parks","pause","pauses","place","places","plant","plants","play","plays","race","races","rain","rains","ran","rest","right","ring","rings","roll","rolls","round","run","runs","shadow","shadows","shelter","shelters","shine","shines","shout","shouts","sign","signs","sleep","sleeps","smell","smells","smile","smiles","snow","snows","sound","sounds","still","stop","stops","storm","storms","swim","swims","taste","tastes","test","tests","touch","touches","train","trains","turn","turns","walk","walks","wash","washes","watch","watches","water","waters","wave","waves","well","whisper","whispers","wind","winds","wish","wishes","work","works"];
 /* >>> BANK:AMBIG END >>> */
 </script>
 
@@ -319,7 +461,7 @@ var AMBIG = ["answer","answers","back","bark","barks","book","books","brush","br
 <script>
 "use strict";
 
-var APP = "wcc", VER = "v0.2", BANK_REV = 2;
+var APP = "wcc", VER = "v0.3", BANK_REV = 3;
 var BUG_FORM_URL = "";   /* paste the Office 365 form link to switch the report button on */
 
 /* ---------- the four tests: one source for the Learn screen AND every
@@ -885,6 +1027,227 @@ function copyRef(){
   if(BUG_FORM_URL) window.open(BUG_FORM_URL, "_blank");
 }
 
+
+/* ==================================================================
+   WHERE DOES IT FIT?  (SPEC 9.4)
+   One word, three slots, exactly one fits. The student chooses between
+   authored strings rather than judging their own English, which is the
+   whole point: a grammaticality judgement needs an oracle an EAL learner
+   does not have, and a forced choice does not.
+   ================================================================== */
+var F = { lvl:"all", item:null, pick:-1, done:false };
+
+function framePool(lvl){
+  var out=[];
+  for(var i=0;i<FRAMES.length;i++)
+    if(lvl==="all" || FRAMES[i].level===lvl) out.push(FRAMES[i]);
+  return out;
+}
+function startFrames(){ go("frames"); frChips(); frNext(); }
+function frChips(){
+  var h = '<button class="chip" aria-pressed="'+(F.lvl==="all")+'" onclick="frLvl(\'all\')">All</button>';
+  for(var j=0;j<LEVELS.length;j++){
+    var L=LEVELS[j], n=framePool(L).length;
+    h += '<button class="chip" '+(n<1?'disabled ':'')+'aria-pressed="'+(F.lvl===L)+'" '+
+         'onclick="frLvl(\''+L+'\')">'+LEVEL_LABEL[L]+'</button>';
+  }
+  el("frLevels").innerHTML = h;
+}
+function frLvl(l){ F.lvl=l; frChips(); frNext(); }
+
+function frNext(){
+  var p = framePool(F.lvl);
+  if(!p.length){ el("frWord").textContent="Nothing here yet."; el("frSlots").innerHTML=""; return; }
+  var st = store(), key = "frames:"+F.lvl, seen = st.seen[key] || [];
+  var un=[]; for(var i=0;i<p.length;i++) if(seen.indexOf(p[i].id)<0) un.push(p[i]);
+  if(!un.length){ seen=[]; un=p.slice(); }
+  st.seen[key]=seen; save(st);
+  F.item = un[Math.floor(Math.random()*un.length)];
+  F.pick = -1; F.done = false;
+  frRender();
+}
+function frRender(){
+  var it = F.item;
+  el("frWord").textContent = it.w;
+  var h="";
+  for(var i=0;i<it.slots.length;i++){
+    h += '<button class="slot" id="fs'+i+'" aria-pressed="false" onclick="frPick('+i+')">'+
+         it.slots[i].t.replace("____", '<span class="gap"></span>') + '</button>';
+  }
+  el("frSlots").innerHTML = h;
+  el("frFb").innerHTML=""; el("frScore").textContent="";
+  el("frNextBar").style.display="none";
+  el("frCheck").disabled = true; el("frCheck").style.display="";
+  el("frRef").textContent = it.id;
+}
+function frPick(i){
+  if(F.done) return;
+  F.pick = i;
+  for(var j=0;j<F.item.slots.length;j++){
+    var b=el("fs"+j); if(b) b.setAttribute("aria-pressed", j===i ? "true":"false");
+  }
+  el("frCheck").disabled = false;
+}
+function frCheck(){
+  if(F.done || F.pick<0) return;
+  F.done = true;
+  var it = F.item, right = -1, i;
+  for(i=0;i<it.slots.length;i++) if(it.slots[i].fit) right = i;
+  var ok = F.pick === right;
+
+  for(i=0;i<it.slots.length;i++){
+    var b = el("fs"+i); if(!b) continue;
+    b.setAttribute("aria-pressed","false");
+    if(i===right){
+      b.className = "slot s-ok";
+      b.innerHTML = it.slots[i].t.replace("____", '<span class="filled">'+it.w+'</span>');
+    } else if(i===F.pick){
+      b.className = "slot s-bad";
+    }
+  }
+  el("frScore").textContent = ok ? "Right" : "Not that one";
+  var out = [];
+  if(ok) out.push(['k-ok', icon(it.cls) + "<b>Yes.</b> " + it.why]);
+  else {
+    var chose = it.slots[F.pick].c;
+    out.push(['k-bad', icon(chose) + "That gap wants " +
+      (chose==="adj"||chose==="adv" ? "an " : "a ") + CLASSNAME[chose] + ". " +
+      "Read it back with <b>" + it.w + "</b> in it and listen to how it sounds."]);
+    out.push(['k-ok', icon(it.cls) + "<b>" + it.w + "</b> goes in the gap above. " + it.why]);
+  }
+  out.push(['k-miss', "<b>How to check for " + TESTS[it.cls].plural + ".</b> " + TESTS[it.cls].test]);
+  el("frFb").innerHTML = out.map(function(o){ return '<li class="'+o[0]+'">'+o[1]+'</li>'; }).join("");
+
+  var st = store(), key="frames:"+F.lvl, seen = st.seen[key] || [];
+  if(ok){ if(seen.indexOf(it.id)<0) seen.push(it.id); }
+  else { st.err["frame_"+it.cls] = (st.err["frame_"+it.cls]||0)+1; }
+  st.seen[key]=seen; save(st);
+
+  el("frCheck").style.display="none";
+  el("frNextBar").style.display="";
+}
+
+/* ==================================================================
+   YES OR NO  (SPEC 9.5)
+   The rung below "click the word": one word in its sentence, one class
+   name, a binary tap. Built entirely from SENTENCES, so it costs no new
+   authoring. Neutral tokens are never offered, because "is this an
+   adverb?" has no honest yes-or-no answer for a time adverb in a manner
+   round. The timer is display only: a cutoff would punish a slower
+   reader for their reading speed rather than their grammar.
+   ================================================================== */
+var Y = { cls:"noun", item:null, idx:-1, want:false, done:false,
+          streak:0, best:0, t0:0 };
+
+function startYN(){ if(!LIVE[Y.cls]) Y.cls="noun"; go("yesno"); ynChips(); ynNext(); }
+function ynChips(){
+  var h="";
+  for(var i=0;i<SCORED.length;i++){
+    var c=SCORED[i];
+    h += '<button class="chip" '+(LIVE[c]?'':'disabled ')+'aria-pressed="'+(Y.cls===c)+'" '+
+         'onclick="ynSet(\''+c+'\')">'+icon(c)+TESTS[c].plural.charAt(0).toUpperCase()+
+         TESTS[c].plural.slice(1)+(LIVE[c]?'':' <span class="small">(soon)</span>')+'</button>';
+  }
+  el("ynClass").innerHTML = h;
+}
+function ynSet(c){ if(!LIVE[c]) return; Y.cls=c; Y.streak=0; ynChips(); ynNext(); }
+
+/* candidate words in one sentence: yes-words are in ans, no-words carry a
+   different class. Neutral tokens are excluded from both. */
+function ynCandidates(s, cls){
+  var yes=[], no=[], i, j;
+  var ansIdx = s.ans[cls] || [], neu = (s.neutral && s.neutral[cls]) || [];
+  var inAns = {}, isNeu = {};
+  for(i=0;i<ansIdx.length;i++){
+    var g = gkey(s, ansIdx[i]);
+    for(j=0;j<s.words.length;j++) if(gkey(s,j)===g && s.words[j].c===cls) inAns[j]=1;
+  }
+  for(i=0;i<neu.length;i++) isNeu[neu[i]]=1;
+  for(i=0;i<s.words.length;i++){
+    if(isNeu[i]) continue;
+    if(inAns[i]) yes.push(i);
+    else if(s.words[i].c!==cls) no.push(i);
+  }
+  return {yes:yes, no:no};
+}
+
+function ynNext(){
+  var pool=[], i;
+  for(i=0;i<SENTENCES.length;i++){
+    var s=SENTENCES[i];
+    if(!s.eligible || !s.eligible[Y.cls]) continue;
+    var c = ynCandidates(s, Y.cls);
+    if(c.yes.length && c.no.length) pool.push([s, c]);
+  }
+  if(!pool.length){ el("ynPrompt").textContent="Nothing here yet."; el("ynSent").innerHTML=""; return; }
+  var picked = pool[Math.floor(Math.random()*pool.length)];
+  var s2 = picked[0], cand = picked[1];
+  var wantYes = Math.random() < 0.5;
+  var list = wantYes ? cand.yes : cand.no;
+  if(!wantYes){
+    var content=[], fn=[];
+    for(i=0;i<list.length;i++){
+      var wc = s2.words[list[i]].c;
+      (SCORED.indexOf(wc)>=0 ? content : fn).push(list[i]);
+    }
+    if(content.length && (!fn.length || Math.random() < 0.75)) list = content;
+    else if(fn.length) list = fn;
+  }
+  Y.item = s2;
+  Y.idx = list[Math.floor(Math.random()*list.length)];
+  Y.want = wantYes;
+  Y.done = false;
+  Y.t0 = new Date().getTime();
+  ynRender();
+}
+function ynRender(){
+  var s = Y.item, T = TESTS[Y.cls], h="", i;
+  el("ynPrompt").innerHTML = icon(Y.cls) + "Is the marked word " +
+    (Y.cls==="adj"||Y.cls==="adv" ? "an " : "a ") + T.name.toLowerCase() + "?";
+  for(i=0;i<s.words.length;i++){
+    var w = s.words[i];
+    var body = (w.pre||"") + w.w + (w.p||"");
+    h += (i===Y.idx ? '<span class="hl">'+body+'</span>' : body) + " ";
+  }
+  el("ynSent").innerHTML = h;
+  el("ynFb").innerHTML=""; el("ynNextBar").style.display="none";
+  el("ynYes").style.display=""; el("ynNo").style.display="";
+  el("ynStreak").textContent = Y.streak;
+  el("ynBest").textContent = Y.best;
+  el("ynTime").textContent = "";
+  el("ynRef").textContent = s.id + "." + (Y.idx+1) + "-" + Y.cls.toUpperCase().slice(0,3) + "?";
+}
+function ynAnswer(said){
+  if(Y.done) return;
+  Y.done = true;
+  var s = Y.item, t = s.words[Y.idx], T = TESTS[Y.cls];
+  var secs = Math.max(0, (new Date().getTime() - Y.t0) / 1000);
+  var ok = (said === Y.want);
+  if(ok){ Y.streak++; if(Y.streak>Y.best) Y.best=Y.streak; }
+  else Y.streak = 0;
+
+  var out = [];
+  if(ok){
+    out.push(['k-ok', "<b>Right.</b> " + (Y.want
+      ? "<b>" + t.w + "</b> is " + (Y.cls==="adj"||Y.cls==="adv"?"an ":"a ") + T.name.toLowerCase() + " here."
+      : "<b>" + t.w + "</b> is " + aOrAn(CLASSNAME[t.c]) + " here.")]);
+  } else {
+    out.push(['k-bad', icon(t.c) + "<b>" + t.w + "</b> is " + aOrAn(CLASSNAME[t.c]) +
+      " in this sentence" + (Y.want ? ", and this round is asking about " + T.plural + "." : ".")]);
+    var line = FB[Y.cls] && FB[Y.cls][t.c];
+    if(line && !Y.want) out.push(['k-miss', line]);
+    out.push(['k-miss', "<b>How to check for " + T.plural + ".</b> " + T.test]);
+    var st2 = store(); st2.err[Y.cls+"_"+t.c] = (st2.err[Y.cls+"_"+t.c]||0)+1; save(st2);
+  }
+  el("ynFb").innerHTML = out.map(function(o){ return '<li class="'+o[0]+'">'+o[1]+'</li>'; }).join("");
+  el("ynStreak").textContent = Y.streak;
+  el("ynBest").textContent = Y.best;
+  el("ynTime").textContent = secs.toFixed(1) + "s";
+  el("ynYes").style.display="none"; el("ynNo").style.display="none";
+  el("ynNextBar").style.display="";
+}
+function aOrAn(w){ return ("aeiou".indexOf(w.charAt(0))>=0 ? "an " : "a ") + w; }
+
 /* ==================================================================
    VALIDATOR. Same function under Node and in the browser.
    Must report 0 ERRORS before a batch is done (SPEC section 3).
@@ -984,6 +1347,42 @@ function validate(){
            " place"+(ah.n===1?"":"s")+" (first: "+ah.first+"). Re-read if that sense ever changes.");
   }
 
+  /* FRAMES: exactly one fitting slot, three distinct classes, known word class */
+  var fids = {};
+  for(i=0;i<FRAMES.length;i++){
+    var fr = FRAMES[i];
+    if(fids[fr.id]) E.push(fr.id+": duplicate id");
+    fids[fr.id]=1;
+    if(!/^wc-fr\d{3}$/.test(fr.id)) E.push(fr.id+": id must look like wc-fr001");
+    if(SCORED.indexOf(fr.cls)<0) E.push(fr.id+": class '"+fr.cls+"' is not scored");
+    if(LEVELS.indexOf(fr.level)<0) E.push(fr.id+": level '"+fr.level+"' is not in the enum");
+    if(fr.slots.length!==3) E.push(fr.id+": needs exactly 3 slots");
+    var fit=0, cs={};
+    for(j=0;j<fr.slots.length;j++){
+      if(fr.slots[j].fit) fit++;
+      if(fr.slots[j].t.indexOf("____")<0) E.push(fr.id+" slot "+j+": no ____ gap");
+      if(cs[fr.slots[j].c]) E.push(fr.id+": two slots for the same class ("+fr.slots[j].c+")");
+      cs[fr.slots[j].c]=1;
+      if(fr.slots[j].fit && fr.slots[j].c!==fr.cls)
+        E.push(fr.id+": the fitting slot is tagged "+fr.slots[j].c+" but the word is "+fr.cls);
+    }
+    if(fit!==1) E.push(fr.id+": has "+fit+" fitting slots, needs exactly 1");
+    if(/[—–]|--/.test(fr.w+fr.why)) E.push(fr.id+": dash in student-facing text");
+    if(!fr.why) E.push(fr.id+": missing why");
+  }
+
+  /* Yes-or-no is derived from SENTENCES, so check the derived pool is usable */
+  for(var c3=0;c3<SCORED.length;c3++){
+    if(!LIVE[SCORED[c3]]) continue;
+    var ynN=0;
+    for(i=0;i<SENTENCES.length;i++){
+      if(!SENTENCES[i].eligible[SCORED[c3]]) continue;
+      var cc = ynCandidates(SENTENCES[i], SCORED[c3]);
+      if(cc.yes.length && cc.no.length) ynN++;
+    }
+    if(ynN<4) E.push("yes-or-no pool for "+SCORED[c3]+" is only "+ynN+" sentences");
+  }
+
   /* level quota, per 20 */
   var lc={}; for(i=0;i<SENTENCES.length;i++) lc[SENTENCES[i].level]=(lc[SENTENCES[i].level]||0)+1;
   var n=SENTENCES.length;
@@ -1010,15 +1409,27 @@ function validate(){
     E.push("mojibake detected: the file has been read as ANSI somewhere. See SPEC section 3.");
 
   /* lemma map */
-  var lm=[], shifty=[];
+  var lm=[], hardShift=[], softShift=[];
   var keys=[]; for(k in lemmas) keys.push(k); keys.sort();
   for(i=0;i<keys.length;i++){
     var cs=[]; for(k in lemmas[keys[i]]) cs.push(k);
     lm.push(keys[i]+"  "+cs.join(",")+"  ("+lemmas[keys[i]][cs[0]].length+")");
-    if(cs.length>1) shifty.push(keys[i]+": "+cs.join(" + "));
+    if(cs.length>1){
+      /* SPEC section 4, two-tier ambiguity. A lemma taking two or more SCORED
+         classes is hard: it can be read as the class a round is asking for, so
+         it must become a deliberate SHIFTERS item. A lemma varying only among
+         the unscored classes ("on" as preposition and as particle) is soft: it
+         is never in an answer set, so it is permitted and merely noted. */
+      var scoredCount=0;
+      for(j=0;j<cs.length;j++) if(SCORED.indexOf(cs[j])>=0) scoredCount++;
+      var line = keys[i]+": "+cs.join(" + ")+"  in "+lemmas[keys[i]][cs[0]][0]+" and elsewhere";
+      if(scoredCount>1) hardShift.push(line); else softShift.push(keys[i]+": "+cs.join(" + "));
+    }
   }
+  for(i=0;i<hardShift.length;i++)
+    E.push("hard shifter, "+hardShift[i]+". A lemma may not carry two scored classes in this bank (SPEC 4).");
 
-  return {E:E, W:W, floor:floorFails, lemmas:lm, shifty:shifty, levels:lc};
+  return {E:E, W:W, floor:floorFails, lemmas:lm, shifty:hardShift, soft:softShift, levels:lc};
 }
 
 /* the single source of truth for ans / neutral, shared by the validator
@@ -1051,14 +1462,19 @@ function runValidate(){
   for(i=0;i<r.W.length;i++) o.push("  ? "+r.W[i]);
   o.push("");
   o.push("SENTENCES: "+SENTENCES.length+"   levels: "+JSON.stringify(r.levels));
+  o.push("FRAMES: "+FRAMES.length);
   o.push("");
   o.push("POOL FLOOR (live classes, fewer than 4 items):");
   if(!r.floor.length) o.push("  all live cells at or above the floor");
   for(i=0;i<r.floor.length;i++) o.push("  - "+r.floor[i]);
   o.push("");
-  o.push("LEMMAS CARRYING MORE THAN ONE CLASS (must each be a deliberate SHIFTERS item):");
+  o.push("HARD SHIFTERS (a lemma carrying two SCORED classes: must be fixed or moved to SHIFTERS):");
   if(!r.shifty.length) o.push("  none");
   for(i=0;i<r.shifty.length;i++) o.push("  * "+r.shifty[i]);
+  o.push("");
+  o.push("SOFT SHIFTERS (varying only among unscored classes: permitted, never in an answer set):");
+  if(!r.soft.length) o.push("  none");
+  for(i=0;i<r.soft.length;i++) o.push("  - "+r.soft[i]);
   o.push("");
   o.push("LEMMA MAP ("+r.lemmas.length+" lemmas):");
   for(i=0;i<r.lemmas.length;i++) o.push("  "+r.lemmas[i]);
