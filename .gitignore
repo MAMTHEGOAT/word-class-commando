@@ -9,6 +9,7 @@ smoke.py
 verbtest.py
 strict_test.py
 v3test.py
+v4test.py
 serve.ps1
 
 # Generated intermediates and reports
