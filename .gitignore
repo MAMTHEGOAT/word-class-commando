@@ -1,0 +1,37 @@
+# Local-only dev and authoring files (kept off the public repo)
+CLAUDE.md
+SPEC.md
+build_bank.py
+splice.py
+template.html
+collide.py
+smoke.py
+verbtest.py
+strict_test.py
+serve.ps1
+
+# Generated intermediates and reports
+dev/
+content/
+docs/
+shot-*.png
+blind-*.json
+wrongtest.py
+__pycache__/
+*.pyc
+collision-report.md
+sentences.jsonl
+policy.json
+ambig.json
+
+# OS / editor cruft
+Thumbs.db
+ehthumbs.db
+.DS_Store
+Desktop.ini
+*.tmp
+*~
+node_modules/
+
+# local scratch
+_gitscratch/

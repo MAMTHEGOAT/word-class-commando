@@ -1,0 +1,4 @@
+# Keep text files LF-normalised; never CRLF-mangle the app file.
+* text=auto eol=lf
+*.png binary
+*.jpg binary
