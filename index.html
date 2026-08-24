@@ -442,7 +442,11 @@ var SENTENCES = [
 {"id":"wc-s097","level":"secure","topic":"home","words":[{"w":"Somebody","c":"pron"},{"w":"was","c":"verb","sub":"aux","g":1,"lem":"be"},{"w":"knocking","c":"verb","sub":"lex","g":1,"head":true},{"w":"gently","c":"adv","sub":"manner","p":".","lem":"gentle"}],"ans":{"verb":[1],"adv":[3]},"eligible":{"noun":false,"verb":true,"adj":false,"adv":true},"tomorrow":"Somebody will be knocking gently tomorrow."},
 {"id":"wc-s098","level":"secure","topic":"animals","words":[{"w":"The","c":"det","sub":"art"},{"w":"frightened","c":"adj"},{"w":"horse","c":"noun","sub":"common"},{"w":"would","c":"verb","sub":"modal","g":1},{"w":"not","c":"neg"},{"w":"move","c":"verb","sub":"lex","p":".","g":1,"head":true}],"ans":{"noun":[2],"verb":[3],"adj":[1]},"eligible":{"noun":true,"verb":true,"adj":true,"adv":false},"tomorrow":"The frightened horse will not move tomorrow."},
 {"id":"wc-s099","level":"challenge","topic":"nature","words":[{"w":"Although","c":"conj"},{"w":"the","c":"det","sub":"art"},{"w":"path","c":"noun","sub":"common"},{"w":"was","c":"verb","sub":"cop","head":true,"lem":"be"},{"w":"steep","c":"adj","p":","},{"w":"the","c":"det","sub":"art"},{"w":"climbers","c":"noun","sub":"common","lem":"climber"},{"w":"pressed","c":"verb","sub":"lex"},{"w":"on","c":"part","p":"."}],"ans":{"noun":[2,6],"verb":[3,7],"adj":[4]},"eligible":{"noun":true,"verb":true,"adj":true,"adv":false},"tomorrow":"Although the path is steep tomorrow, the climbers will press on."},
-{"id":"wc-s100","level":"challenge","topic":"town","words":[{"w":"Footsteps","c":"noun","sub":"common","lem":"footstep"},{"w":"echoed","c":"verb","sub":"lex"},{"w":"and","c":"conj"},{"w":"torches","c":"noun","sub":"common","lem":"torch"},{"w":"flickered","c":"verb","sub":"lex"},{"w":"in","c":"prep"},{"w":"the","c":"det","sub":"art"},{"w":"narrow","c":"adj"},{"w":"lane","c":"noun","sub":"common","p":"."}],"ans":{"noun":[0,3,8],"verb":[1,4],"adj":[7]},"eligible":{"noun":true,"verb":true,"adj":true,"adv":false},"tomorrow":"Footsteps will echo and torches will flicker in the narrow lane tomorrow."}
+{"id":"wc-s100","level":"challenge","topic":"town","words":[{"w":"Footsteps","c":"noun","sub":"common","lem":"footstep"},{"w":"echoed","c":"verb","sub":"lex"},{"w":"and","c":"conj"},{"w":"torches","c":"noun","sub":"common","lem":"torch"},{"w":"flickered","c":"verb","sub":"lex"},{"w":"in","c":"prep"},{"w":"the","c":"det","sub":"art"},{"w":"narrow","c":"adj"},{"w":"lane","c":"noun","sub":"common","p":"."}],"ans":{"noun":[0,3,8],"verb":[1,4],"adj":[7]},"eligible":{"noun":true,"verb":true,"adj":true,"adv":false},"tomorrow":"Footsteps will echo and torches will flicker in the narrow lane tomorrow."},
+{"id":"wc-s101","level":"foundation","topic":"people","words":[{"w":"The","c":"det","sub":"art"},{"w":"friendly","c":"adj"},{"w":"waiter","c":"noun","sub":"common"},{"w":"brought","c":"verb","sub":"lex","lem":"bring"},{"w":"our","c":"det","sub":"poss"},{"w":"food","c":"noun","sub":"mass","p":"."}],"ans":{"noun":[2,5],"verb":[3],"adj":[1]},"eligible":{"noun":true,"verb":true,"adj":true,"adv":false},"tomorrow":"The friendly waiter will bring our food tomorrow."},
+{"id":"wc-s102","level":"developing","topic":"home","words":[{"w":"A","c":"det","sub":"art"},{"w":"lonely","c":"adj"},{"w":"light","c":"noun","sub":"common"},{"w":"burned","c":"verb","sub":"lex"},{"w":"in","c":"prep"},{"w":"the","c":"det","sub":"art"},{"w":"window","c":"noun","sub":"common","p":"."}],"ans":{"noun":[2,6],"verb":[3],"adj":[1]},"eligible":{"noun":true,"verb":true,"adj":true,"adv":false},"tomorrow":"A lonely light will burn in the window tomorrow."},
+{"id":"wc-s103","level":"developing","topic":"nature","words":[{"w":"The","c":"det","sub":"art"},{"w":"lovely","c":"adj"},{"w":"garden","c":"noun","sub":"common"},{"w":"smelled","c":"verb","sub":"lex","lem":"smell"},{"w":"of","c":"prep"},{"w":"roses","c":"noun","sub":"common","p":".","lem":"rose"}],"ans":{"noun":[2,5],"verb":[3],"adj":[1]},"eligible":{"noun":true,"verb":true,"adj":true,"adv":false},"tomorrow":"The lovely garden will smell of roses tomorrow."},
+{"id":"wc-s104","level":"foundation","topic":"people","words":[{"w":"Her","c":"det","sub":"poss"},{"w":"silly","c":"adj"},{"w":"hat","c":"noun","sub":"common"},{"w":"blew","c":"verb","sub":"lex","lem":"blow"},{"w":"away","c":"adv","sub":"place","p":"."}],"ans":{"noun":[2],"verb":[3],"adj":[1]},"eligible":{"noun":true,"verb":true,"adj":true,"adv":false},"neutral":{"adv":[4]},"tomorrow":"Her silly hat will blow away tomorrow."}
 /* >>> APPEND NEW SENTENCES ABOVE THIS LINE >>> */
 ];
 /* >>> BANK:SENTENCES END >>> */
@@ -488,7 +492,11 @@ var FRAMES = [
 {"id":"wc-fr037","level":"developing","cls":"adv","w":"bravely","slots":[{"t":"We will ____ soon.","c":"verb"},{"t":"It was a very ____ day.","c":"adj"},{"t":"He walked ____.","c":"adv","fit":true}],"why":"It tells you HOW something was done, so it is an adverb."},
 {"id":"wc-fr038","level":"secure","cls":"adv","w":"calmly","slots":[{"t":"I saw a ____.","c":"noun"},{"t":"She did it ____.","c":"adv","fit":true},{"t":"It was a very ____ day.","c":"adj"}],"why":"It tells you HOW something was done, so it is an adverb."},
 {"id":"wc-fr039","level":"secure","cls":"adv","w":"cheerfully","slots":[{"t":"He walked ____.","c":"adv","fit":true},{"t":"I saw a ____.","c":"noun"},{"t":"They ____ every day.","c":"verb"}],"why":"It tells you HOW something was done, so it is an adverb."},
-{"id":"wc-fr040","level":"challenge","cls":"adv","w":"reluctantly","slots":[{"t":"They ____ every day.","c":"verb"},{"t":"That looks very ____.","c":"adj"},{"t":"She did it ____.","c":"adv","fit":true}],"why":"It tells you HOW something was done, so it is an adverb."}
+{"id":"wc-fr040","level":"challenge","cls":"adv","w":"reluctantly","slots":[{"t":"They ____ every day.","c":"verb"},{"t":"That looks very ____.","c":"adj"},{"t":"She did it ____.","c":"adv","fit":true}],"why":"It tells you HOW something was done, so it is an adverb."},
+{"id":"wc-fr041","level":"foundation","cls":"adj","w":"friendly","slots":[{"t":"The ____ was there.","c":"noun"},{"t":"That looks very ____.","c":"adj","fit":true},{"t":"He walked ____.","c":"adv"}],"why":"It fits after <b>very</b> and describes a thing, so it is an adjective."},
+{"id":"wc-fr042","level":"foundation","cls":"adj","w":"silly","slots":[{"t":"It was a very ____ day.","c":"adj","fit":true},{"t":"The ____ was there.","c":"noun"},{"t":"We will ____ soon.","c":"verb"}],"why":"It fits after <b>very</b> and describes a thing, so it is an adjective."},
+{"id":"wc-fr043","level":"developing","cls":"adj","w":"lovely","slots":[{"t":"We will ____ soon.","c":"verb"},{"t":"She did it ____.","c":"adv"},{"t":"That looks very ____.","c":"adj","fit":true}],"why":"It fits after <b>very</b> and describes a thing, so it is an adjective."},
+{"id":"wc-fr044","level":"developing","cls":"adj","w":"lonely","slots":[{"t":"I saw a ____.","c":"noun"},{"t":"It was a very ____ day.","c":"adj","fit":true},{"t":"She did it ____.","c":"adv"}],"why":"It fits after <b>very</b> and describes a thing, so it is an adjective."}
 /* >>> APPEND NEW FRAMES ABOVE THIS LINE >>> */
 ];
 /* >>> BANK:FRAMES END >>> */
@@ -547,7 +555,13 @@ var CLOZE = [
 {"id":"wc-c050","level":"developing","family":"wc-wf035","answerClass":"adv","text":"The horse ran very ____.","options":[{"w":"fastness"},{"w":"fast","correct":true},{"w":"fastly"}],"why":"The adverb of fast is FAST. There is no such word as fastly."},
 {"id":"wc-c051","level":"secure","family":"wc-wf036","answerClass":"adv","text":"The train arrived ____ again.","options":[{"w":"late","correct":true},{"w":"lateness"},{"w":"lately"}],"why":"The adverb of late is LATE. Lately means recently."},
 {"id":"wc-c052","level":"secure","family":"wc-wf037","answerClass":"adv","text":"Do not stand too ____ to the edge.","options":[{"w":"nearness"},{"w":"nearly"},{"w":"near","correct":true}],"why":"The adverb of near is NEAR. Nearly means almost."},
-{"id":"wc-c053","level":"challenge","family":"wc-wf038","answerClass":"adv","text":"The kite flew ____ above the field.","options":[{"w":"highly"},{"w":"high","correct":true},{"w":"height"}],"why":"For actual height the adverb is HIGH, with no ending. Highly means very much: highly recommended."}
+{"id":"wc-c053","level":"challenge","family":"wc-wf038","answerClass":"adv","text":"The kite flew ____ above the field.","options":[{"w":"highly"},{"w":"high","correct":true},{"w":"height"}],"why":"For actual height the adverb is HIGH, with no ending. Highly means very much: highly recommended."},
+{"id":"wc-c054","level":"foundation","family":"wc-wf039","answerClass":"adj","text":"She gave us a ____ wave.","options":[{"w":"friendly","correct":true},{"w":"friend"},{"w":"friendlily"}],"why":"Friendly describes the wave, so it is an adjective. It ends in -ly and it is still not an adverb."},
+{"id":"wc-c055","level":"foundation","family":"wc-wf040","answerClass":"adj","text":"His ____ jokes made everyone groan.","options":[{"w":"silliness"},{"w":"sillily"},{"w":"silly","correct":true}],"why":"Silly describes the jokes, so it is an adjective, even though it ends in -ly."},
+{"id":"wc-c056","level":"developing","family":"wc-wf041","answerClass":"adj","text":"It was a ____ afternoon by the river.","options":[{"w":"lovelily"},{"w":"lovely","correct":true},{"w":"love"}],"why":"Lovely describes the afternoon, so it is an adjective. The -ly ending does not make it an adverb."},
+{"id":"wc-c057","level":"developing","family":"wc-wf042","answerClass":"adj","text":"The old house looked ____ and empty.","options":[{"w":"lonely","correct":true},{"w":"loneliness"},{"w":"lonelily"}],"why":"Lonely describes the house, so it is an adjective, even though it ends in -ly."},
+{"id":"wc-c058","level":"developing","family":"wc-wf043","answerClass":"adv","text":"The plane flew ____ over the field.","options":[{"w":"lower"},{"w":"lowly"},{"w":"low","correct":true}],"why":"Low tells you HOW it flew, so it is an adverb. Some adverbs have no -ly ending."},
+{"id":"wc-c059","level":"developing","family":"wc-wf044","answerClass":"adv","text":"Walk ____ on to the end of the road.","options":[{"w":"straightly"},{"w":"straight","correct":true},{"w":"straighten"}],"why":"Straight tells you HOW to walk, so it is an adverb, with no -ly on the end."}
 /* >>> APPEND NEW CLOZE ABOVE THIS LINE >>> */
 ];
 /* >>> BANK:CLOZE END >>> */
@@ -624,7 +638,13 @@ var TRANSFORM = [
 {"id":"wc-tr068","level":"secure","family":"wc-wf037","from":"adj","to":"adv","w":"near","options":[{"w":"nearly"},{"w":"near","correct":true},{"w":"nearness"}],"why":"Nearly means 'almost': I nearly fell. It is NOT the adverb of near."},
 {"id":"wc-tr069","level":"secure","family":"wc-wf037","from":"adj","to":"noun","w":"near","options":[{"w":"nearness","correct":true},{"w":"near"},{"w":"nearly"}],"why":""},
 {"id":"wc-tr070","level":"challenge","family":"wc-wf038","from":"adj","to":"adv","w":"high","options":[{"w":"height"},{"w":"highly"},{"w":"high","correct":true}],"why":"Highly means 'very much': highly recommended. For actual height, the adverb is high."},
-{"id":"wc-tr071","level":"challenge","family":"wc-wf038","from":"adj","to":"noun","w":"high","options":[{"w":"highly"},{"w":"height","correct":true},{"w":"high"}],"why":""}
+{"id":"wc-tr071","level":"challenge","family":"wc-wf038","from":"adj","to":"noun","w":"high","options":[{"w":"highly"},{"w":"height","correct":true},{"w":"high"}],"why":""},
+{"id":"wc-tr072","level":"foundation","family":"wc-wf039","from":"adj","to":"noun","w":"friendly","options":[{"w":"friend","correct":true},{"w":"friendly"},{"w":"friendlily"}],"why":""},
+{"id":"wc-tr073","level":"foundation","family":"wc-wf040","from":"adj","to":"noun","w":"silly","options":[{"w":"silly"},{"w":"sillily"},{"w":"silliness","correct":true}],"why":""},
+{"id":"wc-tr074","level":"developing","family":"wc-wf041","from":"adj","to":"noun","w":"lovely","options":[{"w":"lovelily"},{"w":"love","correct":true},{"w":"lovely"}],"why":""},
+{"id":"wc-tr075","level":"developing","family":"wc-wf042","from":"adj","to":"noun","w":"lonely","options":[{"w":"loneliness","correct":true},{"w":"lonely"},{"w":"lonelily"}],"why":""},
+{"id":"wc-tr076","level":"developing","family":"wc-wf043","from":"adj","to":"adv","w":"low","options":[{"w":"lower"},{"w":"lowly"},{"w":"low","correct":true}],"why":"Lowly is an ADJECTIVE meaning humble. It is not the adverb of low. The adverb of low is low: the plane flew low."},
+{"id":"wc-tr077","level":"developing","family":"wc-wf044","from":"adj","to":"adv","w":"straight","options":[{"w":"straightly"},{"w":"straight","correct":true},{"w":"straighten"}],"why":"There is no word 'straightly'. Straight is already the adverb: walk straight on."}
 /* >>> APPEND NEW TRANSFORM ABOVE THIS LINE >>> */
 ];
 /* >>> BANK:TRANSFORM END >>> */
@@ -668,7 +688,13 @@ var FAMILIES = [
 {"id":"wc-wf035","base":"fast","level":"developing","forms":{"adj":["fast"],"adv":["fast"]},"traps":[{"w":"fastly","why":"There is no word 'fastly'. Fast is already the adverb: he ran fast."},{"w":"fastness","why":"Fastness is a real word, but it means a stronghold: a mountain fastness. It is not the noun of fast."}]},
 {"id":"wc-wf036","base":"late","level":"secure","forms":{"adj":["late"],"adv":["late"],"noun":["lateness"]},"traps":[{"w":"lately","why":"Lately means 'recently': I have been busy lately. It is NOT the adverb of late."}]},
 {"id":"wc-wf037","base":"near","level":"secure","forms":{"adj":["near"],"adv":["near"],"noun":["nearness"]},"traps":[{"w":"nearly","why":"Nearly means 'almost': I nearly fell. It is NOT the adverb of near."}]},
-{"id":"wc-wf038","base":"high","level":"challenge","forms":{"adj":["high"],"adv":["high"],"noun":["height"]},"traps":[{"w":"highly","why":"Highly means 'very much': highly recommended. For actual height, the adverb is high."}]}
+{"id":"wc-wf038","base":"high","level":"challenge","forms":{"adj":["high"],"adv":["high"],"noun":["height"]},"traps":[{"w":"highly","why":"Highly means 'very much': highly recommended. For actual height, the adverb is high."}]},
+{"id":"wc-wf039","base":"friend","level":"foundation","forms":{"noun":["friend"],"adj":["friendly"]},"traps":[{"w":"friendlily","why":"There is no adverb 'friendlily'. Friendly is an ADJECTIVE, even though it ends in -ly. To say it as an adverb you need a phrase: in a friendly way."}]},
+{"id":"wc-wf040","base":"silly","level":"foundation","forms":{"noun":["silliness"],"adj":["silly"]},"traps":[{"w":"sillily","why":"There is no adverb 'sillily'. Silly is an ADJECTIVE, even though it ends in -ly."}]},
+{"id":"wc-wf041","base":"lovely","level":"developing","forms":{"noun":["love"],"adj":["lovely"]},"traps":[{"w":"lovelily","why":"There is no adverb 'lovelily'. Lovely is an ADJECTIVE, even though it ends in -ly."}]},
+{"id":"wc-wf042","base":"lonely","level":"developing","forms":{"noun":["loneliness"],"adj":["lonely"]},"traps":[{"w":"lonelily","why":"There is no adverb 'lonelily'. Lonely is an ADJECTIVE, even though it ends in -ly."}]},
+{"id":"wc-wf043","base":"low","level":"developing","forms":{"adj":["low"],"adv":["low"],"verb":["lower"]},"traps":[{"w":"lowly","why":"Lowly is an ADJECTIVE meaning humble. It is not the adverb of low. The adverb of low is low: the plane flew low."}]},
+{"id":"wc-wf044","base":"straight","level":"developing","forms":{"adj":["straight"],"adv":["straight"],"verb":["straighten"]},"traps":[{"w":"straightly","why":"There is no word 'straightly'. Straight is already the adverb: walk straight on."}]}
 /* >>> APPEND NEW FAMILIES ABOVE THIS LINE >>> */
 ];
 /* >>> BANK:FAMILIES END >>> */
@@ -745,7 +771,10 @@ var TESTS = {
           "<b>absolutely</b> in front?",
     eg: "<i>the <b>old</b> dog</i> and <i>the dog is <b>old</b></i> both work, and so does " +
         "<i>very old</i>. It is an adjective.",
-    limit: "Some adjectives are already as strong as they go, so <i>very</i> sounds odd " +
+    limit: "<b>Some adjectives end in -ly</b>: <i>friendly</i>, <i>lovely</i>, " +
+           "<i>silly</i>, <i>lonely</i>, <i>lowly</i>. The -ly ending is a clue that a " +
+           "word might be an adverb, never a rule, and there is no such word as " +
+           "<i>friendlily</i>. Some adjectives are already as strong as they go, so <i>very</i> sounds odd " +
            "in front of them. Use <i>absolutely</i> or <i>really</i> instead: " +
            "<i>absolutely enormous</i>, <i>really freezing</i>. A few adjectives only fit " +
            "the second slot: <i>the dog is <b>asleep</b></i>, but not <i>the asleep " +
@@ -1897,6 +1926,41 @@ function validate(){
   }
   checkOptionBank(CLOZE, "CLOZE", true);
   checkOptionBank(TRANSFORM, "TRANSFORM", false);
+
+  /* The -ly pattern, measured in BOTH directions. The app was teaching two
+     false rules by example while the Learn card denied them: "add -ly" always
+     worked, and every -ly word in the app was an adverb. Salting means
+     deliberately breaking both. */
+  var lyMap = {};
+  function noteLy(w, cls){
+    if(!/ly$/.test(w) || w.length < 4) return;
+    lyMap[w] = lyMap[w] || {};
+    lyMap[w][cls] = 1;
+  }
+  for(i=0;i<SENTENCES.length;i++)
+    for(j=0;j<SENTENCES[i].words.length;j++)
+      noteLy(SENTENCES[i].words[j].w.toLowerCase(), SENTENCES[i].words[j].c);
+  for(i=0;i<CLOZE.length;i++)
+    for(j=0;j<CLOZE[i].options.length;j++)
+      if(CLOZE[i].options[j].correct) noteLy(CLOZE[i].options[j].w, CLOZE[i].answerClass);
+  for(i=0;i<FRAMES.length;i++) noteLy(FRAMES[i].w, FRAMES[i].cls);
+  for(i=0;i<FAMILIES.length;i++){
+    for(k in FAMILIES[i].forms)
+      for(j=0;j<FAMILIES[i].forms[k].length;j++) noteLy(FAMILIES[i].forms[k][j], k);
+  }
+  var lyTotal=0, lyNotAdv=[];
+  for(k in lyMap){
+    lyTotal++;
+    if(!lyMap[k].adv) lyNotAdv.push(k);
+  }
+  INFO.push("-ly words in the app: "+lyTotal+", of which "+lyNotAdv.length+
+            " are NOT adverbs ("+(lyNotAdv.length?lyNotAdv.join(", "):"none")+
+            "). If that second number is near zero the app is teaching "+
+            "'-ly means adverb' by example, whatever the Learn card says.");
+  if(lyTotal >= 20 && lyNotAdv.length < 4)
+    E.push("only "+lyNotAdv.length+" of "+lyTotal+" -ly words in the app are not adverbs. "+
+           "The bank needs salting with -ly adjectives (friendly, lovely, silly, lonely) "+
+           "or it teaches a rule the Learn card denies.");
 
   /* level quota, per 20 */
   var lc={}; for(i=0;i<SENTENCES.length;i++) lc[SENTENCES[i].level]=(lc[SENTENCES[i].level]||0)+1;
