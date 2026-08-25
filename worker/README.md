@@ -1,47 +1,111 @@
 # worker/ — the leaderboard service
 
-**Nothing here is built yet.** This folder and its rules exist before the code, so the
-rules are set rather than discovered. Governed by **SPEC section 19**. Read that first.
+Governed by **SPEC section 19**. Read that before changing anything here.
+
+Holds challenge-mode high scores only. Not a gradebook, not a login, not a store
+of practice data.
 
 ## The one rule that matters
 
-**The app must work completely with this service unreachable.** If you find yourself
-writing a student-facing error message about the network, stop: the requirement is a
-silent fallback to a local personal best, not a good error message.
-
-## What this is
-
-A Cloudflare Worker plus a D1 database, free plan, holding challenge-mode high scores
-only. Not a gradebook, not a login, not a store of practice data.
-
-- `POST /score`  — one run: nickname, score, correct, wrong, chain, level, class code
-- `GET  /board`  — top N for a class code
-- teacher routes behind a shared secret: delete a row, clear a board
+**The app must work completely with this service unreachable.** If you find
+yourself writing a student-facing error message about the network, stop: the
+requirement is a silent fallback to a local personal best, not a good error
+message.
 
 ## Deploying
 
-The site is on GitHub Pages and does **not** deploy this. It is a separate step:
+The site and the service deploy **separately**. `git push` publishes the app to
+GitHub Pages; it does not touch this. From this folder:
 
 ```
-npx wrangler login      # once, opens a browser
-npx wrangler deploy     # or double-click deploy-worker.bat
+npx wrangler login          # once, ever
+deploy-worker.bat           # or the two commands it runs
+npx wrangler secret put TEACHER_KEY   # once, sets the teacher password
 ```
+
+`deploy-worker.bat` is safe to re-run. The database is auto-provisioned on the
+first deploy (`database_id` is deliberately absent from `wrangler.jsonc`), and
+the schema is idempotent.
+
+## Endpoints
+
+| Route | Method | Who | What |
+|---|---|---|---|
+| `/health` | GET | anyone | liveness |
+| `/score` | POST | the app | submit one run |
+| `/board?cls=9B&limit=20` | GET | the app | top scores for a class |
+| `/admin/delete` | POST | teacher | remove one row by id |
+| `/admin/clear` | POST | teacher | empty one class board |
+
+Teacher routes need an `X-Teacher-Key` header matching the `TEACHER_KEY` secret.
+**If that secret has never been set, they refuse rather than defaulting to open.**
+
+### POST /score
+
+```json
+{ "cls": "9B", "adj": 0, "noun": 0, "correct": 20, "wrong": 2,
+  "chain": 8, "level": "secure", "score": 30 }
+```
+
+`adj` and `noun` are **indexes into word lists held in the worker**, not text.
+The worker composes the nickname. A `nick` field sent by the client is ignored
+entirely, which is tested. This is SPEC 19.3: free-text nicknames chosen by
+teenagers and then projected in a lesson have a known ending, and no word filter
+has ever won that argument. Structurally impossible beats filtered.
+
+The lists are **append-only**. Reordering or removing an entry silently renames
+everyone who already scored.
+
+## What is validated, and what is not
+
+Scores cannot be trusted and **that is unfixable, not merely unfixed** (SPEC
+19.4). The run happens in a browser and the source is public. So the worker
+rejects the *impossible* rather than pretending to verify the plausible:
+
+- arithmetic that could not have happened (score above `correct x maxMultiplier - wrong x penalty`)
+- more items than sixty seconds physically allows
+- a chain longer than the number of correct answers
+- nickname indexes outside the lists, class codes that are not plain alphanumerics
+- more than 40 submissions for one class in 60 seconds
+
+The bound is deliberately loose. It exists to reject 999999, not to second-guess
+a fast student, and a legitimately excellent run is tested to still pass.
+
+**Rate limiting counts rows in the `runs` table rather than tracking IP
+addresses**, so that no request metadata has to be stored to make it work.
+
+## Testing
+
+```
+node worker/test.mjs
+```
+
+41 assertions. Drives the real worker module against a real SQLite database
+through a small D1 shim, so the SQL is executed rather than eyeballed. The shim
+implements only the four D1 calls the worker makes; if the worker starts using
+more of the D1 API, the shim has to grow with it, and a missing method throws
+loudly rather than passing quietly.
+
+`wrangler dev` would be better and is not available in the build sandbox, whose
+package registry does not serve wrangler. Run it locally if you want the real
+runtime.
 
 ## Secrets: what must never be committed
 
-The repository is **public**. Before adding any file here, check it against this list.
+The repository is **public**.
 
 | Never commit | Where it goes instead |
 |---|---|
-| Cloudflare API tokens | `wrangler login`, or `wrangler secret put` |
-| The teacher shared secret | `npx wrangler secret put TEACHER_KEY` |
-| `.dev.vars` (local secrets file) | git-ignored, stays on the machine |
-| `.wrangler/` (local state) | git-ignored |
+| Cloudflare API tokens | `wrangler login` |
+| The teacher password | `npx wrangler secret put TEACHER_KEY` |
+| `.dev.vars` | git-ignored, stays on the machine |
+| `.wrangler/` | git-ignored |
 
-`wrangler.toml` holds a database id and an account id. Those are identifiers, not
-credentials, and are safe in a public repo, but do not put anything else in there.
+`wrangler.jsonc` holds a worker name and an allowed origin. Both are public
+information and safe in a public repo. Nothing else belongs in it.
 
 ## What is deliberately NOT stored
 
-Real names, school identifiers, misconception counters, practice history, IP addresses.
-SPEC 19.3 is the list and it is a decision, not an implementation detail.
+Real names, school identifiers, misconception counters, practice history, IP
+addresses. SPEC 19.3 is the list, and it is a decision rather than an
+implementation detail.
