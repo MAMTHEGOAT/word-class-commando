@@ -21,14 +21,10 @@ serve.ps1
 *test*.py
 smoke.py
 
-# One-off patch scripts
-fix_engine.py
-fix2.py
-fix3.py
-fix4.py
-fix5.py
-fix6.py
-fix7.py
+# One-off patch scripts. Pattern, not a list: naming them one by one meant
+# fix8.py was committed the moment it was written (2026-08-25), which is the
+# same mistake the test-file list made a day earlier.
+fix*.py
 
 # Generated intermediates and reports
 dev/
