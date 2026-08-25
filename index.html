@@ -61,6 +61,25 @@ button{font:inherit;cursor:pointer}
 @media(max-width:560px){.group .why{min-height:0}}
 .group .menu-btn{padding:11px 14px;margin-bottom:8px}
 .pl{text-align:center;color:var(--dim);font-size:.85rem;margin:0 0 18px}
+/* the diagnosis screen. Deliberately plain: no bars, no numbers, no scores
+   (teacher ruling 2026-08-25, SPEC 22). */
+.diag-entry{display:block;width:100%;text-align:left;background:transparent;
+  color:var(--txt);border:1px dashed var(--line);border-radius:10px;
+  padding:12px 15px;margin-top:22px;line-height:1.3}
+.diag-entry:hover{border-color:var(--brass);border-style:solid}
+.diag-entry .sub{display:block;color:var(--dim);font-size:.8rem;margin-top:3px}
+.diag-h{color:var(--brass);text-transform:uppercase;letter-spacing:.09em;
+  font-size:.78rem;margin:22px 0 10px;border-bottom:1px solid var(--line);padding-bottom:7px}
+.diag-card{background:var(--bg2);border:1px solid var(--line);border-radius:10px;
+  padding:14px 16px;margin-bottom:11px}
+.diag-t{font-weight:650;display:flex;align-items:flex-start;gap:8px;line-height:1.3}
+.diag-b{color:var(--dim);font-size:.9rem;line-height:1.45;margin:8px 0 12px}
+.diag-go{background:transparent;color:var(--brass);border:1px solid var(--line);
+  border-radius:8px;padding:9px 13px;font-size:.85rem;min-height:40px}
+.diag-go:hover{border-color:var(--brass)}
+.diag-untried{display:flex;flex-wrap:wrap;gap:8px}
+.who{margin-top:30px;padding-top:16px;border-top:1px solid var(--line)}
+.who a{color:var(--brass)}
 .pl b{color:var(--txt);font-weight:600}
 .menu-btn{display:block;width:100%;text-align:left;background:var(--bg2);
   color:var(--txt);border:1px solid var(--line);border-radius:10px;
@@ -236,6 +255,9 @@ button.yn{min-width:110px;font-size:1.05rem}
         <span class="sub">terrible into terribly, and the traps</span></button>
     </div>
   </div>
+  <button class="diag-entry" onclick="startDiag()">What I keep getting wrong
+    <span class="sub">Your own mistakes, and what to do about each one</span></button>
+
   <p class="small dim" style="margin-top:28px">Sister app to
     <b>Analysis Acrobat</b>, which teaches you to analyse the language you find here.</p>
 </section>
@@ -346,6 +368,21 @@ button.yn{min-width:110px;font-size:1.05rem}
     <button class="go" onclick="czNext()">Next gap</button>
   </div>
   <div class="ref"><span>Reference: <code id="czRef">--</code></span></div>
+</section>
+
+<!-- ================= WHAT I KEEP GETTING WRONG ===================== -->
+<section id="diag" class="screen">
+  <div class="topbar"><button class="back" onclick="go('splash')">&larr; Menu</button><img alt="" src="data:image/png;base64,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"></div>
+  <h2>What I keep getting wrong</h2>
+  <p class="dim">Built from your own answers on this device. There are no scores here on
+     purpose: this is about what to do next, not how you are doing.</p>
+  <div id="diagBody"></div>
+  <div class="who">
+    <p class="lbl">Who is using this device</p>
+    <div class="chips" id="whoChips"></div>
+    <p class="small dim" style="margin-top:8px">Each person keeps their own record.
+       <a href="#" onclick="whoRename();return false;">Rename this one</a>.</p>
+  </div>
 </section>
 
 <!-- =================== WHICH CLASS FILLS THE GAP? =================== -->
@@ -905,7 +942,7 @@ var AMBIG = ["answer","answers","back","bark","barks","book","books","brush","br
 <script>
 "use strict";
 
-var APP = "wcc", VER = "v0.8", BANK_REV = 7;
+var APP = "wcc", VER = "v0.9", BANK_REV = 7;
 var BUG_FORM_URL = "";   /* paste the Office 365 form link to switch the report button on */
 
 /* ---------- the four tests: one source for the Learn screen AND every
@@ -1158,7 +1195,7 @@ var _dirty = false;        /* a migration, prune or repair happened and has
                               not been written back yet */
 
 function _blankProfile(name){
-  return { name: name || "Player 1", seen:{}, revisit:{}, err:{}, best:{} };
+  return { name: name || "Player 1", seen:{}, revisit:{}, err:{}, best:{}, tried:{} };
 }
 function _blankRoot(){
   return { v:REC_VERSION, bankRev:BANK_REV, active:"p1",
@@ -1215,6 +1252,7 @@ function _load(){
     if(!pr.revisit) pr.revisit = {};
     if(!pr.err) pr.err = {};
     if(!pr.best) pr.best = {};
+    if(!pr.tried) pr.tried = {};
     if(!pr.name) pr.name = "Player 1";
   }
   if(root.bankRev !== BANK_REV){ _pruneToBank(root); root.bankRev = BANK_REV; _dirty = true; }
@@ -1259,6 +1297,18 @@ function save(){
 }
 
 /* ---- profiles. No UI yet; the switcher lands with the results screen. ---- */
+/** Record that an activity has been opened. The seen lists cannot answer this
+ *  on their own: Yes or no keeps no seen list, and every other activity only
+ *  gains one once an item is answered CORRECTLY, so a student who tried a drill
+ *  and found it hard would show as never having touched it. The diagnosis screen
+ *  says "not tried yet" out loud, so it has to be true. */
+function markTried(act){
+  var st = store();
+  if(!st.tried) st.tried = {};
+  if(st.tried[act]) return;
+  st.tried[act] = 1; save();
+}
+
 function profiles(){ store(); return _root.profiles; }
 function activeProfile(){ store(); return _root.active; }
 function profileAdd(name){
@@ -1340,6 +1390,7 @@ function renderTests(){
 
 /* ---------------------------- play ------------------------------ */
 function start(act){
+  markTried(act);            /* "one" or "all" */
   S.act = act;
   if(!LIVE[S.cls]) S.cls = "noun";
   go("play"); renderChips(); next();
@@ -1650,7 +1701,7 @@ function framePool(lvl){
     if(lvl==="all" || FRAMES[i].level===lvl) out.push(FRAMES[i]);
   return out;
 }
-function startFrames(){ go("frames"); frChips(); frNext(); }
+function startFrames(){ markTried("frames"); go("frames"); frChips(); frNext(); }
 function frChips(){
   var h = '<button class="chip" aria-pressed="'+(F.lvl==="all")+'" onclick="frLvl(\'all\')">All</button>';
   for(var j=0;j<LEVELS.length;j++){
@@ -1746,7 +1797,7 @@ function frCheck(){
 var Y = { cls:"noun", item:null, idx:-1, want:false, done:false,
           streak:0, best:0, t0:0 };
 
-function startYN(){ if(!LIVE[Y.cls]) Y.cls="noun"; go("yesno"); ynChips(); ynNext(); }
+function startYN(){ markTried("yesno"); if(!LIVE[Y.cls]) Y.cls="noun"; go("yesno"); ynChips(); ynNext(); }
 function ynChips(){
   var h="";
   for(var i=0;i<SCORED.length;i++){
@@ -1912,7 +1963,7 @@ function markOptions(target, item, pick){
 }
 
 /* ---------------- insert the word ---------------- */
-function startCloze(){ go("cloze"); lvlChips("czLevels", CLOZE, C.lvl, "czLvl"); czNext(); }
+function startCloze(){ markTried("cloze"); go("cloze"); lvlChips("czLevels", CLOZE, C.lvl, "czLvl"); czNext(); }
 function czLvl(l){ C.lvl=l; lvlChips("czLevels", CLOZE, C.lvl, "czLvl"); czNext(); }
 function czNext(){
   var p = lvlPool(CLOZE, C.lvl);
@@ -1982,6 +2033,223 @@ function famLine(fam){
   return '<div style="margin-top:2px">' + rows.join("") + '</div>';
 }
 
+/* ==================================================================
+   WHAT I KEEP GETTING WRONG  (SPEC 22)
+
+   The misconception counters have been written on every wrong answer
+   since v0.2 and shown to nobody. This is the screen that shows them.
+
+   Teacher ruling 2026-08-25: misconceptions ONLY. No percentage, no
+   items-done, no streak, nothing countable. Practice carries no score
+   (SPEC 20) and a summary screen full of numbers would smuggle one in
+   through the back door. Nothing here can be compared between students.
+
+   The counters are CONFUSION PAIRS, not error totals: `noun_det` means
+   "asked for a noun, tapped the determiner", which is a named mistake
+   with a named fix. That is the whole reason this screen is worth
+   building: it can say what to do, not merely how badly it went.
+   ================================================================== */
+
+/* A misconception is only worth a paragraph once it has happened twice.
+   One slip is noise, and lecturing a student about noise teaches them to
+   ignore the screen. */
+var DIAG_FLOOR = 2, DIAG_MAX = 4;
+
+/* Bespoke wording for the mistakes that actually recur. Anything not
+   listed falls through to a generic line built from the class tests, so
+   a new counter can never produce a blank card. */
+var DIAG = {
+  noun_det: { t: "Hunting for nouns, you keep grabbing the little word in front",
+    b: "In <i>the dog</i>, <b>the</b> points AT the naming word, it is not the naming word. " +
+       "Determiners (<i>the, a, my, this, some</i>) sit in front and hand you the noun: it is " +
+       "usually the very next word.", go: "start('one')", label: "Click the word" },
+  noun_adj: { t: "You are picking the describing word instead of the thing",
+    b: "In <i>the old dog</i>, <b>old</b> tells you what the dog is like. The dog is the thing. " +
+       "Ask which word names something you could point at.", go: "start('one')", label: "Click the word" },
+  noun_verb: { t: "You are picking what happens rather than what it happens to",
+    b: "Try the sentence in the future. The word that changes is the verb, so it is not your noun.",
+    go: "start('one')", label: "Click the word" },
+  noun_pron: { t: "Pronouns are standing in for your nouns",
+    b: "<i>She</i>, <i>they</i> and <i>it</i> replace a naming word rather than being one. " +
+       "This app does not count them as nouns.", go: "start('one')", label: "Click the word" },
+  verb_adv: { t: "You are picking how it was done, not what was done",
+    b: "In <i>ran quickly</i>, <b>quickly</b> describes the running. <b>Ran</b> is the doing. " +
+       "Change the sentence to tomorrow: the word that has to change is the verb.",
+    go: "start('one')", label: "Click the word" },
+  verb_adj: { t: "Some describing words look like verbs",
+    b: "<i>frightened</i>, <i>boring</i>, <i>tired</i> end like verbs but describe a thing. " +
+       "Ask whether it is happening, or whether it is what something is like.",
+    go: "start('one')", label: "Click the word" },
+  verb_noun: { t: "You are picking the thing rather than the doing",
+    b: "Change the sentence to tomorrow and watch which word changes. That word is the verb.",
+    go: "start('one')", label: "Click the word" },
+  adj_det: { t: "Determiners are not adjectives here",
+    b: "<i>my</i>, <i>this</i>, <i>some</i> and <i>each</i> point a noun out rather than describe " +
+       "it. Some primary books call them adjectives; this app follows the National Curriculum, " +
+       "which calls them determiners.", go: "go('learn')", label: "Read the adjective card" },
+  adj_noun: { t: "Nouns can sit in front of other nouns and look like adjectives",
+    b: "In <i>a stone bridge</i>, <b>stone</b> is doing an adjective's job but it is still a noun. " +
+       "Ask whether the word names a thing in its own right.", go: "start('one')", label: "Click the word" },
+  adj_adv: { t: "You are picking the word that describes the action",
+    b: "An adjective describes the THING. An adverb describes the ACTION. Ask what the word is " +
+       "describing before you look at its ending.", go: "startKlass()", label: "Which class fills the gap?" },
+  adv_adj: { t: "You are reading -ly as a rule rather than a clue",
+    b: "<i>friendly</i>, <i>lovely</i>, <i>silly</i> and <i>lonely</i> end in -ly and are " +
+       "ADJECTIVES. And <i>hard</i>, <i>fast</i>, <i>late</i> and <i>low</i> have no -ly at all " +
+       "and are ADVERBS. Ask what the word describes: the thing, or the action.",
+    go: "startKlass()", label: "Which class fills the gap?" },
+  adv_verb: { t: "You are picking the action rather than how it was done",
+    b: "The adverb is the word you could answer <i>how?</i> with.",
+    go: "start('one')", label: "Click the word" },
+  adv_prep: { t: "Prepositions look like adverbs of place",
+    b: "<i>under the table</i> starts a phrase and needs a noun after it. An adverb stands on its " +
+       "own: <i>she waited outside</i>.", go: "start('one')", label: "Click the word" },
+  aux_missed: { t: "You are finding the main verb but leaving its helper behind",
+    b: "In <i>is waiting</i> and <i>did not bark</i>, the helper word is part of the verb. At the " +
+       "harder levels you have to find every word of it, because helpers are verbs and they are " +
+       "easy to walk past.", go: "start('all')", label: "Click all the words" },
+  vocab_block: { t: "You are getting stuck on the words themselves",
+    b: "Word class is about the job a word does in its sentence, not what it means. If a word is " +
+       "unfamiliar, the tests still work on it.", go: "go('learn')", label: "How to spot each class" }
+};
+
+/* Counters that are about an ACTIVITY rather than a confusion pair. */
+var DIAG_ACT = {
+  cloze: { label: "Insert the word", go: "startCloze()",
+           t: "You are choosing the wrong FORM for the gap",
+           b: "The class is right but the ending is not. Read the words either side of the gap and " +
+              "ask what job the missing word has to do." },
+  klass: { label: "Which class fills the gap?", go: "startKlass()",
+           t: "You are naming the wrong job for the gap",
+           b: "Read the slot rather than hunting for a word. Ask what KIND of word could stand there." },
+  trans: { label: "Change the word", go: "startTrans()",
+           t: "The word changes are catching you out",
+           b: "Some families do not change the way you expect, and a few have traps: there is no " +
+              "word <i>friendlily</i>, and <i>hardly</i> does not mean <i>hard</i>." },
+  frame: { label: "Where does it fit?", go: "startFrames()",
+           t: "Choosing which gap a word belongs in is the sticking point",
+           b: "Try each gap out loud with the word in it. Only one of them will sound like English." }
+};
+
+var ACTIVITY_LIST = [
+  ["one",    "Click the word",             "start('one')"],
+  ["all",    "Click all the words",        "start('all')"],
+  ["yesno",  "Yes or no",                  "startYN()"],
+  ["klass",  "Which class fills the gap?", "startKlass()"],
+  ["frames", "Where does it fit?",         "startFrames()"],
+  ["cloze",  "Insert the word",            "startCloze()"],
+  ["trans",  "Change the word",            "startTrans()"]
+];
+
+/** Turn one raw counter key into something a student can act on. Never returns
+ *  null: an unrecognised key still produces an honest generic card. */
+function diagCard(key, n){
+  if(DIAG[key]) return { t:DIAG[key].t, b:DIAG[key].b, go:DIAG[key].go,
+                         label:DIAG[key].label, cls:key.split("_")[0], n:n };
+  var parts = key.split("_");
+  if(DIAG_ACT[parts[0]]){
+    var a = DIAG_ACT[parts[0]];
+    return { t:a.t, b:a.b, go:a.go, label:a.label, cls:parts[1]||null, n:n };
+  }
+  /* generic: asked for X, picked Y */
+  var asked = parts[0], picked = parts[1];
+  if(TESTS[asked] && CLASSNAME[picked])
+    return { t: "Asked for " + aOrAn(CLASSNAME[asked]) + ", you keep picking " +
+                aOrAn(CLASSNAME[picked]),
+             b: TESTS[asked].check || ("Ask what job the word is doing in its sentence, not what " +
+                "it means."), go: "start('one')", label: "Click the word", cls: asked, n:n };
+  return null;
+}
+
+function startDiag(){ go("diag"); renderDiag(); }
+
+function renderDiag(){
+  var st = store(), key, cards = [], i;
+
+  for(key in st.err){
+    var n = st.err[key];
+    if(n < DIAG_FLOOR) continue;
+    var c = diagCard(key, n);
+    if(c) cards.push(c);
+  }
+  /* Most frequent first: the thing costing them most answers is the thing to
+     work on. Ties keep insertion order, which is stable enough. */
+  cards.sort(function(a,b){ return b.n - a.n; });
+
+  /* Two cards can describe the same mistake from different activities (a
+     determiner tapped in a click round and the same confusion in yes or no).
+     Show each piece of advice once. */
+  var seenTitle = {}, keep = [];
+  for(i=0;i<cards.length && keep.length<DIAG_MAX;i++){
+    if(seenTitle[cards[i].t]) continue;
+    seenTitle[cards[i].t] = 1; keep.push(cards[i]);
+  }
+
+  var h = "";
+  if(!keep.length){
+    h += '<p class="dim">Nothing to report yet. Once a mistake happens more than once, ' +
+         'it will show up here with what to do about it.</p>';
+  } else {
+    h += '<h3 class="diag-h">What to work on</h3>';
+    for(i=0;i<keep.length;i++){
+      var c = keep[i];
+      h += '<div class="diag-card">' +
+             '<div class="diag-t">' + (c.cls && ICON[c.cls] ? icon(c.cls) : "") + c.t + '</div>' +
+             '<p class="diag-b">' + c.b + '</p>' +
+             '<button class="diag-go" onclick="' + c.go + '">Practise this: ' + c.label + '</button>' +
+           '</div>';
+    }
+  }
+
+  /* Not tried yet. Uses the `tried` marker rather than the seen lists, because a
+     seen list only gains an entry on a CORRECT answer, so a student who tried a
+     drill and struggled would otherwise be told they had never opened it. */
+  var untried = [];
+  for(i=0;i<ACTIVITY_LIST.length;i++)
+    if(!(st.tried && st.tried[ACTIVITY_LIST[i][0]])) untried.push(ACTIVITY_LIST[i]);
+  if(untried.length){
+    h += '<h3 class="diag-h">Not tried yet</h3><div class="diag-untried">';
+    for(i=0;i<untried.length;i++)
+      h += '<button class="diag-go" onclick="' + untried[i][2] + '">' + untried[i][1] + '</button>';
+    h += '</div>';
+  }
+  el("diagBody").innerHTML = h;
+  renderWho();
+}
+
+/* ---- who is using this device (SPEC 21.2) ----
+   Deliberately small and at the bottom. A student on their own laptop should
+   never have to think about it; it exists for the shared class set. */
+function renderWho(){
+  var ps = profiles(), act = activeProfile(), h = "", id;
+  for(id in ps)
+    h += '<button class="chip" aria-pressed="' + (id===act) + '" onclick="whoSwitch(\'' +
+         id + '\')">' + esc(ps[id].name) + '</button>';
+  h += '<button class="chip" onclick="whoAdd()">+ Add</button>';
+  if(Object.keys(ps).length > 1)
+    h += '<button class="chip" onclick="whoRemove()">Remove ' + esc(ps[act].name) + '</button>';
+  el("whoChips").innerHTML = h;
+}
+function whoSwitch(id){ profileSwitch(id); renderDiag(); }
+function whoAdd(){
+  var n = prompt("Name for the new person using this device:");
+  if(n === null) return;
+  profileAdd(String(n).slice(0,24) || null); renderDiag();
+}
+function whoRemove(){
+  var ps = profiles(), act = activeProfile();
+  if(!confirm("Remove " + ps[act].name + " and everything they have done on this device?")) return;
+  profileRemove(act); renderDiag();
+}
+function whoRename(){
+  var ps = profiles(), act = activeProfile();
+  var n = prompt("Rename:", ps[act].name);
+  if(n) { profileRename(act, n); renderDiag(); }
+}
+function esc(t){
+  return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
 /* ------------- which word class fills the gap? (SPEC 9f) -------------
    Same gaps as Insert the word, but the options are the four class names, so
    the student has to read the slot instead of recognising a word ending. The
@@ -2000,7 +2268,7 @@ var KSLOT = {
   adv:  "An adverb would tell you <b>how, when or where</b> the action happened."
 };
 
-function startKlass(){ go("klass"); lvlChips("kLevels", KLASS, K.lvl, "kLvl"); kNext(); }
+function startKlass(){ markTried("klass"); go("klass"); lvlChips("kLevels", KLASS, K.lvl, "kLvl"); kNext(); }
 function kLvl(l){ K.lvl=l; lvlChips("kLevels", KLASS, K.lvl, "kLvl"); kNext(); }
 function kNext(){
   var p = lvlPool(KLASS, K.lvl);
@@ -2064,7 +2332,7 @@ function kCheck(){
 }
 
 /* ---------------- change the word ---------------- */
-function startTrans(){ go("trans"); lvlChips("trLevels", TRANSFORM, R.lvl, "trLvl"); trNext(); }
+function startTrans(){ markTried("trans"); go("trans"); lvlChips("trLevels", TRANSFORM, R.lvl, "trLvl"); trNext(); }
 function trLvl(l){ R.lvl=l; lvlChips("trLevels", TRANSFORM, R.lvl, "trLvl"); trNext(); }
 function trNext(){
   var p = lvlPool(TRANSFORM, R.lvl);
