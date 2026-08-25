@@ -74,7 +74,12 @@ button{font:inherit;cursor:pointer}
 .bz-flash.ok{background:rgba(143,220,156,.13);opacity:1}
 .bz-flash.bad{background:rgba(255,139,128,.15);opacity:1}
 body.blitz{padding-bottom:120px}
-body.blitz .go{display:none}          /* every activity auto-advances: no Check, no Next */
+/* Hide the CHECK and NEXT buttons only, by id. A blanket `.go` rule was used
+   here first and it hid the Yes button in Yes or no, because Yes is a primary
+   button and No is a ghost one: every question in a challenge run could only be
+   answered No. Answer buttons are never hidden. */
+body.blitz #checkBtn, body.blitz #nextBtn, body.blitz #czCheck,
+body.blitz #frCheck, body.blitz #kCheck, body.blitz #trCheck{display:none !important}
 
 /* test mode. The bar sits over whichever activity is running, and body.testing
    hides everything that would teach or distract mid-paper (SPEC 23). */
@@ -100,6 +105,10 @@ body.testing .lbl,
 body.testing .topbar .back,
 body.testing #czNextBar, body.testing #kNextBar, body.testing #trNextBar,
 body.testing #frNextBar, body.testing #ynNextBar,
+/* The click round's own advance button is a bare #nextBtn rather than a NextBar,
+   and was missed when this list was written by hand. It let a student pull a new
+   sentence without the question counter moving. Both modes own the advance. */
+body.testing #nextBtn,
 body.testing .ref{display:none !important}
 body.testing .score{visibility:hidden}
 .res-score{text-align:center;font-size:3rem;font-weight:650;letter-spacing:.02em;
@@ -1095,7 +1104,7 @@ var AMBIG = ["answer","answers","back","bark","barks","book","books","brush","br
 <script>
 "use strict";
 
-var APP = "wcc", VER = "v0.12", BANK_REV = 7;
+var APP = "wcc", VER = "v0.12.1", BANK_REV = 7;
 var BUG_FORM_URL = "";   /* paste the Office 365 form link to switch the report button on */
 
 /* ---------- the four tests: one source for the Learn screen AND every
