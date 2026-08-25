@@ -36,6 +36,9 @@ the schema is idempotent.
 | `/board?cls=9B&limit=20` | GET | the app | top scores for a class |
 | `/admin/delete` | POST | teacher | remove one row by id |
 | `/admin/clear` | POST | teacher | empty one class board |
+| `/admin/pending` | POST | teacher | names awaiting a decision |
+| `/admin/approve` | POST | teacher | let a name be seen |
+| `/admin/reject` | POST | teacher | keep a name hidden for good |
 
 Teacher routes need an `X-Teacher-Key` header matching the `TEACHER_KEY` secret.
 **If that secret has never been set, they refuse rather than defaulting to open.**
@@ -43,18 +46,34 @@ Teacher routes need an `X-Teacher-Key` header matching the `TEACHER_KEY` secret.
 ### POST /score
 
 ```json
-{ "cls": "9B", "adj": 0, "noun": 0, "correct": 20, "wrong": 2,
+{ "cls": "9B", "nick": "Aisha", "correct": 20, "wrong": 2,
   "chain": 8, "level": "secure", "score": 30 }
 ```
 
-`adj` and `noun` are **indexes into word lists held in the worker**, not text.
-The worker composes the nickname. A `nick` field sent by the client is ignored
-entirely, which is tested. This is SPEC 19.3: free-text nicknames chosen by
-teenagers and then projected in a lesson have a known ending, and no word filter
-has ever won that argument. Structurally impossible beats filtered.
+**Nicknames are free text and therefore moderated** (SPEC 19.3, revised
+2026-08-25 on the teacher's ruling; an earlier version composed them from word
+lists so a rude one was impossible to type).
 
-The lists are **append-only**. Reordering or removing an entry silently renames
-everyone who already scored.
+The safety property is **not a filter, it is a gate**: `GET /board` never
+returns a name that has not been approved. Not masked, not filtered on the
+client, not sent at all. The score ranks immediately, because holding a score
+hostage to a teacher's attention would make the board useless.
+
+**A name is judged once per class, not once per run.** Approving *Aisha* in 9B
+updates every run she has posted and every run she posts afterwards. Without
+that, a teacher approves the same thirty names every lesson, which is how a
+moderation queue stops being used.
+
+### Moderating
+
+| Route | Body | Effect |
+|---|---|---|
+| `/admin/pending` | `{cls}` | names waiting, grouped by name with a run count |
+| `/admin/approve` | `{cls, nick}` | that name becomes visible, past and future |
+| `/admin/reject` | `{cls, nick}` | that name never becomes visible |
+
+A rejected student's **scores still count and still rank**; only the name stays
+hidden.
 
 ## What is validated, and what is not
 
@@ -65,7 +84,7 @@ rejects the *impossible* rather than pretending to verify the plausible:
 - arithmetic that could not have happened (score above `correct x maxMultiplier - wrong x penalty`)
 - more items than sixty seconds physically allows
 - a chain longer than the number of correct answers
-- nickname indexes outside the lists, class codes that are not plain alphanumerics
+- names that are empty, over 16 characters, or not a string; class codes that are not plain alphanumerics
 - more than 40 submissions for one class in 60 seconds
 
 The bound is deliberately loose. It exists to reject 999999, not to second-guess
@@ -80,7 +99,7 @@ addresses**, so that no request metadata has to be stored to make it work.
 node worker/test.mjs
 ```
 
-41 assertions. Drives the real worker module against a real SQLite database
+62 assertions. Drives the real worker module against a real SQLite database
 through a small D1 shim, so the SQL is executed rather than eyeballed. The shim
 implements only the four D1 calls the worker makes; if the worker starts using
 more of the D1 API, the shim has to grow with it, and a missing method throws

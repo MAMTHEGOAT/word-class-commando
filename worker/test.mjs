@@ -52,7 +52,7 @@ function req(path, opts) {
   return worker.fetch(new Request("https://board.example.com" + path, init), env);
 }
 
-const good = { cls: "9b", adj: 0, noun: 0, correct: 20, wrong: 2, chain: 8, level: "secure", score: 30 };
+const good = { cls: "9b", nick: "Aisha", correct: 20, wrong: 2, chain: 8, level: "secure", score: 30 };
 
 /* ------------------------------------------------------------------ runner */
 let pass = 0;
@@ -91,13 +91,13 @@ await test("a valid score is accepted and ranked", async () => {
   let r = await req("/score", { method: "POST", body: good });
   let b = await r.json();
   check("valid score accepted", r.status === 200, r.status + " " + JSON.stringify(b));
-  check("nickname is composed by the worker", b.nick === "BraveOtter", b.nick);
+  check("the submitted name comes back", b.nick === "Aisha", b.nick);
   check("first score ranks first", b.rank === 1, String(b.rank));
 
-  r = await req("/score", { method: "POST", body: { ...good, adj: 1, noun: 1, score: 50 } });
+  r = await req("/score", { method: "POST", body: { ...good, nick: "Ben", score: 50 } });
   b = await r.json();
   check("higher score ranks first", b.rank === 1, String(b.rank));
-  r = await req("/score", { method: "POST", body: { ...good, adj: 2, noun: 2, score: 10 } });
+  r = await req("/score", { method: "POST", body: { ...good, nick: "Cal", score: 10 } });
   b = await r.json();
   check("lower score ranks third", b.rank === 3, String(b.rank));
 
@@ -107,23 +107,102 @@ await test("a valid score is accepted and ranked", async () => {
   check("board is ordered high to low",
     b.board[0].score === 50 && b.board[1].score === 30 && b.board[2].score === 10,
     JSON.stringify(b.board.map(x => x.score)));
-  check("board rows carry no hidden fields",
+  /* Guards against a field being added to the board response by accident. The
+     unapproved shape matters most: `nick` must be ABSENT, not null or masked. */
+  check("an unapproved row carries no nick field at all",
     Object.keys(b.board[0]).sort().join(",") ===
-    "chain,correct,created,id,level,nick,score,wrong",
+    "chain,correct,created,id,level,score,status,wrong",
     Object.keys(b.board[0]).sort().join(","));
+  await req("/admin/approve", { method: "POST", body: { cls: "9B", nick: "Ben" },
+                                headers: { "X-Teacher-Key": KEY } });
+  r = await req("/board?cls=9B");
+  b = await r.json();
+  const approvedRow = b.board.filter(x => x.nick === "Ben")[0];
+  check("an approved row adds nick and nothing else",
+    approvedRow && Object.keys(approvedRow).sort().join(",") ===
+    "chain,correct,created,id,level,nick,score,status,wrong",
+    approvedRow && Object.keys(approvedRow).sort().join(","));
 });
 
-await test("free-text nicknames are structurally impossible", async () => {
-  /* SPEC 19.3: the client sends indexes, never text. Anything it puts in a
-     `nick` field must be ignored entirely. */
-  const r = await req("/score", { method: "POST", body: { ...good, nick: "SOMETHING RUDE" } });
-  const b = await r.json();
-  check("a client-supplied nick field is ignored", b.nick === "BraveOtter", b.nick);
+await test("free-text nicknames are accepted but never shown unapproved", async () => {
+  /* SPEC 19.3 as revised: the student types their own name, and the SAFETY
+     property is that the public board never returns it until a person approves.
+     This is the single most important test in this file. */
+  let r = await req("/score", { method: "POST", body: { ...good, nick: "Something Rude" } });
+  let b = await r.json();
+  check("a free-text name is accepted", r.status === 200, r.status + " " + JSON.stringify(b));
+  check("and comes back to its own author", b.nick === "Something Rude", b.nick);
+  check("and starts unapproved", b.approved === 0, String(b.approved));
+  check("but the score still ranks immediately", b.rank === 1, String(b.rank));
 
-  for (const bad of [{ adj: 99 }, { adj: -1 }, { noun: 999 }, { adj: "Rude" }, { adj: 1.5 }]) {
+  r = await req("/board?cls=9B");
+  b = await r.json();
+  const raw = JSON.stringify(b);
+  check("the public board does NOT contain the unapproved name",
+    raw.indexOf("Something Rude") < 0, raw.slice(0, 200));
+  check("the row is still on the board, without a name",
+    b.board.length === 1 && b.board[0].nick === undefined && b.board[0].status === 0,
+    JSON.stringify(b.board[0]));
+
+  for (const bad of [{ nick: "" }, { nick: "   " }, { nick: 42 },
+                     { nick: "x".repeat(17) }, { nick: "\u0000\u0001" }]) {
     const rr = await req("/score", { method: "POST", body: { ...good, ...bad } });
-    check("nickname index rejected: " + JSON.stringify(bad), rr.status === 400, "got " + rr.status);
+    check("rejected as a name: " + JSON.stringify(bad), rr.status === 400, "got " + rr.status);
   }
+  r = await req("/score", { method: "POST", body: { ...good, nick: "  Ada   Lovelace  " } });
+  b = await r.json();
+  check("whitespace is tidied rather than refused", b.nick === "Ada Lovelace", b.nick);
+  r = await req("/score", { method: "POST", body: { ...good, nick: "<b>bold</b>" } });
+  b = await r.json();
+  check("angle brackets are stripped before storage", b.nick === "bbold/b", b.nick);
+});
+
+await test("moderation: approve, reject, and judge a name only once", async () => {
+  await req("/score", { method: "POST", body: { ...good, nick: "Aisha", score: 40 } });
+  await req("/score", { method: "POST", body: { ...good, nick: "Aisha", score: 20 } });
+  await req("/score", { method: "POST", body: { ...good, nick: "Rude One", score: 30 } });
+
+  let r = await req("/admin/pending", { method: "POST", body: { cls: "9B" } });
+  check("pending needs the teacher key", r.status === 403, "got " + r.status);
+  r = await req("/admin/pending", { method: "POST", body: { cls: "9B" },
+                                    headers: { "X-Teacher-Key": KEY } });
+  let b = await r.json();
+  check("pending lists NAMES not runs", b.pending.length === 2, JSON.stringify(b.pending));
+  const aisha = b.pending.filter(p => p.nick === "Aisha")[0];
+  check("and groups a repeat player into one decision", aisha && aisha.runs === 2,
+    JSON.stringify(aisha));
+
+  r = await req("/admin/approve", { method: "POST", body: { cls: "9B", nick: "Aisha" },
+                                    headers: { "X-Teacher-Key": KEY } });
+  b = await r.json();
+  check("approving updates every run that name posted", b.runsUpdated === 2, JSON.stringify(b));
+
+  r = await req("/board?cls=9B");
+  b = await r.json();
+  const named = b.board.filter(x => x.nick === "Aisha");
+  check("the approved name now appears", named.length === 2, JSON.stringify(b.board));
+  check("the unjudged name still does not",
+    JSON.stringify(b.board).indexOf("Rude One") < 0, JSON.stringify(b.board));
+
+  /* the decision must carry to FUTURE runs, or the queue is unusable */
+  r = await req("/score", { method: "POST", body: { ...good, nick: "Aisha", score: 60 } });
+  b = await r.json();
+  check("a later run by an approved name is approved on arrival", b.approved === 1,
+    String(b.approved));
+
+  r = await req("/admin/reject", { method: "POST", body: { cls: "9B", nick: "Rude One" },
+                                   headers: { "X-Teacher-Key": KEY } });
+  b = await r.json();
+  check("rejecting works", b.status === -1, JSON.stringify(b));
+  r = await req("/score", { method: "POST", body: { ...good, nick: "Rude One", score: 55 } });
+  b = await r.json();
+  check("a rejected name stays rejected on its next run", b.approved === -1, String(b.approved));
+  r = await req("/board?cls=9B");
+  b = await r.json();
+  check("and never reaches the board",
+    JSON.stringify(b.board).indexOf("Rude One") < 0, JSON.stringify(b.board));
+  check("even though its score is ranked",
+    b.board.filter(x => x.score === 55).length === 1, JSON.stringify(b.board));
 });
 
 await test("the impossible is rejected", async () => {
@@ -162,7 +241,7 @@ await test("rate limiting", async () => {
 
 await test("teacher routes", async () => {
   await req("/score", { method: "POST", body: good });
-  await req("/score", { method: "POST", body: { ...good, adj: 3, noun: 3 } });
+  await req("/score", { method: "POST", body: { ...good, nick: "Dee" } });
 
   let r = await req("/admin/delete", { method: "POST", body: { id: 1 } });
   check("delete without a key is refused", r.status === 403, "got " + r.status);

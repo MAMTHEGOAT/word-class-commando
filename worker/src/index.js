@@ -16,26 +16,45 @@
  *     chain longer than the correct answers. Everything past that is a social
  *     problem, and in a class of thirty a social problem is manageable.
  *
- *  3. Nicknames are composed HERE from two fixed word lists (SPEC 19.3). The
- *     client sends two integers, never text. A free-text nickname chosen by a
- *     teenager and then projected in a lesson has a known ending, and no word
- *     filter has ever won that argument. Structurally impossible beats filtered.
+ *  3. Nicknames are FREE TEXT and therefore MODERATED (SPEC 19.3, revised
+ *     2026-08-25). An earlier version of this file composed them from word
+ *     lists so that a rude name was structurally impossible; the teacher
+ *     ruled that students should choose their own. The safety property moved
+ *     from "cannot be typed" to "cannot be SEEN until approved": the public
+ *     board route never returns an unapproved name, and the score ranks
+ *     immediately while the name waits. A blocklist was considered instead
+ *     and rejected, because it loses the arms race within a week.
  *
  * Not stored, ever: real names, school identifiers, IP addresses, misconception
  * counters, anything from practice or test mode.
  */
 
-/* Nickname parts. The client sends indexes into these; both lists are mirrored
-   in the app so it can show the student their name before they submit. Keep the
-   two lists append-only, or old rows stop matching what students see. */
-const ADJ = [
-  "Brave", "Quick", "Quiet", "Clever", "Bright", "Steady", "Bold", "Keen",
-  "Swift", "Calm", "Sharp", "Lucky", "Fierce", "Nimble", "Solid", "Wily"
-];
-const NOUN = [
-  "Otter", "Falcon", "Badger", "Heron", "Fox", "Lynx", "Raven", "Marten",
-  "Osprey", "Stoat", "Kestrel", "Hare", "Owl", "Pike", "Adder", "Wren"
-];
+/* Nicknames are FREE TEXT, and therefore moderated (SPEC 19.3, revised
+   2026-08-25 on the teacher's ruling, reversing the generated-name design).
+
+   The safety property is not a filter, it is a gate: a name NEVER leaves this
+   worker on the public board route until a teacher has approved it. A blocklist
+   was considered and rejected, because it loses the arms race to spacing and
+   spelling within a week and produces false positives on ordinary words.
+
+   A name is judged once per class, not once per run: see the `names` table.
+   Without that, a teacher approves the same thirty names every lesson, which is
+   how a moderation queue stops being used. */
+const NICK_MAX = 16;
+
+/** Clean a submitted nickname, or return null if nothing usable is left.
+ *  Cleaning is about making the value SAFE TO STORE AND DISPLAY, not about
+ *  judging it. The judging is a person's job and happens later. */
+function cleanNick(v) {
+  if (typeof v !== "string") return null;
+  let s = v.replace(/[\u0000-\u001F\u007F]/g, " ")   // control characters
+           .replace(/[<>]/g, "")                       // never worth storing
+           .replace(/\s+/g, " ")
+           .trim();
+  if (!s) return null;
+  if ([...s].length > NICK_MAX) return null;
+  return s;
+}
 
 const LEVELS = ["foundation", "developing", "secure", "challenge"];
 
@@ -117,8 +136,8 @@ async function postScore(request, env) {
   const cls = cleanClass(body.cls);
   if (!cls) return json(env, { error: "bad class code" }, 400);
 
-  if (!isInt(body.adj, 0, ADJ.length - 1) || !isInt(body.noun, 0, NOUN.length - 1))
-    return json(env, { error: "bad nickname" }, 400);
+  const nick = cleanNick(body.nick);
+  if (!nick) return json(env, { error: "bad nickname" }, 400);
 
   const correct = body.correct, wrong = body.wrong, chain = body.chain, score = body.score;
 
@@ -144,14 +163,21 @@ async function postScore(request, env) {
   if (recent && recent.n >= RATE_MAX_PER_CLASS)
     return json(env, { error: "too many scores from this class just now" }, 429);
 
-  const nick = ADJ[body.adj] + NOUN[body.noun];
+  /* Has this name already been judged for this class? If so the decision
+     carries over, so a student who has been approved once is not re-queued
+     every single run. */
+  const prior = await env.DB
+    .prepare("SELECT status FROM names WHERE cls = ? AND nick = ?")
+    .bind(cls, nick)
+    .first();
+  const approved = prior ? prior.status : 0;
 
   await env.DB
     .prepare(
-      "INSERT INTO runs (cls, nick, score, correct, wrong, chain, level, created) " +
-      "VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+      "INSERT INTO runs (cls, nick, approved, score, correct, wrong, chain, level, created) " +
+      "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
     )
-    .bind(cls, nick, score, correct, wrong, chain, body.level, now)
+    .bind(cls, nick, approved, score, correct, wrong, chain, body.level, now)
     .run();
 
   /* Tell the student where they landed, which is the only thing they want to
@@ -161,7 +187,8 @@ async function postScore(request, env) {
     .bind(cls, score)
     .first();
 
-  return json(env, { ok: true, nick: nick, rank: (rank ? rank.n : 0) + 1 });
+  return json(env, { ok: true, nick: nick, approved: approved,
+                     rank: (rank ? rank.n : 0) + 1 });
 }
 
 async function getBoard(url, env) {
@@ -174,13 +201,27 @@ async function getBoard(url, env) {
 
   const rows = await env.DB
     .prepare(
-      "SELECT id, nick, score, correct, wrong, chain, level, created FROM runs " +
+      "SELECT id, nick, approved, score, correct, wrong, chain, level, created FROM runs " +
       "WHERE cls = ? ORDER BY score DESC, created ASC LIMIT ?"
     )
     .bind(cls, limit)
     .all();
 
-  return json(env, { cls: cls, board: (rows && rows.results) || [] });
+  /* THE safety property of the whole moderation design: an unapproved name does
+     not leave this worker on the public route. Not masked on the client, not
+     filtered in the app, not sent at all. The score still ranks, because holding
+     the score hostage to a teacher's attention would make the board useless. */
+  const board = ((rows && rows.results) || []).map(function (r) {
+    const out = {
+      id: r.id, score: r.score, correct: r.correct, wrong: r.wrong,
+      chain: r.chain, level: r.level, created: r.created,
+      status: r.approved
+    };
+    if (r.approved === 1) out.nick = r.nick;
+    return out;
+  });
+
+  return json(env, { cls: cls, board: board });
 }
 
 /** Teacher routes. One shared secret, set with `wrangler secret put TEACHER_KEY`.
@@ -203,6 +244,51 @@ async function adminDelete(request, env) {
   if (!isInt(body.id, 1, Number.MAX_SAFE_INTEGER)) return json(env, { error: "bad id" }, 400);
   const r = await env.DB.prepare("DELETE FROM runs WHERE id = ?").bind(body.id).run();
   return json(env, { ok: true, deleted: (r.meta && r.meta.changes) || 0 });
+}
+
+/** Everything in one class still waiting on a person. */
+async function adminPending(request, env) {
+  if (!teacherOk(request, env)) return json(env, { error: "no" }, 403);
+  let body;
+  try { body = await request.json(); } catch (e) { return json(env, { error: "bad json" }, 400); }
+  const cls = cleanClass(body.cls);
+  if (!cls) return json(env, { error: "bad class code" }, 400);
+  /* Grouped by name: the teacher is judging NAMES, not runs, so a student who
+     has played six times is one decision rather than six. */
+  const rows = await env.DB
+    .prepare(
+      "SELECT nick, COUNT(*) AS runs, MAX(score) AS best, MIN(created) AS first " +
+      "FROM runs WHERE cls = ? AND approved = 0 GROUP BY nick ORDER BY first ASC LIMIT 200"
+    )
+    .bind(cls)
+    .all();
+  return json(env, { cls: cls, pending: (rows && rows.results) || [] });
+}
+
+/** Approve or reject a NAME for a class, which decides every run that name has
+ *  posted and every run it posts in future. */
+async function adminJudge(request, env, status) {
+  if (!teacherOk(request, env)) return json(env, { error: "no" }, 403);
+  let body;
+  try { body = await request.json(); } catch (e) { return json(env, { error: "bad json" }, 400); }
+  const cls = cleanClass(body.cls);
+  if (!cls) return json(env, { error: "bad class code" }, 400);
+  const nick = cleanNick(body.nick);
+  if (!nick) return json(env, { error: "bad nickname" }, 400);
+
+  const now = Math.floor(Date.now() / 1000);
+  await env.DB
+    .prepare("INSERT INTO names (cls, nick, status, decided) VALUES (?, ?, ?, ?) " +
+             "ON CONFLICT(cls, nick) DO UPDATE SET status = excluded.status, " +
+             "decided = excluded.decided")
+    .bind(cls, nick, status, now)
+    .run();
+  const r = await env.DB
+    .prepare("UPDATE runs SET approved = ? WHERE cls = ? AND nick = ?")
+    .bind(status, cls, nick)
+    .run();
+  return json(env, { ok: true, nick: nick, status: status,
+                     runsUpdated: (r.meta && r.meta.changes) || 0 });
 }
 
 async function adminClear(request, env) {
@@ -231,6 +317,12 @@ export default {
         return await getBoard(url, env);
       if (url.pathname === "/admin/delete" && request.method === "POST")
         return await adminDelete(request, env);
+      if (url.pathname === "/admin/pending" && request.method === "POST")
+        return await adminPending(request, env);
+      if (url.pathname === "/admin/approve" && request.method === "POST")
+        return await adminJudge(request, env, 1);
+      if (url.pathname === "/admin/reject" && request.method === "POST")
+        return await adminJudge(request, env, -1);
       if (url.pathname === "/admin/clear" && request.method === "POST")
         return await adminClear(request, env);
       if (url.pathname === "/health")
