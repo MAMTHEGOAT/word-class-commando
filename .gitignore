@@ -15,16 +15,11 @@ collide.py
 verify.py
 serve.ps1
 
-# Test suites
+# Test suites. Pattern rather than a list of names, because naming them one by
+# one meant storetest.py got committed the moment it was written (2026-08-25).
+# worker/test.mjs is .mjs and stays tracked: it is part of the worker.
+*test*.py
 smoke.py
-verbtest.py
-strict_test.py
-wrongtest.py
-v3test.py
-v4test.py
-v6test.py
-v7test.py
-menutest.py
 
 # One-off patch scripts
 fix_engine.py

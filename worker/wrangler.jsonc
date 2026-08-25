@@ -1,33 +1,31 @@
 {
-  // Word Class Commando leaderboard service. See ../SPEC.md section 19.
-  // Deployed SEPARATELY from the site: `git push` publishes the app to GitHub
-  // Pages, this needs `wrangler deploy` from inside worker/.
-  "name": "wcc-board",
-  "main": "src/index.js",
-
-  // Set to the date this was written, per Cloudflare's guidance to use the
-  // current date on a new project. Changing it later needs a re-test.
-  "compatibility_date": "2026-08-25",
-
-  "d1_databases": [
-    {
-      "binding": "DB",
-      "database_name": "wcc-board"
-      // database_id is deliberately omitted. Wrangler provisions the database
-      // on first deploy, which saves copying an id by hand. After it exists,
-      // the schema is applied BY NAME: see deploy-worker.bat.
-    }
-  ],
-
-  "vars": {
-    // The only origin allowed to post scores. A leaderboard that accepts
-    // cross-origin writes from anywhere is a leaderboard anyone can fill.
-    "ALLOWED_ORIGIN": "https://mamthegoat.github.io"
-  },
-
-  "observability": {
-    "enabled": true
-  }
-
-  // TEACHER_KEY is NOT here. It is a secret:  wrangler secret put TEACHER_KEY
+	// Word Class Commando leaderboard service. See ../SPEC.md section 19.
+	// Deployed SEPARATELY from the site: `git push` publishes the app to GitHub
+	// Pages, this needs `wrangler deploy` from inside worker/.
+	"name": "wcc-board",
+	"main": "src/index.js",
+	// Set to the date this was written, per Cloudflare's guidance to use the
+	// current date on a new project. Changing it later needs a re-test.
+	"compatibility_date": "2026-08-25",
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "wcc-board",
+			"database_id": "7e4d6a18-dbe1-4d7e-9449-00a760de37b6"
+			// This id was NOT typed by hand. It was left out deliberately so that the
+			// first `wrangler deploy` would provision the database and write it back
+			// here, which it did on 2026-08-25. It is an identifier, not a
+			// credential, and is safe in a public repo. The schema is applied by
+			// NAME rather than by id: see deploy-worker.bat.
+		}
+	],
+	"vars": {
+		// The only origin allowed to post scores. A leaderboard that accepts
+		// cross-origin writes from anywhere is a leaderboard anyone can fill.
+		"ALLOWED_ORIGIN": "https://mamthegoat.github.io"
+	},
+	"observability": {
+		"enabled": true
+	}
+	// TEACHER_KEY is NOT here. It is a secret:  wrangler secret put TEACHER_KEY
 }

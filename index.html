@@ -905,7 +905,7 @@ var AMBIG = ["answer","answers","back","bark","barks","book","books","brush","br
 <script>
 "use strict";
 
-var APP = "wcc", VER = "v0.7.1", BANK_REV = 7;
+var APP = "wcc", VER = "v0.8", BANK_REV = 7;
 var BUG_FORM_URL = "";   /* paste the Office 365 form link to switch the report button on */
 
 /* ---------- the four tests: one source for the Learn screen AND every
@@ -1128,19 +1128,165 @@ var LIVE = {noun:true, verb:true, adj:true, adv:true};
 /* ---------------------------- state ---------------------------- */
 var S = { act:"one", cls:"noun", lvl:"all", item:null, sel:{}, done:false };
 
-/* ---------------------------- storage --------------------------- */
-function store(){
-  try{
-    var raw = localStorage.getItem("wcc_v1");
-    var o = raw ? JSON.parse(raw) : null;
-    if(!o || o.rev !== BANK_REV) o = {rev:BANK_REV, seen:{}, revisit:{}, err:{}};
-    if(!o.seen) o.seen = {};
-    if(!o.revisit) o.revisit = {};
-    if(!o.err) o.err = {};
-    return o;
-  }catch(e){ return {rev:BANK_REV, seen:{}, revisit:{}, err:{}, off:true}; }
+/* ---------------------------- storage ---------------------------
+   Rewritten 2026-08-25 (SPEC 21). Two things were wrong with the old version
+   and both were harmless right up until they were not:
+
+   1. It DELETED every student's history whenever BANK_REV changed, i.e. on
+      every content release. That was written when the app had 26 sentences and
+      nobody had any history worth keeping. It is indefensible now, and it was
+      never necessary: item ids are append-only and never reused (CLAUDE.md),
+      so a seen list stays valid across content releases by construction. The
+      only thing a new bank can invalidate is an id that no longer exists, and
+      that is pruned rather than everything being thrown away.
+
+   2. It had no concept of more than one student. On a shared class laptop the
+      second student inherited the first one's record and then overwrote it.
+
+   The record is now versioned SEPARATELY from the bank (`v`), so the format can
+   change later without touching content, and every future migration has a
+   documented place to live.
+
+   store() still returns an object carrying {seen, revisit, err} and save() still
+   persists it, so all 22 call sites in the engine are untouched by this. That is
+   deliberate: a storage change should not be able to break scoring.        */
+
+var REC_KEY = "wcc_v2", OLD_KEY = "wcc_v1", REC_VERSION = 2;
+var _root = null;          /* cached so repeated store() calls cannot clobber
+                              each other within one interaction */
+var _dirty = false;        /* a migration, prune or repair happened and has
+                              not been written back yet */
+
+function _blankProfile(name){
+  return { name: name || "Player 1", seen:{}, revisit:{}, err:{}, best:{} };
 }
-function save(o){ try{ if(!o.off) localStorage.setItem("wcc_v1", JSON.stringify(o)); }catch(e){} }
+function _blankRoot(){
+  return { v:REC_VERSION, bankRev:BANK_REV, active:"p1",
+           profiles:{ p1:_blankProfile("Player 1") } };
+}
+
+/** Drop ids the current banks no longer contain. Only worth doing when the bank
+ *  has actually changed, so it runs once after a content release rather than on
+ *  every call. Stale ids are inert rather than harmful, but a revisit entry that
+ *  can never be matched would be re-examined forever. */
+function _pruneToBank(root){
+  var live = {}, i, j, banks = [SENTENCES, FRAMES, CLOZE, KLASS, TRANSFORM];
+  for(i=0;i<banks.length;i++)
+    for(j=0;j<banks[i].length;j++) live[banks[i][j].id] = 1;
+  for(var p in root.profiles){
+    var prof = root.profiles[p], k;
+    for(k in prof.seen)
+      prof.seen[k] = (prof.seen[k]||[]).filter(function(id){ return live[id]; });
+    for(k in prof.revisit)
+      prof.revisit[k] = (prof.revisit[k]||[]).filter(function(r){ return live[r.id]; });
+  }
+}
+
+function _migrate(){
+  /* v1 -> v2. Everything is CARRIED, including history recorded under an older
+     bank revision, which the old code would have deleted. */
+  var raw = localStorage.getItem(OLD_KEY);
+  if(!raw) return null;
+  var old = JSON.parse(raw);
+  var root = _blankRoot();
+  root.profiles.p1.seen    = old.seen    || {};
+  root.profiles.p1.revisit = old.revisit || {};
+  root.profiles.p1.err     = old.err     || {};
+  root.bankRev = (typeof old.rev === "number") ? old.rev : BANK_REV;
+  return root;
+}
+
+function _load(){
+  var raw = localStorage.getItem(REC_KEY);
+  var root = raw ? JSON.parse(raw) : null;
+  if(!root) root = _migrate();
+  if(!root || root.v !== REC_VERSION) root = root ? _upgrade(root) : _blankRoot();
+
+  /* repair rather than reset: a half-written record loses the damaged part only */
+  if(!root.profiles || typeof root.profiles !== "object") root.profiles = {};
+  if(!root.profiles[root.active]) {
+    var ids = Object.keys(root.profiles);
+    if(ids.length){ root.active = ids[0]; }
+    else { root.profiles = { p1:_blankProfile("Player 1") }; root.active = "p1"; }
+  }
+  for(var p in root.profiles){
+    var pr = root.profiles[p];
+    if(!pr.seen) pr.seen = {};
+    if(!pr.revisit) pr.revisit = {};
+    if(!pr.err) pr.err = {};
+    if(!pr.best) pr.best = {};
+    if(!pr.name) pr.name = "Player 1";
+  }
+  if(root.bankRev !== BANK_REV){ _pruneToBank(root); root.bankRev = BANK_REV; _dirty = true; }
+  if(!raw) _dirty = true;      /* migrated or created: write it out below */
+  return root;
+}
+
+/** Future record-format migrations land here, one branch per version step.
+ *  Never delete a student's work to reach a new format. */
+function _upgrade(root){
+  var fresh = _blankRoot();
+  if(root && root.profiles) { fresh.profiles = root.profiles; fresh.active = root.active || "p1"; }
+  else if(root && root.seen) { fresh.profiles.p1.seen = root.seen;
+                               fresh.profiles.p1.revisit = root.revisit || {};
+                               fresh.profiles.p1.err = root.err || {}; }
+  return fresh;
+}
+
+function store(){
+  if(_root) return _root.profiles[_root.active];
+  try{
+    _root = _load();
+    /* Persist a migration or repair immediately. Without this the old record is
+       re-read and re-migrated on every single load, and a student who never
+       finishes an item never gets their history written under the new key. */
+    if(_dirty){ _dirty = false; save(); }
+    return _root.profiles[_root.active];
+  }catch(e){
+    /* Private browsing, storage disabled, or a corrupt record we could not
+       repair. The app must still be fully playable, so hand back a working
+       in-memory profile that simply never persists. */
+    _root = _blankRoot(); _root.off = true;
+    _root.profiles[_root.active].off = true;
+    return _root.profiles[_root.active];
+  }
+}
+function save(){
+  try{
+    if(!_root || _root.off) return;
+    localStorage.setItem(REC_KEY, JSON.stringify(_root));
+  }catch(e){ /* quota or disabled: keep playing, just stop persisting */ }
+}
+
+/* ---- profiles. No UI yet; the switcher lands with the results screen. ---- */
+function profiles(){ store(); return _root.profiles; }
+function activeProfile(){ store(); return _root.active; }
+function profileAdd(name){
+  store();
+  var n = 1; while(_root.profiles["p"+n]) n++;
+  var id = "p"+n;
+  _root.profiles[id] = _blankProfile(name || ("Player " + n));
+  _root.active = id; save(); return id;
+}
+function profileSwitch(id){
+  store();
+  if(!_root.profiles[id]) return false;
+  _root.active = id; save(); return true;
+}
+function profileRename(id, name){
+  store();
+  if(!_root.profiles[id] || !name) return false;
+  _root.profiles[id].name = String(name).slice(0, 24);
+  save(); return true;
+}
+function profileRemove(id){
+  store();
+  if(!_root.profiles[id]) return false;
+  if(Object.keys(_root.profiles).length < 2) return false;   /* never zero profiles */
+  delete _root.profiles[id];
+  if(_root.active === id) _root.active = Object.keys(_root.profiles)[0];
+  save(); return true;
+}
 
 /* ---------------------------- helpers --------------------------- */
 function el(id){ return document.getElementById(id); }
