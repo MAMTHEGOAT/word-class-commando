@@ -67,3 +67,6 @@ Desktop.ini
 *.tmp
 *~
 node_modules/
+
+# Quiz authoring (the Forms import doc is a deliverable, not part of the site)
+quiz/
