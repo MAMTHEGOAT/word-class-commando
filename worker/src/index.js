@@ -235,6 +235,19 @@ export default {
         return await adminClear(request, env);
       if (url.pathname === "/health")
         return json(env, { ok: true });
+
+      /* A human landed on the root. The 404 that used to be here read as a
+         broken deploy to the person who had just deployed it, which is a bad
+         way to greet the one user who most needs reassurance. */
+      if (url.pathname === "/" || url.pathname === "")
+        return json(env, {
+          service: "Word Class Commando leaderboard",
+          ok: true,
+          note: "This is the score service, not the app. The app is at " +
+                "https://mamthegoat.github.io/word-class-commando/",
+          routes: ["/health", "/board?cls=9B"]
+        });
+
       return json(env, { error: "not found" }, 404);
     } catch (err) {
       /* Never leak internals to a student's browser. The app treats any failure

@@ -77,6 +77,10 @@ await test("health and routing", async () => {
     r.headers.get("Access-Control-Allow-Origin"));
   r = await req("/nope");
   check("unknown route is 404", r.status === 404, "got " + r.status);
+  r = await req("/");
+  const rootBody = await r.json();
+  check("the root explains itself rather than 404ing", r.status === 200, "got " + r.status);
+  check("the root points at the app", /github\.io/.test(rootBody.note || ""), rootBody.note);
   r = await req("/score", { method: "OPTIONS" });
   check("preflight returns 204", r.status === 204, "got " + r.status);
   r = await req("/score", { method: "GET" });
