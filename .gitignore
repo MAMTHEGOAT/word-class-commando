@@ -1,16 +1,39 @@
-# Local-only dev and authoring files (kept off the public repo)
+# The public repo holds ONLY what the live site needs: index.html, assets, README,
+# and the worker README. Everything else is authoring, testing or local scratch.
+#
+# NOTE (2026-08-24): this file is edited ON THE DEVICE. A session that edits its own
+# container copy will be working from a stale version and will silently drop lines.
+# Stage this file first, or edit it here.
+
+# Local-only dev and authoring files
 CLAUDE.md
 SPEC.md
 build_bank.py
 splice.py
 template.html
 collide.py
+verify.py
+serve.ps1
+
+# Test suites
 smoke.py
 verbtest.py
 strict_test.py
+wrongtest.py
 v3test.py
 v4test.py
-serve.ps1
+v6test.py
+v7test.py
+menutest.py
+
+# One-off patch scripts
+fix_engine.py
+fix2.py
+fix3.py
+fix4.py
+fix5.py
+fix6.py
+fix7.py
 
 # Generated intermediates and reports
 dev/
@@ -18,13 +41,28 @@ content/
 docs/
 shot-*.png
 blind-*.json
-wrongtest.py
-__pycache__/
-*.pyc
 collision-report.md
 sentences.jsonl
+frames.jsonl
+families.jsonl
+cloze.jsonl
+classcloze.jsonl
+transform.jsonl
 policy.json
 ambig.json
+__pycache__/
+*.pyc
+
+# Cloudflare worker: local state and secrets. The repo is public (SPEC 19).
+worker/.wrangler/
+worker/.dev.vars
+worker/node_modules/
+.dev.vars
+
+# Local helpers and scratch
+deploy.bat
+deploy-worker.bat
+_gitscratch/
 
 # OS / editor cruft
 Thumbs.db
@@ -34,8 +72,3 @@ Desktop.ini
 *.tmp
 *~
 node_modules/
-
-# local scratch
-_gitscratch/
-
-deploy.bat
