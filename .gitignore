@@ -20,6 +20,8 @@ serve.ps1
 # worker/test.mjs is .mjs and stays tracked: it is part of the worker.
 *test*.py
 smoke.py
+# and the standalone measurement tools the gates are built on (SPEC 27)
+poscheck.py
 
 # One-off patch scripts. Pattern, not a list: naming them one by one meant
 # fix8.py was committed the moment it was written (2026-08-25), which is the
