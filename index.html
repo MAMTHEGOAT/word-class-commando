@@ -515,10 +515,12 @@ button.yn{min-width:110px;font-size:1.05rem}
      appears once you approve it here. Deciding a name decides it for every run that
      student has posted and every run they post later.</p>
   <div class="board-form">
-    <input id="tCls" class="tin" maxlength="8" placeholder="Class, e.g. 9B" autocomplete="off">
     <input id="tKey" class="tin" type="password" placeholder="Teacher password" autocomplete="off">
     <button class="go" onclick="teacherLoad()">Load</button>
+    <input id="tCls" class="tin" maxlength="8" placeholder="Class filter (optional)" autocomplete="off">
   </div>
+  <p class="dim small">The password is the only thing you need. Leave the class box empty
+     and every name waiting, in every class, is listed together.</p>
   <div id="tBody"></div>
 
   <h2 style="margin-top:34px">Set one drill as homework</h2>
@@ -1343,7 +1345,7 @@ var AMBIG = ["answer","answers","back","bark","barks","book","books","brush","br
 <script>
 "use strict";
 
-var APP = "wcc", VER = "v0.16", BANK_REV = 10;
+var APP = "wcc", VER = "v0.17", BANK_REV = 10;
 var BUG_FORM_URL = "";   /* paste the Office 365 form link to switch the report button on */
 
 /* ---------- the four tests: one source for the Learn screen AND every
@@ -2630,46 +2632,72 @@ function startTeacher(){
   el("tCls").value = st.cls || "";
   el("tBody").innerHTML = "";
 }
+/* The PASSWORD is what gets you in. The class box is a filter and nothing more.
+   Requiring a class code to see the queue meant a teacher had to already know
+   which class a name had been posted under, which is asking them for something
+   the server knows and they do not. Each row now carries its own class and the
+   Approve button sends that row's class, so it is never typed. */
 async function teacherLoad(){
   setTeacherKey(el("tKey").value.trim());
-  var cls = (el("tCls").value || "").trim().toUpperCase();
-  if(!cls){ el("tBody").innerHTML = '<p class="dim">Type a class code first.</p>'; return; }
+  if(!teacherKey()){
+    el("tBody").innerHTML = '<p class="dim">Type the teacher password first.</p>'; return;
+  }
+  var filter = (el("tCls").value || "").trim().toUpperCase();
   el("tBody").innerHTML = '<p class="dim">Loading...</p>';
-  var r = await netPost("/admin/pending", { cls: cls }, { "X-Teacher-Key": teacherKey() });
+  var body = filter ? { cls: filter } : {};
+  var r = await netPost("/admin/pending", body, { "X-Teacher-Key": teacherKey() });
   if(!r){ el("tBody").innerHTML = '<p class="dim">Could not reach the board.</p>'; return; }
   if(!r.ok){
-    el("tBody").innerHTML = '<p class="dim">' +
-      (r.body && r.body.error === "no" ? "That password was not accepted."
-                                       : "That did not work.") + '</p>';
+    /* The site and the worker deploy separately (SPEC 19.7), so a site that has
+       been pushed before the worker is updated will ask for every class at once
+       and be refused. Say what to do about it rather than "that did not work". */
+    var why;
+    if(r.body && r.body.error === "no") why = "That password was not accepted.";
+    else if(!filter) why = "The board service has not been updated yet. Deploy the worker " +
+                           "(deploy-worker.bat), or put a class code in the box for now.";
+    else why = "That did not work.";
+    el("tBody").innerHTML = '<p class="dim">' + why + '</p>';
     return;
   }
-  var pend = r.body.pending || [];
+  var pend = r.body.pending || [], i, p;
+  var where = filter ? (" in " + esc(filter)) : "";
   var h = '<h3 class="diag-h">Waiting for you (' + pend.length + ')</h3>';
-  if(!pend.length) h += '<p class="dim">Nothing waiting. Every name in ' + esc(cls) +
-                        ' has been decided.</p>';
-  for(var i=0;i<pend.length;i++){
-    var p = pend[i];
-    h += '<div class="diag-card"><div class="diag-t">' + esc(p.nick) + '</div>' +
+  if(!pend.length)
+    h += '<p class="dim">Nothing waiting. Every name' + where + ' has been decided.</p>';
+  for(i=0;i<pend.length;i++){
+    p = pend[i];
+    var q = function(v){ return JSON.stringify(String(v)).replace(/"/g, "&quot;"); };
+    h += '<div class="diag-card"><div class="diag-t">' + esc(p.nick) +
+         ' <span class="dim small">' + esc(p.cls || "") + '</span></div>' +
          '<p class="diag-b">' + p.runs + (p.runs === 1 ? ' run' : ' runs') +
          ', best ' + p.best + '</p>' +
-         '<button class="diag-go" onclick="teacherJudge(\'approve\',' +
-         JSON.stringify(esc(p.nick)).replace(/"/g, "&quot;") + ')">Approve</button> ' +
-         '<button class="diag-go" onclick="teacherJudge(\'reject\',' +
-         JSON.stringify(esc(p.nick)).replace(/"/g, "&quot;") + ')">Reject</button></div>';
+         '<button class="diag-go" onclick="teacherJudge(\'approve\',' + q(p.cls) + ',' +
+         q(p.nick) + ')">Approve</button> ' +
+         '<button class="diag-go" onclick="teacherJudge(\'reject\',' + q(p.cls) + ',' +
+         q(p.nick) + ')">Reject</button></div>';
   }
-  h += '<h3 class="diag-h">Danger</h3>' +
-       '<button class="diag-go" onclick="teacherClear()">Clear the whole ' + esc(cls) +
-       ' board</button>';
+  /* Clearing a board is NOT like the queue: you name the class you are wiping.
+     A one-click "clear everything" is not a convenience, it is a trap. */
+  var classes = {};
+  for(i=0;i<pend.length;i++) if(pend[i].cls) classes[pend[i].cls] = 1;
+  h += '<h3 class="diag-h">Danger</h3>';
+  if(filter){
+    h += '<button class="diag-go" onclick="teacherClear()">Clear the whole ' +
+         esc(filter) + ' board</button>';
+  } else {
+    h += '<p class="dim">To clear a board, put its class code in the filter box above ' +
+         'first. Clearing is per class on purpose.</p>';
+  }
   el("tBody").innerHTML = h;
 }
-async function teacherJudge(what, nick){
-  var cls = (el("tCls").value || "").trim().toUpperCase();
+async function teacherJudge(what, cls, nick){
   await netPost("/admin/" + what, { cls: cls, nick: nick },
                 { "X-Teacher-Key": teacherKey() });
   teacherLoad();
 }
 async function teacherClear(){
   var cls = (el("tCls").value || "").trim().toUpperCase();
+  if(!cls) return;
   if(!confirm("Delete every score in " + cls + "? This cannot be undone.")) return;
   await netPost("/admin/clear", { cls: cls }, { "X-Teacher-Key": teacherKey() });
   teacherLoad();

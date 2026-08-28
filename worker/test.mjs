@@ -171,6 +171,36 @@ await test("moderation: approve, reject, and judge a name only once", async () =
   const aisha = b.pending.filter(p => p.nick === "Aisha")[0];
   check("and groups a repeat player into one decision", aisha && aisha.runs === 2,
     JSON.stringify(aisha));
+  check("every pending row carries its own class", b.pending.every(p => p.cls === "9B"),
+    JSON.stringify(b.pending));
+
+  /* The class is a FILTER, not a credential. A teacher does not necessarily
+     know which class a name was posted under, and the key is what authorises
+     this route, so asking them to name the class is asking for something the
+     server already knows. */
+  await req("/score", { method: "POST", body: { ...good, cls: "7C", nick: "Farid", score: 11 } });
+  r = await req("/admin/pending", { method: "POST", body: {},
+                                    headers: { "X-Teacher-Key": KEY } });
+  b = await r.json();
+  check("with no class given, pending spans every class",
+    b.pending.length === 3 && b.pending.some(p => p.cls === "7C"), JSON.stringify(b.pending));
+  check("and it still needs the key",
+    (await req("/admin/pending", { method: "POST", body: {} })).status === 403);
+  r = await req("/admin/pending", { method: "POST", body: { cls: "" },
+                                    headers: { "X-Teacher-Key": KEY } });
+  check("an empty class string means all classes, not a bad request", r.status === 200,
+    "got " + r.status);
+  r = await req("/admin/pending", { method: "POST", body: { cls: "not a class!!" },
+                                    headers: { "X-Teacher-Key": KEY } });
+  check("but a class code that is junk is still refused", r.status === 400, "got " + r.status);
+
+  /* Clearing a board is deliberately NOT like this: you have to name it. */
+  r = await req("/admin/clear", { method: "POST", body: {},
+                                  headers: { "X-Teacher-Key": KEY } });
+  check("clearing a board still demands an explicit class", r.status === 400, "got " + r.status);
+
+  await req("/admin/reject", { method: "POST", body: { cls: "7C", nick: "Farid" },
+                               headers: { "X-Teacher-Key": KEY } });
 
   r = await req("/admin/approve", { method: "POST", body: { cls: "9B", nick: "Aisha" },
                                     headers: { "X-Teacher-Key": KEY } });

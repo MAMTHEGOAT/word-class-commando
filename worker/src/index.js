@@ -246,22 +246,36 @@ async function adminDelete(request, env) {
   return json(env, { ok: true, deleted: (r.meta && r.meta.changes) || 0 });
 }
 
-/** Everything in one class still waiting on a person. */
+/** Everything still waiting on a person.
+ *
+ *  `cls` is OPTIONAL and is only a filter. The teacher key is what authorises
+ *  this route, and a teacher does not necessarily know which class a name was
+ *  posted under: making them guess it is asking them for something the server
+ *  already knows. With no class given this returns every pending name across
+ *  every class, each row carrying its own.
+ *
+ *  Note this is NOT how /admin/clear behaves. Deleting one board is a thing you
+ *  should have to name. */
 async function adminPending(request, env) {
   if (!teacherOk(request, env)) return json(env, { error: "no" }, 403);
   let body;
   try { body = await request.json(); } catch (e) { return json(env, { error: "bad json" }, 400); }
-  const cls = cleanClass(body.cls);
-  if (!cls) return json(env, { error: "bad class code" }, 400);
-  /* Grouped by name: the teacher is judging NAMES, not runs, so a student who
-     has played six times is one decision rather than six. */
-  const rows = await env.DB
-    .prepare(
-      "SELECT nick, COUNT(*) AS runs, MAX(score) AS best, MIN(created) AS first " +
-      "FROM runs WHERE cls = ? AND approved = 0 GROUP BY nick ORDER BY first ASC LIMIT 200"
-    )
-    .bind(cls)
-    .all();
+
+  let cls = null;
+  if (body.cls !== undefined && body.cls !== null && String(body.cls).trim() !== "") {
+    cls = cleanClass(body.cls);
+    if (!cls) return json(env, { error: "bad class code" }, 400);
+  }
+
+  /* Grouped by name WITHIN a class, because a name is judged per class: the
+     teacher is judging NAMES, not runs, so a student who has played six times
+     is one decision rather than six. */
+  const sql =
+    "SELECT cls, nick, COUNT(*) AS runs, MAX(score) AS best, MIN(created) AS first " +
+    "FROM runs WHERE approved = 0 " + (cls ? "AND cls = ? " : "") +
+    "GROUP BY cls, nick ORDER BY first ASC LIMIT 200";
+  const stmt = cls ? env.DB.prepare(sql).bind(cls) : env.DB.prepare(sql);
+  const rows = await stmt.all();
   return json(env, { cls: cls, pending: (rows && rows.results) || [] });
 }
 
