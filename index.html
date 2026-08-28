@@ -83,12 +83,15 @@ button{font:inherit;cursor:pointer}
 .bz-flash.ok{background:rgba(143,220,156,.13);opacity:1}
 .bz-flash.bad{background:rgba(255,139,128,.15);opacity:1}
 body.blitz{padding-bottom:120px}
-/* Hide the CHECK and NEXT buttons only, by id. A blanket `.go` rule was used
-   here first and it hid the Yes button in Yes or no, because Yes is a primary
-   button and No is a ghost one: every question in a challenge run could only be
-   answered No. Answer buttons are never hidden. */
-body.blitz #checkBtn, body.blitz #nextBtn, body.blitz #czCheck,
-body.blitz #frCheck, body.blitz #kCheck, body.blitz #trCheck{display:none !important}
+/* Hide the CHECK and NEXT controls only. A blanket `.go` rule was used here
+   first and it hid the Yes button in Yes or no, because Yes is a primary button
+   and No is a ghost one: every question in a challenge run could only be
+   answered No. Answer buttons are never hidden.
+   Hidden BY CLASS, not by a list of ids. Two live bugs (v0.12.1) came from a
+   hand-written id list going stale the moment an activity was added: the Yes
+   button vanished in challenge and "next sentence" survived into test mode.
+   A class cannot go stale, because the new control has to carry it to exist. */
+body.blitz .checkbtn, body.blitz .nextbar{display:none !important}
 
 /* test mode. The bar sits over whichever activity is running, and body.testing
    hides everything that would teach or distract mid-paper (SPEC 23). */
@@ -106,18 +109,11 @@ body.testing{padding-bottom:150px}
 /* Feedback is WITHHELD, not merely unread: hidden here and never rendered into
    view, so a student cannot learn the answer mid-paper and move the target. */
 body.testing .fb,
-body.testing #ynFb, body.testing #czFb, body.testing #kFb,
-body.testing #trFb, body.testing #frFb,
 body.testing #ynStreakWrap,
 body.testing .chips,
 body.testing .lbl,
 body.testing .topbar .back,
-body.testing #czNextBar, body.testing #kNextBar, body.testing #trNextBar,
-body.testing #frNextBar, body.testing #ynNextBar,
-/* The click round's own advance button is a bare #nextBtn rather than a NextBar,
-   and was missed when this list was written by hand. It let a student pull a new
-   sentence without the question counter moving. Both modes own the advance. */
-body.testing #nextBtn,
+body.testing .nextbar,
 body.testing .ref{display:none !important}
 body.testing .score{visibility:hidden}
 .res-score{text-align:center;font-size:3rem;font-weight:650;letter-spacing:.02em;
@@ -284,6 +280,17 @@ button.yn{min-width:110px;font-size:1.05rem}
   border:2px solid #ded28f;border-radius:12px;padding:15px 16px;margin-bottom:9px;
   font-size:1.1rem;min-height:54px;font-weight:600}
 .opt:hover{border-color:#b39b47}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+@media(max-width:700px){.pair{grid-template-columns:1fr}}
+.side{border:2px solid var(--line);border-radius:14px;padding:12px 12px 4px}
+.side.s-ok{border-color:var(--ok);background:var(--okbg)}
+.side.s-bad{border-color:var(--bad);background:var(--badbg)}
+.sidelbl{margin:0 0 6px;font-size:.82rem;font-weight:700;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--dim)}
+.side .sent{font-size:1.12rem;line-height:1.9;padding:14px 12px;margin-bottom:10px}
+.side .opt{font-size:1rem;min-height:46px;padding:11px 12px;margin-bottom:7px}
+.target{background:#f3e39a;border-radius:6px;padding:2px 7px;font-weight:800;
+  box-shadow:inset 0 -3px 0 #8a7c3a}
 .opt[aria-pressed="true"]{border-color:#1a3a6b;box-shadow:inset 0 0 0 2px #1a3a6b}
 .opt.o-ok{border-color:var(--ok);background:var(--okbg)}
 .opt.o-bad{border-color:var(--bad);background:var(--badbg);text-decoration:line-through}
@@ -364,6 +371,8 @@ button.yn{min-width:110px;font-size:1.05rem}
         <span class="sub">Quickfire: is this word a noun? a verb?</span></button>
       <button class="menu-btn" onclick="startKlass()">Which class fills the gap?
         <span class="sub">Name the job the gap needs doing</span></button>
+      <button class="menu-btn" onclick="startShift()">Same word, different job
+        <span class="sub">One word, two sentences, two jobs</span></button>
     </div>
     <div class="group">
       <h3>3. Use it</h3>
@@ -406,7 +415,7 @@ button.yn{min-width:110px;font-size:1.05rem}
   <div class="sent" id="sent"></div>
 
   <div class="bar">
-    <button class="go" id="checkBtn" onclick="check()" disabled>Check</button>
+    <button class="go checkbtn" id="checkBtn" onclick="check()" disabled>Check</button>
     <button class="ghost" id="dunnoBtn" onclick="dunno()">I do not know a word here</button>
     <span class="score" id="score"></span>
   </div>
@@ -414,7 +423,7 @@ button.yn{min-width:110px;font-size:1.05rem}
   <ul class="fb" id="fb"></ul>
 
   <div class="bar" id="nextBar" style="display:none">
-    <button class="go" id="nextBtn" onclick="next()">Next sentence</button>
+    <button class="go nextbar" id="nextBtn" onclick="next()">Next sentence</button>
   </div>
 
   <div class="ref">
@@ -434,11 +443,11 @@ button.yn{min-width:110px;font-size:1.05rem}
   <div class="bigword" id="frWord"></div>
   <div id="frSlots"></div>
   <div class="bar">
-    <button class="go" id="frCheck" onclick="frCheck()" disabled>Check</button>
+    <button class="go checkbtn" id="frCheck" onclick="frCheck()" disabled>Check</button>
     <span class="score" id="frScore"></span>
   </div>
   <ul class="fb" id="frFb"></ul>
-  <div class="bar" id="frNextBar" style="display:none">
+  <div class="bar nextbar" id="frNextBar" style="display:none">
     <button class="go" onclick="frNext()">Next word</button>
   </div>
   <div class="ref"><span>Reference: <code id="frRef">--</code></span></div>
@@ -461,7 +470,7 @@ button.yn{min-width:110px;font-size:1.05rem}
     <button class="ghost yn" onclick="ynAnswer(false)" id="ynNo">No</button>
   </div>
   <ul class="fb" id="ynFb"></ul>
-  <div class="bar" id="ynNextBar" style="display:none">
+  <div class="bar nextbar" id="ynNextBar" style="display:none">
     <button class="go" onclick="ynNext()">Next word</button>
   </div>
   <div class="ref"><span>Reference: <code id="ynRef">--</code></span></div>
@@ -477,11 +486,11 @@ button.yn{min-width:110px;font-size:1.05rem}
   <div class="sent" id="czSent"></div>
   <div id="czOpts"></div>
   <div class="bar">
-    <button class="go" id="czCheck" onclick="czCheck()" disabled>Check</button>
+    <button class="go checkbtn" id="czCheck" onclick="czCheck()" disabled>Check</button>
     <span class="score" id="czScore"></span>
   </div>
   <ul class="fb" id="czFb"></ul>
-  <div class="bar" id="czNextBar" style="display:none">
+  <div class="bar nextbar" id="czNextBar" style="display:none">
     <button class="go" onclick="czNext()">Next gap</button>
   </div>
   <div class="ref"><span>Reference: <code id="czRef">--</code></span></div>
@@ -511,6 +520,20 @@ button.yn{min-width:110px;font-size:1.05rem}
     <button class="go" onclick="teacherLoad()">Load</button>
   </div>
   <div id="tBody"></div>
+
+  <h2 style="margin-top:34px">Set one drill as homework</h2>
+  <p class="dim">Builds a link that opens straight into one activity at one level.
+     No menu, no wrong chip, nothing to explain. Send it as it is.</p>
+  <div class="board-form">
+    <select id="lkAct" class="tin" onchange="linkBuild()"></select>
+    <select id="lkCls" class="tin" onchange="linkBuild()"></select>
+    <select id="lkLvl" class="tin" onchange="linkBuild()"></select>
+  </div>
+  <div class="sent" id="lkOut" style="font-size:.95rem;line-height:1.6;word-break:break-all"></div>
+  <div class="bar">
+    <button class="go" onclick="linkCopy()">Copy link</button>
+    <span class="score" id="lkNote"></span>
+  </div>
 </section>
 
 <!-- ======================= CHALLENGE MODE ========================== -->
@@ -603,11 +626,11 @@ button.yn{min-width:110px;font-size:1.05rem}
   <div class="sent" id="kSent"></div>
   <div id="kOpts"></div>
   <div class="bar">
-    <button class="go" id="kCheck" onclick="kCheck()" disabled>Check</button>
+    <button class="go checkbtn" id="kCheck" onclick="kCheck()" disabled>Check</button>
     <span class="score" id="kScore"></span>
   </div>
   <ul class="fb" id="kFb"></ul>
-  <div class="bar" id="kNextBar" style="display:none">
+  <div class="bar nextbar" id="kNextBar" style="display:none">
     <button class="go" onclick="kNext()">Next gap</button>
   </div>
   <div class="ref"><span>Reference: <code id="kRef">--</code></span></div>
@@ -622,14 +645,43 @@ button.yn{min-width:110px;font-size:1.05rem}
   <div class="bigword" id="trWord"></div>
   <div id="trOpts"></div>
   <div class="bar">
-    <button class="go" id="trCheck" onclick="trCheck()" disabled>Check</button>
+    <button class="go checkbtn" id="trCheck" onclick="trCheck()" disabled>Check</button>
     <span class="score" id="trScore"></span>
   </div>
   <ul class="fb" id="trFb"></ul>
-  <div class="bar" id="trNextBar" style="display:none">
+  <div class="bar nextbar" id="trNextBar" style="display:none">
     <button class="go" onclick="trNext()">Next word</button>
   </div>
   <div class="ref"><span>Reference: <code id="trRef">--</code></span></div>
+</section>
+
+<!-- ===================== SAME WORD DIFFERENT JOB =================== -->
+<section id="shift" class="screen">
+  <div class="topbar"><button class="back" onclick="go('splash')">&larr; Menu</button><img alt="" src="data:image/png;base64,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"></div>
+  <p class="lbl">Level</p>
+  <div class="chips" id="shLevels"></div>
+  <p class="prompt" id="shPrompt"></p>
+  <div class="pair">
+    <div class="side" id="shSideA">
+      <p class="sidelbl">Sentence 1</p>
+      <div class="sent" id="shTextA"></div>
+      <div class="opts" id="shOptsA"></div>
+    </div>
+    <div class="side" id="shSideB">
+      <p class="sidelbl">Sentence 2</p>
+      <div class="sent" id="shTextB"></div>
+      <div class="opts" id="shOptsB"></div>
+    </div>
+  </div>
+  <div class="bar">
+    <button class="go checkbtn" id="shCheck" onclick="shCheck()" disabled>Check</button>
+    <span class="score" id="shScore"></span>
+  </div>
+  <ul class="fb" id="shFb"></ul>
+  <div class="bar nextbar" id="shNextBar" style="display:none">
+    <button class="go" onclick="shNext()">Next word</button>
+  </div>
+  <div class="ref"><span>Reference: <code id="shRef">--</code></span></div>
 </section>
 
 <!-- =========================== VALIDATE =========================== -->
@@ -1082,6 +1134,65 @@ var KLASS = [
 ];
 /* >>> BANK:CLASSCLOZE END >>> */
 
+/* >>> BANK:SHIFTERS START >>> */
+/* Same word, two jobs. Authored from AMBIG, never derived from SENTENCES, and
+   deliberately kept out of POLICY and the lemma map: every item here IS the
+   thing those two exist to forbid everywhere else. SPEC 9.7. */
+var SHIFTERS = [
+{"id":"wc-sh001","level":"foundation","w":"run","a":{"t":"We went for a long [run] before breakfast.","c":"noun","why":"You can say a run, and two runs. That is a naming word."},"b":{"t":"They [run] to school every morning.","c":"verb","why":"Change the time and it changes: yesterday they ran."}},
+{"id":"wc-sh002","level":"foundation","w":"play","a":{"t":"The children [play] in the garden after tea.","c":"verb","why":"Change the time and it changes: yesterday they played."},"b":{"t":"Our class watched a [play] at the theatre.","c":"noun","why":"You can say a play, and two plays. That is a naming word."}},
+{"id":"wc-sh003","level":"foundation","w":"walk","a":{"t":"We [walk] home together on Fridays.","c":"verb","why":"Change the time and it changes: yesterday we walked."},"b":{"t":"My grandfather takes a [walk] every evening.","c":"noun","why":"You can say a walk, and two walks. That is a naming word."}},
+{"id":"wc-sh004","level":"foundation","w":"drink","a":{"t":"They [drink] water after every match.","c":"verb","why":"Change the time and it changes: yesterday they drank."},"b":{"t":"She poured herself a cold [drink].","c":"noun","why":"You can say a drink, and two drinks. That is a naming word."}},
+{"id":"wc-sh005","level":"foundation","w":"cook","a":{"t":"My uncle is a very good [cook].","c":"noun","why":"You can say a cook, and two cooks. That is a naming word."},"b":{"t":"We [cook] dinner together on Sundays.","c":"verb","why":"Change the time and it changes: yesterday we cooked."}},
+{"id":"wc-sh006","level":"foundation","w":"paint","a":{"t":"They [paint] the fence every summer.","c":"verb","why":"Change the time and it changes: yesterday they painted."},"b":{"t":"The [paint] on the door was still wet.","c":"noun","why":"You can say the paint. That is a naming word."}},
+{"id":"wc-sh007","level":"foundation","w":"rain","a":{"t":"[Rain] fell steadily all afternoon.","c":"noun","why":"It names the thing that fell. Stuff-words like rain do not need a the or an a in front, and they are still naming words."},"b":{"t":"It will [rain] again before Friday.","c":"verb","why":"Change the time and it changes: yesterday it rained."}},
+{"id":"wc-sh008","level":"foundation","w":"brush","a":{"t":"They [brush] their teeth before bed.","c":"verb","why":"Change the time and it changes: yesterday they brushed their teeth."},"b":{"t":"He cleaned the [brush] under the tap.","c":"noun","why":"You can say the brush, and two brushes. That is a naming word."}},
+{"id":"wc-sh009","level":"foundation","w":"water","a":{"t":"[Water] dripped from the broken tap.","c":"noun","why":"It names the thing that dripped. Stuff-words like water do not need a the or an a in front, and they are still naming words."},"b":{"t":"We [water] the plants every Saturday.","c":"verb","why":"Change the time and it changes: yesterday we watered them."}},
+{"id":"wc-sh010","level":"foundation","w":"waves","a":{"t":"Big [waves] broke over the harbour wall.","c":"noun","why":"You can say the waves, and one wave. The -s here is a plural, which is a naming word thing."},"b":{"t":"She [waves] at every passing boat.","c":"verb","why":"Change the time and it changes: yesterday she waved. The -s here is what a verb does after he, she or it."}},
+{"id":"wc-sh011","level":"developing","w":"watch","a":{"t":"The guards [watch] the gate all night.","c":"verb","why":"Change the time and it changes: last night they watched it."},"b":{"t":"My sister lost her [watch] on the bus.","c":"noun","why":"You can say her watch, and two watches. That is a naming word."}},
+{"id":"wc-sh012","level":"developing","w":"book","a":{"t":"They [book] the hall for the concert each year.","c":"verb","why":"Change the time and it changes: last year they booked it."},"b":{"t":"She returned the [book] to the library.","c":"noun","why":"You can say the book, and two books. That is a naming word."}},
+{"id":"wc-sh013","level":"developing","w":"plant","a":{"t":"A small [plant] grew beside the wall.","c":"noun","why":"You can say a plant, and two plants. That is a naming word."},"b":{"t":"The gardeners [plant] new trees in spring.","c":"verb","why":"Change the time and it changes: last spring they planted them."}},
+{"id":"wc-sh014","level":"developing","w":"rings","a":{"t":"The bell [rings] at the end of every lesson.","c":"verb","why":"Change the time and it changes: yesterday the bell rang. The -s here is what a verb does after he, she or it."},"b":{"t":"She wore two silver [rings].","c":"noun","why":"You can say one ring, and two rings. The -s here is a plural."}},
+{"id":"wc-sh015","level":"developing","w":"park","a":{"t":"The children played in the [park] until dark.","c":"noun","why":"You can say the park, and two parks. That is a naming word."},"b":{"t":"Visitors [park] their cars behind the school.","c":"verb","why":"Change the time and it changes: yesterday they parked there."}},
+{"id":"wc-sh016","level":"developing","w":"film","a":{"t":"They [film] the match from the far end.","c":"verb","why":"Change the time and it changes: yesterday they filmed it."},"b":{"t":"We watched an old [film] on Sunday.","c":"noun","why":"You can say a film, and two films. That is a naming word."}},
+{"id":"wc-sh017","level":"developing","w":"smell","a":{"t":"A strange [smell] came from the kitchen.","c":"noun","why":"You can say a smell, and two smells. That is a naming word."},"b":{"t":"The dogs [smell] every bag at the airport.","c":"verb","why":"Change the time and it changes: yesterday they smelled every bag."}},
+{"id":"wc-sh018","level":"developing","w":"hand","a":{"t":"She raised her [hand] and waited.","c":"noun","why":"You can say her hand, and two hands. That is a naming word."},"b":{"t":"The teachers [hand] out the books at the start of the lesson.","c":"verb","why":"Change the time and it changes: yesterday they handed them out."}},
+{"id":"wc-sh019","level":"developing","w":"dress","a":{"t":"The nurses [dress] the wound every morning.","c":"verb","why":"Change the time and it changes: yesterday they dressed it."},"b":{"t":"She wore a long green [dress].","c":"noun","why":"You can say a dress, and two dresses. That is a naming word."}},
+{"id":"wc-sh020","level":"developing","w":"snow","a":{"t":"[Snow] covered the whole playground.","c":"noun","why":"It names the thing that covered the playground. Stuff-words like snow do not need a the or an a in front."},"b":{"t":"It might [snow] before the weekend.","c":"verb","why":"Change the time and it changes: last week it snowed."}},
+{"id":"wc-sh021","level":"secure","w":"train","a":{"t":"The coaches [train] the younger players on Tuesdays.","c":"verb","why":"Change the time and it changes: last Tuesday they trained them."},"b":{"t":"The early [train] was already full.","c":"noun","why":"You can say the train, and two trains. That is a naming word."}},
+{"id":"wc-sh022","level":"secure","w":"sign","a":{"t":"A wooden [sign] pointed towards the village.","c":"noun","why":"You can say a sign, and two signs. That is a naming word."},"b":{"t":"Both parents must [sign] the form before Friday.","c":"verb","why":"It is what has to be done. The helper word must sits in front of it, and only a verb can go there."}},
+{"id":"wc-sh023","level":"secure","w":"place","a":{"t":"The workers must [place] every box beside the door.","c":"verb","why":"It is what has to be done. The helper word must sits in front of it, and only a verb can go there."},"b":{"t":"We found a quiet [place] near the river.","c":"noun","why":"You can say a place, and two places. That is a naming word."}},
+{"id":"wc-sh024","level":"secure","w":"drive","a":{"t":"The [drive] to the coast took three hours.","c":"noun","why":"You can say the drive, and two drives. That is a naming word."},"b":{"t":"My parents [drive] to work together.","c":"verb","why":"Change the time and it changes: yesterday they drove."}},
+{"id":"wc-sh025","level":"secure","w":"rest","a":{"t":"The climbers [rest] at the halfway point.","c":"verb","why":"Change the time and it changes: yesterday they rested there."},"b":{"t":"After a short [rest] they carried on.","c":"noun","why":"You can say a rest, and two rests. That is a naming word."}},
+{"id":"wc-sh026","level":"secure","w":"touch","a":{"t":"She felt the [touch] of cold air on her face.","c":"noun","why":"You can say the touch. That is a naming word."},"b":{"t":"Visitors must not [touch] anything in the glass room.","c":"verb","why":"It is what they are told not to do. The helper words must not sit in front of it, and only a verb can go there."}},
+{"id":"wc-sh027","level":"secure","w":"hard","a":{"t":"The work in the yard was very [hard].","c":"adj","why":"It describes the work: which work? Hard work. That is a describing word."},"b":{"t":"The whole team worked [hard] on Saturday.","c":"adv","why":"It tells you HOW they worked, and it has no -ly ending. Some adverbs never do."}},
+{"id":"wc-sh028","level":"secure","w":"fast","a":{"t":"Our neighbour bought a [fast] car.","c":"adj","why":"It describes the car: which car? A fast car. That is a describing word."},"b":{"t":"The runners set off far too [fast].","c":"adv","why":"It tells you HOW they set off, and it has no -ly ending. Some adverbs never do."}},
+{"id":"wc-sh029","level":"secure","w":"shows","a":{"t":"The [shows] start again at seven.","c":"noun","why":"You can say one show, and two shows. The -s here is a plural."},"b":{"t":"She [shows] her drawings to the whole class.","c":"verb","why":"Change the time and it changes: yesterday she showed them. The -s here is what a verb does after he, she or it."}},
+{"id":"wc-sh030","level":"secure","w":"cheers","a":{"t":"Loud [cheers] filled the hall at the final whistle.","c":"noun","why":"You can say one cheer, and three cheers. The -s here is a plural, and there is no the or a in front of it at all."},"b":{"t":"The whole crowd [cheers] whenever he scores.","c":"verb","why":"Change the time and it changes: yesterday the crowd cheered. The -s here is what a verb does after he, she or it."}},
+{"id":"wc-sh031","level":"challenge","w":"late","a":{"t":"The [late] bus was crowded again.","c":"adj","why":"It describes the bus: which bus? The late bus. That is a describing word."},"b":{"t":"Our visitors arrived very [late].","c":"adv","why":"It tells you WHEN they arrived, and it has no -ly ending. Careful: lately is a different word with a different meaning."}},
+{"id":"wc-sh032","level":"challenge","w":"straight","a":{"t":"The arrow flew [straight] and struck the target.","c":"adv","why":"It tells you HOW the arrow flew, and it has no -ly ending."},"b":{"t":"He drew a [straight] line across the page.","c":"adj","why":"It describes the line: which line? A straight line. That is a describing word."}},
+{"id":"wc-sh033","level":"challenge","w":"early","a":{"t":"The [early] train leaves before six.","c":"adj","why":"It describes the train: which train? The early train. That is a describing word."},"b":{"t":"Our guests arrived rather [early].","c":"adv","why":"It tells you WHEN they arrived. It ends in -ly and it is still not describing a thing, which is a reminder that the ending settles nothing."}},
+{"id":"wc-sh034","level":"challenge","w":"work","a":{"t":"[Work] on the bridge finished in May.","c":"noun","why":"It names the thing that finished. Stuff-words like work do not need a the or an a in front, and they are still naming words."},"b":{"t":"Most of the machines [work] perfectly well.","c":"verb","why":"Change the time and it changes: last year they worked perfectly well."}},
+{"id":"wc-sh035","level":"challenge","w":"taste","a":{"t":"The judges [taste] each cake before choosing a winner.","c":"verb","why":"Change the time and it changes: yesterday they tasted each cake."},"b":{"t":"The soup had a strange [taste].","c":"noun","why":"You can say a taste, and two tastes. That is a naming word."}},
+{"id":"wc-sh036","level":"challenge","w":"face","a":{"t":"The tall windows [face] the sea.","c":"verb","why":"Change the time and it changes: the old windows faced the sea."},"b":{"t":"A worried [face] appeared at the window.","c":"noun","why":"You can say a face, and two faces. That is a naming word."}},
+{"id":"wc-sh037","level":"challenge","w":"turn","a":{"t":"It was her [turn] to read aloud.","c":"noun","why":"You can say her turn, and two turns. That is a naming word."},"b":{"t":"The dancers [turn] slowly on the spot.","c":"verb","why":"Change the time and it changes: yesterday they turned slowly."}},
+{"id":"wc-sh038","level":"challenge","w":"light","a":{"t":"The [light] above the door had failed.","c":"noun","why":"You can say the light, and two lights. That is a naming word."},"b":{"t":"They [light] the candles at six every evening.","c":"verb","why":"Change the time and it changes: yesterday they lit them."}},
+{"id":"wc-sh039","level":"challenge","w":"sound","a":{"t":"The bells [sound] at noon every day.","c":"verb","why":"Change the time and it changes: yesterday the bells sounded at noon."},"b":{"t":"A strange [sound] woke the whole house.","c":"noun","why":"You can say a sound, and two sounds. That is a naming word."}},
+{"id":"wc-sh040","level":"challenge","w":"matches","a":{"t":"He struck three [matches] before one of them lit.","c":"noun","why":"You can say one match, and three matches. The -s here is a plural."},"b":{"t":"That colour [matches] your coat perfectly.","c":"verb","why":"Change the time and it changes: last year that colour matched your coat. The -s here is what a verb does after he, she or it."}},
+{"id":"wc-sh041","level":"foundation","w":"bike","a":{"t":"She rode her [bike] all the way to school.","c":"noun","why":"You can say her bike, and two bikes. That is a naming word."},"b":{"t":"The old [bike] in the shed had a flat tyre.","c":"noun","why":"A naming word again. Same word, same job, in a different sentence. Check every time rather than assuming the two must differ."}},
+{"id":"wc-sh042","level":"foundation","w":"jump","a":{"t":"The dogs [jump] over the low gate.","c":"verb","why":"Change the time and it changes: yesterday they jumped."},"b":{"t":"They [jump] into the pool every summer.","c":"verb","why":"A doing word again. Same word, same job. The only way to know was to read both sentences."}},
+{"id":"wc-sh043","level":"developing","w":"quiet","a":{"t":"The [quiet] library suited her perfectly.","c":"adj","why":"It describes the library: which library? The quiet one."},"b":{"t":"The whole street was very [quiet] that evening.","c":"adj","why":"Still describing a thing, the street, but standing after was instead of in front of the noun. A describing word can sit in either place."}},
+{"id":"wc-sh044","level":"developing","w":"swim","a":{"t":"They [swim] in the river every summer.","c":"verb","why":"Change the time and it changes: last summer they swam."},"b":{"t":"We [swim] two lengths before breakfast.","c":"verb","why":"A doing word again, this time with something after it. Same job either way."}},
+{"id":"wc-sh045","level":"developing","w":"letters","a":{"t":"The [letters] arrived on Tuesday morning.","c":"noun","why":"You can say one letter, and three letters. That is a naming word."},"b":{"t":"She posted three [letters] at the corner.","c":"noun","why":"A naming word again. It moved from the front of the sentence to the middle, and the job it does did not move with it."}},
+{"id":"wc-sh046","level":"secure","w":"sharp","a":{"t":"A [sharp] stone cut his hand.","c":"adj","why":"It describes the stone: which stone? A sharp one."},"b":{"t":"The kitchen knife was very [sharp].","c":"adj","why":"Still describing a thing, the knife. Sitting after was does not turn a describing word into an adverb."}},
+{"id":"wc-sh047","level":"secure","w":"notice","a":{"t":"A [notice] on the door said the shop was closed.","c":"noun","why":"You can say a notice, and two notices. That is a naming word."},"b":{"t":"She pinned a [notice] to the board.","c":"noun","why":"A naming word again, and notice is a doing word in other sentences. Not here, in either of them."}},
+{"id":"wc-sh048","level":"challenge","w":"slowly","a":{"t":"She spoke [slowly] and clearly to the whole room.","c":"adv","why":"It tells you HOW she spoke."},"b":{"t":"The queue moved [slowly] towards the door.","c":"adv","why":"It tells you HOW the queue moved. Same job twice, in two different sentences."}},
+{"id":"wc-sh049","level":"challenge","w":"deep","a":{"t":"A [deep] crack ran right across the playground.","c":"adj","why":"It describes the crack: which crack? A deep one."},"b":{"t":"The water beside the harbour wall is very [deep].","c":"adj","why":"Still describing a thing, the water. Deep is an adverb in other sentences. Not in either of these."}},
+{"id":"wc-sh050","level":"challenge","w":"gather","a":{"t":"The crowds [gather] before the gates open.","c":"verb","why":"Change the time and it changes: yesterday the crowds gathered."},"b":{"t":"We [gather] the fallen leaves every autumn.","c":"verb","why":"A doing word again, this time with something after it. Same job either way."}}
+/* >>> APPEND NEW SHIFTERS ABOVE THIS LINE >>> */
+];
+/* >>> BANK:SHIFTERS END >>> */
+
 /* >>> BANK:TRANSFORM START >>> */
 var TRANSFORM = [
 {"id":"wc-tr001","level":"foundation","family":"wc-wf001","from":"adj","to":"adv","w":"silent","options":[{"w":"silence"},{"w":"silent"},{"w":"silently","correct":true}],"why":""},
@@ -1232,7 +1343,7 @@ var AMBIG = ["answer","answers","back","bark","barks","book","books","brush","br
 <script>
 "use strict";
 
-var APP = "wcc", VER = "v0.15", BANK_REV = 9;
+var APP = "wcc", VER = "v0.16", BANK_REV = 10;
 var BUG_FORM_URL = "";   /* paste the Office 365 form link to switch the report button on */
 
 /* ---------- the four tests: one source for the Learn screen AND every
@@ -2797,13 +2908,20 @@ var TEST_PLAN = [
   {act:"trans",  lvl:"foundation"},
   {act:"trans",  lvl:"developing"},
   {act:"trans",  lvl:"secure"},
-  {act:"trans",  lvl:"challenge"}
+  {act:"trans",  lvl:"challenge"},
+
+  {act:"shift",  lvl:"foundation"},
+  {act:"shift",  lvl:"foundation"},
+  {act:"shift",  lvl:"developing"},
+  {act:"shift",  lvl:"secure"},
+  {act:"shift",  lvl:"challenge"}
 ];
 
 var ACT_LABEL = {
   one:"Click the word", all:"Click all the words", yesno:"Yes or no",
   klass:"Which class fills the gap?", frames:"Where does it fit?",
-  cloze:"Insert the word", trans:"Change the word"
+  cloze:"Insert the word", trans:"Change the word",
+  shift:"Same word, different job"
 };
 
 var T = { on:false, i:0, results:[], t0:0 };
@@ -2841,6 +2959,8 @@ function testShow(){
     C.lvl = spec.lvl; go("cloze"); lvlChips("czLevels", CLOZE, C.lvl, "czLvl"); czNext();
   } else if(spec.act === "trans"){
     R.lvl = spec.lvl; go("trans"); lvlChips("trLevels", TRANSFORM, R.lvl, "trLvl"); trNext();
+  } else if(spec.act === "shift"){
+    SH.lvl = spec.lvl; go("shift"); lvlChips("shLevels", SHIFTERS, SH.lvl, "shLvl"); shNext();
   }
   el("testBar").style.display = "";
   document.body.appendChild(el("testBar"));
@@ -3014,6 +3134,11 @@ var DIAG_ACT = {
            t: "The word changes are catching you out",
            b: "Some families do not change the way you expect, and a few have traps: there is no " +
               "word <i>friendlily</i>, and <i>hardly</i> does not mean <i>hard</i>." },
+  shift: { label: "Same word, different job", go: "startShift()",
+           t: "You are giving a word one fixed class, whatever sentence it is in",
+           b: "This is the big one. A word out of its sentence has no class at all. <i>run</i> is " +
+              "a noun in <i>a long run</i> and a verb in <i>they run</i>, and nothing about the " +
+              "word changed. Read the sentence around it, every time." },
   frame: { label: "Where does it fit?", go: "startFrames()",
            t: "Choosing which gap a word belongs in is the sticking point",
            b: "Try each gap out loud with the word in it. Only one of them will sound like English." }
@@ -3026,7 +3151,8 @@ var ACTIVITY_LIST = [
   ["klass",  "Which class fills the gap?", "startKlass()"],
   ["frames", "Where does it fit?",         "startFrames()"],
   ["cloze",  "Insert the word",            "startCloze()"],
-  ["trans",  "Change the word",            "startTrans()"]
+  ["trans",  "Change the word",            "startTrans()"],
+  ["shift",  "Same word, different job",   "startShift()"]
 ];
 
 /** Turn one raw counter key into something a student can act on. Never returns
@@ -3226,6 +3352,119 @@ function kCheck(){
   st2.seen[key]=seen; save(st2);
   el("kCheck").style.display="none"; el("kNextBar").style.display="";
   testRecord(ok);
+}
+
+/* ------------- same word, different job (SPEC 9.7) -------------
+   The whole point is the CONTRAST, so both sentences are on screen at once and
+   the student names the job in each. Answering one side at a time would make
+   the contrast the reveal rather than the question.
+
+   Which sentence appears on the left is decided at RENDER time, not in the
+   bank. SPEC 27 was a lesson about position carrying information a student can
+   use instead of grammar, and "sentence one is always the noun" is that same
+   defect in a new costume. Shuffling makes it impossible rather than merely
+   measured, and the bank is balanced as well so the two agree. */
+var SH = { lvl:"all", item:null, order:[0,1], pick:[-1,-1], done:false };
+
+function startShift(){
+  markTried("shift"); go("shift");
+  lvlChips("shLevels", SHIFTERS, SH.lvl, "shLvl"); shNext();
+}
+function shLvl(l){ SH.lvl=l; lvlChips("shLevels", SHIFTERS, SH.lvl, "shLvl"); shNext(); }
+
+function shSides(){ return [SH.item[SH.order[0]?"b":"a"], SH.item[SH.order[0]?"a":"b"]]; }
+
+function shNext(){
+  var p = lvlPool(SHIFTERS, SH.lvl);
+  if(!p.length){ el("shTextA").textContent="Nothing here yet."; el("shOptsA").innerHTML="";
+                 el("shTextB").innerHTML=""; el("shOptsB").innerHTML=""; return; }
+  SH.item = pickUnseen(p, "shift:"+SH.lvl);
+  SH.order = Math.random() < 0.5 ? [0,1] : [1,0];
+  SH.pick = [-1,-1]; SH.done = false;
+
+  /* The prompt must NOT promise a difference. Four in five pairs do contrast,
+     and if all of them did, "they are always different" would answer the second
+     sentence without reading it. The question is what each one is doing. */
+  el("shPrompt").innerHTML = "Look at <b>" + SH.item.w + "</b> in both sentences. " +
+    "What job is it doing in each one? They might match, and they might not.";
+  var sides = shSides(), tag = ["A","B"], i, j;
+  for(i=0;i<2;i++){
+    el("shText"+tag[i]).innerHTML = shMark(sides[i].t);
+    var h="";
+    for(j=0;j<KORDER.length;j++){
+      var c=KORDER[j];
+      h += '<button class="opt" id="sh'+tag[i]+j+'" aria-pressed="false" onclick="shPick('+i+','+j+')">' +
+           icon(c) + CLASSNAME[c].charAt(0).toUpperCase() + CLASSNAME[c].slice(1) + '</button>';
+    }
+    el("shOpts"+tag[i]).innerHTML = h;
+    el("shSide"+tag[i]).className = "side";
+  }
+  el("shFb").innerHTML=""; el("shScore").textContent="";
+  el("shNextBar").style.display="none";
+  el("shCheck").disabled=true; el("shCheck").style.display="";
+  el("shRef").textContent = SH.item.id;
+}
+
+/* the target word is written [in brackets] in the bank */
+function shMark(t){
+  return t.replace(/\[([^\]]+)\]/, '<span class="target">$1</span>');
+}
+
+function shPick(side, j){
+  if(SH.done) return;
+  SH.pick[side] = j;
+  var tag = ["A","B"][side], k;
+  for(k=0;k<KORDER.length;k++){
+    var b=el("sh"+tag+k); if(b) b.setAttribute("aria-pressed", k===j?"true":"false");
+  }
+  var both = SH.pick[0]>=0 && SH.pick[1]>=0;
+  el("shCheck").disabled = !both;
+  if(both && B.on) return shCheck();
+}
+
+function shCheck(){
+  if(SH.done || SH.pick[0]<0 || SH.pick[1]<0) return;
+  SH.done = true;
+  var sides = shSides(), tag=["A","B"], out=[], allOk=true, i, j;
+
+  for(i=0;i<2;i++){
+    var right = KORDER.indexOf(sides[i].c), ok = SH.pick[i]===right;
+    if(!ok) allOk=false;
+    for(j=0;j<KORDER.length;j++){
+      var b=el("sh"+tag[i]+j); if(!b) continue;
+      b.setAttribute("aria-pressed","false");
+      if(j===right) b.className="opt o-ok";
+      else if(j===SH.pick[i]) b.className="opt o-bad";
+    }
+    el("shSide"+tag[i]).className = "side " + (ok ? "s-ok" : "s-bad");
+    if(ok){
+      out.push(['k-ok', icon(sides[i].c) + "<b>Sentence " + (i+1) + ": " +
+                        aOrAn(CLASSNAME[sides[i].c]) + ".</b> " + sides[i].why]);
+    } else {
+      var chosen = KORDER[SH.pick[i]];
+      out.push(['k-bad', icon(chosen) + "<b>Sentence " + (i+1) + " is not " +
+                         aOrAn(CLASSNAME[chosen]) + ".</b> It is " +
+                         aOrAn(CLASSNAME[sides[i].c]) + ". " + sides[i].why]);
+      var st=store();
+      st.err["shift_"+sides[i].c]=(st.err["shift_"+sides[i].c]||0)+1;
+      save(st);
+    }
+  }
+  el("shScore").textContent = allOk ? "Both right" : "Not both";
+  var contrast = sides[0].c !== sides[1].c;
+  out.push(['k-miss', contrast
+    ? ("<b>" + SH.item.w + "</b> is the same word in both. Nothing about the word itself " +
+       "changed, only the job it was doing, which is why you have to read the sentence and " +
+       "not the word.")
+    : ("<b>" + SH.item.w + "</b> is doing the <b>same</b> job in both this time. It does not " +
+       "always change, which is exactly why it has to be checked rather than assumed.")]);
+  el("shFb").innerHTML = out.map(function(o){return '<li class="'+o[0]+'">'+o[1]+'</li>';}).join("");
+
+  var st2=store(), key="shift:"+SH.lvl, seen=st2.seen[key]||[];
+  if(allOk && seen.indexOf(SH.item.id)<0) seen.push(SH.item.id);
+  st2.seen[key]=seen; save(st2);
+  el("shCheck").style.display="none"; el("shNextBar").style.display="";
+  testRecord(allOk);
 }
 
 /* ---------------- change the word ---------------- */
@@ -3669,6 +3908,118 @@ function validate(){
              Math.round(100*pa.share)+"% of the time");
   }
 
+  /* ---------------- SHIFTERS (SPEC 9.7) ----------------
+     The one bank in the app that is ALLOWED to give a word two classes. That is
+     its content, so POLICY and the lemma map deliberately do not see it, which
+     means these checks are the only ones it gets. */
+  var shWords = {}, shSideA = {}, shPairs = {}, shByLvl = {};
+  for(i=0;i<SHIFTERS.length;i++){
+    var sh = SHIFTERS[i], id = sh.id;
+    if(!sh.a || !sh.b){ E.push(id+": needs two sides"); continue; }
+    /* Both sides carrying the same class is DELIBERATE on some items and used
+       to be an error here. It stopped being one when a blind reader pointed out
+       that a bank where every pair contrasts is answerable by assuming they do.
+       The share is checked in aggregate further down instead. */
+    for(j=0;j<2;j++){
+      var sd = j ? sh.b : sh.a;
+      if(SCORED.indexOf(sd.c) < 0) E.push(id+": '"+sd.c+"' is not a scored class");
+      /* case-insensitive: a bare mass noun at the start of a sentence is
+         capitalised, and those are exactly the items this bank needs most */
+      if(sd.t.toLowerCase().indexOf("["+sh.w+"]") < 0)
+        E.push(id+": side "+(j?"B":"A")+" does not contain ["+sh.w+"]");
+      if(!sd.why || sd.why.length < 12) E.push(id+": side "+(j?"B":"A")+" has no reason a student could use");
+      if(/[\u2014\u2013]|--/.test(sd.t + sd.why))
+        E.push(id+": dash characters are not allowed in anything a student sees");
+    }
+    if(shWords[sh.w]) E.push(id+": '"+sh.w+"' is already used by "+shWords[sh.w]);
+    shWords[sh.w] = id;
+    shByLvl[sh.level] = (shByLvl[sh.level]||0) + 1;
+    var pk = [sh.a.c, sh.b.c].sort().join("/");
+    shPairs[pk] = (shPairs[pk]||0) + 1;
+    shSideA[sh.a.c] = (shSideA[sh.a.c]||0) + 1;
+  }
+  for(k in shPairs) INFO.push("shifters: "+shPairs[k]+" items are "+k);
+  for(i=0;i<LEVELS.length;i++){
+    var shn = shByLvl[LEVELS[i]] || 0;
+    if(shn < 4) E.push("shifters: "+LEVELS[i]+" has "+shn+" items, floor is 4");
+  }
+  /* SPEC 27 in a new costume. If one class is nearly always the FIRST sentence,
+     a student can answer "sentence one is the noun" without reading either. The
+     render shuffles the sides, so this is belt and braces, and it stays because
+     the shuffle is one line somebody could delete without noticing this. */
+  var shTop = null, shTopN = 0;
+  for(k in shSideA) if(shSideA[k] > shTopN){ shTop = k; shTopN = shSideA[k]; }
+  if(SHIFTERS.length){
+    var shShare = shTopN / SHIFTERS.length;
+    INFO.push("shifters: the commonest class in the FIRST authored sentence is "+shTop+
+              " at "+Math.round(100*shShare)+"%. The render shuffles the two sides, so "+
+              "this is the authored balance underneath that.");
+    if(shShare > 0.70)
+      E.push("shifters: '"+shTop+"' is the first sentence "+Math.round(100*shShare)+"% of the "+
+             "time. If the shuffle is ever removed, 'sentence one is the "+shTop+"' answers "+
+             "most of the bank (SPEC 27).");
+  }
+
+  /* Does a DETERMINER decide it, rather than the word's job? Both blind readers
+     of the first draft made the same observation unprompted: every noun sat in
+     "the ___" or "a ___" and every verb did not, so a student could answer the
+     whole bank on "the word before it" and never read the target at all.
+     This is SPEC 27 again in a third costume, and the answer is the v0.5 one:
+     the noun card says stuff-words and names are the exception to the a/the
+     test, so the bank has to CONTAIN some or it teaches the narrow rule. */
+  var DETS = (" the a an my her his their its our your this that these those " +
+              " every each some any no both one two three ").split(/\s+/);
+  var bareNouns = 0, detCue = 0, nvSides = 0;
+  for(i=0;i<SHIFTERS.length;i++){
+    for(j=0;j<2;j++){
+      var sd2 = j ? SHIFTERS[i].b : SHIFTERS[i].a;
+      if(!sd2 || (sd2.c!=="noun" && sd2.c!=="verb")) continue;
+      var head = sd2.t.toLowerCase().split("["+SHIFTERS[i].w+"]")[0];
+      var pre = head.replace(/[^a-z ]/g," ").split(/\s+/).filter(Boolean);
+      var hasDet = false, d;
+      for(d=1; d<=3 && d<=pre.length; d++) if(DETS.indexOf(pre[pre.length-d])>=0) hasDet = true;
+      nvSides++;
+      if(sd2.c==="noun" && !hasDet) bareNouns++;
+      if((sd2.c==="noun") === hasDet) detCue++;
+    }
+  }
+  if(nvSides){
+    INFO.push("shifters: 'a determiner just before it means noun' answers " +
+              Math.round(100*detCue/nvSides) + "% of the noun-against-verb sides, and " +
+              bareNouns + " noun sides have no determiner at all.");
+    if(bareNouns < 4)
+      E.push("shifters: only " + bareNouns + " noun sides have no determiner in front. " +
+             "The noun card calls stuff-words and names the exception to the a/the test, " +
+             "so the bank has to contain some or it teaches the narrow rule (SPEC 27).");
+  }
+
+  /* Does the PAIRING answer itself? If every pair contrasts, a student who
+     solves one sentence gets the other free by assuming they must differ, and
+     that is a rule about the exercise rather than about English. */
+  var shContrast = 0, shCls = {};
+  for(i=0;i<SHIFTERS.length;i++){
+    if(SHIFTERS[i].a.c !== SHIFTERS[i].b.c) shContrast++;
+    shCls[SHIFTERS[i].a.c] = (shCls[SHIFTERS[i].a.c]||0)+1;
+    shCls[SHIFTERS[i].b.c] = (shCls[SHIFTERS[i].b.c]||0)+1;
+  }
+  if(SHIFTERS.length){
+    var shcShare = shContrast/SHIFTERS.length;
+    INFO.push("shifters: "+shContrast+" of "+SHIFTERS.length+" pairs contrast ("+
+              Math.round(100*shcShare)+"%). The rest do the same job twice on purpose.");
+    if(shcShare > 0.90)
+      E.push("shifters: "+Math.round(100*shcShare)+"% of pairs contrast. Solving one sentence "+
+             "then assuming the other must differ answers the bank without reading it (SPEC 27).");
+    /* four fixed buttons, so an unbalanced bank is a free pass. Same rule as
+       the class cloze bank at SPEC 9f. */
+    var shTot = 2*SHIFTERS.length, shBig = null, shBigN = 0;
+    for(k in shCls) if(shCls[k] > shBigN){ shBig = k; shBigN = shCls[k]; }
+    INFO.push("shifters: commonest answer is "+shBig+" at "+Math.round(100*shBigN/shTot)+
+              "% of sides. Chance with four buttons is 25%.");
+    if(shBigN/shTot > 0.45)
+      E.push("shifters: '"+shBig+"' is the answer on "+Math.round(100*shBigN/shTot)+
+             "% of sides. Pressing one button every time would beat chance too easily.");
+  }
+
   /* pool floor */
   var acts=["one","all"], floorFails=[];
   for(i=0;i<acts.length;i++) for(j=0;j<SCORED.length;j++){
@@ -3766,10 +4117,89 @@ function runValidate(){
 }
 
 /* ---------------------------- boot ------------------------------ */
+/* ------------- assignable links (SPEC 28) -------------
+   ?a=one&cls=adv&lvl=developing opens straight into one drill at one level, so
+   a named weakness can be set as homework. Practice only: test and challenge
+   are whole-app modes and a link into the middle of one would mean nothing.
+   Anything unrecognised falls through to the normal menu rather than erroring,
+   because a mistyped link in a student's hands must not look like a broken app. */
+var LINK_ACTS = {
+  one:    function(q){ S.act="one"; S.cls=q.cls||"noun"; S.lvl=q.lvl||"all";
+                       markTried("one"); go("play"); renderChips(); next(); },
+  all:    function(q){ S.act="all"; S.cls=q.cls||"noun"; S.lvl=q.lvl||"all";
+                       markTried("all"); go("play"); renderChips(); next(); },
+  yesno:  function(q){ Y.cls=q.cls||"noun"; markTried("yesno"); go("yesno"); ynChips(); ynNext(); },
+  klass:  function(q){ K.lvl=q.lvl||"all"; startKlass(); },
+  frames: function(q){ F.lvl=q.lvl||"all"; startFrames(); },
+  cloze:  function(q){ C.lvl=q.lvl||"all"; startCloze(); },
+  trans:  function(q){ R.lvl=q.lvl||"all"; startTrans(); },
+  shift:  function(q){ SH.lvl=q.lvl||"all"; startShift(); }
+};
+
+function query(){
+  var out={}, qs=location.search.replace(/^\?/,"").split("&"), i, kv;
+  for(i=0;i<qs.length;i++){
+    if(!qs[i]) continue;
+    kv = qs[i].split("=");
+    out[decodeURIComponent(kv[0])] = decodeURIComponent(kv[1]||"");
+  }
+  return out;
+}
+
+function openLink(q){
+  var f = LINK_ACTS[q.a];
+  if(!f) return false;
+  if(q.cls && SCORED.indexOf(q.cls) < 0) delete q.cls;
+  if(q.lvl && q.lvl !== "all" && LEVELS.indexOf(q.lvl) < 0) delete q.lvl;
+  try{ f(q); return true; }catch(e){ return false; }
+}
+
+/* the builder on the teacher page */
+var LINK_NEEDS = { one:"cls", all:"cls", yesno:"cls",
+                   klass:"lvl", frames:"lvl", cloze:"lvl", trans:"lvl", shift:"lvl" };
+function linkInit(){
+  var a="", i;
+  for(i=0;i<ACTIVITY_LIST.length;i++)
+    a += '<option value="'+ACTIVITY_LIST[i][0]+'">'+ACTIVITY_LIST[i][1]+'</option>';
+  el("lkAct").innerHTML = a;
+  var c='<option value="">Any word class</option>';
+  for(i=0;i<SCORED.length;i++)
+    c += '<option value="'+SCORED[i]+'">'+CLASSNAME[SCORED[i]]+'</option>';
+  el("lkCls").innerHTML = c;
+  var l='<option value="">Any level</option>';
+  for(i=0;i<LEVELS.length;i++)
+    l += '<option value="'+LEVELS[i]+'">'+LEVELS[i]+'</option>';
+  el("lkLvl").innerHTML = l;
+  linkBuild();
+}
+function linkBuild(){
+  var act = el("lkAct").value, need = LINK_NEEDS[act];
+  el("lkCls").style.display = (need==="cls") ? "" : "none";
+  el("lkLvl").style.display = (need==="lvl" || act==="one" || act==="all") ? "" : "none";
+  var u = location.origin + location.pathname + "?a=" + act;
+  if(el("lkCls").style.display!=="none" && el("lkCls").value) u += "&cls=" + el("lkCls").value;
+  if(el("lkLvl").style.display!=="none" && el("lkLvl").value) u += "&lvl=" + el("lkLvl").value;
+  el("lkOut").textContent = u;
+  el("lkNote").textContent = "";
+}
+function linkCopy(){
+  var t = el("lkOut").textContent;
+  try{
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(t);
+      el("lkNote").textContent = "Copied";
+      return;
+    }
+  }catch(e){}
+  el("lkNote").textContent = "Select the link above and copy it";
+}
+
 function boot(){
   renderTests();
+  var q = query();
   if(location.search.indexOf("validate")>=0){ go("validate"); runValidate(); }
-  else if(location.search.indexOf("teacher")>=0){ startTeacher(); }
+  else if(location.search.indexOf("teacher")>=0){ startTeacher(); linkInit(); }
+  else if(q.a){ openLink(q); }
 
   /* Anything that could not be sent last time goes up now, silently. A student
      who lost wifi mid-lesson should never have to think about it again. */
