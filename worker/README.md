@@ -23,6 +23,18 @@ deploy-worker.bat           # or the two commands it runs
 npx wrangler secret put TEACHER_KEY   # once, sets the teacher password
 ```
 
+**`TEACHER_KEY` is the NAME and never changes.** The command then prints
+`Enter a secret value:` and *that* is where the password goes. Typing the
+password in place of the name creates a secret with the wrong name, leaves
+`TEACHER_KEY` unset, and puts the password somewhere it is not secret: names are
+listed in plain text by `wrangler secret list` and by the Cloudflare dashboard.
+This happened on 2026-08-25. Check with `npx wrangler secret list`, which must
+show exactly `TEACHER_KEY`.
+
+**Type the value at the prompt rather than pasting it.** A paste often carries a
+trailing space or newline, the comparison is exact, and nothing typed into the
+teacher page would then ever match.
+
 `deploy-worker.bat` is safe to re-run. The database is auto-provisioned on the
 first deploy (`database_id` is deliberately absent from `wrangler.jsonc`), and
 the schema is idempotent.
@@ -116,7 +128,7 @@ The repository is **public**.
 | Never commit | Where it goes instead |
 |---|---|
 | Cloudflare API tokens | `wrangler login` |
-| The teacher password | `npx wrangler secret put TEACHER_KEY` |
+| The teacher password | `npx wrangler secret put TEACHER_KEY`, entered at the **value** prompt, never as the name |
 | `.dev.vars` | git-ignored, stays on the machine |
 | `.wrangler/` | git-ignored |
 
