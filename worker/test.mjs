@@ -257,8 +257,7 @@ await test("the impossible is rejected", async () => {
     ["negative correct", { correct: -1 }],
     ["a level that does not exist", { level: "impossible" }],
     ["a non-integer score", { score: 12.5 }],
-    ["a class code with markup in it", { cls: "<script>" }],
-    ["an empty class code", { cls: "" }]
+    ["a class code with markup in it", { cls: "<script>" }]
   ];
   for (const [name, patch] of cases) {
     const r = await req("/score", { method: "POST", body: { ...good, ...patch } });
@@ -274,12 +273,61 @@ await test("the impossible is rejected", async () => {
   check("a genuinely excellent run is still accepted", okRun.status === 200, "got " + okRun.status);
 });
 
+await test("the one shared board", async () => {
+  /* Students are not asked for a class code any more (2026-08-25). */
+  let r = await req("/score", { method: "POST", body: { ...good, cls: undefined } });
+  check("a score with no class code is accepted", r.status === 200, "got " + r.status);
+  r = await req("/score", { method: "POST", body: { ...good, cls: "" } });
+  check("and an empty one means the same thing", r.status === 200, "got " + r.status);
+
+  r = await req("/board");
+  let b = await r.json();
+  check("the board with no class is the shared one", r.status === 200 && b.board.length >= 2,
+    JSON.stringify(b).slice(0, 160));
+
+  /* A code still filters, so nothing posted under one before the change is
+     stranded, and per-class boards stay possible without a migration. */
+  await req("/score", { method: "POST", body: { ...good, cls: "7C", nick: "Farid" } });
+  r = await req("/board?cls=7C");
+  b = await r.json();
+  check("a class code still filters when one is given",
+    b.board.length === 1, JSON.stringify(b.board));
+  r = await req("/board");
+  b = await r.json();
+  check("and the shared board contains it too", b.board.length >= 3, b.board.length);
+
+  /* Clearing is the one thing that must never be a slip. */
+  r = await req("/admin/clear", { method: "POST", body: {},
+                                  headers: { "X-Teacher-Key": KEY } });
+  check("clearing with nothing named is refused", r.status === 400, "got " + r.status);
+  r = await req("/admin/clear", { method: "POST", body: { all: "yes" },
+                                  headers: { "X-Teacher-Key": KEY } });
+  check("and a merely truthy all is not enough", r.status === 400, "got " + r.status);
+  r = await req("/admin/clear", { method: "POST", body: { all: true },
+                                  headers: { "X-Teacher-Key": KEY } });
+  check("all: true wipes every board", r.status === 200, "got " + r.status);
+  r = await req("/board");
+  b = await r.json();
+  check("and the board is then empty", b.board.length === 0, JSON.stringify(b.board));
+});
+
 await test("rate limiting", async () => {
   let last;
-  for (let i = 0; i < 45; i++) last = await req("/score", { method: "POST", body: good });
+  /* The ceiling is the whole app now rather than one class, because there is
+     one board. It has to sit above several classes playing at once. */
+  for (let i = 0; i < 30; i++) last = await req("/score", { method: "POST", body: good });
+  check("a class of thirty playing at once is NOT throttled", last.status === 200,
+    "got " + last.status);
+  for (let i = 0; i < 220; i++) last = await req("/score", { method: "POST", body: good });
   check("a flood is eventually refused", last.status === 429, "got " + last.status);
+  /* This USED to assert that another class was unaffected. With one shared board
+     every run lands under the same code, so there is no isolation left to have:
+     the ceiling is the whole app and a flood stops everyone. That is the honest
+     trade of a single board, and it is survivable because a refused submit is
+     queued on the device and retried rather than lost (invariant 4). */
   const other = await req("/score", { method: "POST", body: { ...good, cls: "7A" } });
-  check("a different class is unaffected", other.status === 200, "got " + other.status);
+  check("the ceiling is app-wide now, so naming a class does not dodge it",
+    other.status === 429, "got " + other.status);
 });
 
 await test("teacher routes", async () => {
@@ -313,8 +361,8 @@ await test("board query hygiene", async () => {
   let r = await req("/board?cls=9B&limit=99999");
   let b = await r.json();
   check("an absurd limit is capped, not obeyed", r.status === 200 && b.board.length <= 100);
-  r = await req("/board");
-  check("a missing class code is refused", r.status === 400, "got " + r.status);
+  r = await req("/board?cls=%3Cscript%3E");
+  check("a class code with markup in it is still refused", r.status === 400, "got " + r.status);
   r = await req("/board?cls=" + encodeURIComponent("' OR 1=1 --"));
   check("an injection attempt is refused by the class-code rule", r.status === 400, "got " + r.status);
 });

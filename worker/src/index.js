@@ -69,7 +69,18 @@ const WRONG_PENALTY = 3;
 /* Rate limit, measured off the runs table so that no request metadata (IP,
    headers, fingerprint) has to be stored to make it work. */
 const RATE_WINDOW_SECONDS = 60;
-const RATE_MAX_PER_CLASS = 40;
+/* There is ONE board now (2026-08-25), so this ceiling is no longer per class:
+   it is the whole app. A run takes sixty seconds, so a student cannot post more
+   than once a minute, and a class of thirty is thirty. Set for several classes
+   playing at once with room to spare, because a limit that throttles a real
+   lesson is worse than one that lets a script through: the script is answered
+   by the Remove button and the moderation queue, a stuck lesson is not. */
+const RATE_MAX_PER_WINDOW = 240;
+
+/* Every run lands here unless a class code is explicitly given. Keeping the
+   column rather than dropping it means per-class boards remain possible later
+   without a migration, and existing rows keep working. */
+const DEFAULT_BOARD = "ALL";
 
 const BOARD_DEFAULT = 20;
 const BOARD_MAX = 100;
@@ -133,8 +144,13 @@ async function postScore(request, env) {
     return json(env, { error: "bad json" }, 400);
   }
 
-  const cls = cleanClass(body.cls);
-  if (!cls) return json(env, { error: "bad class code" }, 400);
+  /* The class code is optional. One shared board is the default and students
+     are not asked for a code at all; a code still works if one is sent. */
+  let cls = DEFAULT_BOARD;
+  if (body.cls !== undefined && body.cls !== null && String(body.cls).trim() !== "") {
+    cls = cleanClass(body.cls);
+    if (!cls) return json(env, { error: "bad class code" }, 400);
+  }
 
   const nick = cleanNick(body.nick);
   if (!nick) return json(env, { error: "bad nickname" }, 400);
@@ -157,11 +173,11 @@ async function postScore(request, env) {
 
   /* Rate limit off the table itself. See the note by RATE_WINDOW_SECONDS. */
   const recent = await env.DB
-    .prepare("SELECT COUNT(*) AS n FROM runs WHERE cls = ? AND created > ?")
-    .bind(cls, now - RATE_WINDOW_SECONDS)
+    .prepare("SELECT COUNT(*) AS n FROM runs WHERE created > ?")
+    .bind(now - RATE_WINDOW_SECONDS)
     .first();
-  if (recent && recent.n >= RATE_MAX_PER_CLASS)
-    return json(env, { error: "too many scores from this class just now" }, 429);
+  if (recent && recent.n >= RATE_MAX_PER_WINDOW)
+    return json(env, { error: "too many scores just now" }, 429);
 
   /* Has this name already been judged for this class? If so the decision
      carries over, so a student who has been approved once is not re-queued
@@ -191,21 +207,26 @@ async function postScore(request, env) {
                      rank: (rank ? rank.n : 0) + 1 });
 }
 
+/** The board. `cls` is OPTIONAL: with none given this is the one shared board
+ *  across everything, which is what the app asks for. A code still filters, so
+ *  rows posted under one before 2026-08-25 are neither lost nor stranded. */
 async function getBoard(url, env) {
-  const cls = cleanClass(url.searchParams.get("cls"));
-  if (!cls) return json(env, { error: "bad class code" }, 400);
+  const raw = url.searchParams.get("cls");
+  let cls = null;
+  if (raw !== null && raw.trim() !== "") {
+    cls = cleanClass(raw);
+    if (!cls) return json(env, { error: "bad class code" }, 400);
+  }
 
   let limit = parseInt(url.searchParams.get("limit") || "", 10);
   if (!Number.isInteger(limit) || limit < 1) limit = BOARD_DEFAULT;
   if (limit > BOARD_MAX) limit = BOARD_MAX;
 
-  const rows = await env.DB
-    .prepare(
-      "SELECT id, nick, approved, score, correct, wrong, chain, level, created FROM runs " +
-      "WHERE cls = ? ORDER BY score DESC, created ASC LIMIT ?"
-    )
-    .bind(cls, limit)
-    .all();
+  const sql =
+    "SELECT id, nick, approved, score, correct, wrong, chain, level, created FROM runs " +
+    (cls ? "WHERE cls = ? " : "") + "ORDER BY score DESC, created ASC LIMIT ?";
+  const rows = await (cls ? env.DB.prepare(sql).bind(cls, limit)
+                          : env.DB.prepare(sql).bind(limit)).all();
 
   /* THE safety property of the whole moderation design: an unapproved name does
      not leave this worker on the public route. Not masked on the client, not
@@ -323,15 +344,24 @@ async function adminJudge(request, env, status) {
                      runsUpdated: (r.meta && r.meta.changes) || 0 });
 }
 
+/** Wiping a board is the one thing here that must never be a slip. With a single
+ *  shared board there is no class code left to type, so the deliberateness has
+ *  to come from somewhere: `all: true` must be sent explicitly. An absent or
+ *  falsy field is refused, so a malformed request can never clear the board. */
 async function adminClear(request, env) {
   const auth = teacherState(request, env);
   if (auth !== "ok")
     return json(env, { error: auth === "unset" ? "no key set" : "no" }, 403);
   let body;
   try { body = await request.json(); } catch (e) { return json(env, { error: "bad json" }, 400); }
-  const cls = cleanClass(body.cls);
-  if (!cls) return json(env, { error: "bad class code" }, 400);
-  const r = await env.DB.prepare("DELETE FROM runs WHERE cls = ?").bind(cls).run();
+  let r;
+  if (body.all === true) {
+    r = await env.DB.prepare("DELETE FROM runs").run();
+  } else {
+    const cls = cleanClass(body.cls);
+    if (!cls) return json(env, { error: "name a class, or send all: true" }, 400);
+    r = await env.DB.prepare("DELETE FROM runs WHERE cls = ?").bind(cls).run();
+  }
   return json(env, { ok: true, cleared: (r.meta && r.meta.changes) || 0 });
 }
 
@@ -371,7 +401,7 @@ export default {
           ok: true,
           note: "This is the score service, not the app. The app is at " +
                 "https://mamthegoat.github.io/word-class-commando/",
-          routes: ["/health", "/board?cls=9B"]
+          routes: ["/health", "/board"]
         });
 
       return json(env, { error: "not found" }, 404);
