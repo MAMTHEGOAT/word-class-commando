@@ -194,6 +194,19 @@ await test("moderation: approve, reject, and judge a name only once", async () =
                                     headers: { "X-Teacher-Key": KEY } });
   check("but a class code that is junk is still refused", r.status === 400, "got " + r.status);
 
+  /* A worker with no secret set must say so rather than blaming the password.
+     Michael hit this: the page said "that password was not accepted" when the
+     real state was that the worker had no password to accept. */
+  const noKeyEnv = { ...env, TEACHER_KEY: undefined };
+  r = await worker.fetch(new Request("https://x/admin/pending",
+        { method: "POST", body: "{}", headers: { "X-Teacher-Key": KEY } }), noKeyEnv);
+  check("a worker with no secret set says so, rather than blaming the key",
+    r.status === 403 && (await r.json()).error === "no key set", "got " + r.status);
+  r = await req("/admin/pending", { method: "POST", body: {},
+                                    headers: { "X-Teacher-Key": "definitely-wrong" } });
+  check("and a genuinely wrong key still says only 'no'",
+    r.status === 403 && (await r.json()).error === "no", "got " + r.status);
+
   /* Clearing a board is deliberately NOT like this: you have to name it. */
   r = await req("/admin/clear", { method: "POST", body: {},
                                   headers: { "X-Teacher-Key": KEY } });

@@ -226,6 +226,18 @@ async function getBoard(url, env) {
 
 /** Teacher routes. One shared secret, set with `wrangler secret put TEACHER_KEY`.
  *  If the secret was never set, these refuse rather than defaulting to open. */
+/** Distinguishes "no key is configured on this worker" from "wrong key".
+ *  Returns "ok", "wrong", or "unset".
+ *
+ *  Telling the caller the secret was never set leaks nothing useful: it says
+ *  the route is unusable, not what would make it usable. It is worth saying
+ *  because the alternative is a teacher hunting for a password that does not
+ *  exist, told by their own app that the one they have is wrong. */
+function teacherState(request, env) {
+  if (!env.TEACHER_KEY) return "unset";
+  return teacherOk(request, env) ? "ok" : "wrong";
+}
+
 function teacherOk(request, env) {
   if (!env.TEACHER_KEY) return false;
   const given = request.headers.get("X-Teacher-Key") || "";
@@ -238,7 +250,9 @@ function teacherOk(request, env) {
 }
 
 async function adminDelete(request, env) {
-  if (!teacherOk(request, env)) return json(env, { error: "no" }, 403);
+  const auth = teacherState(request, env);
+  if (auth !== "ok")
+    return json(env, { error: auth === "unset" ? "no key set" : "no" }, 403);
   let body;
   try { body = await request.json(); } catch (e) { return json(env, { error: "bad json" }, 400); }
   if (!isInt(body.id, 1, Number.MAX_SAFE_INTEGER)) return json(env, { error: "bad id" }, 400);
@@ -257,7 +271,9 @@ async function adminDelete(request, env) {
  *  Note this is NOT how /admin/clear behaves. Deleting one board is a thing you
  *  should have to name. */
 async function adminPending(request, env) {
-  if (!teacherOk(request, env)) return json(env, { error: "no" }, 403);
+  const auth = teacherState(request, env);
+  if (auth !== "ok")
+    return json(env, { error: auth === "unset" ? "no key set" : "no" }, 403);
   let body;
   try { body = await request.json(); } catch (e) { return json(env, { error: "bad json" }, 400); }
 
@@ -282,7 +298,9 @@ async function adminPending(request, env) {
 /** Approve or reject a NAME for a class, which decides every run that name has
  *  posted and every run it posts in future. */
 async function adminJudge(request, env, status) {
-  if (!teacherOk(request, env)) return json(env, { error: "no" }, 403);
+  const auth = teacherState(request, env);
+  if (auth !== "ok")
+    return json(env, { error: auth === "unset" ? "no key set" : "no" }, 403);
   let body;
   try { body = await request.json(); } catch (e) { return json(env, { error: "bad json" }, 400); }
   const cls = cleanClass(body.cls);
@@ -306,7 +324,9 @@ async function adminJudge(request, env, status) {
 }
 
 async function adminClear(request, env) {
-  if (!teacherOk(request, env)) return json(env, { error: "no" }, 403);
+  const auth = teacherState(request, env);
+  if (auth !== "ok")
+    return json(env, { error: auth === "unset" ? "no key set" : "no" }, 403);
   let body;
   try { body = await request.json(); } catch (e) { return json(env, { error: "bad json" }, 400); }
   const cls = cleanClass(body.cls);

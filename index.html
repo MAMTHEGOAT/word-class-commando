@@ -1345,7 +1345,7 @@ var AMBIG = ["answer","answers","back","bark","barks","book","books","brush","br
 <script>
 "use strict";
 
-var APP = "wcc", VER = "v0.17", BANK_REV = 10;
+var APP = "wcc", VER = "v0.17.1", BANK_REV = 10;
 var BUG_FORM_URL = "";   /* paste the Office 365 form link to switch the report button on */
 
 /* ---------- the four tests: one source for the Learn screen AND every
@@ -2651,8 +2651,11 @@ async function teacherLoad(){
     /* The site and the worker deploy separately (SPEC 19.7), so a site that has
        been pushed before the worker is updated will ask for every class at once
        and be refused. Say what to do about it rather than "that did not work". */
-    var why;
-    if(r.body && r.body.error === "no") why = "That password was not accepted.";
+    var why, err = r.body && r.body.error;
+    if(err === "no key set")
+      why = "The board service has no teacher password set at all, so nothing you type " +
+            "here can work yet. Set one with: npx wrangler secret put TEACHER_KEY";
+    else if(err === "no") why = "That password was not accepted.";
     else if(!filter) why = "The board service has not been updated yet. Deploy the worker " +
                            "(deploy-worker.bat), or put a class code in the box for now.";
     else why = "That did not work.";
