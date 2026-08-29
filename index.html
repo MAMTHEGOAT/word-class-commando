@@ -2533,8 +2533,10 @@ async function flushQueue(){
   for(var i=0;i<st.queue.length;i++){
     var r = await netPost("/score", st.queue[i]);
     if(r && r.ok) sent++;
-    else if(r && !r.ok) { /* the server refused it: never going to work, drop it */ }
-    else keep.push(st.queue[i]);          /* unreachable: try again next time */
+    else if(r && !r.ok && !(r.body && r.body.error === "bad class code")){
+      /* the server refused it on its merits: never going to work, drop it */
+    }
+    else keep.push(st.queue[i]);   /* unreachable, or an un-deployed worker: retry */
   }
   st.queue = keep; save();
   return sent;
@@ -2567,10 +2569,22 @@ async function submitRun(){
     el("bzSubmitRow").style.display = "none";
     el("bzSeeBoard").style.display = "";
   } else if(r && !r.ok){
-    el("bzSubmitNote").textContent = r.body && r.body.error === "bad nickname"
-      ? "That name will not work. Try something shorter."
-      : "That one could not be saved. Your best is still kept on this device.";
-    el("bzSubmit").disabled = false;
+    var err = r.body && r.body.error;
+    if(err === "bad class code"){
+      /* We sent no class code, so an old worker is refusing a request a new one
+         accepts. That is a VERSION SKEW, not a permanent refusal: it will work
+         the moment the worker is deployed, so it queues like an outage rather
+         than being dropped like a bad request. The student loses nothing. */
+      queueRun(run);
+      el("bzSubmitNote").textContent =
+        "Saved. It will go up next time you open this.";
+      el("bzSubmitRow").style.display = "none";
+    } else {
+      el("bzSubmitNote").textContent = err === "bad nickname"
+        ? "That name will not work. Try something shorter."
+        : "That one could not be saved. Your best is still kept on this device.";
+      el("bzSubmit").disabled = false;
+    }
   } else {
     /* unreachable: queue it and say something calm and true */
     queueRun(run);
