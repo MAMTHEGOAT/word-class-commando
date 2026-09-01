@@ -564,7 +564,8 @@ button.yn{min-width:110px;font-size:1.05rem}
   <p class="small dim" id="bzNeutral" style="text-align:center"></p>
 
   <div class="board-box">
-    <p class="lbl">Put it on the leaderboard</p>
+    <p class="lbl" id="bzBoardLbl">Put it on the leaderboard</p>
+    <p class="small dim" id="bzNoPost" style="display:none"></p>
     <div id="bzSubmitRow" class="board-form">
       <input id="bzNick" class="tin" maxlength="16" placeholder="Your name on the board" autocomplete="off">
       <button class="go" id="bzSubmit" onclick="submitRun()">Send</button>
@@ -1345,7 +1346,7 @@ var AMBIG = ["answer","answers","back","bark","barks","book","books","brush","br
 <script>
 "use strict";
 
-var APP = "wcc", VER = "v0.18", BANK_REV = 10;
+var APP = "wcc", VER = "v0.19", BANK_REV = 10;
 var BUG_FORM_URL = "";   /* paste the Office 365 form link to switch the report button on */
 
 /* ---------- the four tests: one source for the Learn screen AND every
@@ -2544,6 +2545,7 @@ async function flushQueue(){
 
 /* ---- submitting from the challenge result ---- */
 async function submitRun(){
+  if(B.lastScore < 0) return;           /* not postable: see blitzFinish */
   var nick = (el("bzNick").value || "").trim();
   if(!nick){
     el("bzSubmitNote").textContent = "Put a name in the box first.";
@@ -2765,6 +2767,13 @@ var BLITZ_SECONDS = 60;
 var WRONG_PENALTY = 3;          /* tuned against the FEWEST-options activity:
                                    with Yes or no at two options, -1 would make
                                    mashing worth exactly zero. */
+/* The running total cannot fall below this (SPEC 31). Students found it funny
+   to race each other towards the most negative score they could reach, and that
+   race is watched on the timer bar during the run: refusing the submission
+   afterwards does not touch it, so the number itself has to stop falling.
+   The chain still breaks on every wrong answer at the floor, which is the cost
+   the original design called the real one. */
+var SCORE_FLOOR = -5;
 var MULT_STEP = 3, MULT_CAP = 5;
 
 /* Click-all is excluded: it needs a variable number of taps, so it cannot be
@@ -2847,7 +2856,9 @@ function blitzRecord(ok, outcome){
     if(B.chain > B.bestChain) B.bestChain = B.chain;
     flash("ok");
   } else {
-    B.score -= WRONG_PENALTY;
+    /* Clamped as it happens, not tidied up at the end: the falling number IS
+       the game the students invented, and it is on screen throughout the run. */
+    B.score = Math.max(SCORE_FLOOR, B.score - WRONG_PENALTY);
     B.wrong++; B.chain = 0;            /* the chain is the real cost */
     flash("bad");
   }
@@ -2882,8 +2893,10 @@ function blitzFinish(){
   if(isBest) st.best.blitz = { score:B.score, chain:B.bestChain };
   save();
 
-  /* The score is NOT floored at zero: in an arcade loop the catastrophic
-     number is the feedback. The diagnosis sits underneath it, never instead. */
+  /* Floored at SCORE_FLOOR rather than at zero. Zero would remove the sting
+     entirely; no floor at all turned into a race towards minus infinity that
+     the students ran among themselves on the timer bar. Minus five is small
+     enough to sting and shallow enough to be nothing to compete over. */
   el("bzScore").textContent = B.score;
   el("bzBestChain").textContent = B.bestChain;
   var note = "";
@@ -2899,8 +2912,20 @@ function blitzFinish(){
   var who = boardId();
   el("bzNick").value = who.nick;
   el("bzSubmit").disabled = false;
-  el("bzSubmitRow").style.display = "";
   el("bzSubmitNote").textContent = "";
+
+  /* A run has to be worth something to go up (SPEC 31). Students raced each
+     other for the WORST score, which is a second leaderboard running the other
+     way and an easier one to win. The real score stays on screen above this,
+     because a bad run saying so loudly is the whole point of the penalty. What
+     is taken away is the audience, which is the part that made tanking fun. */
+  var postable = B.lastScore >= 0;
+  el("bzSubmitRow").style.display = postable ? "" : "none";
+  el("bzBoardLbl").style.display = postable ? "" : "none";
+  el("bzNoPost").style.display = postable ? "none" : "";
+  el("bzNoPost").textContent = postable ? "" :
+    "Nothing on the board this time. A run needs to finish on zero or better to " +
+    "go up, so getting back to zero is the thing to aim at next.";
 
   el("bzNeutral").innerHTML = B.neutral
     ? "<b>" + B.neutral + "</b> of your taps were true of the language but not what that " +

@@ -273,6 +273,25 @@ await test("the impossible is rejected", async () => {
   check("a genuinely excellent run is still accepted", okRun.status === 200, "got " + okRun.status);
 });
 
+await test("a run has to be worth something to go on the board", async () => {
+  /* Students raced each other for the WORST score, which is a second
+     leaderboard running the other way. The refusal lives in the worker because
+     the board is public and a client-side rule is only a suggestion. */
+  for (const bad of [-1, -5, -30]) {
+    const r = await req("/score", { method: "POST",
+      body: { ...good, correct: 0, wrong: 10, chain: 0, score: bad } });
+    check("a score of " + bad + " is refused", r.status === 400, "got " + r.status);
+  }
+  let r = await req("/score", { method: "POST",
+    body: { ...good, correct: 3, wrong: 3, chain: 1, score: 0 } });
+  check("zero is accepted: the bar is zero or better, not high",
+    r.status === 200, "got " + r.status);
+  r = await req("/board");
+  const b = await r.json();
+  check("so nothing on the board is negative",
+    b.board.every(x => x.score >= 0), JSON.stringify(b.board.map(x => x.score)));
+});
+
 await test("the one shared board", async () => {
   /* Students are not asked for a class code any more (2026-08-25). */
   let r = await req("/score", { method: "POST", body: { ...good, cls: undefined } });

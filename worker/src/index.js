@@ -169,6 +169,17 @@ async function postScore(request, env) {
   if (score > maxPossibleScore(correct, wrong))
     return json(env, { error: "score impossible for that many answers" }, 400);
 
+  /* A run has to be worth something to go on the board (2026-08-25). Students
+     found it funny to race each other for the WORST possible score, which is a
+     second leaderboard running the other way and an easier one to win.
+     It is refused here rather than only in the app, because the board is public
+     and a client-side rule is a suggestion. Note what this does NOT do: the app
+     still shows the student their real negative score, because a bad run saying
+     so loudly is the feedback the penalty exists for (SPEC 24). What is removed
+     is the audience for it, which is the part that made tanking fun. */
+  if (score < 0)
+    return json(env, { error: "a run has to finish on zero or better" }, 400);
+
   const now = Math.floor(Date.now() / 1000);
 
   /* Rate limit off the table itself. See the note by RATE_WINDOW_SECONDS. */
