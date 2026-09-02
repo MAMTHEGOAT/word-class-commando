@@ -359,6 +359,35 @@ async function adminJudge(request, env, status) {
  *  shared board there is no class code left to type, so the deliberateness has
  *  to come from somewhere: `all: true` must be sent explicitly. An absent or
  *  falsy field is refused, so a malformed request can never clear the board. */
+/** The board AS THE TEACHER SEES IT: every row with its real name and its
+ *  decision, including names already rejected.
+ *
+ *  A separate route rather than a flag on `/board`, deliberately. The public
+ *  board not returning an unapproved name is THE safety property of the whole
+ *  moderation design (SPEC 19.3), and the way that property dies is somebody
+ *  adding a parameter to the same handler. This one is behind the key.
+ *
+ *  It exists because a rejected name was previously invisible everywhere: the
+ *  pending queue only lists `approved = 0`, so a rejection made by mistake
+ *  could not be found again, let alone undone. */
+async function adminBoard(request, env) {
+  const auth = teacherState(request, env);
+  if (auth !== "ok")
+    return json(env, { error: auth === "unset" ? "no key set" : "no" }, 403);
+  const url = new URL(request.url);
+  let limit = parseInt(url.searchParams.get("limit") || "", 10);
+  if (!Number.isInteger(limit) || limit < 1) limit = 50;
+  if (limit > BOARD_MAX) limit = BOARD_MAX;
+  const rows = await env.DB
+    .prepare(
+      "SELECT id, cls, nick, approved, score, created FROM runs " +
+      "ORDER BY score DESC, created ASC LIMIT ?"
+    )
+    .bind(limit)
+    .all();
+  return json(env, { board: (rows && rows.results) || [] });
+}
+
 async function adminClear(request, env) {
   const auth = teacherState(request, env);
   if (auth !== "ok")
@@ -394,6 +423,8 @@ export default {
         return await adminDelete(request, env);
       if (url.pathname === "/admin/pending" && request.method === "POST")
         return await adminPending(request, env);
+      if (url.pathname === "/admin/board" && request.method === "POST")
+        return await adminBoard(request, env);
       if (url.pathname === "/admin/approve" && request.method === "POST")
         return await adminJudge(request, env, 1);
       if (url.pathname === "/admin/reject" && request.method === "POST")

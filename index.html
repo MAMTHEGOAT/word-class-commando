@@ -1346,7 +1346,7 @@ var AMBIG = ["answer","answers","back","bark","barks","book","books","brush","br
 <script>
 "use strict";
 
-var APP = "wcc", VER = "v0.19", BANK_REV = 10;
+var APP = "wcc", VER = "v0.19.1", BANK_REV = 10;
 var BUG_FORM_URL = "";   /* paste the Office 365 form link to switch the report button on */
 
 /* ---------- the four tests: one source for the Learn screen AND every
@@ -2621,8 +2621,14 @@ async function showBoard(){
   var h = '<table class="restab">';
   for(var i=0;i<rows.length;i++){
     var row = rows[i];
+    /* status: 1 approved, 0 waiting, -1 rejected. Rejected used to render as
+       "waiting for approval" because the only test here was whether a name had
+       come back, and the board sends no name for either. So a decided row sat
+       there looking queued, and the teacher's queue was empty. */
     var name = row.nick ? esc(row.nick)
-             : '<span class="dim">name waiting for approval</span>';
+             : (row.status === -1
+                ? '<span class="dim">name not shown</span>'
+                : '<span class="dim">name waiting for approval</span>');
     var mine = (row.nick && row.nick === who.nick) ? ' class="me"' : '';
     h += '<tr' + mine + '><td class="num dim">' + (i+1) + '</td><td>' + name +
          '</td><td class="num">' + row.score + '</td></tr>';
@@ -2705,7 +2711,7 @@ async function teacherLoad(){
    click rather than wiping the term. Approving a NAME and removing a SCORE are
    different jobs: a name is judged once and forever, a score is one row. */
 async function teacherBoard(){
-  var r = await netGet("/board?limit=50");
+  var r = await netPost("/admin/board", {}, { "X-Teacher-Key": teacherKey() });
   var box = document.createElement("div");
   box.id = "tBoard";
   var old = el("tBoard"); if(old) old.parentNode.removeChild(old);
@@ -2718,11 +2724,26 @@ async function teacherBoard(){
   h += '<table class="restab">';
   for(i=0;i<rows.length;i++){
     var row = rows[i];
-    var name = row.nick ? esc(row.nick)
-             : '<span class="dim">waiting for approval</span>';
-    h += '<tr><td class="num dim">' + (i+1) + '</td><td>' + name +
-         '</td><td class="num">' + row.score + '</td>' +
-         '<td><button class="tb-quit" onclick="teacherRemove(' + row.id + ')">Remove</button></td></tr>';
+    /* The teacher sees the REAL name whatever its state, and what that state
+       is. A rejected name was previously invisible here and absent from the
+       queue, so a rejection made by mistake could not be found, let alone
+       undone. Students still never see an unapproved name: this list comes
+       from a different, key-protected route. */
+    var q = function(v){ return JSON.stringify(String(v)).replace(/"/g, "&quot;"); };
+    var state = row.approved === 1 ? '' :
+                (row.approved === -1
+                  ? ' <span class="dim small">rejected</span>'
+                  : ' <span class="dim small">waiting</span>');
+    var act = '';
+    if(row.approved !== 1)
+      act += '<button class="tb-quit" onclick="teacherJudge(\'approve\',' + q(row.cls) +
+             ',' + q(row.nick) + ')">Approve</button> ';
+    if(row.approved !== -1)
+      act += '<button class="tb-quit" onclick="teacherJudge(\'reject\',' + q(row.cls) +
+             ',' + q(row.nick) + ')">Reject</button> ';
+    act += '<button class="tb-quit" onclick="teacherRemove(' + row.id + ')">Remove</button>';
+    h += '<tr><td class="num dim">' + (i+1) + '</td><td>' + esc(row.nick) + state +
+         '</td><td class="num">' + row.score + '</td><td>' + act + '</td></tr>';
   }
   h += '</table>';
   h += '<h3 class="diag-h">Danger</h3>' +

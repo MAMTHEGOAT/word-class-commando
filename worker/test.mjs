@@ -292,6 +292,50 @@ await test("a run has to be worth something to go on the board", async () => {
     b.board.every(x => x.score >= 0), JSON.stringify(b.board.map(x => x.score)));
 });
 
+await test("the teacher can see and undo a rejection", async () => {
+  /* A rejected name used to be invisible everywhere: the pending queue lists
+     only approved = 0, and the public board strips the name from anything that
+     is not approved = 1, so a rejection made by mistake could not be found
+     again. Worse, the app rendered rejected and pending identically, so three
+     rejected rows read as "waiting for approval" with an empty queue. */
+  await req("/score", { method: "POST", body: { ...good, nick: "Rude One", score: 40 } });
+  await req("/score", { method: "POST", body: { ...good, nick: "Fine One", score: 20 } });
+  await req("/admin/reject", { method: "POST", body: { cls: "9B", nick: "Rude One" },
+                               headers: { "X-Teacher-Key": KEY } });
+
+  let r = await req("/admin/pending", { method: "POST", body: {},
+                                        headers: { "X-Teacher-Key": KEY } });
+  let b = await r.json();
+  check("a rejected name is NOT in the pending queue",
+    !b.pending.some(p => p.nick === "Rude One"), JSON.stringify(b.pending));
+
+  r = await req("/board");
+  b = await r.json();
+  check("and the public board still refuses to send its name",
+    JSON.stringify(b).indexOf("Rude One") < 0, JSON.stringify(b).slice(0, 200));
+  check("but it does say the row was DECIDED, not that it is waiting",
+    b.board.some(x => x.status === -1), JSON.stringify(b.board.map(x => x.status)));
+
+  r = await req("/admin/board", { method: "POST", body: {} });
+  check("the teacher board needs the key", r.status === 403, "got " + r.status);
+  r = await req("/admin/board", { method: "POST", body: {},
+                                  headers: { "X-Teacher-Key": KEY } });
+  b = await r.json();
+  const rude = b.board.filter(x => x.nick === "Rude One")[0];
+  check("the teacher board shows the rejected name so it can be found again",
+    rude && rude.approved === -1, JSON.stringify(b.board));
+  check("and it shows the undecided and approved ones too",
+    b.board.length === 2, b.board.length);
+
+  /* and the decision can be reversed */
+  await req("/admin/approve", { method: "POST", body: { cls: "9B", nick: "Rude One" },
+                                headers: { "X-Teacher-Key": KEY } });
+  r = await req("/board");
+  b = await r.json();
+  check("approving a previously rejected name puts it back on the board",
+    b.board.some(x => x.nick === "Rude One"), JSON.stringify(b.board));
+});
+
 await test("the one shared board", async () => {
   /* Students are not asked for a class code any more (2026-08-25). */
   let r = await req("/score", { method: "POST", body: { ...good, cls: undefined } });
