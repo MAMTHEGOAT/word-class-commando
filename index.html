@@ -197,6 +197,7 @@ body.testing .score{visibility:hidden}
 .prompt{font-size:1.12rem;margin:18px 0 12px;font-weight:650}
 .sent{background:var(--paper);color:var(--ink);border-radius:12px;
   padding:20px 16px;font-size:1.28rem;line-height:2.35;letter-spacing:.01em}
+.soapl{display:inline-block;width:1.5em;color:var(--brass);font-weight:700}
 .wbtn{display:inline-block;background:transparent;border:2px solid transparent;
   border-radius:8px;padding:6px 7px;margin:0 1px;color:var(--ink);font:inherit;
   min-height:44px;min-width:34px;line-height:1.1}
@@ -358,6 +359,21 @@ button.yn{min-width:110px;font-size:1.05rem}
   <p class="pl" style="margin-top:-4px">No timer and no score anywhere in here. Pick what
     you want to work on.</p>
   <div id="domList" class="modes"></div>
+</section>
+
+<section id="techlearn" class="screen">
+  <div class="topbar"><button class="back" onclick="openDomain('tech')">&larr; Techniques</button><img alt="" src="data:image/png;base64,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"></div>
+  <h2>SOAPMAPS</h2>
+  <p class="dim">Eight things writers do to make description work. You will not find
+    all eight in one sentence, and you do not need to: the point is to notice which
+    one is doing the work in front of you.</p>
+  <div id="soapCards"></div>
+  <div class="note">A sentence is often several of these at once. <i>The icy wind
+    clawed hungrily at the window</i> is adjectives, personification, adverbs,
+    powerful verbs and senses all together, and <i>clawed</i> is two of them by
+    itself. That is why this app asks you to <b>find</b> a technique rather than to
+    name one: the question is where it is doing its work, not which single label
+    the sentence deserves.</div>
 </section>
 
 <section id="domain" class="screen">
@@ -664,6 +680,26 @@ button.yn{min-width:110px;font-size:1.05rem}
     <button class="go" onclick="shNext()">Next word</button>
   </div>
   <div class="ref"><span>Reference: <code id="shRef">--</code></span></div>
+</section>
+
+<!-- =========================== TECHNIQUES ========================= -->
+<section id="tech" class="screen">
+  <div class="topbar"><button class="back" onclick="go('splash')">&larr; Menu</button><img alt="" src="data:image/png;base64,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"></div>
+  <p class="lbl">Technique</p>
+  <div class="chips" id="tqTechs"></div>
+  <p class="lbl">Level</p>
+  <div class="chips" id="tqLevels"></div>
+  <p class="prompt" id="tqPrompt"></p>
+  <div class="sent" id="tqSent"></div>
+  <div class="bar">
+    <button class="go checkbtn" id="tqCheck" onclick="tqCheck()" disabled>Check</button>
+    <span class="score" id="tqScore"></span>
+  </div>
+  <ul class="fb" id="tqFb"></ul>
+  <div class="bar nextbar" id="tqNextBar" style="display:none">
+    <button class="go" onclick="tqNext()">Next sentence</button>
+  </div>
+  <div class="ref"><span>Reference: <code id="tqRef">--</code></span></div>
 </section>
 
 <!-- =========================== VALIDATE =========================== -->
@@ -1435,6 +1471,143 @@ var SHIFTERS = [
 ];
 /* >>> BANK:SHIFTERS END >>> */
 
+/* >>> BANK:TECHNIQUES START >>> */
+/* SOAPMAPS (SPEC 35). Descriptive sentences with ONE technique marked, possibly
+   in more than one place. The student is told which technique to hunt for and
+   taps a word inside a marked span.
+
+   FIND IT, never name it, and that is the whole reason this activity can exist
+   here. SOAPMAPS is a checklist for writing rather than a set of exclusive
+   bins: "The icy wind clawed hungrily at the window" is Adjectives,
+   Personification, Adverbs, Powerful verbs and Senses at once, and "clawed" is
+   two of those by itself. "Which technique is this?" would mark right answers
+   wrong. "Find the personification" does not care what else the sentence is. */
+var TECHNIQUES = [
+{"id":"wc-tq001","level":"foundation","tech":"sim","text":"The lake was as flat as glass that morning.","words":["The","lake","was","as","flat","as","glass","that","morning."],"spans":[{"a":3,"b":6,"t":"sim"}],"cov":0.444},
+{"id":"wc-tq002","level":"foundation","tech":"sim","text":"His hands were like blocks of ice after the walk.","words":["His","hands","were","like","blocks","of","ice","after","the","walk."],"spans":[{"a":3,"b":6,"t":"sim"}],"cov":0.4},
+{"id":"wc-tq003","level":"foundation","tech":"sim","text":"Her coat was as red as a postbox in the grey playground.","words":["Her","coat","was","as","red","as","a","postbox","in","the","grey","playground."],"spans":[{"a":3,"b":7,"t":"sim"}],"cov":0.417},
+{"id":"wc-tq004","level":"foundation","tech":"sim","text":"The path ahead of them was as narrow as a ribbon of pale stone.","words":["The","path","ahead","of","them","was","as","narrow","as","a","ribbon","of","pale","stone."],"spans":[{"a":6,"b":10,"t":"sim"}],"cov":0.357},
+{"id":"wc-tq005","level":"foundation","tech":"sim","text":"The puppy on the step was like a small brown mop.","words":["The","puppy","on","the","step","was","like","a","small","brown","mop."],"spans":[{"a":6,"b":10,"t":"sim"}],"cov":0.455},
+{"id":"wc-tq006","level":"developing","tech":"sim","text":"The crowd moved like a slow river towards the gates.","words":["The","crowd","moved","like","a","slow","river","towards","the","gates."],"spans":[{"a":3,"b":6,"t":"sim"}],"cov":0.4},
+{"id":"wc-tq007","level":"developing","tech":"sim","text":"Snow lay on the roofs like icing.","words":["Snow","lay","on","the","roofs","like","icing."],"spans":[{"a":5,"b":6,"t":"sim"}],"cov":0.286},
+{"id":"wc-tq008","level":"developing","tech":"sim","text":"The torch beam was as thin as a pencil in the dark.","words":["The","torch","beam","was","as","thin","as","a","pencil","in","the","dark."],"spans":[{"a":4,"b":8,"t":"sim"}],"cov":0.417},
+{"id":"wc-tq009","level":"developing","tech":"sim","text":"His voice came out like gravel.","words":["His","voice","came","out","like","gravel."],"spans":[{"a":4,"b":5,"t":"sim"}],"cov":0.333},
+{"id":"wc-tq010","level":"developing","tech":"sim","text":"The school hall was as cold as a cellar all through January.","words":["The","school","hall","was","as","cold","as","a","cellar","all","through","January."],"spans":[{"a":4,"b":8,"t":"sim"}],"cov":0.417},
+{"id":"wc-tq011","level":"secure","tech":"sim","text":"The corridor stretched ahead of her as long as a runway.","words":["The","corridor","stretched","ahead","of","her","as","long","as","a","runway."],"spans":[{"a":6,"b":10,"t":"sim"}],"cov":0.455},
+{"id":"wc-tq012","level":"secure","tech":"sim","text":"The gulls circled the boat like scraps of torn paper.","words":["The","gulls","circled","the","boat","like","scraps","of","torn","paper."],"spans":[{"a":5,"b":9,"t":"sim"}],"cov":0.5},
+{"id":"wc-tq013","level":"secure","tech":"sim","text":"Her thoughts scattered like startled birds.","words":["Her","thoughts","scattered","like","startled","birds."],"spans":[{"a":3,"b":5,"t":"sim"}],"cov":0.5},
+{"id":"wc-tq014","level":"secure","tech":"sim","text":"The town lay below them as quiet as a held breath.","words":["The","town","lay","below","them","as","quiet","as","a","held","breath."],"spans":[{"a":5,"b":10,"t":"sim"}],"cov":0.545},
+{"id":"wc-tq015","level":"secure","tech":"sim","text":"The queue shuffled forward like a tired animal.","words":["The","queue","shuffled","forward","like","a","tired","animal."],"spans":[{"a":4,"b":7,"t":"sim"}],"cov":0.5},
+{"id":"wc-tq016","level":"challenge","tech":"sim","text":"The argument spread through the family like damp through a wall.","words":["The","argument","spread","through","the","family","like","damp","through","a","wall."],"spans":[{"a":6,"b":10,"t":"sim"}],"cov":0.455},
+{"id":"wc-tq017","level":"challenge","tech":"sim","text":"In the second half his confidence drained away as quickly as water through sand.","words":["In","the","second","half","his","confidence","drained","away","as","quickly","as","water","through","sand."],"spans":[{"a":8,"b":13,"t":"sim"}],"cov":0.429},
+{"id":"wc-tq018","level":"challenge","tech":"sim","text":"The rumour travelled the school like fire through dry grass.","words":["The","rumour","travelled","the","school","like","fire","through","dry","grass."],"spans":[{"a":5,"b":9,"t":"sim"}],"cov":0.5},
+{"id":"wc-tq019","level":"challenge","tech":"sim","text":"Doubt settled over the crew as heavily as fog.","words":["Doubt","settled","over","the","crew","as","heavily","as","fog."],"spans":[{"a":5,"b":8,"t":"sim"}],"cov":0.444},
+{"id":"wc-tq020","level":"challenge","tech":"sim","text":"The delay worked through the timetable like a crack through ice.","words":["The","delay","worked","through","the","timetable","like","a","crack","through","ice."],"spans":[{"a":6,"b":10,"t":"sim"}],"cov":0.455},
+{"id":"wc-tq021","level":"foundation","tech":"onom","text":"The door creaked as it opened.","words":["The","door","creaked","as","it","opened."],"spans":[{"a":2,"b":2,"t":"onom"}],"cov":0.167},
+{"id":"wc-tq022","level":"foundation","tech":"onom","text":"Bees buzzed around the lavender.","words":["Bees","buzzed","around","the","lavender."],"spans":[{"a":1,"b":1,"t":"onom"}],"cov":0.2},
+{"id":"wc-tq023","level":"foundation","tech":"onom","text":"The bacon sizzled in the pan.","words":["The","bacon","sizzled","in","the","pan."],"spans":[{"a":2,"b":2,"t":"onom"}],"cov":0.167},
+{"id":"wc-tq024","level":"foundation","tech":"onom","text":"Leaves crunched under their boots.","words":["Leaves","crunched","under","their","boots."],"spans":[{"a":1,"b":1,"t":"onom"}],"cov":0.2},
+{"id":"wc-tq025","level":"foundation","tech":"onom","text":"The old pipes knocked all night.","words":["The","old","pipes","knocked","all","night."],"spans":[{"a":3,"b":3,"t":"onom"}],"cov":0.167},
+{"id":"wc-tq026","level":"developing","tech":"onom","text":"Gravel crackled under the tyres.","words":["Gravel","crackled","under","the","tyres."],"spans":[{"a":1,"b":1,"t":"onom"}],"cov":0.2},
+{"id":"wc-tq027","level":"developing","tech":"onom","text":"The kettle hissed on the stove.","words":["The","kettle","hissed","on","the","stove."],"spans":[{"a":2,"b":2,"t":"onom"}],"cov":0.167},
+{"id":"wc-tq028","level":"developing","tech":"onom","text":"Rain pattered against the window.","words":["Rain","pattered","against","the","window."],"spans":[{"a":1,"b":1,"t":"onom"}],"cov":0.2},
+{"id":"wc-tq029","level":"developing","tech":"onom","text":"The gate clanged shut behind them.","words":["The","gate","clanged","shut","behind","them."],"spans":[{"a":2,"b":2,"t":"onom"}],"cov":0.167},
+{"id":"wc-tq030","level":"developing","tech":"onom","text":"Paper rustled at the back of the hall.","words":["Paper","rustled","at","the","back","of","the","hall."],"spans":[{"a":1,"b":1,"t":"onom"}],"cov":0.125},
+{"id":"wc-tq031","level":"secure","tech":"onom","text":"The radiator gurgled in the empty classroom.","words":["The","radiator","gurgled","in","the","empty","classroom."],"spans":[{"a":2,"b":2,"t":"onom"}],"cov":0.143},
+{"id":"wc-tq032","level":"secure","tech":"onom","text":"Somewhere below them a pipe clanked twice.","words":["Somewhere","below","them","a","pipe","clanked","twice."],"spans":[{"a":5,"b":5,"t":"onom"}],"cov":0.143},
+{"id":"wc-tq033","level":"secure","tech":"onom","text":"The wet log popped as the fire caught it.","words":["The","wet","log","popped","as","the","fire","caught","it."],"spans":[{"a":3,"b":3,"t":"onom"}],"cov":0.111},
+{"id":"wc-tq034","level":"secure","tech":"onom","text":"The chain rattled against the post.","words":["The","chain","rattled","against","the","post."],"spans":[{"a":2,"b":2,"t":"onom"}],"cov":0.167},
+{"id":"wc-tq035","level":"secure","tech":"onom","text":"A loose sheet of metal banged on the roof all evening.","words":["A","loose","sheet","of","metal","banged","on","the","roof","all","evening."],"spans":[{"a":5,"b":5,"t":"onom"}],"cov":0.091},
+{"id":"wc-tq036","level":"challenge","tech":"onom","text":"The wave drew back and the shingle rasped behind it.","words":["The","wave","drew","back","and","the","shingle","rasped","behind","it."],"spans":[{"a":7,"b":7,"t":"onom"}],"cov":0.1},
+{"id":"wc-tq037","level":"challenge","tech":"onom","text":"A loose wire thrummed in the wind above the yard.","words":["A","loose","wire","thrummed","in","the","wind","above","the","yard."],"spans":[{"a":3,"b":3,"t":"onom"}],"cov":0.1},
+{"id":"wc-tq038","level":"challenge","tech":"onom","text":"The machinery clattered into life at six.","words":["The","machinery","clattered","into","life","at","six."],"spans":[{"a":2,"b":2,"t":"onom"}],"cov":0.143},
+{"id":"wc-tq039","level":"challenge","tech":"onom","text":"Ice cracked somewhere out on the reservoir.","words":["Ice","cracked","somewhere","out","on","the","reservoir."],"spans":[{"a":1,"b":1,"t":"onom"}],"cov":0.143},
+{"id":"wc-tq040","level":"challenge","tech":"onom","text":"The old projector whirred through the last reel.","words":["The","old","projector","whirred","through","the","last","reel."],"spans":[{"a":3,"b":3,"t":"onom"}],"cov":0.125},
+{"id":"wc-tq041","level":"foundation","tech":"pers","text":"The sun smiled down on the playground.","words":["The","sun","smiled","down","on","the","playground."],"spans":[{"a":2,"b":2,"t":"pers"}],"cov":0.143},
+{"id":"wc-tq042","level":"foundation","tech":"pers","text":"The old car complained on cold mornings.","words":["The","old","car","complained","on","cold","mornings."],"spans":[{"a":3,"b":3,"t":"pers"}],"cov":0.143},
+{"id":"wc-tq043","level":"foundation","tech":"pers","text":"The trees whispered in the evening breeze.","words":["The","trees","whispered","in","the","evening","breeze."],"spans":[{"a":2,"b":2,"t":"pers"}],"cov":0.143},
+{"id":"wc-tq044","level":"foundation","tech":"pers","text":"The wind called down the chimney.","words":["The","wind","called","down","the","chimney."],"spans":[{"a":2,"b":2,"t":"pers"}],"cov":0.167},
+{"id":"wc-tq045","level":"foundation","tech":"pers","text":"Our fridge hums to itself all afternoon.","words":["Our","fridge","hums","to","itself","all","afternoon."],"spans":[{"a":2,"b":4,"t":"pers"}],"cov":0.429},
+{"id":"wc-tq046","level":"developing","tech":"pers","text":"The camera stared at the empty corridor.","words":["The","camera","stared","at","the","empty","corridor."],"spans":[{"a":2,"b":2,"t":"pers"}],"cov":0.143},
+{"id":"wc-tq047","level":"developing","tech":"pers","text":"Frost crept across the inside of the window.","words":["Frost","crept","across","the","inside","of","the","window."],"spans":[{"a":1,"b":1,"t":"pers"}],"cov":0.125},
+{"id":"wc-tq048","level":"developing","tech":"pers","text":"The clock on the wall refused to hurry.","words":["The","clock","on","the","wall","refused","to","hurry."],"spans":[{"a":5,"b":7,"t":"pers"}],"cov":0.375},
+{"id":"wc-tq049","level":"developing","tech":"pers","text":"Shadows gathered in the corners of the room.","words":["Shadows","gathered","in","the","corners","of","the","room."],"spans":[{"a":1,"b":1,"t":"pers"}],"cov":0.125},
+{"id":"wc-tq050","level":"developing","tech":"pers","text":"The engine gave up halfway up the hill.","words":["The","engine","gave","up","halfway","up","the","hill."],"spans":[{"a":2,"b":3,"t":"pers"}],"cov":0.25},
+{"id":"wc-tq051","level":"secure","tech":"pers","text":"The sea chewed at the harbour wall.","words":["The","sea","chewed","at","the","harbour","wall."],"spans":[{"a":2,"b":2,"t":"pers"}],"cov":0.143},
+{"id":"wc-tq052","level":"secure","tech":"pers","text":"The storm bullied the little boats in the harbour.","words":["The","storm","bullied","the","little","boats","in","the","harbour."],"spans":[{"a":2,"b":2,"t":"pers"}],"cov":0.111},
+{"id":"wc-tq053","level":"secure","tech":"pers","text":"The town slept under a thin layer of snow.","words":["The","town","slept","under","a","thin","layer","of","snow."],"spans":[{"a":2,"b":2,"t":"pers"}],"cov":0.111},
+{"id":"wc-tq054","level":"secure","tech":"pers","text":"Hunger gnawed at him through the afternoon.","words":["Hunger","gnawed","at","him","through","the","afternoon."],"spans":[{"a":1,"b":1,"t":"pers"}],"cov":0.143},
+{"id":"wc-tq055","level":"secure","tech":"pers","text":"The empty stage waited for them.","words":["The","empty","stage","waited","for","them."],"spans":[{"a":3,"b":3,"t":"pers"}],"cov":0.167},
+{"id":"wc-tq056","level":"challenge","tech":"pers","text":"The examination hall held its breath.","words":["The","examination","hall","held","its","breath."],"spans":[{"a":3,"b":5,"t":"pers"}],"cov":0.5},
+{"id":"wc-tq057","level":"challenge","tech":"pers","text":"The old factory watched the town from the hill.","words":["The","old","factory","watched","the","town","from","the","hill."],"spans":[{"a":3,"b":3,"t":"pers"}],"cov":0.111},
+{"id":"wc-tq058","level":"challenge","tech":"pers","text":"Time dragged its feet through the last lesson.","words":["Time","dragged","its","feet","through","the","last","lesson."],"spans":[{"a":1,"b":3,"t":"pers"}],"cov":0.375},
+{"id":"wc-tq059","level":"challenge","tech":"pers","text":"The rumour walked from class to class before lunch.","words":["The","rumour","walked","from","class","to","class","before","lunch."],"spans":[{"a":2,"b":2,"t":"pers"}],"cov":0.111},
+{"id":"wc-tq060","level":"challenge","tech":"pers","text":"The cold reached into every corner of the flat.","words":["The","cold","reached","into","every","corner","of","the","flat."],"spans":[{"a":2,"b":3,"t":"pers"}],"cov":0.222},
+{"id":"wc-tq061","level":"foundation","tech":"meta","text":"The classroom was a zoo that afternoon.","words":["The","classroom","was","a","zoo","that","afternoon."],"spans":[{"a":3,"b":4,"t":"meta"}],"cov":0.286},
+{"id":"wc-tq062","level":"foundation","tech":"meta","text":"My brother is a machine on the football pitch.","words":["My","brother","is","a","machine","on","the","football","pitch."],"spans":[{"a":3,"b":4,"t":"meta"}],"cov":0.222},
+{"id":"wc-tq063","level":"foundation","tech":"meta","text":"The playground was a furnace by noon.","words":["The","playground","was","a","furnace","by","noon."],"spans":[{"a":3,"b":4,"t":"meta"}],"cov":0.286},
+{"id":"wc-tq064","level":"foundation","tech":"meta","text":"Her bedroom is a jungle.","words":["Her","bedroom","is","a","jungle."],"spans":[{"a":3,"b":4,"t":"meta"}],"cov":0.4},
+{"id":"wc-tq065","level":"foundation","tech":"meta","text":"The old sofa was a boat in the middle of the room.","words":["The","old","sofa","was","a","boat","in","the","middle","of","the","room."],"spans":[{"a":4,"b":5,"t":"meta"}],"cov":0.167},
+{"id":"wc-tq066","level":"developing","tech":"meta","text":"The corridor was a tunnel of noise at break.","words":["The","corridor","was","a","tunnel","of","noise","at","break."],"spans":[{"a":3,"b":6,"t":"meta"}],"cov":0.444},
+{"id":"wc-tq067","level":"developing","tech":"meta","text":"His answer was a wall.","words":["His","answer","was","a","wall."],"spans":[{"a":3,"b":4,"t":"meta"}],"cov":0.4},
+{"id":"wc-tq068","level":"developing","tech":"meta","text":"The lake was a sheet of hammered tin.","words":["The","lake","was","a","sheet","of","hammered","tin."],"spans":[{"a":3,"b":7,"t":"meta"}],"cov":0.625},
+{"id":"wc-tq069","level":"developing","tech":"meta","text":"That exam was a mountain.","words":["That","exam","was","a","mountain."],"spans":[{"a":3,"b":4,"t":"meta"}],"cov":0.4},
+{"id":"wc-tq070","level":"developing","tech":"meta","text":"The sky was a bruise above the rooftops.","words":["The","sky","was","a","bruise","above","the","rooftops."],"spans":[{"a":3,"b":4,"t":"meta"}],"cov":0.25},
+{"id":"wc-tq071","level":"secure","tech":"meta","text":"Her voice was a warm blanket over the frightened class.","words":["Her","voice","was","a","warm","blanket","over","the","frightened","class."],"spans":[{"a":3,"b":5,"t":"meta"}],"cov":0.3},
+{"id":"wc-tq072","level":"secure","tech":"meta","text":"The city below them was a circuit board of lights.","words":["The","city","below","them","was","a","circuit","board","of","lights."],"spans":[{"a":5,"b":7,"t":"meta"}],"cov":0.3},
+{"id":"wc-tq073","level":"secure","tech":"meta","text":"His temper is a dropped match.","words":["His","temper","is","a","dropped","match."],"spans":[{"a":3,"b":5,"t":"meta"}],"cov":0.5},
+{"id":"wc-tq074","level":"secure","tech":"meta","text":"The hall was an ocean of turned heads.","words":["The","hall","was","an","ocean","of","turned","heads."],"spans":[{"a":3,"b":4,"t":"meta"}],"cov":0.25},
+{"id":"wc-tq075","level":"secure","tech":"meta","text":"Fear was a stone in her stomach.","words":["Fear","was","a","stone","in","her","stomach."],"spans":[{"a":2,"b":3,"t":"meta"}],"cov":0.286},
+{"id":"wc-tq076","level":"challenge","tech":"meta","text":"The report was a mirror nobody wanted to look into.","words":["The","report","was","a","mirror","nobody","wanted","to","look","into."],"spans":[{"a":3,"b":4,"t":"meta"}],"cov":0.2},
+{"id":"wc-tq077","level":"challenge","tech":"meta","text":"His promises were paper bridges.","words":["His","promises","were","paper","bridges."],"spans":[{"a":3,"b":4,"t":"meta"}],"cov":0.4},
+{"id":"wc-tq078","level":"challenge","tech":"meta","text":"The town's history is a locked drawer.","words":["The","town's","history","is","a","locked","drawer."],"spans":[{"a":4,"b":6,"t":"meta"}],"cov":0.429},
+{"id":"wc-tq079","level":"challenge","tech":"meta","text":"Their friendship had become a museum.","words":["Their","friendship","had","become","a","museum."],"spans":[{"a":4,"b":5,"t":"meta"}],"cov":0.333},
+{"id":"wc-tq080","level":"challenge","tech":"meta","text":"The deadline was a wall of glass in front of them.","words":["The","deadline","was","a","wall","of","glass","in","front","of","them."],"spans":[{"a":3,"b":6,"t":"meta"}],"cov":0.364},
+{"id":"wc-tq081","level":"foundation","tech":"pverb","text":"She sprinted for the bus.","words":["She","sprinted","for","the","bus."],"spans":[{"a":1,"b":1,"t":"pverb"}],"cov":0.2},
+{"id":"wc-tq082","level":"foundation","tech":"pverb","text":"He hurled the ball across the yard.","words":["He","hurled","the","ball","across","the","yard."],"spans":[{"a":1,"b":1,"t":"pverb"}],"cov":0.143},
+{"id":"wc-tq083","level":"foundation","tech":"pverb","text":"The cat pounced on the toy.","words":["The","cat","pounced","on","the","toy."],"spans":[{"a":2,"b":2,"t":"pverb"}],"cov":0.167},
+{"id":"wc-tq084","level":"foundation","tech":"pverb","text":"They scrambled up the bank.","words":["They","scrambled","up","the","bank."],"spans":[{"a":1,"b":1,"t":"pverb"}],"cov":0.2},
+{"id":"wc-tq085","level":"foundation","tech":"pverb","text":"She snatched the note from his hand.","words":["She","snatched","the","note","from","his","hand."],"spans":[{"a":1,"b":1,"t":"pverb"}],"cov":0.143},
+{"id":"wc-tq086","level":"developing","tech":"pverb","text":"The climber hauled herself onto the ledge.","words":["The","climber","hauled","herself","onto","the","ledge."],"spans":[{"a":2,"b":2,"t":"pverb"}],"cov":0.143},
+{"id":"wc-tq087","level":"developing","tech":"pverb","text":"He wrenched the door open.","words":["He","wrenched","the","door","open."],"spans":[{"a":1,"b":1,"t":"pverb"}],"cov":0.2},
+{"id":"wc-tq088","level":"developing","tech":"pverb","text":"The children barged into the hall.","words":["The","children","barged","into","the","hall."],"spans":[{"a":2,"b":2,"t":"pverb"}],"cov":0.167},
+{"id":"wc-tq089","level":"developing","tech":"pverb","text":"She scoured the pan for ten minutes.","words":["She","scoured","the","pan","for","ten","minutes."],"spans":[{"a":1,"b":1,"t":"pverb"}],"cov":0.143},
+{"id":"wc-tq090","level":"developing","tech":"pverb","text":"The runner surged past two others.","words":["The","runner","surged","past","two","others."],"spans":[{"a":2,"b":2,"t":"pverb"}],"cov":0.167},
+{"id":"wc-tq091","level":"secure","tech":"pverb","text":"He prised the lid from the tin.","words":["He","prised","the","lid","from","the","tin."],"spans":[{"a":1,"b":1,"t":"pverb"}],"cov":0.143},
+{"id":"wc-tq092","level":"secure","tech":"pverb","text":"She squeezed between the parked cars.","words":["She","squeezed","between","the","parked","cars."],"spans":[{"a":1,"b":1,"t":"pverb"}],"cov":0.167},
+{"id":"wc-tq093","level":"secure","tech":"pverb","text":"The gardener levered the root out of the soil.","words":["The","gardener","levered","the","root","out","of","the","soil."],"spans":[{"a":2,"b":2,"t":"pverb"}],"cov":0.111},
+{"id":"wc-tq094","level":"secure","tech":"pverb","text":"They ransacked the cupboard for batteries.","words":["They","ransacked","the","cupboard","for","batteries."],"spans":[{"a":1,"b":1,"t":"pverb"}],"cov":0.167},
+{"id":"wc-tq095","level":"secure","tech":"pverb","text":"The steward ushered the last visitors towards the exit.","words":["The","steward","ushered","the","last","visitors","towards","the","exit."],"spans":[{"a":2,"b":2,"t":"pverb"}],"cov":0.111},
+{"id":"wc-tq096","level":"challenge","tech":"pverb","text":"The nurse eased the splinter from his palm.","words":["The","nurse","eased","the","splinter","from","his","palm."],"spans":[{"a":2,"b":2,"t":"pverb"}],"cov":0.125},
+{"id":"wc-tq097","level":"challenge","tech":"pverb","text":"He paced the touchline for the whole match.","words":["He","paced","the","touchline","for","the","whole","match."],"spans":[{"a":1,"b":1,"t":"pverb"}],"cov":0.125},
+{"id":"wc-tq098","level":"challenge","tech":"pverb","text":"She marshalled the younger pupils into two lines.","words":["She","marshalled","the","younger","pupils","into","two","lines."],"spans":[{"a":1,"b":1,"t":"pverb"}],"cov":0.125},
+{"id":"wc-tq099","level":"challenge","tech":"pverb","text":"The old man shuffled to the window and back.","words":["The","old","man","shuffled","to","the","window","and","back."],"spans":[{"a":3,"b":3,"t":"pverb"}],"cov":0.111},
+{"id":"wc-tq100","level":"challenge","tech":"pverb","text":"The crew lashed the crates to the deck.","words":["The","crew","lashed","the","crates","to","the","deck."],"spans":[{"a":2,"b":2,"t":"pverb"}],"cov":0.125},
+{"id":"wc-tq101","level":"foundation","tech":"sense","text":"The bread smelled warm and yeasty.","words":["The","bread","smelled","warm","and","yeasty."],"spans":[{"a":3,"b":5,"t":"sense"}],"cov":0.5},
+{"id":"wc-tq102","level":"foundation","tech":"sense","text":"The lemon tasted sharp on her tongue.","words":["The","lemon","tasted","sharp","on","her","tongue."],"spans":[{"a":3,"b":3,"t":"sense"}],"cov":0.143},
+{"id":"wc-tq103","level":"foundation","tech":"sense","text":"The blanket felt rough against his cheek.","words":["The","blanket","felt","rough","against","his","cheek."],"spans":[{"a":3,"b":3,"t":"sense"}],"cov":0.143},
+{"id":"wc-tq104","level":"foundation","tech":"sense","text":"The kitchen smelled of burnt toast.","words":["The","kitchen","smelled","of","burnt","toast."],"spans":[{"a":3,"b":5,"t":"sense"}],"cov":0.5},
+{"id":"wc-tq105","level":"foundation","tech":"sense","text":"The sand was hot under their feet.","words":["The","sand","was","hot","under","their","feet."],"spans":[{"a":3,"b":3,"t":"sense"}],"cov":0.143},
+{"id":"wc-tq106","level":"developing","tech":"sense","text":"Down at the harbour the air tasted of salt and diesel.","words":["Down","at","the","harbour","the","air","tasted","of","salt","and","diesel."],"spans":[{"a":7,"b":10,"t":"sense"}],"cov":0.364},
+{"id":"wc-tq107","level":"developing","tech":"sense","text":"Her fingers were numb with cold.","words":["Her","fingers","were","numb","with","cold."],"spans":[{"a":3,"b":5,"t":"sense"}],"cov":0.5},
+{"id":"wc-tq108","level":"developing","tech":"sense","text":"The corridor smelled of floor polish.","words":["The","corridor","smelled","of","floor","polish."],"spans":[{"a":3,"b":5,"t":"sense"}],"cov":0.5},
+{"id":"wc-tq109","level":"developing","tech":"sense","text":"The soup was thick and peppery.","words":["The","soup","was","thick","and","peppery."],"spans":[{"a":3,"b":5,"t":"sense"}],"cov":0.5},
+{"id":"wc-tq110","level":"developing","tech":"sense","text":"The wool was scratchy at his collar.","words":["The","wool","was","scratchy","at","his","collar."],"spans":[{"a":3,"b":3,"t":"sense"}],"cov":0.143},
+{"id":"wc-tq111","level":"secure","tech":"sense","text":"The room held the stale smell of old paper.","words":["The","room","held","the","stale","smell","of","old","paper."],"spans":[{"a":4,"b":8,"t":"sense"}],"cov":0.556},
+{"id":"wc-tq112","level":"secure","tech":"sense","text":"A bitter, metallic taste filled her mouth.","words":["A","bitter,","metallic","taste","filled","her","mouth."],"spans":[{"a":1,"b":3,"t":"sense"}],"cov":0.429},
+{"id":"wc-tq113","level":"secure","tech":"sense","text":"The handrail was slick with rain under her palm.","words":["The","handrail","was","slick","with","rain","under","her","palm."],"spans":[{"a":3,"b":5,"t":"sense"}],"cov":0.333},
+{"id":"wc-tq114","level":"secure","tech":"sense","text":"The market carried the smell of frying onions.","words":["The","market","carried","the","smell","of","frying","onions."],"spans":[{"a":4,"b":7,"t":"sense"}],"cov":0.5},
+{"id":"wc-tq115","level":"secure","tech":"sense","text":"The tea had gone cold and bitter in the cup.","words":["The","tea","had","gone","cold","and","bitter","in","the","cup."],"spans":[{"a":4,"b":6,"t":"sense"}],"cov":0.3},
+{"id":"wc-tq116","level":"challenge","tech":"sense","text":"The hall kept the faint smell of chalk dust and varnish.","words":["The","hall","kept","the","faint","smell","of","chalk","dust","and","varnish."],"spans":[{"a":4,"b":10,"t":"sense"}],"cov":0.636},
+{"id":"wc-tq117","level":"challenge","tech":"sense","text":"Her coat carried woodsmoke into the classroom.","words":["Her","coat","carried","woodsmoke","into","the","classroom."],"spans":[{"a":3,"b":3,"t":"sense"}],"cov":0.143},
+{"id":"wc-tq118","level":"challenge","tech":"sense","text":"The water in the plunge pool was so cold it burned.","words":["The","water","in","the","plunge","pool","was","so","cold","it","burned."],"spans":[{"a":7,"b":10,"t":"sense"}],"cov":0.364},
+{"id":"wc-tq119","level":"challenge","tech":"sense","text":"The paper had gone soft and damp at the edges.","words":["The","paper","had","gone","soft","and","damp","at","the","edges."],"spans":[{"a":4,"b":6,"t":"sense"}],"cov":0.3},
+{"id":"wc-tq120","level":"challenge","tech":"sense","text":"The air in the cellar was thick, cold and stale.","words":["The","air","in","the","cellar","was","thick,","cold","and","stale."],"spans":[{"a":6,"b":9,"t":"sense"}],"cov":0.4}
+/* >>> APPEND NEW TECHNIQUES ABOVE THIS LINE >>> */
+];
+var TECHMETA = {"names":{"sim":["Simile","S","compares one thing to another using <b>like</b> or <b>as</b>"],"onom":["Onomatopoeia","O","a word that sounds like the noise it names"],"pers":["Personification","P","gives a thing or an animal human qualities or actions"],"meta":["Metaphor","M","says one thing <b>is</b> another, without like or as"],"pverb":["Powerful verb","P","a precise, vivid action word chosen instead of a plain one"],"sense":["Senses","S","language that appeals to sight, sound, touch, taste or smell"],"adj":["Adjectives","A","describing words, drilled in the Word classes activities"],"adv":["Adverbs","A","words telling you how, drilled in the Word classes activities"]},"order":["sim","onom","adj","pers","meta","adv","pverb","sense"],"authored":["sim","onom","pers","meta","pverb","sense"]};
+/* >>> BANK:TECHNIQUES END >>> */
+
 /* >>> BANK:TRANSFORM START >>> */
 var TRANSFORM = [
 {"id":"wc-tr001","level":"foundation","family":"wc-wf001","from":"adj","to":"adv","w":"silent","options":[{"w":"silence"},{"w":"silent"},{"w":"silently","correct":true}],"why":""},
@@ -1808,7 +1981,7 @@ var AMBIG = ["answer","answers","back","bark","barks","book","books","brush","br
 <script>
 "use strict";
 
-var APP = "wcc", VER = "v0.21", BANK_REV = 11;
+var APP = "wcc", VER = "v0.22", BANK_REV = 12;
 var BUG_FORM_URL = "";   /* paste the Office 365 form link to switch the report button on */
 
 /* ---------- the four tests: one source for the Learn screen AND every
@@ -2100,7 +2273,7 @@ function _blankRoot(){
     derives the expected list from splice.py, which is the one place a bank
     cannot fail to be registered and still reach the page at all. */
 function allBanks(){
-  return [SENTENCES, FRAMES, CLOZE, KLASS, TRANSFORM, SHIFTERS];
+  return [SENTENCES, FRAMES, CLOZE, KLASS, TRANSFORM, SHIFTERS, TECHNIQUES];
 }
 
 function _pruneToBank(root){
@@ -3485,6 +3658,14 @@ function blitzQuit(){
    blocked rather than interleaved so a student is not thrown between
    seven interfaces every question. Level spread is the house 35%
    foundation rule; classes rotate so all four are examined. */
+/* The test paper covers these domains and no others. Techniques are deliberately
+   NOT in it yet: a paper spanning every domain grows by five questions each time
+   one lands, and scoping a run by domain is bound up with what a single
+   leaderboard means for a challenge score. That is a decision for the release
+   that needs it, not a side effect of adding content. Declared here so the test
+   suite can check the paper against it instead of against a typed number. */
+var TEST_DOMAINS = ["wc"];
+
 var TEST_PLAN = [
   {act:"one",    cls:"noun", lvl:"foundation"},
   {act:"one",    cls:"verb", lvl:"foundation"},
@@ -3775,7 +3956,8 @@ var ACTIVITY_LIST = [
   ["shift",  "Same word, different job",   "startShift()",  "wc", "name", "One word, two sentences, two jobs"],
   ["frames", "Where does it fit?",         "startFrames()", "wc", "use",  "One word, three gaps: which one takes it?"],
   ["cloze",  "Insert the word",            "startCloze()",  "wc", "use",  "Which form fills the gap?"],
-  ["trans",  "Change the word",            "startTrans()",  "wc", "use",  "terrible into terribly, and the traps"]
+  ["trans",  "Change the word",            "startTrans()",  "wc", "use",  "terrible into terribly, and the traps"],
+  ["tech",   "Find the technique",         "startTech()",   "tech", "find", "Hunt one technique down inside a sentence"]
 ];
 
 /* The four domains this app is growing into.
@@ -3795,9 +3977,11 @@ var DOMAINS = [
       ["name", "2. Name it", "Given a word, or a gap where a word should be, can you say what job it is doing?"],
       ["use",  "3. Use it",  "Now choose or build the word the sentence actually needs. This is the one that shows up in your writing."]
     ]},
-  { id:"tech", name:"Techniques",
+  { id:"tech", name:"Techniques", learn:["What SOAPMAPS means", "showTechLearn()"],
     sub:"SOAPMAPS: simile, onomatopoeia, adjectives, personification, metaphor, adverbs, powerful verbs and senses. Find them in a sentence before you name them.",
-    groups:[] },
+    groups:[
+      ["find", "1. Find it", "You are told which technique to hunt for. Find where it is doing its work in the sentence."]
+    ]},
   { id:"punc", name:"Punctuation",
     sub:"Full stops, commas, apostrophes, colons and semicolons. Where each one goes, and what changes when it moves.",
     groups:[] },
@@ -3869,6 +4053,12 @@ function openDomain(id){
            '<span class="sub">' + esc(acts[j][5]) + '</span></button>';
     h += '</div>';
   }
+  if(d.learn)
+    h = '<div class="group"><h3>Before you start</h3>' +
+        '<p class="why">What each technique is, with an example of each.</p>' +
+        '<button class="menu-btn" onclick="' + d.learn[1] + '">' + esc(d.learn[0]) +
+        '<span class="sub">The eight letters, and which two live in Word classes</span>' +
+        '</button></div>' + h;
   el("domGroups").innerHTML = h;
   /* Back goes wherever the student actually came from. With one live domain
      startPractice skips the picker, so sending them "back" to a screen holding
@@ -4277,6 +4467,152 @@ var MWU = ["in front of","a lot of","next to","on top of","out of","as well as",
            "instead of","because of","each other","used to"];
 var ING_OK = ["interesting","exciting","boring","amazing","charming","terrifying",
               "thrilling","stunning","willing","cunning"];
+
+/* ===================== TECHNIQUES: find it (SPEC 35) =====================
+   The student is TOLD the technique and taps a word inside it. Tapping any word
+   of a marked span counts, which is deliberate: delimiting a simile exactly is a
+   different and harder skill from locating one, and this round is the locating
+   one. The cost is that a long span is easier to hit by accident, so the build
+   measures the span's share of each sentence per technique and errors above
+   55%. That number IS the guess rate, so it is gated rather than hoped about. */
+var TQ = { tech:"all", lvl:"all", item:null, pick:-1, done:false };
+
+function techName(t){ return (TECHMETA.names[t]||[t])[0]; }
+function techDef(t){  return (TECHMETA.names[t]||["","",""])[2]; }
+
+function techPool(tech, lvl){
+  var out=[], i, r;
+  for(i=0;i<TECHNIQUES.length;i++){
+    r = TECHNIQUES[i];
+    if(tech!=="all" && r.tech!==tech) continue;
+    if(lvl!=="all"  && r.level!==lvl) continue;
+    out.push(r);
+  }
+  return out;
+}
+
+function startTech(){
+  markTried("tech"); go("tech");
+  tqChips(); lvlChips("tqLevels", techPool(TQ.tech,"all"), TQ.lvl, "tqLvl");
+  tqNext();
+}
+function tqTech(t){
+  TQ.tech=t; tqChips();
+  lvlChips("tqLevels", techPool(TQ.tech,"all"), TQ.lvl, "tqLvl");
+  tqNext();
+}
+function tqLvl(l){
+  TQ.lvl=l; lvlChips("tqLevels", techPool(TQ.tech,"all"), TQ.lvl, "tqLvl");
+  tqNext();
+}
+/* The SOAPMAPS card, rendered from the same registry the drill uses. Two of the
+   eight letters, Adjectives and Adverbs, are NOT authored as techniques here:
+   this app already teaches both as word classes, and a second place to teach
+   them is a second place for them to drift. They appear on the card with a
+   route into the word-class drills, so the mnemonic stays whole on screen. */
+function renderSoap(){
+  var h = "", i, t, meta, authored;
+  for(i=0;i<TECHMETA.order.length;i++){
+    t = TECHMETA.order[i];
+    meta = TECHMETA.names[t];
+    authored = TECHMETA.authored.indexOf(t) > -1;
+    h += '<div class="card"><h3><span class="soapl">' + esc(meta[1]) + '</span> ' +
+         esc(meta[0]) + '</h3><p>' + meta[2] + '.</p>';
+    h += authored
+       ? '<p class="small"><button class="ghost" onclick="tqTech(\'' + t +
+         '\');go(\'tech\')">Practise finding ' + esc(meta[0].toLowerCase()) + '</button></p>'
+       : '<p class="small dim">Drilled in the <b>Word classes</b> activities rather ' +
+         'than here. <button class="ghost" onclick="openDomain(\'wc\')">Go there</button></p>';
+    h += '</div>';
+  }
+  el("soapCards").innerHTML = h;
+}
+function showTechLearn(){ renderSoap(); go("techlearn"); }
+
+function tqChips(){
+  var h = '<button class="chip" aria-pressed="'+(TQ.tech==="all")+'" onclick="tqTech(\'all\')">All</button>';
+  for(var i=0;i<TECHMETA.authored.length;i++){
+    var t=TECHMETA.authored[i], n=techPool(t,"all").length;
+    h += '<button class="chip" '+(n<1?'disabled ':'')+'aria-pressed="'+(TQ.tech===t)+'" '+
+         'onclick="tqTech(\''+t+'\')">'+esc(techName(t))+'</button>';
+  }
+  el("tqTechs").innerHTML = h;
+}
+
+function tqNext(){
+  var p = techPool(TQ.tech, TQ.lvl);
+  if(!p.length){
+    el("tqSent").textContent = "Nothing here yet.";
+    el("tqPrompt").textContent = "";
+    el("tqCheck").disabled = true; el("tqNextBar").style.display="none";
+    return;
+  }
+  TQ.item = pickUnseen(p, "tech:"+TQ.tech+":"+TQ.lvl);
+  TQ.pick = -1; TQ.done = false;
+  var it = TQ.item, h="", i;
+  for(i=0;i<it.words.length;i++)
+    h += '<button class="wbtn" id="tqw'+i+'" aria-pressed="false" onclick="tqTap('+i+')">'+
+         '<span class="tw">'+esc(it.words[i])+'</span></button> ';
+  el("tqSent").innerHTML = h;
+  el("tqPrompt").innerHTML = "Find the <b>" + esc(techName(it.tech)) + "</b> in this sentence.";
+  el("tqScore").textContent = ""; el("tqFb").innerHTML = "";
+  el("tqCheck").disabled = true; el("tqNextBar").style.display = "none";
+  el("tqRef").textContent = it.id;
+}
+
+function tqTap(i){
+  if(TQ.done) return;
+  TQ.pick = i;
+  for(var j=0;j<TQ.item.words.length;j++){
+    var b = el("tqw"+j); if(b) b.setAttribute("aria-pressed", j===i ? "true" : "false");
+  }
+  el("tqCheck").disabled = false;
+}
+
+/* is this word index inside a span of the technique being asked for? */
+function tqInSpan(it, i){
+  for(var k=0;k<it.spans.length;k++)
+    if(it.spans[k].t===it.tech && i>=it.spans[k].a && i<=it.spans[k].b) return k;
+  return -1;
+}
+
+function tqCheck(){
+  if(TQ.done || TQ.pick<0) return;
+  TQ.done = true;
+  var it = TQ.item, ok = tqInSpan(it, TQ.pick) >= 0, i, k, b;
+
+  /* mark every marked span, so a student sees the whole phrase and not just the
+     word they happened to hit */
+  for(i=0;i<it.words.length;i++){
+    b = el("tqw"+i); if(!b) continue;
+    b.setAttribute("aria-pressed","false");
+    if(tqInSpan(it, i) >= 0) b.className = "wbtn res-ok";
+    else if(i === TQ.pick)   b.className = "wbtn res-bad";
+  }
+  el("tqScore").textContent = ok ? "Right" : "Not that one";
+
+  var span = [];
+  for(k=0;k<it.spans.length;k++)
+    if(it.spans[k].t===it.tech)
+      span.push(it.words.slice(it.spans[k].a, it.spans[k].b+1).join(" "));
+  var fb = '<li><b>' + esc(techName(it.tech)) + '</b>: ' + techDef(it.tech) + '.</li>' +
+           '<li>Here it is <b>' + esc(span.join("</b> and <b>")) + '</b>.</li>';
+  if(!ok)
+    fb += '<li class="dim">You tapped <b>' + esc(it.words[TQ.pick]) +
+          '</b>, which is not doing that job in this sentence.</li>';
+  el("tqFb").innerHTML = fb;
+
+  var st = store();
+  if(ok){
+    var key = "tech:"+TQ.tech+":"+TQ.lvl;
+    st.seen[key] = st.seen[key] || [];
+    if(st.seen[key].indexOf(it.id) < 0) st.seen[key].push(it.id);
+  } else {
+    st.err["tech_"+it.tech] = (st.err["tech_"+it.tech]||0) + 1;
+  }
+  save(st);
+  el("tqNextBar").style.display = "";
+}
 
 function validate(){
   var E=[], W=[], INFO=[], i, j, k, s, t;
@@ -4717,6 +5053,48 @@ function validate(){
                  "exactly like one that does.");
       }
   }
+  /* ---- TECHNIQUES (SPEC 35) ----
+     Two gates. The cell floor, so a technique or a level cannot quietly empty
+     the way cloze and transform did before v0.20. And the span's share of the
+     sentence, which IS the hit rate of tapping at random, because any word
+     inside the marked span counts. A long span in a short sentence is a free
+     answer, and nothing about that is visible by reading one item. */
+  var tqCell = {}, tqCov = {}, tqN = {}, tqi, tqr;
+  for(tqi=0;tqi<TECHNIQUES.length;tqi++){
+    tqr = TECHNIQUES[tqi];
+    if(!/^wc-tq\d{3}$/.test(tqr.id)) E.push(tqr.id+": id must look like wc-tq001");
+    if(LEVELS.indexOf(tqr.level)<0) E.push(tqr.id+": level '"+tqr.level+"' is not in the enum");
+    if(TECHMETA.authored.indexOf(tqr.tech)<0) E.push(tqr.id+": '"+tqr.tech+"' is not an authored technique");
+    if(!tqr.spans || !tqr.spans.length) E.push(tqr.id+": nothing is marked");
+    var tqHit = 0, tqs;
+    for(var tqj=0;tqj<(tqr.spans||[]).length;tqj++){
+      tqs = tqr.spans[tqj];
+      if(tqs.t !== tqr.tech) E.push(tqr.id+": a span is marked '"+tqs.t+"' in a '"+tqr.tech+"' item");
+      if(tqs.a < 0 || tqs.b >= tqr.words.length || tqs.a > tqs.b)
+        E.push(tqr.id+": span out of range");
+      else tqHit += tqs.b - tqs.a + 1;
+    }
+    if(/[—–]|--/.test(tqr.text)) E.push(tqr.id+": dash in student-facing text");
+    tqCell[tqr.level+"/"+tqr.tech] = (tqCell[tqr.level+"/"+tqr.tech]||0) + 1;
+    tqCov[tqr.tech] = (tqCov[tqr.tech]||0) + tqHit / tqr.words.length;
+    tqN[tqr.tech]   = (tqN[tqr.tech]||0) + 1;
+  }
+  for(tqi=0;tqi<LEVELS.length;tqi++)
+    for(var tqk=0;tqk<TECHMETA.authored.length;tqk++){
+      var tqc = LEVELS[tqi]+"/"+TECHMETA.authored[tqk];
+      if((tqCell[tqc]||0) < 4)
+        E.push("techniques: "+tqc+" has "+(tqCell[tqc]||0)+" items, floor is 4");
+    }
+  for(var tqt in tqCov){
+    var tqShare = tqCov[tqt] / tqN[tqt];
+    INFO.push("techniques / "+tqt+": tapping at random answers "+
+              Math.round(100*tqShare)+"% of items.");
+    if(tqShare > 0.55)
+      E.push("techniques / "+tqt+": the marked span is "+Math.round(100*tqShare)+
+             "% of the sentence on average, so tapping at random answers that "+
+             "share of the round (SPEC 35).");
+  }
+
   cellFloor("insert the word", CLOZE,     function(r){ return r.answerClass; }, 3);
   cellFloor("change the word", TRANSFORM, function(r){ return r.to; },          3);
   cellFloor("where does it fit", FRAMES,  function(r){ return r.cls; },         3);
