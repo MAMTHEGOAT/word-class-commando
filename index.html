@@ -197,6 +197,26 @@ body.testing .score{visibility:hidden}
 .prompt{font-size:1.12rem;margin:18px 0 12px;font-weight:650}
 .sent{background:var(--paper);color:var(--ink);border-radius:12px;
   padding:20px 16px;font-size:1.28rem;line-height:2.35;letter-spacing:.01em}
+/* A box between every pair of words makes the sentence hard to read, which is
+   the opposite of what a punctuation exercise needs. Unmarked gaps are a faint
+   hint that grows under the cursor; a marked one is unmistakable. */
+.cgapline{line-height:2.6;word-spacing:1px}
+/* The sentence sits on the cream paper panel, NOT on the dark page, so every
+   colour here has to read against cream. The first version used the dark-page
+   palette and the marked gaps rendered as black blocks with the comma cut off
+   below the box. */
+.cgap{display:inline-flex;align-items:center;justify-content:center;
+  width:14px;height:24px;padding:0 0 4px;margin:0 3px;vertical-align:-5px;
+  border:1px dashed #b9ad72;border-radius:4px;background:transparent;cursor:pointer;
+  font:inherit;font-size:1.1em;line-height:1;color:transparent;
+  transition:border-color .12s,background .12s}
+.cgap::after{content:","}
+.cgap:hover{border-color:#6b5f27;background:#f2e7ad}
+.cgap[aria-pressed="true"]{border-style:solid;border-color:#1a3a6b;background:#1a3a6b;color:#fff}
+.cgap[aria-pressed="true"]::after{content:","}
+.cgap.g-ok{border-style:solid;border-color:var(--ok);background:var(--okbg);color:#0d3a17}
+.cgap.g-miss{border-style:dashed;border-color:var(--ok);background:#fff;color:#0d3a17}
+.cgap.g-bad{border-style:solid;border-color:var(--bad);background:var(--badbg);color:#5c0f09}
 .soapl{display:inline-block;width:1.5em;color:var(--brass);font-weight:700}
 .wbtn{display:inline-block;background:transparent;border:2px solid transparent;
   border-radius:8px;padding:6px 7px;margin:0 1px;color:var(--ink);font:inherit;
@@ -720,6 +740,27 @@ button.yn{min-width:110px;font-size:1.05rem}
     <button class="go" onclick="pnNext()">Next sentence</button>
   </div>
   <div class="ref"><span>Reference: <code id="pnRef">--</code></span></div>
+</section>
+
+<!-- ============================ COMMAS ============================ -->
+<section id="commas" class="screen">
+  <div class="topbar"><button class="back" onclick="go('splash')">&larr; Menu</button><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIwAAACPCAQAAACCXfsbAAAo8ElEQVR42qWdebwlVXXvv7uqzr1Ny0wzI6AMMgbCJKAoAkaDxglwAiMBFSX4Eh+IE8+BxCQaHNCgAQw4S6KAPJk0KAgyCzLPCHRDQ9PQdDfQ3feeqvN7f9SuffZU97Z55376dvc5VXX2XnvtNfzWsI0AwCD3twHk3uk+C/+ffjq+J/yc6K7xN5Bc0b7G1xj7u3u//S3vSeH3h99CMIr0DiXz9a6v7H/8N4XJTEzB8OPByA0fj8R4JMP9bYLP/am1pDDAiFGWeN0dhf1WfzlNRLJwyf0R+ksRL0fHKfIna7xphVM0yXRz0yazJmR4xCQENBgKROOuKVmf9ViXtViLNTDULOd5lrOE51jhTa4CRgGJ8qSMudhfyMxdJrOVSCaQMmb6KQFZlVxhPD4L7yrAEWQ9XsFO7Mq2bMUmzGVutM7TrOBZ5vMI93In9/C4fUpBwYhRxCtkljS/rOHvWQhjZp20kk/6ZEu8Oh3zF9QATPBnHMRr2J3Now0sJ1XaDeS/lvIQN3IlN/CE5bKWxDF/ptyigGfCrWQQxiiUDSnF+8RWKFDDSfs7OhTUY2J2fDLg1bydg9iRwl7fOGlDZnPL/jYYSvvcJVzPRVxqyVPRJGPp3+ChXHRcYxRL9Zj5Q/KQXK0Zecska9FunhECduAIDmM3+511hidyL5/oIydnYAmX8gOuYASU9htINlbM3+FGcv/qCENmtfs5gCxhUvGtjFzqiHIwx/Em5gIjGm/1wwUKGV6eRgvXe+TIcxP/xnkMKYBRjxIx0RMVfQstz3gb2fufcX9M9G/jrjPen9yPiT4tVAiht+lKta9p1RrZH0V/tz+NmuD/4/fTd4ZqJEm/1xFCqIzm449rPJfcvI0/xXRK6dSNN92QRCYzAP/aQqUQeouukSTVGvZM+U/78Z8hjTTUtCTpEu3oSGOiWZGZVUTAkFYm+dskDwnJQ+ZfJlknY4myry6TJA01zHBCMwtHrP5PrVrSUh0rVARLny6lyS8tydYgywG57UTmngztLa/M0zdUS5bhu6k3q8kLzWpyT6ORJKmxfHOaI01+hqZPIOTkApkHmWSPkiFc7osqIfQePWqJsjpbo4mIkZJIM9wtyRJpKOlUj2vo2eYZwozVdU65kbcKszYKGYvTUFKzIV/lKKC2Ho5ZLVWcN+v7P899IkZU7MPNlNbwU9YdMKm1VWQ9XBNYniZwIU3WtUyfIAoKal7PDRxFzYgyGXofUcm+33pETc+dY7Utb6QC3p5YuWObOpytp9yLwPf011+OCKFdoR5/mwggKBjR8Gku5+UMPaKYrCO3ei9DSdXDN4aagtLNQm60G/VYSONlkLvH+dxFwiPGc9QVOOYxMuLzT2yGFYxYix/xRaCxptfMPJH3e8PlMCzgcsuJI2+riwbDgLu41PIqnoO6LHIxYr/ex3/cE4vMPo3JQTAE/z1lcBUBJQ1b8xvey9B6RfSuWm5D5Ozc9vUcf8kR3M+A0n2baKgY8k324xLnqY+fPj9YDv+pJtoF3r+L7PAUecaxlDHJ1pP3lRU1u/Fb9mJINYswnYljTIbLSgb8jFfyBZ6npKGhoWTAlezP/+IF1nPLN94JD1r5ZJItFMJVxv9fEcFURHsvZWc8nMz3UY0DjmpeyxVsSR1sodw26uMcZcWygIaCAcv5PPtwPhUVFQv5Ww7m90xSJZ5QwfPcHfD3+G8TLKrCfVEk+Fw4UZPIGkX4qwmGXlFzMBczj5oimdwoK3BNoqNMctV4qaYYUlJyH4fzFu7iP9iTb1EwAGpWJsr4ARYE0Ei6M0zwjW75Z3MDTGLqpTZu90kldIhekDzX0DfQmv+Bue+bebWe1ydUCZWqVAjNsUZka0YeqNvUqLHmX2v9niVURW6LCWx4k7PZ6TGRSW4lIJ2JXMnOxj1Ay6TVcA+bWUz+vvsl6Xod4shhVGgghLbQ2aqjJaklHWUJQ8Za73vPiJkuyrtcfZ+UQrvpmWBozSx80KyGlxSSpbae0LnaSggNNBCq9BE9YV2B8O5V2l5YsMNk8IE+R4G8w0jmtj7Pon2nFNpK8yUNpRm2TDMDGZpZiSndpY/oMUnSUzpRk0Lodbreojv/rm9Izh+rJd2lQbL1Tdbzi5xKsiBUDsNIvW3/UYXW0S3eoP4naMrsYIJ0l9DG+rb1nW/R23W65aJb9Rahj0mattcPJZ3t3Nico5yyhRnLmDxUYDL4S87/bslTCZ1nueVPm/CfTphW3B6gqzV+LdXnNFeo0MluFK1vfaRHGJMhTu88i0DlhoiomQG79SN8JTWf4F0MrTU6s+GvHvN/9V4NDRUDruF1nMBCAH7O/nyBVTYs54fiVnGzNRLCGaVhQuNcBusjVokFoR4wgcSwNo4sB/FFCz/PPukcuK3VJtAEoqakYsQZ/JyTuYGf2FBzTcOcwNJ6gD9mAf0YOFEmmNsjl01GP+Vw0kKFNtRjVhf9aeBkkwWZZhbTtX6t/YTQhLdFWt20tr6gZ1VbU2Ao6d/dRsqp5XwAwKlrEtNuJkMuFsyV0E+c0G0iO6VZbZXcrIa0kdVMQ31dG9lvr5xx9w7d42F3qQ1jEiPD9ChsT/iaGYWu6QU+S6H3WD3Q/ElWSbMaRMg/qw2RLNDfCKFJGaEd9VMLso8kh/yu0LbWhslFBExk15vQ6s8RwfRur5CEhQptoqc0ckpakU3b9DgCzf+njmqV9S+1j9BcfVbLJU0Ho6gl3aIiAvFjp4D+bVZF+IrpCV2mArIVu59nY2oK784+AZsDvGaCqEwGwRnrmxENf8FBnMXe7A3UFtnr9MqIkhsZUXmJJfJygWZCgoRBVQZSNgnGEsKcXf5Kzb4cS+OCq0qUcbHa+ibUg5oFADVAyZABxwNDB2mGr1t7TQRlAPYoYaSIYD+TTE8JeDwmzZccAuKTUxlokllsGkVo88z2T/udFQ1DmggME2JEiXggAK3SRCfjZWJ5FgxenoAidCINLCgBpWvew2sYBsF4k8XlTG+uQp4vTE8+FAms2qK9cpPy4acRTyUbWQFip8jUC5LsqiSlQ8lEcww4YpLPZDD32a1Zk92yZpZt5vNrkYHA2ldNjYAa8QxLIyS7N0kox5lVNgWCnuwqXGJXzRHsTBMMUUnaYX7aCpyNfnKM3EYwESleZDnPsIRFPMtilvEMS1nJi6xkyuLAQ4Y800P0NP0sY+sb9aX/9Hs9BhhwE7tZXUAAPmuGNB+TJWG8Zi1ByoAYz7GIBTzMYzzGozzDEpYFflG/A2MyuWJk0pyitLSqN/UqTG/107VKag5hN49fTNbbiIdnMiI3TCJrg7qd1HqBBTzM3dzDQyxgMasi0T/hBKgY2TiTskLb9OTemf5czyoJPcWpqcpO50NgZX+M9+dEWTogf8gjS5D2tYKHuZNbuYsHeNIjRmFjSSMrRxrPQgGYZIKKCQommGAC8SDDbDzJz06OE7wdQ7RbSb0WRRzcFwUjtuM21vgfBeb972jTTyuXgXkP13EDd/BHN+WCCsOIYXD3S1iXecxjEzZgY9ZnA9ZlLdZmDhWTDKgYMMnT7MKzFDbF1UQhZWVTsD1RUvUGLJXFXtrg6xHMZcggE44wGbs3JdSIEaXdNCu5i+u4iluZ78gxiagZMWIagLXYhK3Yji3Zmi3ZmPVYxzMT8q8yUM4zmRAmiqNGMkZhJC6+0D2qoeDNGXmiTDSIhFDt/a3CfZDruIKbud9t69ZkGzEFGLZkW3ZmF7bjZWzE3GgJGm/jhiPonII0wJzKzdC09D6vsqIwF5jtFPWI7djdRqR9mWQSD8ck7zaUVMCd/JzLuc2mvrew05CaGtiQXdiNPdmFl7N2xGXybOwi830+OjdzwkqaJ65QGlWJ2ZXmcPtWTMGI17IGTeQHmcRqDsspWreuYsRlnMkvmbJ4nLGWB2zKXuzHK9mVDQNijOPl5Sx5Eaa3HCR1b8jmj3vvVTELeZ6Tcl4ncIDNoM2Z9vlk9IYBJSv4Md/hRgDm0DBkGliLPTmYV7MrGzhyNA6FnU2SxLJNkV2VT+4PzRNl8j2cS2Ay2dFkZMeIkp2jWK+ZMUeqoaJgGT/iDO4BJoBpVgGbcSCH8iq2dld2W6CaNSMizYxqLaxcYpOy6SWzwCFVAjmoJxeh/XTEemwONrVdPfiJ8YhS8Tzncjp/BCYtl8zjII7gdZZHGkYUidmfWk9jh1ZOQ8Z3jbIJc3154X0FRg6PMVGylTLJid3j5rFetL1ik83YxK+SihWczRk8CEwwzRQFB3EUb2RT6/S1pn+R4Q8Fmm/kfKZ4my5hGYtZxAKWcBzzEg42iQLp21g+c5gqSrLKVZ/4eXUwh0HChnE2ZKt9pvkRp9ntM800W/FO3s0ejksqymQafvacL2NK9+QlLGIRC5jPQhawkMUs4wX76WFs6Ay6USAZc2arScZtfO86rr3IFV2EpVQ1g2yeyZiZK8R/8WVusQp+mlfxfg5nPcclpYPI/EKbIlGyDct5ioU8wXwe5XEWspDlkSXc5drNcWlQcu+ZjIOrHj0aOEJVZIrFLpe8tND20xdZFfBMmDfZkvpSvsh19t01eTvH8Bq7dTrZVDtOKCJCLGMJj7OAx3mUx3iKRTybEKJwtU1j/hpFvlPpLHMFc8uXqiYZwFWk2UMIwkRCDwyLeJwdrLj0wa0RBRXwW07jYvvUTfgbjmFboLZ5UKmIfY7FPMkC5jOfBTzBYpZEfrRPiDFul1ZvmgCXG7E0Y9kok6SdylMP2jSJUsvHB0pWcT6nWAh8LBpbolzLV7nQvrsjH+BINvbM/c57Xswi5vMo83mMBSziOVYmhPCJLq+IVEnare+NFW5TjliLt/FjV9CVJtOFOYQJ/4+raNXjTYdiq0Csx/VsT+OqywxQczFncYVl+n35KO9gDlCzlMdZwjKe5GEe4wmeZgnLkmhCvDWALOsbdwfBlA1iDW5nO4sStariC3zepS2oB7rqg+YytSV9NSe4FKFtdInNSpGm9Ad9SXvbJ03or3SxLacaqlajO/UPOkBreMG7UqULrpYuKBaXjOXLf0pVtsSnSzYrbPAPzdF9ks3Aa8s5bu8t4CKJv0bZQUZpaUTO4jSBEz8C9mAX5rKUe7jX8slmvIlj2NcK14ICw8jywkJu4Fpu5B6es08ceI5hmlkcG4xtdmnjEJkdKbnT1V8bChomuYPtaawR0FByDa+xHJPiLv2ljd5WgnyNaY44fgVs91qP/TicN7MhUHtWx1gCdSL3EW7gSm7gISdXKvusnMVdWGu7gxDWYWf2ZT/24OXAA1zD1fyOJxgibyu1bkVMGNPrXubx396Esr6iP+Mx9UCVttWFetRuq6FNBokTOtraoaHNupRq3asf6Fjt5KVyxFumtCmFCK2j/fVxXaT5XhZV4/51tuaqEFpDD7jUyEa1pGv665GyibseBape50+ZreWDUo1l4E15m0VgS1djosSCMFaLtY5ixQ7swFFMcz/XcR1X8GQUM2/5cWN2ZW/25c95aeB5txtrikka/o1/serdRNqqS7hW4mSEeG/cgsEieLk4XQwOmwyS0f09bYc6luZFb1VAZ9vK4r0T7MquHMcn+RIVtXvG2ryGfXkVO7mSGtlCLENpN4qY5EE+yi+jMg6/kmA0QyzJZAAID9itsmlfJhNciLH0MaZXMgoQNa1GrKegQIwQQwYMo/0/ybfZwkERrazxUwfaKoWz+BRLbF0+Tn2nvrai3wayUcjAlS6SQKhvT/iYqHpy8QuvRsCsZrrh2M4uqCiZ9gTiiILFvIPlTNk8htKzcowFMx7lMI5jCaUli7FkjEO2eKmHJuNjh6khnropEns3ZiwTgeRE5RX5VekDrpQFI4fBFmiouJkTmWSAaKhpnNdWU1DxQ17JBZQUnhQpGDEnWpgmiMnH2TvxzIKqlCJCZ1M3QJFAI8qVqSOu0QzBevVUy9XR1m2o+A5fYzkFFQNK21umoeJp/pr38TSViz52jRE+zdbU2RqZXAAxrLSJaz8TzDd2wpWBO2OwExvWygGFmjHBo9umUwly21Dwv/lXXsEu7M6ubMv6AFzEx3iEMmjB0xYDHcPnnDkZbqW+DiCmN5xroEpa4JhMz4w0eDaecD1LzsJsrwJsWC3uUVPwJE9yFVCwCduyF8/wfWBAHax1m2l8pttWY2mx0uP2flQ7x9WqErYP8+5EvkXT2BIoZsyYMrOEbbu6tTR9QN5Gb1jIQq620wwj0iUN2/ITKsu1xksjKTJoUxxhN4nGsiHaXF1jLltBPTGBlQmMrj8hEV4WFYxzpUwAcxqPRKOAgAUj1uN8NqL2HJEuBvbMDAlvyjgGHmsUEdBnMreQCeN2MYOS+ziNwmYg5IzFvuCXL8anIekIYyJofOTyG3z41VDwQ/4sSHlrndgBt/F5jKvQN9nogdKSP2x5cSjFlRhC8f/kbaWWXT/NbxhENkQ+3cj0CLs6ipqneiUP0Zc0nM6hUSYgjKh4hLfydFJVnXJrT4lJkR10XzW+slHimmN4JkH8Z8q6pNdCjWMWxjMO/ALVNixX83f8bdAHoNWQBc/xNubbRLq4DlhBlqpvkHgcVQRDMpFIMjPR1A6xoeQxjrb+T787OhN5hpmEjbANwTh3Cid0hxzKVx3AjrOBoOG93GGdhbQ8OuREk3Cm19vBBO5XkZ2Wkts7KjcMuIRPUnlqNJ+D0pfMPMwIX9PTocpYoVuzCz+wXtd4am3mzQe53DqlY5eAJGFEgWurQHpBtjlRFaAVJluWG2I3ldDXXIHD6tUINC73fw8LmeZh1bTKrpDRRhZ9UVCt0Ej6O1dzkkOT0lrgMtcZh6TwYCPt65onmUyFT77BTnv9J73iv1GmRCdXtCM12tkShp7ih3h5SqHXexWYHTAmNfqwR5ZcG6BwNl2LqM1ibDstYXqJbteXNemVcZtZUK8xpocO0dKeEp2+d6RVeoUKC4pnYOmkZKblz6M10lTwTY2e0qFJcWjKf+MxV0KT+pIe0DoxGxSR4qx4kSv4ONfwatuwjxkM5xjFKBwWR0/DTzJh9RFLGWEoHcgwxgLjZ42VwlZR45OGgl9xKZNeshFJhub4+gKo2Z+rOZnrWOZy9uR3HApdwsto2Jsr+SfmJLUlY2WpjAc9Yk17vcm2WclnEVccymYWXqjd77xPPCbWpi4ZBa89S+EUgJKUf9+PrhhR8XmuYh9G/Hd0nSHq19HS9WYWsQkFn+L1fJQbMJQ0nmsg8n095IGJZhYcz7cZSs5hKffyII1t4CQGfIEHvBpfJcp288iCbuh6UuVyzn2AtuWVP+ff2B/RMMX1NkfMV97JTi6FLpA0rSlJUzpVE4E4M9GuDWVAiNTPVtrXuD/x68uqVM7Qb6LQLUGzhLba+odBcWgutNZ9fqJelDStaUnXR99kZGQKz1kb0/hXNiTWMMH/4Sr2snCUiTxv4907U6vrnCEe54LW1NQ2Ce1UTnYJqyYw8LpvXNvrPJU+1WS63xiLT9dsx6WcxlwaBhjgSiswTFSbFemdUmg7vejWdVrSSp2sQmiQtS269/zYTrPaVfphbf+0pH8J7JBUJxZCL9fzXg+J7s7vZZpIhrYW+qCekTRtubSRdLC9y4QtJXPGW6HrPUZt61av1q5eG9FcVwQzC2GabF22vKLSaUlnCBtsM9nGj63tsW9kIradHL6fNB4NC6E3c9W2smFA6QmtGxHQdDEgQ1jYVzLiqsCHhZoDuJa/Z2TFm0lYnGzkqS/7M7f1agacw99SekHZXPs5A2xuQ37hs0YR1N0pihJR8w5u4nDbka+DTeBaliYOsMEUmQRmAVdGSVsVNWvxNS5mW2rKQIKvTvO2NGXQeFGGFkyf4Mccx6S1ZEyiQv1v2qIXcFISCShpWIczOJ/N7dj9RfsNcYs7dXiMgnykNkPyZhbaQFp3eYUY8iZu5AM2tXBs05igMG9m7FcBONQJ8hEF53IkNVNM23hAEQXYfY7bIms8FlGGS4f2vIrrON6GkX3IpGIVV4NLxsfP883J84Ln+B3vtNtmrBsqatbnbA7lRIvVjxJcbDQrlGmSANeIkkVcw1EMGGIouIM/0FXK+kmM3Qhf2hPjDPHDkpqCz3IKFUOXPdY9Z0TB/bbWNi1czDYiqoSOdRXxobCsNZT0lI50PZZ9wbiG7om0xer62nVgx7yoH+m1mX4S3bddk7R8qiWd43l4rZrYRb+xlfu5ev9a37SzNbl+vjm3Hm1vW1c3kQ7ppLr0Xc0TGrgOUIXQXC1QnR3GbJ0ccq879CFt7vz8TmOiNXRf1Kar0ZQanef85fb3h7TMqea0R8RI0luDxjseeSqv73tYdvtHPstH2RCYprReydggaxjxfl7LiVwAXgrgkFt5S6aRZD4aiZcwfS+XUNkko8Z2ip9kDwacx5Lo+nXYIAnGDjDc6+VXzePbHG4/iTvENBRUNPyAK+3MCTrg261knKYvgsQgtKk+q4WWR5rE9mj55kyt67ZUoUIT+gfXmWN1uWXa9nqhtyl72CZs16BFWGvDLNZf23QmhN6oB5O2c7JbtsWAztOels+N18C7GHeALoQ20V84T6KM+nxvqlP1lE1DrKMptXlL9+ggZ0Jhu8g/mdmGM8uXs1VpjgYauMTFNmOryEBLbwjMT0m6XNu6MczRl+14YyNw2kqyn+tVgYQ0KpytvZ+2ESpamq2ha3WzjtX6XuO9rpcPQpvoc1oUyRzZP1OSpK9rLWFbq1VC2+jq7O5uso3dhpLOtPfnmhP6onEgY3vWNPbbV+rjQmiOCqHddJO1axUkvdWWKJfpdQELjLms1Bt1ke7ThvYYC5VC+0mSHteXtZPjl66RW2U7E/6j5ZzpwMNpVGsk6XYd4ETwQGhCX7em+mwekrzGbCbTmc4k/erPlVTbqd6ovYVKS9S/0/JoG8sjyn/rLz2i+IcCbKjjdbMk6dhWHI/lyU+tW7VK/6WD3eqUVvW1xNlcp+k5j3Mae0+75tP6hCNLu1eP00qvL12/6p4OCJMD3P0DH75uTzWQpK9ojtBAE0Jb6hduKeSI3l15rd7ket53TeraUW6rf7R9F2vdrTXazYvba3tpyh12IF2rY7SOoy6eDNlap+t5u4k626PdDrWkqyywXdjrX6VHZxXEfrNQZvTeC6Fv2XMNpEf0Zpt0jdC79GTQK0u2q33bPPBw+4Qy8LTRPvqOnrfKYlrSX3fLg6eDvmv94mn7uId1qrZxVC5UOM55hb6lF5zh1LXMatdmmU5wxB4IbaHfBrJpJsIMMpA7zmArhb4jaYVGkn6qjYUGqoTW1hmJJuyIcrver0knHMbhkkpv1aV29ENr19ypyU5LjdPYjXbSSisxxrtyqc6y6fDG2pQdcXbUOZq2xGlcs9h2MBfopVZMlkJr6FyXA5wHILqtNIic/zGJ2ijCuZJWSFqpkyyvlEL76w57ioocnNCO434db5P1q0AkrKVjdZMTAuNAznvG2znsrnpmIBEaTdlderHe5IXicCJrD52nkYUIR453hpKe0Dtd3YAR+pTdw/0cc7bHMXGgo1XZ50haKek+7evkCvqUpjxekXNkFuhjWssDMzvds6VO0UNeunYHjI50mybGxsF4CIWMXqblkc6orQ6SbtQHNNd+UeFxzn463x3y0smbdmjf0kusy1AKvdcK4ibhm8ap68oZXGGksFSp70makvRf2kCo0oTQVro0ELe1/eZFOkUbegvZidnd9C09607paSJL6t1eDNbEptPpzhPyU9+743nu1Una2F7biteWcw7SLy1xOvXd2IZre9ttMBA60Jp9qVYKuxymbm2ln0hqNKUTPXF7mJ4IopGtvFuqr+qljiiFe+YB+rFWRpzio3+3ePyCjC//Cxltrmfcngstjk5jPal/0Msc5+AdD3SDXYuhJzlW6CP22oHQDro36uHaOOY/23JX4aKSHe/M1U+slXWgUKE5QhM6zXNVOj011Nna1ou+d5voUHtKz8hxrCLtJb3D+dmMT8vxeeYfva9TZJR1Qm2ZztSu3kk47f4tdKRud1ZO46CEH2h919d7M90UWEHjlVus3+tW/cH93Ko/6Fbdot/rftsQ+2XuKTt5sEPjFMUF2ivg5raz4vvsgtXOMG2iZoZDSTe7yikTNjo2Ts5spqcdWyqxVccSf4W+p30scSrHsnN0vB5xxOm44S7t7si3vn4taSoBxmd+/URrCs2REXq3ltgnjJfqGr3Rk3/tWNbWCbrTckSdjaePneG3emkFQZTAb1n8OUmrIn9Gwb+704saXaADPO3TDmgDnWpF3NARcrkVbRNCa+gS5+L52Q+1tYXaP93vKUnfsJKlUKl/dvqtG8V9el8yhnn6mB706uziDrDjxV6lRtfY7UvYazOEqAptaM3+oaZcjVGuJ3z32WXWNy+8gb1MZ6p2Eqflv1M9//fSQGzG+34UsPkXhRXf8+x9jYMPntVntJaDDNrv3kif0YLghLi4gqrThZ3GPTQIuzitFMqZQugwXaonnbk/THr1NslxcpdY/6rwBrivLnFOZ6ulvq8Ja62sqV9nmt3GoMa0pE8JDTQptJPutvc0VoCf7dRAZ6Vsqi/occtT+ehWu/06Z2aFbtGnc2lS/Q3FN9Jb9G094GrSppOzspogICddqgOt61k4wOJdtsvu0No5l2l9q27X0Y2e8lbie8uRpdIcoUO0yJKl3UC/1Wvct7VE2Vin2OWcSkgiJ6iHdkaLdZE+rB0ykfjsVjJOrrf/f4lerX/WXQ7r7fOUuzW4SPu7J7RO35r6jG0r25pfv9dmQpNCm+qhHgezE9pfcXronVrlzDLpMR1t0byOU9bXpyOsMe4MXDsHebF+qiO1qRfmzzTrzQQnvUh09zNXB+ob+qNX+agscVo99AOL6Ywlzo76mefB3qXNLdf8uZZmT/9rt8p33YEM71PjbGu//3NpPZ+TbFWmD4w1HhrTScMXdLGO1uZBqbPJn0yQ76RtZDShN2j7gIrr6+36mZY7hz4XEmmH8IK+4VmfLXEO1/2SGq2UdIfjmsOyB4IMJf1KEyo1R+gYjVRrlUaSfqdXexyJBvqgtXPyx4qMt85N+rh2DOazrg62KWaZxLm+YwwqGR2plbpOZ+j92sEa4Qhtp5N1m+OdJss5rb9ystMXpUqhdfUV1dY/vk3zZDRhDcrpxKZ5SPMsVx1lJZz0rE5QYTdX1yf85sjIb4JxjOxIztKB3gzm6QCdpPP1nM3CyTJH/7mQpdBJlgAv6HadrSO1jcMy3qTzredRW52lQMgNIwujQ0EO1B8krZJ0pSZVaiCjX1lBO8Z1XtQ+9iScv9JQqyyAvb0jcwsxXda7OI3jkxt1vDazM1tT++hjusiqculCB8VmRAk98HNncZwuWSaWpOW6VqfqEIvtbat/dvbCMPFAusH90iLynfZ4if7VXnuu0ISMttZiT9LUkk6wG21/Pa+hpIV6f9CyYEv9u6at1Bkl+G5L5JX6Txf72Ebv1X/obmdfT0m6US/x/LEkdTd/WigOPy91uaRVqj3YU3pE39N7tL5QqaP1B2d2+6ZU4yyRRt/WpnZ1Shv1aQX5SZYvjnZWci3pMruJXmoL0H+ul1rHoxSaoxP1dBZmH8NrT+qfrIjdS5/VVdZgbe8ZakrSAm3tkq6zZxSkpxOHKKvRuvq9ZfWWRaccmz6rX+horS10sH7lWTuywTAfdV2o45wvMxDaSOdJqnWIJcIlzhBcqm1kNNCkrpa0VMdbfmulyut1iwMxm6zRdreO1kBof52uu73eAJ0cGqrREu0VIcxJdCKfmh5iNFvofs+XbZw53b6e0wU6TBtqH33fDq1OcqXaa6/QntbpaPnmJDVaqA1UymhXrbKb4BS7jU6TdIt2c04q2lLnJEpZHhIjXaW3al3tqdOcYTryTkluXLjnjVHEmvzpxWmTEp9/KqFX6ClJKwNB1/VraF/P6AwdpDfou1rhnDxFh3NIq/RZTVhlWwm9Qct0geWZ70pq9KDW0kDozZLO0dreMWTHaZEn6kdeeGRknZK3aQ99whmjTQRItdw+Len92az36OyO/PnUIZkqoX21zEmYoaatROhQl448t+n/6Bj90F7bRI7h0OIqe1qbdUJoe83X+4QK7aDn7aBLbajF+ryLbKGX6+IoDuofXTal/6sP6gRd7rDHsUfd2NGOsymOcwhgf7UCfVspbrPTkuZrulD32CiMbGRp2sWwO4/pWf1MZ+pqLfeUeBgPWKFPePD01rpIW8oIXahFmpRRoXP0EQdSoGP0tFPLTUSUFbpeZ+l7ziqfciJ56MW9pEYL9Gt9W+9OMjTTUI2RUdSKKe69rqBxDcAkm/EK9uCV7MrLXApGY49MGDGyDXPuYynbMi9Tb9QewHoxH2ARJdCwDTtzMeJdbM+pwD5sykVUQM0GfJP3gMuHCjOznuMhBuzIHNpjGwo7hsIl+i/nfm7mRu7kMZtMUnpFiiZTrGZzicMO0GaG+mpjq+Vxbdx25gBeyx5s5rIu24T3kc2mmWIik5TYtZp8mCO5kQGiZoIasQYFK4C5vGA7cu7Oj9nRtsrJ1SNMMWmJ3bXQ6PpATHEPv+M3XvtkbEplShbFnUDCjkNkqtpz9fYm6gK0AXtzCK9jFya8zpnd0Zy5HpwGMWSCFXyIH7nycuM1QSgoGfIuzmJt12laSc2cvMOex1URC7ieX3IdD7gRVkGnkFzrNyWEMiSHZfbVsaV1S6WL16BCu+jv9WvrYnaAYtN7SlJn33w0yFLx0zJOCIKuyhaI1c6kk2rdpq/oEK0btfbKH9mXO0oo0E30lE70nz4f5zgVzntpQ/7H6hdaagc7nY09Ns5pqCV9zDoG4zHMEfp7zx5qEtS5tXKnLMGmdZ0+qd3dKMogN4ykgCJ3PF8y39wBmfnTqvLZKnjxwnGFylY6Vr9w+iuO+jXB5KQPWb3XAtKl0Iedx6xMDugYUK11tU60gZwwGchkDiXrMeUSA8XEUYL8maF5mufOdetC/qVz3U7Qr61vXAfGobymXrWm9VoXNxwIvc7L+1QExY+3zq36nHb3KgXKqFAoLVY0ygmOHkboKwbNcwcZP9Sk1A7Is4s+pzsc78RRh5YfntAWFgottaWesj52nFTYOSGP6Zs6wD6/SEiSO2LNZM+pMxnkLgDD86e2GfVhNf3vhmtSOOE80CE6V4sDu3RsF09LusRaw+j8TFpjbbfOC7pI77SgxzgjKl9SOtORZMxwGBs+YfppZ7LQX64Q2PQw6zisvqk+rOuchepPfSjpCBsBj9N/OhF7l05xUGsVaLI+PqAnxTElYeaQxDzeS3aPMtODZpDzxsPd0Gv0H1oSeOFtQO5BramB7nE4i1zs+3n9p95sD+T1NU6eT2Y6E9L0qBGTCAPyqcY5xusBdHqTldP3xryzlU7WXQFppiUdo7e4VJLuCOc/6lSPT4rMwcwme8j06mweek7hzWC+ptfoMdkqejPjypApAR9n1U7oIy6jv0VUHtbdXsC2lvRJren4xPTozf5jMPsND5Kur8m9/drFJHLGzGgh53tW5tRlG4k2NtVwnPw+zq5o373Qi2v2dQvId2/ISZTcMZnpFnLf1PlKJtN0P9+HzGTLJHItG5UpABz7sAWG9biFLRhS2Ra33WnKDQXL2IPHbYFf2sXG9DRmznfcoqcZWa71senapJA03TdRxVvAYUlBsVyhsQmamSgo8jXBE9vWWoZnOIGCSVuz2Fjft2SCipOZT2HrHk32ED2Svo5xAx5lu0oTFYX1nI9iso5A//nF+Qa36bYxGXkfS4lC6G260NYpjI/1vlzvdrmaOZO9v3ULM5Ql52OO5A3b1o/sazpgMg2ISZqN5o4FSU83CHuA++d7wSbszMvZnAme4AHuZ74tUs8fsmeyvcjCLd3fDNXMeFi5u3sMVKXoXf5EvJl6+ivTjC/dApqxm3QHKTUBeSE+/0k9dZBkpE3uFAsy+Iw3/ypq3JU/nS+VIH2NvpTsWwXne5movyVW5BqvoVKu15V/fkCMLELfyVDpgsftm3MNBA2g/wcZ7i0X0P6ugAAAAABJRU5ErkJggg=="></div>
+  <p class="lbl">Comma job</p>
+  <div class="chips" id="cmTypes"></div>
+  <p class="lbl">Level</p>
+  <div class="chips" id="cmLevels"></div>
+  <p class="prompt" id="cmPrompt"></p>
+  <div class="sent cgapline" id="cmSent"></div>
+  <div class="bar">
+    <button class="go checkbtn" id="cmCheck" onclick="cmCheck()" disabled>Check</button>
+    <button class="ghost" id="cmNone" onclick="cmNone()">No commas needed</button>
+    <span class="score" id="cmScore"></span>
+  </div>
+  <ul class="fb" id="cmFb"></ul>
+  <div class="bar nextbar" id="cmNextBar" style="display:none">
+    <button class="go" onclick="cmNext()">Next sentence</button>
+  </div>
+  <div class="ref"><span>Reference: <code id="cmRef">--</code></span></div>
 </section>
 
 <!-- =========================== VALIDATE =========================== -->
@@ -1740,6 +1781,83 @@ var PUNCT = [
 var PUNCMETA = {"types":{"cap":"Capital letters","end":"Full stops and question marks","apos":"Apostrophes","splice":"Joining two sentences","comma":"Commas","speech":"Speech punctuation"},"order":["cap","end","apos","comma","splice","speech"]};
 /* >>> BANK:PUNCTUATION END >>> */
 
+/* >>> BANK:COMMAS START >>> */
+/* SPEC 37. The sentence arrives with its commas stripped and the student taps
+   the GAPS where they belong. Two kinds of position, which is what makes the
+   activity possible at all: `need` is required and `ok` is merely allowed. The
+   serial comma forces this. A student taught to write "apples, pears, and
+   bananas" is not wrong, and marking them wrong would teach them to distrust
+   the whole activity. */
+var COMMAS = [
+{"id":"wc-cm001","level":"foundation","type":"list","words":["We","bought","apples","pears","and","bananas."],"need":[2],"ok":[3],"why":"Items in a list are separated by commas. The one before and is optional, so it is accepted either way.","gaps":5},
+{"id":"wc-cm002","level":"foundation","type":"list","words":["She","packed","a","towel","some","sun","cream","and","a","book."],"need":[3],"ok":[6],"why":"Each item in the list is separated from the next by a comma.","gaps":9},
+{"id":"wc-cm003","level":"foundation","type":"list","words":["The","shop","sells","bread","milk","and","cheese."],"need":[3],"ok":[4],"why":"A list of three things needs a comma between them.","gaps":6},
+{"id":"wc-cm004","level":"foundation","type":"list","words":["He","needs","a","pen","a","ruler","and","some","paper."],"need":[3],"ok":[5],"why":"Commas separate the items so the reader can see where each one ends.","gaps":8},
+{"id":"wc-cm005","level":"developing","type":"list","words":["He","wanted","a","bike","a","helmet","and","new","gloves","for","his","birthday."],"need":[3],"ok":[5],"why":"Commas separate the items in the list.","gaps":11},
+{"id":"wc-cm006","level":"developing","type":"list","words":["The","kit","contains","scissors","tape","string","and","glue."],"need":[3,4],"ok":[5],"why":"Four items, so three possible commas. The last one before and is optional.","gaps":7},
+{"id":"wc-cm007","level":"developing","type":"list","words":["We","visited","Rome","Paris","and","Berlin","last","summer."],"need":[2],"ok":[3],"why":"The names are a list, so they are separated by commas.","gaps":7},
+{"id":"wc-cm008","level":"developing","type":"list","words":["The","recipe","needs","flour","butter","sugar","and","two","eggs."],"need":[3,4],"ok":[5],"why":"Commas keep the ingredients apart.","gaps":8},
+{"id":"wc-cm009","level":"secure","type":"list","words":["The","team","trains","on","Monday","Wednesday","and","Friday."],"need":[4],"ok":[5],"why":"The days are a list and take commas between them.","gaps":7},
+{"id":"wc-cm010","level":"secure","type":"list","words":["She","studies","history","geography","French","and","music."],"need":[2,3],"ok":[4],"why":"Four subjects listed, so commas separate them.","gaps":6},
+{"id":"wc-cm011","level":"secure","type":"list","words":["The","box","held","photographs","letters","an","old","watch","and","a","train","ticket."],"need":[3,4],"ok":[7],"why":"The items are longer here, which is exactly why the commas matter.","gaps":11},
+{"id":"wc-cm012","level":"secure","type":"list","words":["The","report","covered","costs","timings","staffing","and","safety."],"need":[3,4],"ok":[5],"why":"Each item is separated from the next by a comma.","gaps":7},
+{"id":"wc-cm013","level":"challenge","type":"list","words":["The","exhibition","included","paintings","sculptures","sketches","and","a","short","film."],"need":[3,4],"ok":[5],"why":"A list of four, so commas between them.","gaps":9},
+{"id":"wc-cm014","level":"challenge","type":"list","words":["The","survey","covered","traffic","noise","litter","and","parking."],"need":[3,4],"ok":[5],"why":"Each item is separated from the next by a comma.","gaps":7},
+{"id":"wc-cm015","level":"challenge","type":"list","words":["The","committee","considered","the","cost","the","delay","the","disruption","and","the","risk."],"need":[4,6],"ok":[8],"why":"Each item repeats the, which makes the commas easy to miss and no less necessary.","gaps":11},
+{"id":"wc-cm016","level":"challenge","type":"list","words":["The","garden","was","full","of","roses","lavender","rosemary","and","mint."],"need":[5,6],"ok":[7],"why":"The plants are a list and are separated by commas.","gaps":9},
+{"id":"wc-cm017","level":"foundation","type":"drop","words":["My","uncle","a","retired","engineer","still","fixes","his","own","car."],"need":[1,4],"ok":[],"why":"The description is dropped into the middle, so it needs a comma at BOTH ends.","gaps":9},
+{"id":"wc-cm018","level":"foundation","type":"drop","words":["Our","dog","a","noisy","terrier","barks","at","everything."],"need":[1,4],"ok":[],"why":"Extra information dropped into a sentence is closed off at both ends.","gaps":7},
+{"id":"wc-cm019","level":"foundation","type":"drop","words":["Mrs","Patel","our","new","teacher","comes","from","Leeds."],"need":[1,4],"ok":[],"why":"The extra description needs a comma before it and after it.","gaps":7},
+{"id":"wc-cm020","level":"foundation","type":"drop","words":["The","old","bridge","a","wooden","footbridge","was","closed","last","year."],"need":[2,5],"ok":[],"why":"Two commas, because the extra part is dropped into the middle.","gaps":9},
+{"id":"wc-cm021","level":"developing","type":"drop","words":["Jack","the","tallest","boy","in","the","class","sat","at","the","back."],"need":[0,6],"ok":[],"why":"The description of Jack is dropped in and takes a comma at both ends.","gaps":10},
+{"id":"wc-cm022","level":"developing","type":"drop","words":["Her","brother","a","doctor","in","Manchester","rang","every","Sunday."],"need":[1,5],"ok":[],"why":"Two commas hold the description apart from the rest of the sentence.","gaps":8},
+{"id":"wc-cm023","level":"developing","type":"drop","words":["The","building","once","a","school","is","now","a","library."],"need":[1,4],"ok":[],"why":"The extra fact is dropped in, so it takes two commas.","gaps":8},
+{"id":"wc-cm024","level":"developing","type":"drop","words":["My","neighbour","a","keen","gardener","grows","all","her","own","vegetables."],"need":[1,4],"ok":[],"why":"The sentence still works without the description, which is why it takes commas.","gaps":9},
+{"id":"wc-cm025","level":"secure","type":"drop","words":["Mr","Okonkwo","the","head","of","year","spoke","to","the","whole","assembly."],"need":[1,5],"ok":[],"why":"The job title is extra information and is closed off at both ends.","gaps":10},
+{"id":"wc-cm026","level":"secure","type":"drop","words":["The","island","a","nature","reserve","since","1945","has","nobody","living","on","it."],"need":[1,6],"ok":[],"why":"The description is dropped in and must be closed off.","gaps":11},
+{"id":"wc-cm027","level":"secure","type":"drop","words":["Their","captain","a","quiet","boy","from","Year","9","said","almost","nothing."],"need":[1,7],"ok":[],"why":"Two commas, one at each end of the dropped-in part.","gaps":10},
+{"id":"wc-cm028","level":"secure","type":"drop","words":["The","hall","the","oldest","room","in","the","school","still","has","its","original","floor."],"need":[1,7],"ok":[],"why":"The extra information about the hall needs a comma at both ends.","gaps":12},
+{"id":"wc-cm029","level":"challenge","type":"drop","words":["The","letter","a","copy","made","two","hundred","years","ago","had","never","been","read."],"need":[1,8],"ok":[],"why":"The dropped-in part is long, which makes the closing comma easier to forget.","gaps":12},
+{"id":"wc-cm030","level":"challenge","type":"drop","words":["Dr","Hassan","the","only","witness","to","the","accident","was","called","back."],"need":[1,7],"ok":[],"why":"The description is extra, so it takes a comma at each end.","gaps":10},
+{"id":"wc-cm031","level":"challenge","type":"drop","words":["The","new","rule","an","unpopular","one","from","the","start","angered","the","whole","school."],"need":[2,8],"ok":[],"why":"Two commas, one at each end of the dropped-in part.","gaps":12},
+{"id":"wc-cm032","level":"challenge","type":"drop","words":["The","festival","once","a","small","village","fair","now","fills","the","whole","town."],"need":[1,6],"ok":[],"why":"The extra fact about the festival is closed off at both ends.","gaps":11},
+{"id":"wc-cm033","level":"foundation","type":"front","words":["When","the","bell","rang","for","lunch","the","whole","class","stood","up."],"need":[5],"ok":[],"why":"The sentence opens with a When clause, and a comma closes it before the main part.","gaps":10},
+{"id":"wc-cm034","level":"foundation","type":"front","words":["If","you","finish","early","put","your","book","on","my","desk."],"need":[3],"ok":[],"why":"An opening If clause is closed off with a comma.","gaps":9},
+{"id":"wc-cm035","level":"foundation","type":"front","words":["Because","the","road","was","closed","we","took","the","long","way","round."],"need":[4],"ok":[],"why":"An opening Because clause is followed by a comma.","gaps":10},
+{"id":"wc-cm036","level":"foundation","type":"front","words":["While","the","kettle","boiled","on","the","stove","she","looked","for","a","clean","cup."],"need":[6],"ok":[],"why":"An opening While clause is closed off with a comma before the main part.","gaps":12},
+{"id":"wc-cm037","level":"developing","type":"front","words":["Although","the","rain","had","been","falling","since","dawn","the","match","went","ahead."],"need":[7],"ok":[],"why":"The opening Although clause is long, so the comma is what shows where it ends.","gaps":11},
+{"id":"wc-cm038","level":"developing","type":"front","words":["After","the","ferry","had","finally","docked","the","tired","passengers","walked","ashore."],"need":[5],"ok":[],"why":"An opening After clause is closed off with a comma.","gaps":10},
+{"id":"wc-cm039","level":"developing","type":"front","words":["Before","the","shop","opened","for","the","day","the","shelves","were","filled."],"need":[6],"ok":[],"why":"The comma shows where the opening clause finishes.","gaps":10},
+{"id":"wc-cm040","level":"developing","type":"front","words":["Unless","somebody","objects","at","the","meeting","the","plan","goes","ahead."],"need":[5],"ok":[],"why":"An opening Unless clause takes a comma after it.","gaps":9},
+{"id":"wc-cm041","level":"secure","type":"front","words":["Having","finished","the","exam","early","she","waited","outside","for","her","friends."],"need":[4],"ok":[],"why":"An opening Having clause is closed off with a comma.","gaps":10},
+{"id":"wc-cm042","level":"secure","type":"front","words":["When","the","results","finally","arrived","in","the","post","nobody","wanted","to","open","them."],"need":[7],"ok":[],"why":"Without the comma the reader runs the opening clause into the main part.","gaps":12},
+{"id":"wc-cm043","level":"secure","type":"front","words":["Since","the","old","machine","had","broken","down","twice","already","they","replaced","it."],"need":[8],"ok":[],"why":"An opening Since clause is followed by a comma.","gaps":11},
+{"id":"wc-cm044","level":"secure","type":"front","words":["Although","he","had","apologised","in","person","the","damage","was","already","done."],"need":[5],"ok":[],"why":"The opening clause is closed off with a comma before the main part.","gaps":10},
+{"id":"wc-cm045","level":"challenge","type":"front","words":["If","the","weather","turns","at","any","point","this","week","the","trip","will","be","cancelled."],"need":[8],"ok":[],"why":"An opening If clause is closed off with a comma before the main part.","gaps":13},
+{"id":"wc-cm046","level":"challenge","type":"front","words":["Because","there","was","so","little","time","left","before","the","deadline","the","team","worked","all","night."],"need":[9],"ok":[],"why":"The comma marks the end of the opening clause.","gaps":14},
+{"id":"wc-cm047","level":"challenge","type":"front","words":["Even","though","the","instructions","had","been","written","carefully","somebody","misread","them."],"need":[7],"ok":[],"why":"An opening Even though clause takes a comma after it.","gaps":10},
+{"id":"wc-cm048","level":"challenge","type":"front","words":["Once","the","last","visitors","had","left","for","the","evening","the","alarm","was","set."],"need":[8],"ok":[],"why":"An opening Once clause is closed off with a comma.","gaps":12},
+{"id":"wc-cm049","level":"foundation","type":"address","words":["Yes","I","would","like","another","slice."],"need":[0],"ok":[],"why":"A comma follows Yes or No when the sentence carries on.","gaps":5},
+{"id":"wc-cm050","level":"foundation","type":"address","words":["No","the","shop","does","not","open","on","Sundays."],"need":[0],"ok":[],"why":"Yes and No are followed by a comma.","gaps":7},
+{"id":"wc-cm051","level":"foundation","type":"address","words":["Well","that","did","not","go","as","planned."],"need":[0],"ok":[],"why":"An opening word like Well is followed by a comma.","gaps":6},
+{"id":"wc-cm052","level":"foundation","type":"address","words":["Come","and","look","at","this","Tom."],"need":[4],"ok":[],"why":"When you speak to somebody by name at the end, a comma separates their name from the rest.","gaps":5},
+{"id":"wc-cm053","level":"developing","type":"address","words":["Thank","you","Mrs","Patel","for","all","your","help."],"need":[1,3],"ok":[],"why":"The name is dropped into the middle, so it takes a comma at both ends.","gaps":7},
+{"id":"wc-cm054","level":"developing","type":"address","words":["Sam","could","you","close","the","window","please?"],"need":[0],"ok":[5],"why":"When you address somebody at the start, their name is followed by a comma. The one before please is optional.","gaps":6},
+{"id":"wc-cm055","level":"developing","type":"address","words":["No","I","have","not","seen","your","bag","anywhere."],"need":[0],"ok":[],"why":"No at the start of a sentence is followed by a comma.","gaps":7},
+{"id":"wc-cm056","level":"developing","type":"address","words":["Aisha","your","bag","is","by","the","door."],"need":[0],"ok":[],"why":"When you address somebody at the start, their name is followed by a comma.","gaps":6},
+{"id":"wc-cm057","level":"secure","type":"address","words":["Ladies","and","gentlemen","the","performance","will","begin","shortly."],"need":[2],"ok":[],"why":"The people being addressed are followed by a comma.","gaps":7},
+{"id":"wc-cm058","level":"secure","type":"address","words":["Doctor","the","patient","in","bed","four","is","asking","for","you."],"need":[0],"ok":[],"why":"Addressing somebody by their title works the same way as by name.","gaps":9},
+{"id":"wc-cm059","level":"secure","type":"address","words":["Well","nobody","had","told","the","caretaker."],"need":[0],"ok":[],"why":"An opening Well is followed by a comma.","gaps":5},
+{"id":"wc-cm060","level":"secure","type":"address","words":["Put","those","heavy","boxes","over","there","Amir."],"need":[5],"ok":[],"why":"The name of the person spoken to is separated off with a comma.","gaps":6},
+{"id":"wc-cm061","level":"challenge","type":"address","words":["Your","results","are","ready","Mr","Ali."],"need":[3],"ok":[],"why":"The name of the person spoken to is separated off with a comma.","gaps":5},
+{"id":"wc-cm062","level":"challenge","type":"address","words":["I","will","only","say","this","once","everybody."],"need":[5],"ok":[],"why":"The people being addressed are separated off with a comma.","gaps":6},
+{"id":"wc-cm063","level":"challenge","type":"address","words":["No","the","committee","has","not","reached","a","decision","yet."],"need":[0],"ok":[],"why":"No at the start of a sentence is followed by a comma.","gaps":8},
+{"id":"wc-cm064","level":"challenge","type":"address","words":["Captain","the","harbour","lights","have","gone","out."],"need":[0],"ok":[],"why":"Addressing somebody by their title is followed by a comma.","gaps":6}
+/* >>> APPEND NEW COMMAS ABOVE THIS LINE >>> */
+];
+var COMMAMETA = {"types":{"list":"Lists","drop":"Dropped-in information","front":"Opening clauses","address":"Speaking to somebody, and yes or no"},"order":["list","drop","front","address"]};
+/* >>> BANK:COMMAS END >>> */
+
 /* >>> BANK:TRANSFORM START >>> */
 var TRANSFORM = [
 {"id":"wc-tr001","level":"foundation","family":"wc-wf001","from":"adj","to":"adv","w":"silent","options":[{"w":"silence"},{"w":"silent"},{"w":"silently","correct":true}],"why":""},
@@ -2113,7 +2231,7 @@ var AMBIG = ["answer","answers","back","bark","barks","book","books","brush","br
 <script>
 "use strict";
 
-var APP = "wcc", VER = "v0.23", BANK_REV = 13;
+var APP = "wcc", VER = "v0.24", BANK_REV = 14;
 var BUG_FORM_URL = "";   /* paste the Office 365 form link to switch the report button on */
 
 /* ---------- the four tests: one source for the Learn screen AND every
@@ -2405,7 +2523,7 @@ function _blankRoot(){
     derives the expected list from splice.py, which is the one place a bank
     cannot fail to be registered and still reach the page at all. */
 function allBanks(){
-  return [SENTENCES, FRAMES, CLOZE, KLASS, TRANSFORM, SHIFTERS, TECHNIQUES, PUNCT];
+  return [SENTENCES, FRAMES, CLOZE, KLASS, TRANSFORM, SHIFTERS, TECHNIQUES, PUNCT, COMMAS];
 }
 
 function _pruneToBank(root){
@@ -4090,7 +4208,8 @@ var ACTIVITY_LIST = [
   ["cloze",  "Insert the word",            "startCloze()",  "wc", "use",  "Which form fills the gap?"],
   ["trans",  "Change the word",            "startTrans()",  "wc", "use",  "terrible into terribly, and the traps"],
   ["tech",   "Find the technique",         "startTech()",   "tech", "find", "Hunt one technique down inside a sentence"],
-  ["punc",   "Spot the mistake",           "startPunc()",   "punc", "find", "One sentence, one punctuation error: find it"]
+  ["punc",   "Spot the mistake",           "startPunc()",   "punc", "find", "One sentence, one punctuation error: find it"],
+  ["commas", "Put the commas in",          "startCommas()", "punc", "use",  "The commas have been taken out: put them back"]
 ];
 
 /* The four domains this app is growing into.
@@ -4118,7 +4237,8 @@ var DOMAINS = [
   { id:"punc", name:"Punctuation",
     sub:"Capital letters, full stops, apostrophes, commas and speech marks. Find the mistake in a sentence, the way you would proofread your own work.",
     groups:[
-      ["find", "1. Find it", "Every sentence here has exactly one punctuation mistake in it. Your job is to find which word it is on."]
+      ["find", "1. Find it", "Every sentence here has exactly one punctuation mistake in it. Your job is to find which word it is on."],
+      ["use",  "2. Put it in", "Now the other way round. The marks have been taken out and you decide where they go."]
     ]},
   { id:"anal", name:"Analytical language",
     sub:"The words that do the work in an analytical paragraph: verbs like exposes and undercuts, and the connectives that link one idea to the next.",
@@ -4602,6 +4722,156 @@ var MWU = ["in front of","a lot of","next to","on top of","out of","as well as",
            "instead of","because of","each other","used to"];
 var ING_OK = ["interesting","exciting","boring","amazing","charming","terrifying",
               "thrilling","stunning","willing","cunning"];
+
+/* ================== COMMAS: put them in (SPEC 37) =======================
+   The gap, not the word, is the target. A sentence of n words has n-1 gaps,
+   and the last word keeps its full stop.
+
+   TWO kinds of correct position. `need` is required and `ok` is allowed, and
+   the round is passed by marking every `need` and nothing outside `need`+`ok`.
+   Without the second set the serial comma alone would make this activity mark
+   correct work wrong, which is worse than not having the activity. */
+var CM = { type:"all", lvl:"all", item:null, on:{}, done:false, touched:false };
+
+function cmPool(type, lvl){
+  var out=[], i, r;
+  for(i=0;i<COMMAS.length;i++){
+    r = COMMAS[i];
+    if(type!=="all" && r.type!==type) continue;
+    if(lvl!=="all"  && r.level!==lvl) continue;
+    out.push(r);
+  }
+  return out;
+}
+function startCommas(){
+  markTried("commas"); go("commas");
+  cmChips(); lvlChips("cmLevels", cmPool(CM.type,"all"), CM.lvl, "cmLvl");
+  cmNext();
+}
+function cmType(t){
+  CM.type=t; cmChips();
+  lvlChips("cmLevels", cmPool(CM.type,"all"), CM.lvl, "cmLvl"); cmNext();
+}
+function cmLvl(l){
+  CM.lvl=l; lvlChips("cmLevels", cmPool(CM.type,"all"), CM.lvl, "cmLvl"); cmNext();
+}
+function cmChips(){
+  var h = '<button class="chip" aria-pressed="'+(CM.type==="all")+'" onclick="cmType(\'all\')">All</button>';
+  for(var i=0;i<COMMAMETA.order.length;i++){
+    var t=COMMAMETA.order[i], n=cmPool(t,"all").length;
+    h += '<button class="chip" '+(n<1?'disabled ':'')+'aria-pressed="'+(CM.type===t)+'" '+
+         'onclick="cmType(\''+t+'\')">'+esc(COMMAMETA.types[t])+'</button>';
+  }
+  el("cmTypes").innerHTML = h;
+}
+
+function cmNext(){
+  var p = cmPool(CM.type, CM.lvl);
+  if(!p.length){
+    el("cmSent").textContent = "Nothing here yet."; el("cmPrompt").textContent = "";
+    el("cmCheck").disabled = true; el("cmNextBar").style.display="none"; return;
+  }
+  CM.item = pickUnseen(p, "commas:"+CM.type+":"+CM.lvl);
+  CM.on = {}; CM.done = false; CM.touched = false;
+  var it = CM.item, h="", i;
+  for(i=0;i<it.words.length;i++){
+    h += '<span class="tw">'+esc(it.words[i])+'</span>';
+    /* no gap after the last word: that is where the full stop already is */
+    if(i < it.words.length-1)
+      h += '<button class="cgap" id="cmg'+i+'" aria-pressed="false" aria-label="comma after '+
+           esc(it.words[i])+'" onclick="cmTap('+i+')"></button>';
+  }
+  el("cmSent").innerHTML = h;
+  /* The prompt never says HOW MANY. One sentence in three needs two commas and
+     the rest need one, so a count would hand over most of the answer. */
+  el("cmPrompt").innerHTML = "Tap the gaps where a <b>comma</b> belongs.";
+  el("cmScore").textContent = ""; el("cmFb").innerHTML = "";
+  el("cmCheck").disabled = true;
+  el("cmNone").style.display = "";
+  el("cmNextBar").style.display = "none";
+  el("cmRef").textContent = it.id;
+}
+
+function cmTap(i){
+  if(CM.done) return;
+  CM.on[i] = !CM.on[i];
+  var b = el("cmg"+i);
+  if(b) b.setAttribute("aria-pressed", CM.on[i] ? "true" : "false");
+  CM.touched = true;
+  el("cmCheck").disabled = false;
+}
+
+/* Every sentence in this bank needs at least one comma, so "no commas needed"
+   is always wrong. It is on screen anyway, because without it a student who
+   genuinely thinks none are needed has no way to say so and will tap one they
+   do not believe in, which teaches the wrong thing and tells us nothing. */
+function cmNone(){
+  if(CM.done) return;
+  CM.on = {}; CM.touched = true;
+  for(var i=0;i<CM.item.words.length-1;i++){
+    var b = el("cmg"+i); if(b) b.setAttribute("aria-pressed","false");
+  }
+  cmCheck();
+}
+
+function cmCheck(){
+  if(CM.done || !CM.touched) return;
+  CM.done = true;
+  var it = CM.item, i, b;
+  var need = it.need, ok = it.ok || [];
+  var marked = [];
+  for(i=0;i<it.words.length-1;i++) if(CM.on[i]) marked.push(i);
+
+  var missed = [], wrong = [];
+  for(i=0;i<need.length;i++) if(marked.indexOf(need[i]) < 0) missed.push(need[i]);
+  for(i=0;i<marked.length;i++)
+    if(need.indexOf(marked[i]) < 0 && ok.indexOf(marked[i]) < 0) wrong.push(marked[i]);
+  var right = !missed.length && !wrong.length;
+
+  for(i=0;i<it.words.length-1;i++){
+    b = el("cmg"+i); if(!b) continue;
+    b.setAttribute("aria-pressed","false");
+    if(wrong.indexOf(i) >= 0)        b.className = "cgap g-bad";
+    else if(missed.indexOf(i) >= 0)  b.className = "cgap g-miss";
+    else if(CM.on[i])                b.className = "cgap g-ok";
+  }
+  el("cmScore").textContent = right ? "Right" : "Not quite";
+  el("cmNone").style.display = "none";
+
+  var fb = '<li>' + esc(it.why) + '</li>';
+  fb += '<li>It should read: <b>' + esc(cmFixed(it)) + '</b></li>';
+  if(missed.length)
+    fb += '<li class="dim">You missed the comma after <b>' +
+          esc(missed.map(function(p){ return it.words[p]; }).join("</b> and after <b>")) + '</b>.</li>';
+  if(wrong.length)
+    fb += '<li class="dim">No comma belongs after <b>' +
+          esc(wrong.map(function(p){ return it.words[p]; }).join("</b> or after <b>")) + '</b>.</li>';
+  if(right && ok.length && marked.length > need.length)
+    fb += '<li class="dim">The comma before <b>and</b> is optional. Marked or not, both are accepted.</li>';
+  el("cmFb").innerHTML = fb;
+
+  var st = store();
+  if(right){
+    var key = "commas:"+CM.type+":"+CM.lvl;
+    st.seen[key] = st.seen[key] || [];
+    if(st.seen[key].indexOf(it.id) < 0) st.seen[key].push(it.id);
+  } else {
+    st.err["commas_"+it.type] = (st.err["commas_"+it.type]||0) + 1;
+  }
+  save(st);
+  el("cmNextBar").style.display = "";
+}
+
+/* the sentence written out with its required commas back in */
+function cmFixed(it){
+  var out = "", i;
+  for(i=0;i<it.words.length;i++){
+    out += it.words[i];
+    if(it.need.indexOf(i) >= 0) out += ",";
+    if(i < it.words.length-1) out += " ";
+  }
+  return out;
+}
 
 /* ================== PUNCTUATION: spot the mistake (SPEC 36) ==============
    One sentence, one mistake, tap the word carrying it. The whole corrected
@@ -5382,6 +5652,60 @@ function validate(){
       E.push("punctuation / "+pnType+": '"+bestName+"' is the mistake in "+
              Math.round(100*best)+"% of items, so the round can be passed by tapping a "+
              "position instead of reading (SPEC 27).");
+  }
+
+  /* ---- COMMAS (SPEC 37) ----
+     The gate that matters is whether the round can be passed without reading.
+     Two ways it could be: mark every gap, or always mark exactly one. The first
+     is defeated by the marking rule (nothing outside need or ok) and the second
+     by the mix of one-comma and two-comma items, and BOTH are measured, because
+     a rule nobody measures is a rule nobody knows is still working. */
+  var cmCell = {}, cmi, cmr, cmAll = 0, cmCount = {};
+  for(cmi=0;cmi<COMMAS.length;cmi++){
+    cmr = COMMAS[cmi];
+    if(!/^wc-cm\d{3}$/.test(cmr.id)) E.push(cmr.id+": id must look like wc-cm001");
+    if(LEVELS.indexOf(cmr.level)<0) E.push(cmr.id+": level '"+cmr.level+"' is not in the enum");
+    if(!COMMAMETA.types[cmr.type]) E.push(cmr.id+": '"+cmr.type+"' is not a comma type");
+    if(!cmr.need || !cmr.need.length)
+      E.push(cmr.id+": no required comma, so there is nothing to insert");
+    var cmBad = (cmr.need||[]).concat(cmr.ok||[]).filter(function(x){
+      return x < 0 || x >= cmr.words.length - 1; });
+    if(cmBad.length) E.push(cmr.id+": a comma position outside the gaps");
+    for(var cmj=0;cmj<(cmr.ok||[]).length;cmj++)
+      if(cmr.need.indexOf(cmr.ok[cmj]) >= 0)
+        E.push(cmr.id+": a position is both required and merely allowed");
+    if(cmr.words.join(" ").indexOf(",") >= 0)
+      E.push(cmr.id+": a comma survived into the sentence the student is shown");
+    if(!cmr.why || cmr.why.length < 20) E.push(cmr.id+": the reason is missing or too thin");
+    /* would marking EVERY gap pass this item? */
+    var cmMark = [], cmk;
+    for(cmk=0;cmk<cmr.words.length-1;cmk++) cmMark.push(cmk);
+    var cmMissed = cmr.need.filter(function(x){ return cmMark.indexOf(x) < 0; });
+    var cmWrong = cmMark.filter(function(x){
+      return cmr.need.indexOf(x) < 0 && (cmr.ok||[]).indexOf(x) < 0; });
+    if(!cmMissed.length && !cmWrong.length) cmAll++;
+    cmCell[cmr.level+"/"+cmr.type] = (cmCell[cmr.level+"/"+cmr.type]||0) + 1;
+    cmCount[cmr.need.length] = (cmCount[cmr.need.length]||0) + 1;
+  }
+  for(cmi=0;cmi<LEVELS.length;cmi++)
+    for(var cmk2=0;cmk2<COMMAMETA.order.length;cmk2++){
+      var cmc = LEVELS[cmi]+"/"+COMMAMETA.order[cmk2];
+      if((cmCell[cmc]||0) < 4)
+        E.push("commas: "+cmc+" has "+(cmCell[cmc]||0)+" items, floor is 4");
+    }
+  if(COMMAS.length){
+    var cmShare = cmAll / COMMAS.length;
+    INFO.push("commas: marking every gap passes "+cmAll+" of "+COMMAS.length+" items.");
+    if(cmShare > 0.05)
+      E.push("commas: marking every gap passes "+Math.round(100*cmShare)+"% of items. The "+
+             "round must punish a comma that does not belong, or it rewards spraying "+
+             "them in (SPEC 37).");
+    var cmTop = 0, cmTopN = 0, cmn;
+    for(cmn in cmCount) if(cmCount[cmn] > cmTopN){ cmTopN = cmCount[cmn]; cmTop = cmn; }
+    INFO.push("commas: "+cmTopN+" of "+COMMAS.length+" items need exactly "+cmTop+" comma(s).");
+    if(cmTopN / COMMAS.length > 0.75)
+      E.push("commas: "+Math.round(100*cmTopN/COMMAS.length)+"% of items need exactly "+
+             cmTop+" comma(s), so 'always put in "+cmTop+"' is most of the round (SPEC 27).");
   }
 
   cellFloor("insert the word", CLOZE,     function(r){ return r.answerClass; }, 3);
