@@ -2231,7 +2231,7 @@ var AMBIG = ["answer","answers","back","bark","barks","book","books","brush","br
 <script>
 "use strict";
 
-var APP = "wcc", VER = "v0.24", BANK_REV = 14;
+var APP = "wcc", VER = "v0.25", BANK_REV = 14;
 var BUG_FORM_URL = "";   /* paste the Office 365 form link to switch the report button on */
 
 /* ---------- the four tests: one source for the Learn screen AND every
@@ -4982,7 +4982,8 @@ function pnCheck(){
    one. The cost is that a long span is easier to hit by accident, so the build
    measures the span's share of each sentence per technique and errors above
    55%. That number IS the guess rate, so it is gated rather than hoped about. */
-var TQ = { tech:"all", lvl:"all", item:null, pick:-1, done:false };
+var TQ = { tech:"all", lvl:"all", item:null, a:-1, b:-1, anchor:-1, dragFrom:-1,
+           done:false, drag:false, moved:false, swallow:false };
 
 function techName(t){ return (TECHMETA.names[t]||[t])[0]; }
 function techDef(t){  return (TECHMETA.names[t]||["","",""])[2]; }
@@ -5055,25 +5056,74 @@ function tqNext(){
     return;
   }
   TQ.item = pickUnseen(p, "tech:"+TQ.tech+":"+TQ.lvl);
-  TQ.pick = -1; TQ.done = false;
+  TQ.a = -1; TQ.b = -1; TQ.anchor = -1;
+  TQ.done = false; TQ.drag = false; TQ.moved = false; TQ.swallow = false;
   var it = TQ.item, h="", i;
   for(i=0;i<it.words.length;i++)
-    h += '<button class="wbtn" id="tqw'+i+'" aria-pressed="false" onclick="tqTap('+i+')">'+
+    h += '<button class="wbtn" id="tqw'+i+'" aria-pressed="false" '+
+         'onpointerdown="tqDown(event,'+i+')" onpointerenter="tqOver('+i+')" '+
+         'onclick="tqTap('+i+')">'+
          '<span class="tw">'+esc(it.words[i])+'</span></button> ';
   el("tqSent").innerHTML = h;
-  el("tqPrompt").innerHTML = "Find the <b>" + esc(techName(it.tech)) + "</b> in this sentence.";
+  el("tqPrompt").innerHTML = "Find the <b>" + esc(techName(it.tech)) +
+    "</b>. Select the <b>whole phrase</b>: tap the first word, then the last one.";
   el("tqScore").textContent = ""; el("tqFb").innerHTML = "";
   el("tqCheck").disabled = true; el("tqNextBar").style.display = "none";
   el("tqRef").textContent = it.id;
 }
 
-function tqTap(i){
-  if(TQ.done) return;
-  TQ.pick = i;
+/* ---- selecting a RANGE, not a word ----------------------------------------
+   Locating a simile and delimiting one are different skills, and until v0.25
+   this round accepted a tap on ANY word inside the marked phrase, on the
+   grounds that it was drilling the first. Michael, having watched it: students
+   should select a range. He is right, and the easier version was teaching the
+   easier thing.
+
+   Two ways in, because one of them does not work everywhere. Tapping the first
+   word then the last is the pattern the sister app already uses and is the only
+   one that works on a touch screen. Dragging across the words works with a
+   mouse and is what a person reaches for on a laptop. A single word needs one
+   tap, not two, because making somebody tap the same word twice to answer
+   "find the onomatopoeia" is friction with nothing on the other side of it. */
+function tqSet(a, b){
+  TQ.a = Math.min(a, b); TQ.b = Math.max(a, b);
   for(var j=0;j<TQ.item.words.length;j++){
-    var b = el("tqw"+j); if(b) b.setAttribute("aria-pressed", j===i ? "true" : "false");
+    var el2 = el("tqw"+j); if(!el2) continue;
+    el2.setAttribute("aria-pressed", (j >= TQ.a && j <= TQ.b) ? "true" : "false");
   }
   el("tqCheck").disabled = false;
+}
+
+/* pointerdown only REMEMBERS where a drag might start. It deliberately does not
+   touch the selection, because doing so broke the two-tap path: the second tap's
+   pointerdown reset the anchor to that word, so the range never opened and every
+   pair of taps collapsed to a single word. A drag engages only once the pointer
+   has actually moved onto another word. */
+function tqDown(ev, i){
+  if(TQ.done) return;
+  TQ.drag = true; TQ.dragFrom = i; TQ.moved = false;
+}
+function tqOver(i){
+  if(TQ.done || !TQ.drag) return;
+  TQ.moved = true;
+  tqSet(TQ.dragFrom, i);
+}
+function tqUp(){
+  if(!TQ.drag) return;
+  TQ.drag = false;
+  /* a drag that moved has finished a range, and the click that follows the
+     pointerup must be swallowed or it would start a new selection immediately */
+  TQ.swallow = TQ.moved;
+  if(TQ.moved) TQ.anchor = -1;
+  TQ.moved = false;
+}
+function tqTap(i){
+  if(TQ.done) return;
+  if(TQ.swallow){ TQ.swallow = false; return; }
+  /* one word selected and waiting: this tap is the other end of the phrase.
+     A finished range, or nothing yet: this tap starts a new selection. */
+  if(TQ.a >= 0 && TQ.a === TQ.b && TQ.anchor >= 0) tqSet(TQ.anchor, i);
+  else { TQ.anchor = i; tqSet(i, i); }
 }
 
 /* is this word index inside a span of the technique being asked for? */
@@ -5083,20 +5133,41 @@ function tqInSpan(it, i){
   return -1;
 }
 
-function tqCheck(){
-  if(TQ.done || TQ.pick<0) return;
-  TQ.done = true;
-  var it = TQ.item, ok = tqInSpan(it, TQ.pick) >= 0, i, k, b;
+/* exact = the selection IS one of the marked spans.
+   close = it overlaps one without matching it.
+   Close is neither credited nor penalised, which is the ruling the verb groups
+   already run on at SPEC 9.3: a student who found the right place and drew the
+   edges wrongly has not made the mistake this round is about. */
+function tqJudge(it){
+  var k, sp;
+  for(k=0;k<it.spans.length;k++){
+    sp = it.spans[k];
+    if(sp.t !== it.tech) continue;
+    if(sp.a === TQ.a && sp.b === TQ.b) return {v:"exact", sp:sp};
+  }
+  for(k=0;k<it.spans.length;k++){
+    sp = it.spans[k];
+    if(sp.t !== it.tech) continue;
+    if(TQ.a <= sp.b && TQ.b >= sp.a) return {v:"close", sp:sp};
+  }
+  return {v:"miss", sp:null};
+}
 
-  /* mark every marked span, so a student sees the whole phrase and not just the
-     word they happened to hit */
+function tqCheck(){
+  if(TQ.done || TQ.a < 0) return;
+  TQ.done = true;
+  var it = TQ.item, i, k, b;
+  var res = tqJudge(it);
+
   for(i=0;i<it.words.length;i++){
     b = el("tqw"+i); if(!b) continue;
     b.setAttribute("aria-pressed","false");
-    if(tqInSpan(it, i) >= 0) b.className = "wbtn res-ok";
-    else if(i === TQ.pick)   b.className = "wbtn res-bad";
+    var inSpan = tqInSpan(it, i) >= 0, picked = (i >= TQ.a && i <= TQ.b);
+    if(inSpan)       b.className = "wbtn res-ok";
+    else if(picked)  b.className = "wbtn res-bad";
   }
-  el("tqScore").textContent = ok ? "Right" : "Not that one";
+  el("tqScore").textContent =
+    res.v === "exact" ? "Right" : (res.v === "close" ? "Close" : "Not that one");
 
   var span = [];
   for(k=0;k<it.spans.length;k++)
@@ -5104,19 +5175,26 @@ function tqCheck(){
       span.push(it.words.slice(it.spans[k].a, it.spans[k].b+1).join(" "));
   var fb = '<li><b>' + esc(techName(it.tech)) + '</b>: ' + techDef(it.tech) + '.</li>' +
            '<li>Here it is <b>' + esc(span.join("</b> and <b>")) + '</b>.</li>';
-  if(!ok)
-    fb += '<li class="dim">You tapped <b>' + esc(it.words[TQ.pick]) +
-          '</b>, which is not doing that job in this sentence.</li>';
+  if(res.v === "close")
+    fb += '<li class="dim">You found the right part of the sentence, but not the whole '
+        + 'phrase. The technique is all of <b>'
+        + esc(it.words.slice(res.sp.a, res.sp.b+1).join(" ")) + '</b>.</li>';
+  else if(res.v === "miss")
+    fb += '<li class="dim">You chose <b>'
+        + esc(it.words.slice(TQ.a, TQ.b+1).join(" "))
+        + '</b>, which is not doing that job in this sentence.</li>';
   el("tqFb").innerHTML = fb;
 
   var st = store();
-  if(ok){
+  if(res.v === "exact"){
     var key = "tech:"+TQ.tech+":"+TQ.lvl;
     st.seen[key] = st.seen[key] || [];
     if(st.seen[key].indexOf(it.id) < 0) st.seen[key].push(it.id);
-  } else {
+  } else if(res.v === "miss"){
     st.err["tech_"+it.tech] = (st.err["tech_"+it.tech]||0) + 1;
   }
+  /* "close" is deliberately neither: the student found the right place and drew
+     the edges wrongly, which is not the mistake this round is about. */
   save(st);
   el("tqNextBar").style.display = "";
 }
@@ -5592,14 +5670,39 @@ function validate(){
       if((tqCell[tqc]||0) < 4)
         E.push("techniques: "+tqc+" has "+(tqCell[tqc]||0)+" items, floor is 4");
     }
+  /* The guess rate changed at v0.25 and the old measure would have flattered it.
+     While any word inside the phrase counted, the span's share of the sentence
+     WAS the chance of a lucky tap. Now the student must select the range, so a
+     blind guess has to hit one contiguous run out of n(n+1)/2, and a span that
+     covers half the sentence is no longer half an answer. Measured directly
+     rather than reasoned about, because the reasoning is what needs checking. */
   for(var tqt in tqCov){
-    var tqShare = tqCov[tqt] / tqN[tqt];
-    INFO.push("techniques / "+tqt+": tapping at random answers "+
-              Math.round(100*tqShare)+"% of items.");
-    if(tqShare > 0.55)
-      E.push("techniques / "+tqt+": the marked span is "+Math.round(100*tqShare)+
-             "% of the sentence on average, so tapping at random answers that "+
-             "share of the round (SPEC 35).");
+    var tqPoolT = TECHNIQUES.filter(function(r){ return r.tech === tqt; });
+    var tqExact = 0, tqTouch = 0;
+    for(var tqp=0;tqp<tqPoolT.length;tqp++){
+      var tqIt = tqPoolT[tqp], tqN = tqIt.words.length;
+      var tqRanges = tqN * (tqN + 1) / 2, tqHitE = 0, tqHitT = 0;
+      for(var tqA=0;tqA<tqN;tqA++)
+        for(var tqB=tqA;tqB<tqN;tqB++){
+          for(var tqS=0;tqS<tqIt.spans.length;tqS++){
+            var tqSp = tqIt.spans[tqS];
+            if(tqSp.t !== tqIt.tech) continue;
+            if(tqSp.a === tqA && tqSp.b === tqB) tqHitE++;
+            if(tqA <= tqSp.b && tqB >= tqSp.a){ tqHitT++; break; }
+          }
+        }
+      tqExact += tqHitE / tqRanges;
+      tqTouch += tqHitT / tqRanges;
+    }
+    tqExact = tqExact / tqPoolT.length;
+    tqTouch = tqTouch / tqPoolT.length;
+    INFO.push("techniques / "+tqt+": a blind guess is exact "+
+              Math.round(100*tqExact)+"% of the time and overlaps "+
+              Math.round(100*tqTouch)+"%.");
+    if(tqExact > 0.20)
+      E.push("techniques / "+tqt+": selecting a range at random is exactly right "+
+             Math.round(100*tqExact)+"% of the time, so the round can be guessed "+
+             "(SPEC 35).");
   }
 
   /* ---- PUNCTUATION (SPEC 36) ----
@@ -5986,6 +6089,8 @@ function boot(){
      who lost wifi mid-lesson should never have to think about it again. */
   try{ flushQueue(); }catch(e){}
 }
+if(typeof document!=="undefined" && document.addEventListener)
+  document.addEventListener("pointerup", function(){ try{ tqUp(); }catch(e){} });
 if(typeof document!=="undefined" && document.getElementById) boot();
 if(typeof module!=="undefined") module.exports = {validate:validate, SENTENCES:SENTENCES};
 </script>
