@@ -68,3 +68,7 @@ node_modules/
 
 # Quiz authoring (the Forms import doc is a deliverable, not part of the site)
 quiz/
+
+# shared test navigation helper (dev only, not needed by the live site)
+wccnav.py
+technames.json
