@@ -1829,7 +1829,7 @@ var AMBIG = ["answer","answers","back","bark","barks","book","books","brush","br
 <script>
 "use strict";
 
-var APP = "wcc", VER = "v0.20", BANK_REV = 11;
+var APP = "wcc", VER = "v0.20.1", BANK_REV = 11;
 var BUG_FORM_URL = "";   /* paste the Office 365 form link to switch the report button on */
 
 /* ---------- the four tests: one source for the Learn screen AND every
@@ -2104,8 +2104,28 @@ function _blankRoot(){
  *  has actually changed, so it runs once after a content release rather than on
  *  every call. Stale ids are inert rather than harmful, but a revisit entry that
  *  can never be matched would be re-examined forever. */
+/** Every bank that carries ids a student's history can point at.
+
+    A FUNCTION rather than a constant because the banks are spliced in below
+    this point in the file and are only populated by the time anything calls it.
+
+    This list was written by hand as five banks and SHIFTERS was added as the
+    eighth activity at v0.16 without being added here. The effect was silent and
+    destructive: a shifter id is not in `live`, so every student's *Same word,
+    different job* history was deleted on EVERY content release from v0.16 to
+    v0.20 inclusive. Nothing failed, nothing was logged, and the one test that
+    covers pruning only ever fed it sentence ids.
+
+    Fifth time a hand-written list describing the app has gone stale here, and
+    the first that cost student data rather than a red test. `banktest.py`
+    derives the expected list from splice.py, which is the one place a bank
+    cannot fail to be registered and still reach the page at all. */
+function allBanks(){
+  return [SENTENCES, FRAMES, CLOZE, KLASS, TRANSFORM, SHIFTERS];
+}
+
 function _pruneToBank(root){
-  var live = {}, i, j, banks = [SENTENCES, FRAMES, CLOZE, KLASS, TRANSFORM];
+  var live = {}, i, j, banks = allBanks();
   for(i=0;i<banks.length;i++)
     for(j=0;j<banks[i].length;j++) live[banks[i][j].id] = 1;
   for(var p in root.profiles){
