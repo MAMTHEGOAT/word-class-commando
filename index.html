@@ -218,6 +218,19 @@ body.testing .score{visibility:hidden}
 .cgap.g-miss{border-style:dashed;border-color:var(--ok);background:#fff;color:#0d3a17}
 .cgap.g-bad{border-style:solid;border-color:var(--bad);background:var(--badbg);color:#5c0f09}
 .soapl{display:inline-block;width:1.5em;color:var(--brass);font-weight:700}
+/* v0.26. The transfer step's option chips. New class names rather than reusing
+   .chip states: .gap collided with the answer slots in v0.24 and nothing caught
+   it, because every suite in this project asserts behaviour and none of them
+   asserts appearance. */
+.qchip{background:var(--bg2);color:var(--txt);border:1px solid var(--line);
+  border-radius:999px;padding:9px 14px;font:inherit;min-height:44px;cursor:pointer}
+.qchip[aria-pressed="true"]{background:#1a3a6b;color:#fff;border-color:#1a3a6b}
+.qchip.q-ok{background:var(--okbg);border-color:var(--ok);color:#0d3a17}
+.qchip.q-miss{background:#fff;border-color:var(--ok);border-style:dashed;color:#0d3a17}
+.qchip.q-bad{background:var(--badbg);border-color:var(--bad);color:#5c0f09;
+  text-decoration:line-through}
+.step{margin:0 0 6px;color:var(--brass);font-weight:700;letter-spacing:.04em;
+  text-transform:uppercase;font-size:.78rem}
 .wbtn{display:inline-block;background:transparent;border:2px solid transparent;
   border-radius:8px;padding:6px 7px;margin:0 1px;color:var(--ink);font:inherit;
   min-height:44px;min-width:34px;line-height:1.1}
@@ -709,13 +722,18 @@ button.yn{min-width:110px;font-size:1.05rem}
   <div class="chips" id="tqTechs"></div>
   <p class="lbl">Level</p>
   <div class="chips" id="tqLevels"></div>
+  <p class="step" id="tqStep" style="display:none"></p>
   <p class="prompt" id="tqPrompt"></p>
   <div class="sent" id="tqSent"></div>
+  <div class="chips" id="tqOpts" style="display:none"></div>
   <div class="bar">
     <button class="go checkbtn" id="tqCheck" onclick="tqCheck()" disabled>Check</button>
     <span class="score" id="tqScore"></span>
   </div>
   <ul class="fb" id="tqFb"></ul>
+  <div class="bar nextbar" id="tqOnBar" style="display:none">
+    <button class="go" id="tqOnBtn" onclick="tqOn()">Next step</button>
+  </div>
   <div class="bar nextbar" id="tqNextBar" style="display:none">
     <button class="go" onclick="tqNext()">Next sentence</button>
   </div>
@@ -1604,26 +1622,26 @@ var TECHNIQUES = [
 {"id":"wc-tq058","level":"challenge","tech":"pers","text":"Time dragged its feet through the last lesson.","words":["Time","dragged","its","feet","through","the","last","lesson."],"spans":[{"a":1,"b":3,"t":"pers"}],"cov":0.375},
 {"id":"wc-tq059","level":"challenge","tech":"pers","text":"The rumour walked from class to class before lunch.","words":["The","rumour","walked","from","class","to","class","before","lunch."],"spans":[{"a":2,"b":2,"t":"pers"}],"cov":0.111},
 {"id":"wc-tq060","level":"challenge","tech":"pers","text":"The cold reached into every corner of the flat.","words":["The","cold","reached","into","every","corner","of","the","flat."],"spans":[{"a":2,"b":3,"t":"pers"}],"cov":0.222},
-{"id":"wc-tq061","level":"foundation","tech":"meta","text":"The classroom was a zoo that afternoon.","words":["The","classroom","was","a","zoo","that","afternoon."],"spans":[{"a":3,"b":4,"t":"meta"}],"cov":0.286},
-{"id":"wc-tq062","level":"foundation","tech":"meta","text":"My brother is a machine on the football pitch.","words":["My","brother","is","a","machine","on","the","football","pitch."],"spans":[{"a":3,"b":4,"t":"meta"}],"cov":0.222},
-{"id":"wc-tq063","level":"foundation","tech":"meta","text":"The playground was a furnace by noon.","words":["The","playground","was","a","furnace","by","noon."],"spans":[{"a":3,"b":4,"t":"meta"}],"cov":0.286},
-{"id":"wc-tq064","level":"foundation","tech":"meta","text":"Her bedroom is a jungle.","words":["Her","bedroom","is","a","jungle."],"spans":[{"a":3,"b":4,"t":"meta"}],"cov":0.4},
-{"id":"wc-tq065","level":"foundation","tech":"meta","text":"The old sofa was a boat in the middle of the room.","words":["The","old","sofa","was","a","boat","in","the","middle","of","the","room."],"spans":[{"a":4,"b":5,"t":"meta"}],"cov":0.167},
-{"id":"wc-tq066","level":"developing","tech":"meta","text":"The corridor was a tunnel of noise at break.","words":["The","corridor","was","a","tunnel","of","noise","at","break."],"spans":[{"a":3,"b":6,"t":"meta"}],"cov":0.444},
-{"id":"wc-tq067","level":"developing","tech":"meta","text":"His answer was a wall.","words":["His","answer","was","a","wall."],"spans":[{"a":3,"b":4,"t":"meta"}],"cov":0.4},
-{"id":"wc-tq068","level":"developing","tech":"meta","text":"The lake was a sheet of hammered tin.","words":["The","lake","was","a","sheet","of","hammered","tin."],"spans":[{"a":3,"b":7,"t":"meta"}],"cov":0.625},
-{"id":"wc-tq069","level":"developing","tech":"meta","text":"That exam was a mountain.","words":["That","exam","was","a","mountain."],"spans":[{"a":3,"b":4,"t":"meta"}],"cov":0.4},
-{"id":"wc-tq070","level":"developing","tech":"meta","text":"The sky was a bruise above the rooftops.","words":["The","sky","was","a","bruise","above","the","rooftops."],"spans":[{"a":3,"b":4,"t":"meta"}],"cov":0.25},
-{"id":"wc-tq071","level":"secure","tech":"meta","text":"Her voice was a warm blanket over the frightened class.","words":["Her","voice","was","a","warm","blanket","over","the","frightened","class."],"spans":[{"a":3,"b":5,"t":"meta"}],"cov":0.3},
-{"id":"wc-tq072","level":"secure","tech":"meta","text":"The city below them was a circuit board of lights.","words":["The","city","below","them","was","a","circuit","board","of","lights."],"spans":[{"a":5,"b":7,"t":"meta"}],"cov":0.3},
-{"id":"wc-tq073","level":"secure","tech":"meta","text":"His temper is a dropped match.","words":["His","temper","is","a","dropped","match."],"spans":[{"a":3,"b":5,"t":"meta"}],"cov":0.5},
-{"id":"wc-tq074","level":"secure","tech":"meta","text":"The hall was an ocean of turned heads.","words":["The","hall","was","an","ocean","of","turned","heads."],"spans":[{"a":3,"b":4,"t":"meta"}],"cov":0.25},
-{"id":"wc-tq075","level":"secure","tech":"meta","text":"Fear was a stone in her stomach.","words":["Fear","was","a","stone","in","her","stomach."],"spans":[{"a":2,"b":3,"t":"meta"}],"cov":0.286},
-{"id":"wc-tq076","level":"challenge","tech":"meta","text":"The report was a mirror nobody wanted to look into.","words":["The","report","was","a","mirror","nobody","wanted","to","look","into."],"spans":[{"a":3,"b":4,"t":"meta"}],"cov":0.2},
-{"id":"wc-tq077","level":"challenge","tech":"meta","text":"His promises were paper bridges.","words":["His","promises","were","paper","bridges."],"spans":[{"a":3,"b":4,"t":"meta"}],"cov":0.4},
-{"id":"wc-tq078","level":"challenge","tech":"meta","text":"The town's history is a locked drawer.","words":["The","town's","history","is","a","locked","drawer."],"spans":[{"a":4,"b":6,"t":"meta"}],"cov":0.429},
-{"id":"wc-tq079","level":"challenge","tech":"meta","text":"Their friendship had become a museum.","words":["Their","friendship","had","become","a","museum."],"spans":[{"a":4,"b":5,"t":"meta"}],"cov":0.333},
-{"id":"wc-tq080","level":"challenge","tech":"meta","text":"The deadline was a wall of glass in front of them.","words":["The","deadline","was","a","wall","of","glass","in","front","of","them."],"spans":[{"a":3,"b":6,"t":"meta"}],"cov":0.364},
+{"id":"wc-tq061","level":"foundation","tech":"meta","text":"The classroom was a zoo that afternoon.","words":["The","classroom","was","a","zoo","that","afternoon."],"spans":[{"a":3,"b":4,"t":"meta"}],"cov":0.286,"ten":[0,1],"veh":[3,4],"tr":["noisy and chaotic","full of movement","hard to control","crowded"],"dq":["kept behind bars","somewhere you buy a ticket","quiet and still"],"dw":["a zoo keeps its animals in cages, and the children are not caged, so that part stays behind.","true of a zoo, and nobody pays to get into a classroom.","the opposite of a zoo, and the opposite of the point."],"mod":"Calling the classroom a zoo suggests it was loud and restless, and out of the teacher's control."},
+{"id":"wc-tq062","level":"foundation","tech":"meta","text":"My brother is a machine on the football pitch.","words":["My","brother","is","a","machine","on","the","football","pitch."],"spans":[{"a":3,"b":4,"t":"meta"}],"cov":0.222,"ten":[0,1],"veh":[3,4],"tr":["tireless","powerful","repeats the same thing well","never seems to stop"],"dq":["made of metal","has to be switched on","gives up when it is tired"],"dw":["a machine is metal and a person is not, so only the tirelessness carries over.","true of a machine, and it tells us nothing about him.","the opposite of what the image says about him."],"mod":"Calling his brother a machine suggests he never tires and produces the same strong play again and again."},
+{"id":"wc-tq063","level":"foundation","tech":"meta","text":"The playground was a furnace by noon.","words":["The","playground","was","a","furnace","by","noon."],"spans":[{"a":3,"b":4,"t":"meta"}],"cov":0.286,"ten":[0,1],"veh":[3,4],"tr":["baking hot","glaring and bright","uncomfortable to stand in","heat you cannot escape"],"dq":["built of iron and brick","used for melting metal","cool and shaded"],"dw":["a real furnace is, and the playground's heat is the point, not its walls.","true of a furnace, and nothing is being melted here.","the opposite of a furnace."],"mod":"Calling the playground a furnace suggests a fierce, trapped heat that nobody could get away from."},
+{"id":"wc-tq064","level":"foundation","tech":"meta","text":"Her bedroom is a jungle.","words":["Her","bedroom","is","a","jungle."],"spans":[{"a":3,"b":4,"t":"meta"}],"cov":0.4,"ten":[0,1],"veh":[3,4],"tr":["overgrown","hard to walk through","wild and untidy","things piled everywhere"],"dq":["full of wild animals","hot and damp","neat and ordered"],"dw":["a jungle has animals and her room has clutter, so only the wildness carries over.","true of a jungle, and the image is about the mess, not the weather.","the opposite of a jungle."],"mod":"Calling her bedroom a jungle suggests it is so overgrown with clutter that moving through it is a struggle."},
+{"id":"wc-tq065","level":"foundation","tech":"meta","text":"The old sofa was a boat in the middle of the room.","words":["The","old","sofa","was","a","boat","in","the","middle","of","the","room."],"spans":[{"a":4,"b":5,"t":"meta"}],"cov":0.167,"ten":[0,2],"veh":[4,5],"tr":["surrounded by open floor","apart from everything else","somewhere to escape to","carries whoever climbs in"],"dq":["floats on water","can sink","small and cramped"],"dw":["a boat does, and the carpet is not water, so that part stays behind.","true of boats, and the sofa is in no danger at all.","not what the image suggests: the boat makes the sofa an island, not a squeeze."],"mod":"Calling the sofa a boat suggests it sat alone in open floor, a place to climb into and be carried away from the room."},
+{"id":"wc-tq066","level":"developing","tech":"meta","text":"The corridor was a tunnel of noise at break.","words":["The","corridor","was","a","tunnel","of","noise","at","break."],"spans":[{"a":3,"b":6,"t":"meta"}],"cov":0.444,"ten":[0,1],"veh":[3,6],"tr":["closed in on both sides","echoing","noise with nowhere to go","crowded and dark"],"dq":["cut through solid earth","has daylight at the far end","silent"],"dw":["a tunnel is, and a corridor is not, so that part does not transfer.","true of many tunnels, and the image is about being surrounded, not about an exit.","the opposite of a tunnel of noise."],"mod":"Calling the corridor a tunnel of noise suggests sound pressed in from both sides with nowhere for it to escape."},
+{"id":"wc-tq067","level":"developing","tech":"meta","text":"His answer was a wall.","words":["His","answer","was","a","wall."],"spans":[{"a":3,"b":4,"t":"meta"}],"cov":0.4,"ten":[0,1],"veh":[3,4],"tr":["blocking","solid and immovable","stops the conversation","shuts the other person out"],"dq":["built out of bricks","can be climbed over","welcoming"],"dw":["a wall is, and an answer is made of words, so only the blocking carries over.","true of a wall, and the image is that the conversation ended, not that it went on.","the opposite of what a wall does."],"mod":"Calling his answer a wall suggests it was flat and final, and shut the conversation down where it stood."},
+{"id":"wc-tq068","level":"developing","tech":"meta","text":"The lake was a sheet of hammered tin.","words":["The","lake","was","a","sheet","of","hammered","tin."],"spans":[{"a":3,"b":7,"t":"meta"}],"cov":0.625,"ten":[0,1],"veh":[3,7],"tr":["flat and grey","dull rather than sparkling","hard-looking","dimpled all over"],"dq":["cold to the touch","could be cut with shears","bright blue"],"dw":["tin is, and the image is about how the lake looks from a distance.","true of tin, and nothing is cutting the lake.","not what hammered tin looks like."],"mod":"Calling the lake a sheet of hammered tin suggests a flat, dull surface, dimpled and hard rather than sparkling."},
+{"id":"wc-tq069","level":"developing","tech":"meta","text":"That exam was a mountain.","words":["That","exam","was","a","mountain."],"spans":[{"a":3,"b":4,"t":"meta"}],"cov":0.4,"ten":[0,1],"veh":[3,4],"tr":["huge","exhausting to get through","has to be climbed","frightening to face"],"dq":["covered in snow","beautiful to look at","quick and easy"],"dw":["a mountain is, and an exam is not, so that part stays behind.","true of mountains, and nobody admires an exam paper.","the opposite of the image."],"mod":"Calling the exam a mountain suggests it loomed over her, and getting through it took real effort."},
+{"id":"wc-tq070","level":"developing","tech":"meta","text":"The sky was a bruise above the rooftops.","words":["The","sky","was","a","bruise","above","the","rooftops."],"spans":[{"a":3,"b":4,"t":"meta"}],"cov":0.25,"ten":[0,1],"veh":[3,4],"tr":["purple and blue","darkened and blotchy","spreading","looking damaged"],"dq":["painful to touch","fades after a week","clear and pale"],"dw":["a bruise is, and the sky cannot be touched, so only the colour and the look carry over.","true of a bruise, and the image says nothing about the sky healing.","the opposite of a bruise."],"mod":"Calling the sky a bruise suggests a spreading purple darkness, as though the evening itself had been injured."},
+{"id":"wc-tq071","level":"secure","tech":"meta","text":"Her voice was a warm blanket over the frightened class.","words":["Her","voice","was","a","warm","blanket","over","the","frightened","class."],"spans":[{"a":3,"b":5,"t":"meta"}],"cov":0.3,"ten":[0,1],"veh":[3,5],"tr":["comforting","soft","covers everyone in the room","makes people feel safe"],"dq":["woven out of wool","can be folded away","sharp and hard"],"dw":["a blanket is, and a voice is sound, so only the comfort carries over.","true of a blanket, and a voice is not put in a cupboard.","the opposite of warm and soft."],"mod":"Calling her voice a warm blanket suggests it settled over the whole class and made a frightened room feel safe."},
+{"id":"wc-tq072","level":"secure","tech":"meta","text":"The city below them was a circuit board of lights.","words":["The","city","below","them","was","a","circuit","board","of","lights."],"spans":[{"a":5,"b":7,"t":"meta"}],"cov":0.3,"ten":[0,3],"veh":[5,7],"tr":["laid out in straight lines","tiny points of light","ordered into a pattern","seen from far above"],"dq":["carries electricity","fits in your hand","winding and random"],"dw":["a circuit board does, and a city has power too, but the image is about the pattern.","true of a circuit board, and the point is that the city only looks that small from up there.","the opposite of the neat grid the image gives us."],"mod":"Calling the city a circuit board suggests the streets below made a neat lit grid, small and orderly from that height."},
+{"id":"wc-tq073","level":"secure","tech":"meta","text":"His temper is a dropped match.","words":["His","temper","is","a","dropped","match."],"spans":[{"a":3,"b":5,"t":"meta"}],"cov":0.5,"ten":[0,1],"veh":[3,5],"tr":["sudden","small at first","sets everything alight","dangerous to be near"],"dq":["burns out in seconds","comes in a box of fifty","slow and gentle"],"dw":["a match does, and the image is about what it starts, not how long it lasts.","true of matches, and it tells us nothing about him.","the opposite of a dropped match."],"mod":"Calling his temper a dropped match suggests it flares without warning and can set far more alight than its own size."},
+{"id":"wc-tq074","level":"secure","tech":"meta","text":"The hall was an ocean of turned heads.","words":["The","hall","was","an","ocean","of","turned","heads."],"spans":[{"a":3,"b":4,"t":"meta"}],"cov":0.25,"ten":[0,1],"veh":[3,4],"tr":["vast","filled edge to edge","moving in waves","overwhelming to face"],"dq":["salty and wet","full of fish","empty"],"dw":["an ocean is water, and a hall is not, so that part stays behind.","true of the ocean, and there is nothing swimming in the hall.","the opposite of the image."],"mod":"Calling the hall an ocean of turned heads suggests a vastness of faces moving in waves, far too many to meet one by one."},
+{"id":"wc-tq075","level":"secure","tech":"meta","text":"Fear was a stone in her stomach.","words":["Fear","was","a","stone","in","her","stomach."],"spans":[{"a":2,"b":3,"t":"meta"}],"cov":0.286,"ten":[0,0],"veh":[2,3],"tr":["heavy","hard","cold","sits there and will not move"],"dq":["can be thrown away","found on a beach","light and floating"],"dw":["a stone can, and the point is that she cannot get rid of this one.","true of stones, and it tells us nothing about being afraid.","the opposite of a stone, which is the whole point of the image."],"mod":"Calling fear a stone in her stomach suggests a cold, heavy weight she could feel and could not shift."},
+{"id":"wc-tq076","level":"challenge","tech":"meta","text":"The report was a mirror nobody wanted to look into.","words":["The","report","was","a","mirror","nobody","wanted","to","look","into."],"spans":[{"a":3,"b":4,"t":"meta"}],"cov":0.2,"ten":[0,1],"veh":[3,4],"tr":["shows people themselves","honest","uncomfortable to face","reflects what was really there"],"dq":["made of glass","hangs on a wall","hides what is there"],"dw":["a mirror is, and a report is paper, so only the reflecting carries over.","true of mirrors, and nobody hung the report up.","the opposite of what a mirror does."],"mod":"Calling the report a mirror suggests it showed people an honest picture of themselves, which is exactly why they avoided it."},
+{"id":"wc-tq077","level":"challenge","tech":"meta","text":"His promises were paper bridges.","words":["His","promises","were","paper","bridges."],"spans":[{"a":3,"b":4,"t":"meta"}],"cov":0.4,"ten":[0,1],"veh":[3,4],"tr":["look like they will hold","flimsy","collapse the moment they are used","take no weight at all"],"dq":["can be folded flat","cheap to make","strong enough to cross"],"dw":["paper can, and the image is about the collapse, not about storage.","true of paper, and the point is not what they cost him.","the opposite of the image."],"mod":"Calling his promises paper bridges suggests they looked solid enough to cross until somebody trusted their weight to one."},
+{"id":"wc-tq078","level":"challenge","tech":"meta","text":"The town's history is a locked drawer.","words":["The","town's","history","is","a","locked","drawer."],"spans":[{"a":4,"b":6,"t":"meta"}],"cov":0.429,"ten":[0,2],"veh":[4,6],"tr":["shut away","kept out of sight","hides something somebody wants hidden","could be opened with the key"],"dq":["made of wood","empty inside","on display in a museum"],"dw":["a drawer is, and a history is not, so that part stays behind.","the opposite of the image: locking it suggests there is something in there.","true of some old furniture, and this drawer is closed."],"mod":"Calling the town's history a locked drawer suggests something is being kept shut away, and that somebody holds the key."},
+{"id":"wc-tq079","level":"challenge","tech":"meta","text":"Their friendship had become a museum.","words":["Their","friendship","had","become","a","museum."],"spans":[{"a":4,"b":5,"t":"meta"}],"cov":0.333,"ten":[0,1],"veh":[4,5],"tr":["full of the past","kept behind glass","looked at rather than lived in","nothing new is added"],"dq":["charges people to come in","open to the public","growing and changing"],"dw":["true of many museums, and it tells us nothing about the two of them.","a museum is, and the image is about preserving, not about visitors.","the opposite of a museum."],"mod":"Calling their friendship a museum suggests it had stopped growing, kept in perfect order for looking at rather than living in."},
+{"id":"wc-tq080","level":"challenge","tech":"meta","text":"The deadline was a wall of glass in front of them.","words":["The","deadline","was","a","wall","of","glass","in","front","of","them."],"spans":[{"a":3,"b":6,"t":"meta"}],"cov":0.364,"ten":[0,1],"veh":[3,6],"tr":["hard to see coming","clear but solid","impossible to pass","you can see what is on the other side"],"dq":["can be polished","lets the light through","soft enough to push through"],"dw":["true of glass, and there is nothing to clean about a deadline.","a glass wall does, and the image is about being stopped, not about brightness.","the opposite of a wall of glass."],"mod":"Calling the deadline a wall of glass suggests they could see everything they wanted on the other side and still not get through."},
 {"id":"wc-tq081","level":"foundation","tech":"pverb","text":"She sprinted for the bus.","words":["She","sprinted","for","the","bus."],"spans":[{"a":1,"b":1,"t":"pverb"}],"cov":0.2},
 {"id":"wc-tq082","level":"foundation","tech":"pverb","text":"He hurled the ball across the yard.","words":["He","hurled","the","ball","across","the","yard."],"spans":[{"a":1,"b":1,"t":"pverb"}],"cov":0.143},
 {"id":"wc-tq083","level":"foundation","tech":"pverb","text":"The cat pounced on the toy.","words":["The","cat","pounced","on","the","toy."],"spans":[{"a":2,"b":2,"t":"pverb"}],"cov":0.167},
@@ -1663,10 +1681,26 @@ var TECHNIQUES = [
 {"id":"wc-tq117","level":"challenge","tech":"sense","text":"Her coat carried woodsmoke into the classroom.","words":["Her","coat","carried","woodsmoke","into","the","classroom."],"spans":[{"a":3,"b":3,"t":"sense"}],"cov":0.143},
 {"id":"wc-tq118","level":"challenge","tech":"sense","text":"The water in the plunge pool was so cold it burned.","words":["The","water","in","the","plunge","pool","was","so","cold","it","burned."],"spans":[{"a":7,"b":10,"t":"sense"}],"cov":0.364},
 {"id":"wc-tq119","level":"challenge","tech":"sense","text":"The paper had gone soft and damp at the edges.","words":["The","paper","had","gone","soft","and","damp","at","the","edges."],"spans":[{"a":4,"b":6,"t":"sense"}],"cov":0.3},
-{"id":"wc-tq120","level":"challenge","tech":"sense","text":"The air in the cellar was thick, cold and stale.","words":["The","air","in","the","cellar","was","thick,","cold","and","stale."],"spans":[{"a":6,"b":9,"t":"sense"}],"cov":0.4}
+{"id":"wc-tq120","level":"challenge","tech":"sense","text":"The air in the cellar was thick, cold and stale.","words":["The","air","in","the","cellar","was","thick,","cold","and","stale."],"spans":[{"a":6,"b":9,"t":"sense"}],"cov":0.4},
+{"id":"wc-tq121","level":"foundation","tech":"meta","text":"Dad called my bedroom a bomb site.","words":["Dad","called","my","bedroom","a","bomb","site."],"spans":[{"a":4,"b":6,"t":"meta"}],"cov":0.429,"ten":[2,3],"veh":[4,6],"tr":["a mess everywhere","things flung about","nothing where it should be","looks like something exploded"],"dq":["dangerous to walk into","something reported on the news","swept and tidy"],"dw":["a real bomb site is, and an untidy room is only untidy.","true of a bomb site, and nobody is reporting on his bedroom.","the opposite of the image."],"mod":"Calling the bedroom a bomb site suggests everything had been flung about and left exactly where it landed."},
+{"id":"wc-tq122","level":"foundation","tech":"meta","text":"She pushed through a forest of umbrellas outside the gates.","words":["She","pushed","through","a","forest","of","umbrellas","outside","the","gates."],"spans":[{"a":3,"b":6,"t":"meta"}],"cov":0.4,"ten":[6,6],"veh":[3,4],"tr":["crowded together","tall above her head","too many to count","hard to push between"],"dq":["made of wood and leaves","home to birds and animals","only two or three of them"],"dw":["a forest is, and umbrellas are cloth and wire, so only the crowding carries over.","true of a forest, and nothing is living in the umbrellas.","the opposite of the image: a forest means far too many."],"mod":"Calling the umbrellas a forest suggests they stood so thick and tall above her that she had to force a way between them."},
+{"id":"wc-tq123","level":"foundation","tech":"meta","text":"The rain had turned the path into a river.","words":["The","rain","had","turned","the","path","into","a","river."],"spans":[{"a":7,"b":8,"t":"meta"}],"cov":0.222,"ten":[4,5],"veh":[7,8],"tr":["running with water","moving fast","no longer walkable","too wide to step over"],"dq":["has fish swimming in it","flows all the way to the sea","dry and dusty"],"dw":["a river does, and there are none in the path.","true of a river, and this one ends at the gate.","the opposite of the image."],"mod":"Calling the flooded path a river suggests water running along it so fast and deep that it could not be walked on."},
+{"id":"wc-tq124","level":"foundation","tech":"meta","text":"Everyone called the goalkeeper a spider that season.","words":["Everyone","called","the","goalkeeper","a","spider","that","season."],"spans":[{"a":4,"b":5,"t":"meta"}],"cov":0.25,"ten":[2,3],"veh":[4,5],"tr":["arms reaching everywhere","snatches things out of the air","seems to cover the whole goal","waits in the middle"],"dq":["has eight legs","spins a web out of thread","small and easy to miss"],"dw":["a spider does, and the keeper has two arms, so only the reach carries over.","true of spiders, and the net was hung there already.","the opposite of what the image says about him."],"mod":"Calling the goalkeeper a spider suggests he seemed to reach every corner at once and pluck the ball out of the air."},
+{"id":"wc-tq125","level":"developing","tech":"meta","text":"Winter had made a fortress of the old house.","words":["Winter","had","made","a","fortress","of","the","old","house."],"spans":[{"a":3,"b":8,"t":"meta"}],"cov":0.667,"ten":[6,8],"veh":[3,4],"tr":["shut tight against the outside","cold and stony","hard to get into","standing alone"],"dq":["has soldiers along the walls","built to survive a siege","open and welcoming"],"dw":["a fortress is defended by people, and nobody is up on that roof.","true of a fortress, and no army is coming for the house.","the opposite of a fortress."],"mod":"Calling the house a fortress suggests winter had sealed it shut, cold and closed against everything outside."},
+{"id":"wc-tq126","level":"developing","tech":"meta","text":"He walked into a wall of heat at the door.","words":["He","walked","into","a","wall","of","heat","at","the","door."],"spans":[{"a":3,"b":6,"t":"meta"}],"cov":0.4,"ten":[6,6],"veh":[3,4],"tr":["met all at once","solid enough to stop you","cannot be pushed aside","sudden"],"dq":["built out of bricks","can be climbed over","gentle and cool"],"dw":["a wall is, and heat is air, so only the suddenness and the solidity carry over.","true of walls, and he could not climb the heat.","the opposite of the image."],"mod":"Calling the heat a wall suggests it met him all at once in the doorway, solid enough to stop him where he stood."},
+{"id":"wc-tq127","level":"developing","tech":"meta","text":"The news turned the staff room into a beehive.","words":["The","news","turned","the","staff","room","into","a","beehive."],"spans":[{"a":7,"b":8,"t":"meta"}],"cov":0.222,"ten":[3,5],"veh":[7,8],"tr":["full of busy movement","everyone talking at once","constant coming and going","humming with noise"],"dq":["makes honey","has one queen at the centre","silent and still"],"dw":["a beehive does, and nothing sweet is being made in there.","true of a hive, and the image is about the busyness, not about who is in charge.","the opposite of a beehive."],"mod":"Calling the staff room a beehive suggests it filled with humming talk and people moving in and out without pause."},
+{"id":"wc-tq128","level":"developing","tech":"meta","text":"Years of rain had made a sponge of the carpet.","words":["Years","of","rain","had","made","a","sponge","of","the","carpet."],"spans":[{"a":5,"b":9,"t":"meta"}],"cov":0.5,"ten":[8,9],"veh":[5,6],"tr":["soaked through","heavy with water","squelches underfoot","holds more than it looks"],"dq":["used for washing up","full of little holes","dry and crisp"],"dw":["true of a sponge, and nobody is cleaning anything with the carpet.","a sponge is, and what carries over is the soaking rather than the holes.","the opposite of the image."],"mod":"Calling the carpet a sponge suggests years of rain had left it so soaked that it squelched underfoot."},
+{"id":"wc-tq129","level":"secure","tech":"meta","text":"The hedges had made a corridor of the lane.","words":["The","hedges","had","made","a","corridor","of","the","lane."],"spans":[{"a":4,"b":8,"t":"meta"}],"cov":0.556,"ten":[7,8],"veh":[4,5],"tr":["narrow","walled on both sides","only one way through","closed in overhead"],"dq":["has classroom doors along it","kept warm and dry","wide and open"],"dw":["true of a school corridor, and this one has hedges instead.","a corridor is indoors, and the lane is not, so that part stays behind.","the opposite of the image."],"mod":"Calling the lane a corridor suggests the hedges had grown so high on both sides that only one narrow way was left."},
+{"id":"wc-tq130","level":"secure","tech":"meta","text":"Grief had turned his evenings into a waiting room.","words":["Grief","had","turned","his","evenings","into","a","waiting","room."],"spans":[{"a":6,"b":8,"t":"meta"}],"cov":0.333,"ten":[3,4],"veh":[6,8],"tr":["time to be sat through","nothing happening","the same every night","waiting for what does not come"],"dq":["has old magazines on a table","someone calls your name in the end","busy and full of plans"],"dw":["true of a waiting room, and the image is about the waiting, not the furniture.","in a real one they do, and the point is that for him nobody does.","the opposite of the image."],"mod":"Calling his evenings a waiting room suggests they had become empty time to sit through, with nothing arriving at the end."},
+{"id":"wc-tq131","level":"secure","tech":"meta","text":"The long walk home had made a stranger of the town.","words":["The","long","walk","home","had","made","a","stranger","of","the","town."],"spans":[{"a":6,"b":10,"t":"meta"}],"cov":0.455,"ten":[9,10],"veh":[6,7],"tr":["no longer familiar","seen as if for the first time","hard to recognise","distant"],"dq":["has a name you never learned","might introduce itself","close and familiar"],"dw":["true of a stranger, and he has known the town's name all his life.","people do that and a town cannot, so only the unfamiliarity carries over.","the opposite of a stranger."],"mod":"Calling the town a stranger suggests it had become so unfamiliar that he seemed to be seeing it for the first time."},
+{"id":"wc-tq132","level":"secure","tech":"meta","text":"The heat had turned the afternoon into treacle.","words":["The","heat","had","turned","the","afternoon","into","treacle."],"spans":[{"a":7,"b":7,"t":"meta"}],"cov":0.125,"ten":[4,5],"veh":[7,7],"tr":["slow","thick and heavy","sticky","hard to move through"],"dq":["sweet to taste","comes in a tin from a shop","quick and light"],"dw":["treacle is, and an afternoon has no flavour, so only the thickness and the slowness carry over.","true of treacle, and the image is about how the time felt.","the opposite of the image."],"mod":"Calling the afternoon treacle suggests the heat had made time itself thick and slow, so everything took an effort."},
+{"id":"wc-tq133","level":"challenge","tech":"meta","text":"The inquiry made a weapon of his own words.","words":["The","inquiry","made","a","weapon","of","his","own","words."],"spans":[{"a":3,"b":8,"t":"meta"}],"cov":0.667,"ten":[6,8],"veh":[3,4],"tr":["turned back on him","used to do damage","meant to wound","dangerous in someone else's hand"],"dq":["locked in a cupboard when not in use","bought and sold","harmless"],"dw":["true of real weapons, and words cannot be locked away once they are said.","weapons are, and the image is about the harm, not about trade.","the opposite of a weapon."],"mod":"Calling his own words a weapon suggests the inquiry picked them up and used them to do him damage."},
+{"id":"wc-tq134","level":"challenge","tech":"meta","text":"The years had made a shrine of the front room.","words":["The","years","had","made","a","shrine","of","the","front","room."],"spans":[{"a":4,"b":9,"t":"meta"}],"cov":0.6,"ten":[7,9],"veh":[4,5],"tr":["kept exactly as it was","not to be touched","holds the memory of someone","treated with great care"],"dq":["has candles and offerings","open to anyone who wants to visit","cleared out and changed"],"dw":["true of a shrine, and the front room has only its furniture.","people do visit shrines, and this room is kept private.","the opposite of the image."],"mod":"Calling the front room a shrine suggests it was kept untouched, less a room to live in than a place to remember someone."},
+{"id":"wc-tq135","level":"challenge","tech":"meta","text":"Fame had made a performance of every meal.","words":["Fame","had","made","a","performance","of","every","meal."],"spans":[{"a":3,"b":7,"t":"meta"}],"cov":0.625,"ten":[6,7],"veh":[3,4],"tr":["watched by others","done for an audience","rehearsed","no longer natural"],"dq":["people buy tickets for it","ends in applause","private and unwatched"],"dw":["true of a performance, and nobody pays to watch her eat.","performances do, and the point is that the watching never stops, not that it is praised.","the opposite of the image."],"mod":"Calling every meal a performance suggests fame had turned even eating into something done for an audience."},
+{"id":"wc-tq136","level":"challenge","tech":"meta","text":"Rumour had made a courtroom of the corridor.","words":["Rumour","had","made","a","courtroom","of","the","corridor."],"spans":[{"a":3,"b":7,"t":"meta"}],"cov":0.625,"ten":[6,7],"veh":[3,4],"tr":["a place where people are judged","everyone taking sides","a verdict reached at once","nowhere to defend yourself"],"dq":["has a judge in robes at the front","follows strict rules about evidence","a place where nobody is judged"],"dw":["true of a courtroom, and this one has only students in it.","a courtroom does, and the image is that rumour does not.","the opposite of the image."],"mod":"Calling the corridor a courtroom suggests rumour had put someone on trial there, with the verdict reached before they could answer."}
 /* >>> APPEND NEW TECHNIQUES ABOVE THIS LINE >>> */
 ];
-var TECHMETA = {"names":{"sim":["Simile","S","compares one thing to another using <b>like</b> or <b>as</b>"],"onom":["Onomatopoeia","O","a word that sounds like the noise it names"],"pers":["Personification","P","gives a thing or an animal human qualities or actions"],"meta":["Metaphor","M","says one thing <b>is</b> another, without like or as"],"pverb":["Powerful verb","P","a precise, vivid action word chosen instead of a plain one"],"sense":["Senses","S","language that appeals to sight, sound, touch, taste or smell"],"adj":["Adjectives","A","describing words, drilled in the Word classes activities"],"adv":["Adverbs","A","words telling you how, drilled in the Word classes activities"]},"order":["sim","onom","adj","pers","meta","adv","pverb","sense"],"authored":["sim","onom","pers","meta","pverb","sense"]};
+var TECHMETA = {"names":{"sim":["Simile","S","compares one thing to another using <b>like</b> or <b>as</b>","soap"],"onom":["Onomatopoeia","O","a word that sounds like the noise it names","soap"],"pers":["Personification","P","gives a thing or an animal human qualities or actions","soap"],"meta":["Metaphor","M","says one thing <b>is</b> another, without like or as","soap"],"pverb":["Powerful verb","P","a precise, vivid action word chosen instead of a plain one","soap"],"sense":["Senses","S","language that appeals to sight, sound, touch, taste or smell","soap"],"adj":["Adjectives","A","describing words, drilled in the Word classes activities","soap"],"adv":["Adverbs","A","words telling you how, drilled in the Word classes activities","soap"],"zoo":["Zoomorphism","Z","gives a person or a thing the qualities of an animal","exp"],"anth":["Anthropomorphism","A","makes an animal or an object act like a person, with thoughts and feelings","exp"],"allit":["Alliteration","A","the same sound starting words close together","exp"],"plos":["Plosive alliteration","P","alliteration on the hard, punchy sounds: p, b, t, d, k, g","exp"],"sib":["Sibilance","S","a run of s, sh and z sounds hissing through a phrase","exp"],"hyp":["Hyperbole","H","exaggeration so large it is not meant to be believed","exp"],"oxy":["Oxymoron","O","two words that contradict each other, put side by side","exp"],"iron":["Irony","I","saying one thing while plainly meaning the opposite","exp"]},"order":["sim","onom","adj","pers","meta","adv","pverb","sense"],"expanded":["zoo","anth","allit","plos","sib","hyp","oxy","iron"],"authored":["sim","onom","pers","meta","pverb","sense"]};
 /* >>> BANK:TECHNIQUES END >>> */
 
 /* >>> BANK:PUNCTUATION START >>> */
@@ -2231,7 +2265,7 @@ var AMBIG = ["answer","answers","back","bark","barks","book","books","brush","br
 <script>
 "use strict";
 
-var APP = "wcc", VER = "v0.25", BANK_REV = 14;
+var APP = "wcc", VER = "v0.26", BANK_REV = 15;
 var BUG_FORM_URL = "";   /* paste the Office 365 form link to switch the report button on */
 
 /* ---------- the four tests: one source for the Learn screen AND every
@@ -4190,7 +4224,30 @@ var DIAG_ACT = {
               "word changed. Read the sentence around it, every time." },
   frame: { label: "Where does it fit?", go: "startFrames()",
            t: "Choosing which gap a word belongs in is the sticking point",
-           b: "Try each gap out loud with the word in it. Only one of them will sound like English." }
+           b: "Try each gap out loud with the word in it. Only one of them will sound like English." },
+  /* The counters for the three domains added since v0.22 were being collected
+     and shown to nobody, which is the exact fault the diagnosis screen was
+     built at v0.9 to fix. */
+  tech:  { label: "Find the technique", go: "startTech()",
+           t: "Finding the technique inside the sentence is the sticking point",
+           b: "Read the sentence for what it is DOING, not for a word you recognise. The technique " +
+              "is usually a phrase rather than one word, so find where it starts and where it stops." },
+  punc:  { label: "Spot the mistake", go: "startPunc()",
+           t: "The punctuation mistakes are slipping past you",
+           b: "Read the sentence aloud in your head and listen for where you pause or stop. Then " +
+              "check the marks that are there against the places you heard." },
+  commas:{ label: "Put the commas in", go: "startCommas()",
+           t: "Deciding where a comma belongs is the sticking point",
+           b: "A comma marks a join or a piece you could lift out. Read the sentence without the " +
+              "part between the commas: if it still works, they belong there." },
+  tenor: { label: "Find the technique", go: "startTech()",
+           t: "You are picking the image rather than the thing it describes",
+           b: "The tenor is never the picture itself. <i>The classroom was a zoo</i> is about the " +
+              "classroom, and the zoo is only the picture being used on it." },
+  transfer:{ label: "Find the technique", go: "startTech()",
+           t: "You are carrying across more of the image than the writer meant",
+           b: "Not everything true of the image comes with it. A zoo has cages and a classroom does " +
+              "not, so the cages stay behind. Ask of each one: is this true of the real thing too?" }
 };
 
 /* id, name, call, domain, group, one-line description.
@@ -4229,11 +4286,20 @@ var DOMAINS = [
       ["name", "2. Name it", "Given a word, or a gap where a word should be, can you say what job it is doing?"],
       ["use",  "3. Use it",  "Now choose or build the word the sentence actually needs. This is the one that shows up in your writing."]
     ]},
-  { id:"tech", name:"Techniques", learn:["What SOAPMAPS means", "showTechLearn()"],
-    sub:"SOAPMAPS: simile, onomatopoeia, adjectives, personification, metaphor, adverbs, powerful verbs and senses. Find them in a sentence before you name them.",
+  { id:"tech", name:"Techniques (SOAPMAPS)", learn:["What SOAPMAPS means", "showTechLearn()"],
+    sub:"SOAPMAPS: simile, onomatopoeia, adjectives, personification, metaphor, adverbs, powerful verbs and senses. Find them in a sentence, then work out what the image is actually doing.",
     groups:[
-      ["find", "1. Find it", "You are told which technique to hunt for. Find where it is doing its work in the sentence."]
+      ["find", "1. Find it", "You are told which technique to hunt for. Find where it is doing its work in the sentence, then take the image apart."]
     ]},
+  /* v0.26, on Michael's ruling: two sections rather than one long list, "the
+     former being the first one students practice and the second being the
+     add-on and more challenging section". Declared and disabled until it has
+     content, the same as every domain before it. The technique registry already
+     carries the section each technique belongs to, so this lights up when the
+     items are authored and needs no engine change to do it. */
+  { id:"techx", name:"Techniques (Expanded)",
+    sub:"The harder set, once SOAPMAPS is secure: zoomorphism and anthropomorphism, alliteration with its plosive and sibilant variants, hyperbole, oxymoron and irony.",
+    groups:[]},
   { id:"punc", name:"Punctuation",
     sub:"Capital letters, full stops, apostrophes, commas and speech marks. Find the mistake in a sentence, the way you would proofread your own work.",
     groups:[
@@ -4983,7 +5049,29 @@ function pnCheck(){
    measures the span's share of each sentence per technique and errors above
    55%. That number IS the guess rate, so it is gated rather than hoped about. */
 var TQ = { tech:"all", lvl:"all", item:null, a:-1, b:-1, anchor:-1, dragFrom:-1,
-           done:false, drag:false, moved:false, swallow:false };
+           done:false, drag:false, moved:false, swallow:false,
+           step:1, opts:[], sel:{} };
+
+/* The transfer options are authored transfers first, decoys after, so this
+   shuffle is load-bearing rather than cosmetic: without it "the first four are
+   the answers" passes the step. `techtest.py` asserts the order actually moves,
+   because a shuffle is one line somebody could delete without noticing. */
+function shuffled(a){
+  var out = a.slice(), i, j, t;
+  for(i=out.length-1;i>0;i--){
+    j = Math.floor(Math.random()*(i+1));
+    t = out[i]; out[i] = out[j]; out[j] = t;
+  }
+  return out;
+}
+
+/* A phrase that ends the sentence carries the full stop into every place it is
+   quoted, and the prompt then reads "across to the carpet.. Not everything".
+   Seen in a screenshot rather than by any test, because every suite in this
+   project asserts behaviour and none of them reads the screen. */
+function tqPhrase(it, a, b){
+  return it.words.slice(a, b + 1).join(" ").replace(/[.,!?;:]+$/, "");
+}
 
 function techName(t){ return (TECHMETA.names[t]||[t])[0]; }
 function techDef(t){  return (TECHMETA.names[t]||["","",""])[2]; }
@@ -5056,20 +5144,40 @@ function tqNext(){
     return;
   }
   TQ.item = pickUnseen(p, "tech:"+TQ.tech+":"+TQ.lvl);
-  TQ.a = -1; TQ.b = -1; TQ.anchor = -1;
-  TQ.done = false; TQ.drag = false; TQ.moved = false; TQ.swallow = false;
+  TQ.step = 1;
+  var it = TQ.item;
+  tqDraw(-1, -1);
+  el("tqStep").style.display = tqSteps(it) > 1 ? "" : "none";
+  el("tqStep").textContent = "Step 1 of " + tqSteps(it) + " · find it";
+  el("tqPrompt").innerHTML = "Find the <b>" + esc(techName(it.tech)) +
+    "</b>. Select the <b>whole phrase</b>: tap the first word, then the last one.";
+  el("tqFb").innerHTML = "";
+  el("tqRef").textContent = it.id;
+}
+
+/* How many steps this item carries. Spotting a technique is not an analytical
+   act, and a round that stops there teaches students that it is: the metaphors
+   go on to ask what the image is about and what it carries across, which is the
+   part an examiner is actually reading for (SPEC 38). An item has the further
+   steps only if it was authored with them, so this is a content decision. */
+function tqSteps(it){ return (it && it.ten && it.tr) ? 3 : 1; }
+
+function tqDraw(lockA, lockB){
   var it = TQ.item, h="", i;
-  for(i=0;i<it.words.length;i++)
-    h += '<button class="wbtn" id="tqw'+i+'" aria-pressed="false" '+
+  for(i=0;i<it.words.length;i++){
+    var lock = (lockA >= 0 && i >= lockA && i <= lockB) ? " res-ok" : "";
+    h += '<button class="wbtn'+lock+'" id="tqw'+i+'" aria-pressed="false" '+
          'onpointerdown="tqDown(event,'+i+')" onpointerenter="tqOver('+i+')" '+
          'onclick="tqTap('+i+')">'+
          '<span class="tw">'+esc(it.words[i])+'</span></button> ';
+  }
   el("tqSent").innerHTML = h;
-  el("tqPrompt").innerHTML = "Find the <b>" + esc(techName(it.tech)) +
-    "</b>. Select the <b>whole phrase</b>: tap the first word, then the last one.";
-  el("tqScore").textContent = ""; el("tqFb").innerHTML = "";
-  el("tqCheck").disabled = true; el("tqNextBar").style.display = "none";
-  el("tqRef").textContent = it.id;
+  TQ.a = -1; TQ.b = -1; TQ.anchor = -1;
+  TQ.done = false; TQ.drag = false; TQ.moved = false; TQ.swallow = false;
+  el("tqOpts").style.display = "none"; el("tqOpts").innerHTML = "";
+  el("tqScore").textContent = "";
+  el("tqCheck").style.display = ""; el("tqCheck").disabled = true;
+  el("tqOnBar").style.display = "none"; el("tqNextBar").style.display = "none";
 }
 
 /* ---- selecting a RANGE, not a word ----------------------------------------
@@ -5153,7 +5261,16 @@ function tqJudge(it){
   return {v:"miss", sp:null};
 }
 
+/* the same three-way judgement against any one span, not only the technique's */
+function tqJudgeSpan(sp){
+  if(TQ.a === sp[0] && TQ.b === sp[1]) return "exact";
+  if(TQ.a <= sp[1] && TQ.b >= sp[0])   return "close";
+  return "miss";
+}
+
 function tqCheck(){
+  if(TQ.step === 2) return tqCheckTenor();
+  if(TQ.step === 3) return tqCheckTransfer();
   if(TQ.done || TQ.a < 0) return;
   TQ.done = true;
   var it = TQ.item, i, k, b;
@@ -5172,16 +5289,16 @@ function tqCheck(){
   var span = [];
   for(k=0;k<it.spans.length;k++)
     if(it.spans[k].t===it.tech)
-      span.push(it.words.slice(it.spans[k].a, it.spans[k].b+1).join(" "));
+      span.push(tqPhrase(it, it.spans[k].a, it.spans[k].b));
   var fb = '<li><b>' + esc(techName(it.tech)) + '</b>: ' + techDef(it.tech) + '.</li>' +
            '<li>Here it is <b>' + esc(span.join("</b> and <b>")) + '</b>.</li>';
   if(res.v === "close")
     fb += '<li class="dim">You found the right part of the sentence, but not the whole '
         + 'phrase. The technique is all of <b>'
-        + esc(it.words.slice(res.sp.a, res.sp.b+1).join(" ")) + '</b>.</li>';
+        + esc(tqPhrase(it, res.sp.a, res.sp.b)) + '</b>.</li>';
   else if(res.v === "miss")
     fb += '<li class="dim">You chose <b>'
-        + esc(it.words.slice(TQ.a, TQ.b+1).join(" "))
+        + esc(tqPhrase(it, TQ.a, TQ.b))
         + '</b>, which is not doing that job in this sentence.</li>';
   el("tqFb").innerHTML = fb;
 
@@ -5196,6 +5313,143 @@ function tqCheck(){
   /* "close" is deliberately neither: the student found the right place and drew
      the edges wrongly, which is not the mistake this round is about. */
   save(st);
+  if(tqSteps(it) > 1) tqOffer("Now the tenor");
+  else el("tqNextBar").style.display = "";
+}
+
+/* ---- step 2, the tenor, and step 3, what transfers (SPEC 38) --------------
+   Michael, on the round as it stood: "while technique-spotting is useful, I am
+   wary about making a habit of focusing on this. I would rather we emphasize
+   the writer's purpose and the effect on the reader." Both steps below come
+   from Analysis Acrobat's imagery trainer, aimed down at KS3 and rebuilt on
+   this app's range selection rather than its multiple choice.
+
+   The third step is deliberately NOT "what is the effect on the reader?" A
+   generic effect cannot be marked, so an app that asks for one teaches the
+   boilerplate with the app's authority behind it. "Roots are hidden
+   underground" can be marked, because the sentence either supports it or does
+   not, and the decoys are where the teaching is: a quality that is TRUE of the
+   image and carries nothing across is the mistake worth showing. */
+function tqOffer(label){
+  el("tqOnBtn").textContent = label + " →";
+  el("tqOnBar").style.display = "";
+  el("tqNextBar").style.display = "";
+}
+function tqOn(){
+  if(TQ.step === 1) tqTenor();
+  else if(TQ.step === 2) tqTransfer();
+}
+
+function tqTenor(){
+  var it = TQ.item;
+  TQ.step = 2;
+  tqDraw(it.spans[0].a, it.spans[0].b);
+  el("tqStep").style.display = "";
+  el("tqStep").textContent = "Step 2 of 3 · the tenor";
+  el("tqPrompt").innerHTML =
+    "The image is <b>" + esc(tqPhrase(it, it.veh[0], it.veh[1])) +
+    "</b>. Now the <b>tenor</b>: the real thing the image is describing. Select it.";
+  el("tqFb").innerHTML = "";
+}
+
+function tqCheckTenor(){
+  if(TQ.done || TQ.a < 0) return;
+  TQ.done = true;
+  var it = TQ.item, i, b;
+  var v = tqJudgeSpan(it.ten);
+  for(i=0;i<it.words.length;i++){
+    b = el("tqw"+i); if(!b) continue;
+    b.setAttribute("aria-pressed","false");
+    var isTen = (i >= it.ten[0] && i <= it.ten[1]), picked = (i >= TQ.a && i <= TQ.b);
+    if(isTen)       b.className = "wbtn res-ok";
+    else if(picked) b.className = "wbtn res-bad";
+    else if(i >= it.veh[0] && i <= it.veh[1]) b.className = "wbtn res-neu";
+  }
+  el("tqScore").textContent = v === "exact" ? "Right" : (v === "close" ? "Close" : "Not that one");
+  var ten = tqPhrase(it, it.ten[0], it.ten[1]);
+  var fb = '<li>The tenor is <b>' + esc(ten) + '</b>: that is what the sentence is '
+         + 'really about.</li>';
+  if(v === "miss")
+    fb += '<li class="dim">You chose <b>' + esc(tqPhrase(it, TQ.a, TQ.b))
+        + '</b>. The tenor is never the picture itself, it is the thing the picture '
+        + 'is being used on.</li>';
+  el("tqFb").innerHTML = fb;
+  var st = store();
+  if(v === "miss"){ st.err.tenor_meta = (st.err.tenor_meta||0) + 1; save(st); }
+  tqOffer("What transfers");
+}
+
+function tqTransfer(){
+  var it = TQ.item, i, h="";
+  TQ.step = 3;
+  TQ.done = false; TQ.sel = {};
+  TQ.opts = shuffled(it.tr.concat(it.dq));
+  el("tqStep").textContent = "Step 3 of 3 · what transfers";
+  el("tqPrompt").innerHTML =
+    "The image of <b>" + esc(tqPhrase(it, it.veh[0], it.veh[1])) +
+    "</b> carries plenty with it. Tap <b>only</b> what it carries across to <b>" +
+    esc(tqPhrase(it, it.ten[0], it.ten[1])) +
+    "</b>. Not everything true of the image comes with it.";
+  for(i=0;i<it.words.length;i++){
+    var m = (i >= it.ten[0] && i <= it.ten[1]) ? " res-ok"
+          : ((i >= it.veh[0] && i <= it.veh[1]) ? " res-neu" : "");
+    h += '<span class="wbtn'+m+'"><span class="tw">'+esc(it.words[i])+'</span></span> ';
+  }
+  el("tqSent").innerHTML = h;
+  h = "";
+  for(i=0;i<TQ.opts.length;i++)
+    h += '<button class="qchip" id="tqo'+i+'" aria-pressed="false" onclick="tqPick('+i+')">'
+       + esc(TQ.opts[i]) + '</button>';
+  el("tqOpts").innerHTML = h;
+  el("tqOpts").style.display = "";
+  el("tqFb").innerHTML = ""; el("tqScore").textContent = "";
+  el("tqCheck").style.display = ""; el("tqCheck").disabled = true;
+  el("tqOnBar").style.display = "none"; el("tqNextBar").style.display = "none";
+}
+
+function tqPick(i){
+  if(TQ.done) return;
+  TQ.sel[i] = !TQ.sel[i];
+  el("tqo"+i).setAttribute("aria-pressed", TQ.sel[i] ? "true" : "false");
+  var any = false, k;
+  for(k in TQ.sel) if(TQ.sel[k]) any = true;
+  el("tqCheck").disabled = !any;
+}
+
+function tqCheckTransfer(){
+  if(TQ.done) return;
+  TQ.done = true;
+  var it = TQ.item, i, right = true, found = 0;
+  for(i=0;i<TQ.opts.length;i++){
+    var isT = it.tr.indexOf(TQ.opts[i]) >= 0, sel = !!TQ.sel[i], b = el("tqo"+i);
+    b.disabled = true; b.setAttribute("aria-pressed","false");
+    if(isT && sel){ b.className = "qchip q-ok"; found++; }
+    else if(isT && !sel){ b.className = "qchip q-miss"; right = false; }
+    else if(!isT && sel){ b.className = "qchip q-bad"; right = false; }
+  }
+  /* Three ways to be wrong here and they are not the same mistake. Leaving one
+     out is thin reading; taking one too many is the mistake the round exists
+     for, and saying "you found 4 of 4" to somebody who also dragged a cage into
+     the classroom would be telling them they were right. */
+  var over = 0, k2;
+  for(k2=0;k2<TQ.opts.length;k2++)
+    if(TQ.sel[k2] && it.tr.indexOf(TQ.opts[k2]) < 0) over++;
+  el("tqScore").textContent = right ? "Right" : "Not quite";
+  var fb = '<li>' + (right
+      ? 'All ' + it.tr.length + ' of those carry across.'
+      : (over && found === it.tr.length
+         ? 'You found all ' + it.tr.length + ', and carried across ' + over +
+           ' that the image leaves behind.'
+         : 'You found ' + found + ' of ' + it.tr.length + '.') +
+        ' Dashed means it transfers and you left it out; crossed out means it is true '
+        + 'of the image but carries nothing across.') + '</li>';
+  for(i=0;i<it.dq.length;i++)
+    fb += '<li class="dim"><b>' + esc(it.dq[i]) + '</b>: ' + esc(it.dw[i]) + '</li>';
+  fb += '<li><b>Writing it up.</b> ' + esc(it.mod) + '</li>';
+  el("tqFb").innerHTML = fb;
+  var st = store();
+  if(!right){ st.err.transfer_meta = (st.err.transfer_meta||0) + 1; save(st); }
+  el("tqCheck").style.display = "none";
   el("tqNextBar").style.display = "";
 }
 
@@ -5703,6 +5957,61 @@ function validate(){
       E.push("techniques / "+tqt+": selecting a range at random is exactly right "+
              Math.round(100*tqExact)+"% of the time, so the round can be guessed "+
              "(SPEC 35).");
+  }
+
+  /* ---- the further steps on metaphors (SPEC 38) ----
+     Everything here exists because spotting a technique is not an analytical
+     act. The steps that are are the tenor and the transfer, and both can be
+     cheated in ways the find-it gates cannot see. */
+  var tqMeta = TECHNIQUES.filter(function(r){ return r.tech === "meta"; });
+  var tqWithTen = tqMeta.filter(function(r){ return r.ten && r.tr; });
+  if(tqMeta.length !== tqWithTen.length)
+    E.push("techniques: "+(tqMeta.length-tqWithTen.length)+" metaphors carry no tenor "+
+           "or no transfer set, so the round silently stops after step one on them.");
+  for(i=0;i<tqWithTen.length;i++){
+    var tqm = tqWithTen[i];
+    if(tqm.ten[0] > tqm.ten[1] || tqm.ten[1] >= tqm.words.length)
+      E.push(tqm.id+": the tenor is out of range");
+    if(tqm.ten[0] <= tqm.veh[1] && tqm.ten[1] >= tqm.veh[0])
+      E.push(tqm.id+": the tenor and the vehicle overlap");
+    if(tqm.tr.length < 3) E.push(tqm.id+": fewer than three qualities transfer");
+    if(tqm.dq.length < 2) E.push(tqm.id+": fewer than two decoys");
+    if(tqm.dq.length !== tqm.dw.length)
+      E.push(tqm.id+": a decoy with no reason attached");
+    for(j=0;j<tqm.dq.length;j++)
+      if(tqm.tr.indexOf(tqm.dq[j]) >= 0)
+        E.push(tqm.id+": '"+tqm.dq[j]+"' is a decoy and a transfer at once");
+  }
+  if(tqWithTen.length){
+    /* SPEC 27 once more. In all twenty of the v0.22 metaphors the tenor was the
+       grammatical subject, so "select the words before was" answered this step
+       every time without knowing what a tenor is. Only the first rule picks a
+       span by itself, which is why it is the one that errors. */
+    var tqTenFirst = 0, tqTenBefore = 0;
+    for(i=0;i<tqWithTen.length;i++){
+      if(tqWithTen[i].ten[0] === 0) tqTenFirst++;
+      if(tqWithTen[i].ten[1] < tqWithTen[i].spans[0].a) tqTenBefore++;
+    }
+    tqTenFirst = tqTenFirst / tqWithTen.length;
+    tqTenBefore = tqTenBefore / tqWithTen.length;
+    INFO.push("techniques / tenor: it starts at the first word in "+
+              Math.round(100*tqTenFirst)+"% of metaphors, and sits before the image in "+
+              Math.round(100*tqTenBefore)+"%.");
+    if(tqTenFirst > 0.70)
+      E.push("techniques / tenor: 'the tenor starts at the first word' answers "+
+             Math.round(100*tqTenFirst)+"% of metaphors, so the step can be passed "+
+             "without reading (SPEC 38).");
+    if(tqTenBefore > 0.90)
+      W.push("techniques / tenor: it comes before the image "+
+             Math.round(100*tqTenBefore)+"% of the time");
+    /* And the third step must not be answerable by "tap everything": if every
+       option transferred there would be nothing to decide. */
+    var tqAllPass = 0;
+    for(i=0;i<tqWithTen.length;i++)
+      if(!tqWithTen[i].dq.length) tqAllPass++;
+    if(tqAllPass)
+      E.push("techniques / transfer: "+tqAllPass+" items have no decoy, so tapping every "+
+             "option passes them (SPEC 38).");
   }
 
   /* ---- PUNCTUATION (SPEC 36) ----
