@@ -58,11 +58,40 @@ function cleanNick(v) {
 
 const LEVELS = ["foundation", "developing", "secure", "challenge"];
 
-/* Physical bounds for a sixty-second run. Deliberately generous: this is here to
-   reject 999999, not to second-guess a fast student. */
-const RUN_SECONDS = 60;
+/* The boards (SPEC 50). One per discipline plus the Ultimate Champion, each with
+   its own run length, which is what the physical bounds below are computed from.
+   A run with no board is a Word classes run: that is every run posted before
+   v0.39, and every run from an app that has not been updated yet. */
+const BOARDS = { wc: 60, punc: 90, tense: 90, tech: 90, ult: 120 };
+const DEFAULT_KIND = "wc";
+
+/* Physical bounds for a run. Deliberately generous: this is here to reject
+   999999, not to second-guess a fast student. */
 const MIN_MS_PER_ITEM = 350;                                  // faster than a human reads
-const MAX_ITEMS = Math.floor((RUN_SECONDS * 1000) / MIN_MS_PER_ITEM);   // 171
+function maxItems(board) { return Math.floor((BOARDS[board] * 1000) / MIN_MS_PER_ITEM); }
+
+/* The board column arrived after the database did. D1 has no "ADD COLUMN IF NOT
+   EXISTS", and deploy-worker.bat re-runs schema.sql on every deploy, so the
+   column is added here, once per worker instance, and the "duplicate column"
+   error that every later attempt raises is the sign it is already done. The
+   index is made here too, because schema.sql runs BEFORE any request and so
+   before the column can exist on an old database. */
+let boardColumnReady = false;
+async function ensureBoardColumn(env) {
+  if (boardColumnReady) return;
+  try {
+    await env.DB.prepare("ALTER TABLE runs ADD COLUMN board TEXT NOT NULL DEFAULT 'wc'").run();
+  } catch (e) {
+    if (!/duplicate column/i.test(String(e && e.message || e))) throw e;
+  }
+  await env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_runs_kind ON runs (board, score DESC)").run();
+  boardColumnReady = true;
+}
+
+function cleanKind(v) {
+  if (v === undefined || v === null || v === "") return DEFAULT_KIND;
+  return (typeof v === "string" && Object.prototype.hasOwnProperty.call(BOARDS, v)) ? v : null;
+}
 const MAX_MULTIPLIER = 5;        // combo multiplier ceiling, mirrored in the app
 const WRONG_PENALTY = 3;
 
@@ -155,13 +184,17 @@ async function postScore(request, env) {
   const nick = cleanNick(body.nick);
   if (!nick) return json(env, { error: "bad nickname" }, 400);
 
+  const board = cleanKind(body.board);
+  if (!board) return json(env, { error: "bad board" }, 400);
+  const MAX_ITEMS = maxItems(board);
+
   const correct = body.correct, wrong = body.wrong, chain = body.chain, score = body.score;
 
   if (!isInt(correct, 0, MAX_ITEMS)) return json(env, { error: "bad correct" }, 400);
   if (!isInt(wrong, 0, MAX_ITEMS)) return json(env, { error: "bad wrong" }, 400);
   if (!isInt(chain, 0, correct)) return json(env, { error: "chain longer than correct answers" }, 400);
   if (correct + wrong > MAX_ITEMS)
-    return json(env, { error: "more items than sixty seconds allows" }, 400);
+    return json(env, { error: "more items than the run allows" }, 400);
   if (typeof body.level !== "string" || LEVELS.indexOf(body.level) < 0)
     return json(env, { error: "bad level" }, 400);
   if (!isInt(score, -(MAX_ITEMS * WRONG_PENALTY), MAX_ITEMS * MAX_MULTIPLIER))
@@ -181,6 +214,7 @@ async function postScore(request, env) {
     return json(env, { error: "a run has to finish on zero or better" }, 400);
 
   const now = Math.floor(Date.now() / 1000);
+  await ensureBoardColumn(env);
 
   /* Rate limit off the table itself. See the note by RATE_WINDOW_SECONDS. */
   const recent = await env.DB
@@ -201,20 +235,20 @@ async function postScore(request, env) {
 
   await env.DB
     .prepare(
-      "INSERT INTO runs (cls, nick, approved, score, correct, wrong, chain, level, created) " +
-      "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+      "INSERT INTO runs (cls, nick, approved, score, correct, wrong, chain, level, created, board) " +
+      "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
     )
-    .bind(cls, nick, approved, score, correct, wrong, chain, body.level, now)
+    .bind(cls, nick, approved, score, correct, wrong, chain, body.level, now, board)
     .run();
 
   /* Tell the student where they landed, which is the only thing they want to
      know and saves the app a second request. */
   const rank = await env.DB
-    .prepare("SELECT COUNT(*) AS n FROM runs WHERE cls = ? AND score > ?")
-    .bind(cls, score)
+    .prepare("SELECT COUNT(*) AS n FROM runs WHERE cls = ? AND board = ? AND score > ?")
+    .bind(cls, board, score)
     .first();
 
-  return json(env, { ok: true, nick: nick, approved: approved,
+  return json(env, { ok: true, nick: nick, approved: approved, board: board,
                      rank: (rank ? rank.n : 0) + 1 });
 }
 
@@ -229,21 +263,25 @@ async function getBoard(url, env) {
     if (!cls) return json(env, { error: "bad class code" }, 400);
   }
 
+  const board = cleanKind(url.searchParams.get("board"));
+  if (!board) return json(env, { error: "bad board" }, 400);
+
   let limit = parseInt(url.searchParams.get("limit") || "", 10);
   if (!Number.isInteger(limit) || limit < 1) limit = BOARD_DEFAULT;
   if (limit > BOARD_MAX) limit = BOARD_MAX;
 
+  await ensureBoardColumn(env);
   const sql =
     "SELECT id, nick, approved, score, correct, wrong, chain, level, created FROM runs " +
-    (cls ? "WHERE cls = ? " : "") + "ORDER BY score DESC, created ASC LIMIT ?";
-  const rows = await (cls ? env.DB.prepare(sql).bind(cls, limit)
-                          : env.DB.prepare(sql).bind(limit)).all();
+    "WHERE board = ? " + (cls ? "AND cls = ? " : "") + "ORDER BY score DESC, created ASC LIMIT ?";
+  const rows = await (cls ? env.DB.prepare(sql).bind(board, cls, limit)
+                          : env.DB.prepare(sql).bind(board, limit)).all();
 
   /* THE safety property of the whole moderation design: an unapproved name does
      not leave this worker on the public route. Not masked on the client, not
      filtered in the app, not sent at all. The score still ranks, because holding
      the score hostage to a teacher's attention would make the board useless. */
-  const board = ((rows && rows.results) || []).map(function (r) {
+  const out = ((rows && rows.results) || []).map(function (r) {
     const out = {
       id: r.id, score: r.score, correct: r.correct, wrong: r.wrong,
       chain: r.chain, level: r.level, created: r.created,
@@ -253,7 +291,7 @@ async function getBoard(url, env) {
     return out;
   });
 
-  return json(env, { cls: cls, board: board });
+  return json(env, { cls: cls, kind: board, board: out });
 }
 
 /** Teacher routes. One shared secret, set with `wrangler secret put TEACHER_KEY`.
@@ -318,8 +356,13 @@ async function adminPending(request, env) {
   /* Grouped by name WITHIN a class, because a name is judged per class: the
      teacher is judging NAMES, not runs, so a student who has played six times
      is one decision rather than six. */
+  /* ONE queue for every board (SPEC 50): a name is judged once and the decision
+     covers every board it plays on, so the teacher never visits six queues.
+     `boards` only tells the teacher where the name has been seen. */
+  await ensureBoardColumn(env);
   const sql =
-    "SELECT cls, nick, COUNT(*) AS runs, MAX(score) AS best, MIN(created) AS first " +
+    "SELECT cls, nick, COUNT(*) AS runs, MAX(score) AS best, MIN(created) AS first, " +
+    "GROUP_CONCAT(DISTINCT board) AS boards " +
     "FROM runs WHERE approved = 0 " + (cls ? "AND cls = ? " : "") +
     "GROUP BY cls, nick ORDER BY first ASC LIMIT 200";
   const stmt = cls ? env.DB.prepare(sql).bind(cls) : env.DB.prepare(sql);
@@ -378,13 +421,15 @@ async function adminBoard(request, env) {
   let limit = parseInt(url.searchParams.get("limit") || "", 10);
   if (!Number.isInteger(limit) || limit < 1) limit = 50;
   if (limit > BOARD_MAX) limit = BOARD_MAX;
-  const rows = await env.DB
-    .prepare(
-      "SELECT id, cls, nick, approved, score, created FROM runs " +
-      "ORDER BY score DESC, created ASC LIMIT ?"
-    )
-    .bind(limit)
-    .all();
+  await ensureBoardColumn(env);
+  const kind = url.searchParams.get("board");
+  const board = kind ? cleanKind(kind) : null;
+  if (kind && !board) return json(env, { error: "bad board" }, 400);
+  const rows = await (board
+    ? env.DB.prepare("SELECT id, cls, nick, approved, score, created, board FROM runs " +
+                     "WHERE board = ? ORDER BY score DESC, created ASC LIMIT ?").bind(board, limit)
+    : env.DB.prepare("SELECT id, cls, nick, approved, score, created, board FROM runs " +
+                     "ORDER BY score DESC, created ASC LIMIT ?").bind(limit)).all();
   return json(env, { board: (rows && rows.results) || [] });
 }
 

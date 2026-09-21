@@ -430,6 +430,65 @@ await test("board query hygiene", async () => {
   check("an injection attempt is refused by the class-code rule", r.status === 400, "got " + r.status);
 });
 
+/* ---------------------------------------------------- boards (SPEC 50) */
+await test("one board per challenge, one approval for all of them", async () => {
+  const run = (board, nick, score) => req("/score", { method: "POST",
+    body: Object.assign({}, good, { cls: undefined, nick: nick, board: board, score: score }) });
+  let r = await run("punc", "Mai", 20);
+  check("a punctuation run is accepted", r.status === 200, "got " + r.status);
+  r = await run(undefined, "Mai", 25);
+  check("a run with no board is a word classes run", (await r.json()).board === "wc");
+  await run("tense", "Ben", 22);
+  let b = await (await req("/board?board=punc")).json();
+  check("the punctuation board holds only punctuation runs", b.board.length === 1, JSON.stringify(b.board));
+  b = await (await req("/board")).json();
+  check("the default board is word classes, which is what old apps ask for", b.board.length === 1 && b.board[0].score === 25,
+        JSON.stringify(b.board));
+  r = await req("/board?board=nonsense");
+  check("an unknown board is refused", r.status === 400, "got " + r.status);
+  r = await run("nonsense", "Mai", 5);
+  check("and cannot be posted to", r.status === 400, "got " + r.status);
+
+  const H = { "X-Teacher-Key": KEY };
+  b = await (await req("/admin/pending", { method: "POST", headers: H, body: {} })).json();
+  const mai = b.pending.filter(p => p.nick === "Mai")[0];
+  check("the queue is ONE queue: Mai is one decision across two boards", mai && mai.runs === 2, JSON.stringify(b.pending));
+  check("and the teacher can see which boards the name has played", mai && /punc/.test(mai.boards) && /wc/.test(mai.boards),
+        mai && mai.boards);
+  await req("/admin/approve", { method: "POST", headers: H, body: { cls: "ALL", nick: "Mai" } });
+  const p1 = await (await req("/board?board=punc")).json(), p2 = await (await req("/board?board=wc")).json();
+  check("approving once names her on every board", p1.board[0].nick === "Mai" && p2.board[0].nick === "Mai",
+        JSON.stringify([p1.board, p2.board]));
+  r = await run("ult", "Mai", 10);
+  check("and her future runs on a new board go straight up", (await r.json()).approved === 1);
+});
+
+await test("each board has its own physical bounds", async () => {
+  const post = (board, correct) => req("/score", { method: "POST",
+    body: { nick: "Pim", board: board, correct: correct, wrong: 0, chain: 1, level: "secure", score: correct } });
+  let r = await post("wc", 200);
+  check("two hundred answers is impossible in sixty seconds", r.status === 400, "got " + r.status);
+  r = await post("ult", 200);
+  check("but possible in the two-minute Ultimate run", r.status === 200, "got " + r.status);
+});
+
+await test("an old database gets its board column on the first request", async () => {
+  const db = env.DB._raw;
+  db.exec("DROP TABLE runs");
+  db.exec("CREATE TABLE runs (id INTEGER PRIMARY KEY AUTOINCREMENT, cls TEXT NOT NULL, nick TEXT NOT NULL, " +
+          "approved INTEGER NOT NULL DEFAULT 0, score INTEGER NOT NULL, correct INTEGER NOT NULL, " +
+          "wrong INTEGER NOT NULL, chain INTEGER NOT NULL, level TEXT NOT NULL, created INTEGER NOT NULL)");
+  db.exec("INSERT INTO runs (cls, nick, approved, score, correct, wrong, chain, level, created) " +
+          "VALUES ('ALL', 'Old', 1, 40, 20, 0, 20, 'secure', 1)");
+  const mod = await import(join(HERE, "src/index.js") + "?fresh=" + Date.now());
+  const r = await mod.default.fetch(new Request("https://board.example.com/board"), env);
+  const b = await r.json();
+  check("the old row is still there, on the word classes board", r.status === 200 && b.board.length === 1 && b.board[0].score === 40,
+        r.status + " " + JSON.stringify(b));
+  const again = await mod.default.fetch(new Request("https://board.example.com/board?board=punc"), env);
+  check("and asking twice does not trip over the column it added", again.status === 200, "got " + again.status);
+});
+
 console.log("\npassed: " + pass + "   failed: " + fails.length);
 for (const f of fails) console.log("  - " + f);
 process.exit(fails.length ? 1 : 0);

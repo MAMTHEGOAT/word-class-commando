@@ -22,7 +22,12 @@ CREATE TABLE IF NOT EXISTS runs (
   wrong   INTEGER NOT NULL,
   chain   INTEGER NOT NULL,          -- longest combo chain in the run
   level   TEXT    NOT NULL,          -- deepest level reached
-  created INTEGER NOT NULL           -- unix seconds, server clock not client clock
+  created INTEGER NOT NULL,          -- unix seconds, server clock not client clock
+  board   TEXT    NOT NULL DEFAULT 'wc'  -- which challenge (SPEC 50). On a database
+                                     -- made before v0.39 the worker adds this column
+                                     -- itself on the first request; see
+                                     -- ensureBoardColumn(). Its index is made there
+                                     -- too, for the same reason.
 );
 
 -- The board query: top scores for one class.
