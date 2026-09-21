@@ -72,3 +72,8 @@ quiz/
 # shared test navigation helper (dev only, not needed by the live site)
 wccnav.py
 technames.json
+
+# Analysis Acrobat import sources (v0.34): authoring, not site
+build_aa.py
+aa_bank.py
+imagery_bank.py
