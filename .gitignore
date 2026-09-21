@@ -77,3 +77,7 @@ technames.json
 build_aa.py
 aa_bank.py
 imagery_bank.py
+
+# Analytical language sources (v0.41): authoring, not site
+build_anal.py
+anal_bank.py
