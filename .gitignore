@@ -95,4 +95,8 @@ build-assets/
 run-tests.sh
 AUDIT-BRIEF.md
 *.jsonl
-*.json
+/*.json
+
+# v0.46: frozen id maps (authoring; never regenerate) 
+transform_ids.py
+xterm_ids.py
