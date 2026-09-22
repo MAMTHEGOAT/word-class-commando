@@ -117,7 +117,7 @@ body.testing{padding-bottom:150px}
 /* Feedback is WITHHELD, not merely unread: hidden here and never rendered into
    view, so a student cannot learn the answer mid-paper and move the target. */
 body.testing .fb,
-body.testing #ynStreakWrap,
+body.testing #dunnoBtn,
 body.testing .chips:not(.opts),
 body.testing .rulecard,
 body.testing .aa-theory,
@@ -221,6 +221,10 @@ body.testing .score{visibility:hidden}
   font:inherit;font-size:1.1em;line-height:1;color:transparent;
   transition:border-color .12s,background .12s}
 .cgap::after{content:","}
+/* The visible box stays small; the tap target is 44px (invariant 6, audit A14). */
+.cgap{position:relative}
+.cgap::before{content:"";position:absolute;left:50%;top:50%;width:44px;height:44px;
+  transform:translate(-50%,-50%)}
 .cgap:hover{border-color:#6b5f27;background:#f2e7ad}
 .cgap[aria-pressed="true"]{border-style:solid;border-color:#1a3a6b;background:#1a3a6b;color:#fff}
 .cgap[aria-pressed="true"]::after{content:","}
@@ -605,6 +609,7 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
   <div class="board-form">
     <input id="tKey" class="tin" type="password" placeholder="Teacher password" autocomplete="off">
     <button class="go" onclick="teacherLoad()">Load</button>
+    <button class="ghost" onclick="forgetTeacherKey()">Forget password</button>
     <input id="tCls" class="tin" maxlength="8" placeholder="Class filter (optional)" autocomplete="off">
   </div>
   <p class="dim small">The password is the only thing you need. Leave the class box empty
@@ -4106,7 +4111,7 @@ var AMBIG = ["answer","answers","back","bark","barks","book","books","brush","br
 <script>
 "use strict";
 
-var APP = "wcc", VER = "v0.44", BANK_REV = 31;
+var APP = "wcc", VER = "v0.45", BANK_REV = 31;
 var BUG_FORM_URL = "";   /* paste the Office 365 form link to switch the report button on */
 
 /* ---------- the four tests: one source for the Learn screen AND every
@@ -4366,7 +4371,8 @@ var S = { act:"one", cls:"noun", lvl:"all", item:null, sel:{}, done:false };
 var REC_KEY = "wcc_v2", OLD_KEY = "wcc_v1", REC_VERSION = 2;
 var _root = null;          /* cached so repeated store() calls cannot clobber
                               each other within one interaction */
-var _dirty = false;        /* a migration, prune or repair happened and has
+var _dirty = false;
+var _lastRaw = null, _base = null;   /* the record as this tab last read or wrote it */        /* a migration, prune or repair happened and has
                               not been written back yet */
 
 function _blankProfile(name){
@@ -4432,8 +4438,18 @@ function _migrate(){
 
 function _load(){
   var raw = localStorage.getItem(REC_KEY);
-  var root = raw ? JSON.parse(raw) : null;
-  if(!root) root = _migrate();
+  var root = null;
+  /* An unreadable record (a write cut off by a quota error, a hand edit) must be
+     REPAIRED, not obeyed. Before v0.45 the parse threw, store() fell back to a
+     never-saving profile, and the bad record was never replaced: the app forgot
+     everything on every load, for good (audit 2026-09-22, A1). Keep a copy of
+     the bad string for rescue, rebuild, and write the good record over it. */
+  if(raw){
+    try{ root = JSON.parse(raw); }
+    catch(e){ root = null; raw = null;
+              try{ localStorage.setItem(REC_KEY + "_corrupt", localStorage.getItem(REC_KEY)); }catch(e2){} }
+  }
+  if(!root || typeof root !== "object") root = _migrate();
   if(!root || root.v !== REC_VERSION) root = root ? _upgrade(root) : _blankRoot();
 
   /* repair rather than reset: a half-written record loses the damaged part only */
@@ -4454,6 +4470,7 @@ function _load(){
   }
   if(root.bankRev !== BANK_REV){ _pruneToBank(root); root.bankRev = BANK_REV; _dirty = true; }
   if(!raw) _dirty = true;      /* migrated or created: write it out below */
+  _lastRaw = raw; _base = raw ? JSON.parse(raw) : null;
   return root;
 }
 
@@ -4489,8 +4506,53 @@ function store(){
 function save(){
   try{
     if(!_root || _root.off) return;
-    localStorage.setItem(REC_KEY, JSON.stringify(_root));
+    /* Another tab may have written since this one last read or wrote. Writing
+       our whole copy over it would erase that tab's work (audit A2), so fold its
+       changes into ours first. Three-way: `_base` is the record as this tab last
+       saw it, so a thing the other tab REMOVED (a sent queued run, an answered
+       revisit) stays removed, and a thing it ADDED arrives. */
+    var raw = localStorage.getItem(REC_KEY);
+    if(raw && raw !== _lastRaw){
+      var theirs = null;
+      try{ theirs = JSON.parse(raw); }catch(e){ theirs = null; }
+      if(theirs && typeof theirs === "object") _merge3(_base || {}, _root, theirs, "");
+    }
+    var out = JSON.stringify(_root);
+    localStorage.setItem(REC_KEY, out);
+    _lastRaw = out; _base = JSON.parse(out);
   }catch(e){ /* quota or disabled: keep playing, just stop persisting */ }
+}
+
+/* Merge `theirs` into `ours` IN PLACE (callers hold references into _root).
+   Arrays: ours plus whatever they added since base. Counters under err: ours
+   plus their increase. best: the higher score wins. Anything else: if only
+   they changed it, take theirs. */
+function _merge3(base, ours, theirs, path){
+  for(var k in theirs){
+    if(!Object.prototype.hasOwnProperty.call(theirs, k)) continue;
+    var b = base ? base[k] : undefined, o = ours[k], t = theirs[k];
+    var here = path ? path + "." + k : k;
+    if(o === undefined){ if(b === undefined) ours[k] = t; continue; }
+    if(Array.isArray(o) && Array.isArray(t)){
+      var had = {}, inBase = {}, inTheirs = {}, i, key;
+      if(Array.isArray(b)) for(i=0;i<b.length;i++) inBase[JSON.stringify(b[i])] = 1;
+      for(i=0;i<t.length;i++) inTheirs[JSON.stringify(t[i])] = 1;
+      /* they removed it (a queued run sent, a revisit answered): remove it here */
+      for(i=o.length-1;i>=0;i--){ key = JSON.stringify(o[i]);
+        if(inBase[key] && !inTheirs[key]) o.splice(i,1); else had[key] = 1; }
+      /* they added it: add it here */
+      for(i=0;i<t.length;i++){ key = JSON.stringify(t[i]);
+        if(!had[key] && !inBase[key]){ o.push(t[i]); had[key] = 1; } }
+    } else if(/(^|\.)best$/.test(path) && o && t && typeof o === "object" && typeof t === "object"){
+      if((t.score||0) > (o.score||0)) ours[k] = t;
+    } else if(o && t && typeof o === "object" && typeof t === "object"){
+      _merge3(b && typeof b === "object" ? b : {}, o, t, here);
+    } else if(typeof o === "number" && typeof t === "number" && /(^|\.)err$/.test(path)){
+      ours[k] = o + Math.max(0, t - (typeof b === "number" ? b : 0));
+    } else if(JSON.stringify(o) === JSON.stringify(b) && JSON.stringify(t) !== JSON.stringify(b)){
+      ours[k] = t;
+    }
+  }
 }
 
 /* ---- profiles. No UI yet; the switcher lands with the results screen. ---- */
@@ -4625,6 +4687,8 @@ function next(){
   var p = pool(S.act,S.cls,S.lvl);
   if(!p.length){ el("prompt").textContent="Nothing here yet."; el("sent").innerHTML="";
                  el("fb").innerHTML=""; el("nextBar").style.display="none"; return; }
+  if(B.on){ S.item = p[Math.floor(Math.random()*p.length)]; S.sel = {}; S.done = false;
+            render(); return; }                 /* a run draws uniformly (SPEC 24) */
   var st = store(), key = poolKey(), seen = st.seen[key] || [];
 
   /* an item answered wrong comes back before an unseen one, after N others */
@@ -4728,7 +4792,11 @@ function check(){
       var need = G[g].req, have = 0;
       for(j=0;j<need.length;j++) if(S.sel[need[j]]) have++;
       if(!strict || have===need.length) credited.push(ansG[g]);
-      else partial.push(g);
+      else if(have) partial.push(g);
+      /* only the particle or the negator tapped: none of the verb itself was
+         found, so it is the ordinary wrong line, which teaches the particle,
+         not a "you found ** " partial with nothing in it (audit A8) */
+      else wrong.push(G[g].sel[0]);
     }
     else if(neuG[g]!==undefined) neutral.push(neuG[g]);
     else wrong.push(G[g].sel[0]);
@@ -4873,6 +4941,7 @@ function check(){
 }
 
 function dunno(){
+  if(B.on) return;      /* not a free skip inside a timed run (audit A5) */
   var st = store();
   st.err.vocab_block = (st.err.vocab_block||0)+1; save(st);
   next();
@@ -4880,9 +4949,11 @@ function dunno(){
 
 function copyRef(){
   var code = el("refCode").textContent;
+  /* writeText is a promise: a refusal arrives later, not as a throw */
   try{
-    navigator.clipboard.writeText(code);
-    el("refMsg").textContent = "copied";
+    navigator.clipboard.writeText(code).then(
+      function(){ el("refMsg").textContent = "copied"; },
+      function(){ el("refMsg").textContent = code; });
   }catch(e){ el("refMsg").textContent = code; }
   if(BUG_FORM_URL) window.open(BUG_FORM_URL, "_blank");
 }
@@ -5142,6 +5213,7 @@ function lvlChips(elId, bank, cur, fn){
   el(elId).innerHTML = h;
 }
 function pickUnseen(pool, key){
+  if(B.on) return pool[Math.floor(Math.random()*pool.length)];   /* a run draws uniformly (SPEC 24) */
   var st = store(), seen = st.seen[key] || [], un=[], i;
   for(i=0;i<pool.length;i++) if(seen.indexOf(pool[i].id)<0) un.push(pool[i]);
   if(!un.length){ seen=[]; un=pool.slice(); }
@@ -5269,7 +5341,7 @@ function netPost(path, body, headers){
                    body: JSON.stringify(body) };
       if(headers) for(var k in headers) init.headers[k] = headers[k];
       fetch(WORKER + path, init)
-        .then(function(r){ return r.json().then(function(j){ return { ok: r.ok, body: j }; }); })
+        .then(function(r){ return r.json().then(function(j){ return { ok: r.ok, status: r.status, body: j }; }); })
         .then(function(v){ if(!done){ done = true; clearTimeout(timer); resolve(v); } })
         .catch(function(){ if(!done){ done = true; clearTimeout(timer); resolve(null); } });
     }catch(e){ if(!done){ done = true; clearTimeout(timer); resolve(null); } }
@@ -5281,7 +5353,7 @@ function netGet(path){
     var timer = setTimeout(function(){ if(!done){ done = true; resolve(null); } }, NET_TIMEOUT);
     try{
       fetch(WORKER + path)
-        .then(function(r){ return r.json().then(function(j){ return { ok: r.ok, body: j }; }); })
+        .then(function(r){ return r.json().then(function(j){ return { ok: r.ok, status: r.status, body: j }; }); })
         .then(function(v){ if(!done){ done = true; clearTimeout(timer); resolve(v); } })
         .catch(function(){ if(!done){ done = true; clearTimeout(timer); resolve(null); } });
     }catch(e){ if(!done){ done = true; clearTimeout(timer); resolve(null); } }
@@ -5318,6 +5390,14 @@ async function boardLive(board){
 }
 
 /* ---- the submit queue. A run is never lost to a bad wifi moment. ---- */
+/** A refusal that is about the SERVER, not the run: rate limit (429), a worker
+ *  or database error (5xx), or an old worker asking for a class code. These
+ *  queue and retry. Before v0.45 only the last did, so a 429 or 500 deleted a
+ *  real run (audit A6; SPEC 19.2 and 30.4 promise the queue absorbs them). */
+function netRetry(r){
+  return !!(r && (r.status === 429 || r.status >= 500 ||
+                  (r.body && r.body.error === "bad class code")));
+}
 function queueRun(run){
   var st = store();
   if(!st.queue) st.queue = [];
@@ -5333,10 +5413,10 @@ async function flushQueue(){
     if(bd !== "wc" && !(await boardLive(bd))){ keep.push(st.queue[i]); continue; }
     var r = await netPost("/score", st.queue[i]);
     if(r && r.ok) sent++;
-    else if(r && !r.ok && !(r.body && r.body.error === "bad class code")){
+    else if(r && !r.ok && !netRetry(r)){
       /* the server refused it on its merits: never going to work, drop it */
     }
-    else keep.push(st.queue[i]);   /* unreachable, or an un-deployed worker: retry */
+    else keep.push(st.queue[i]);   /* unreachable, busy, or an un-deployed worker: retry */
   }
   st.queue = keep; save();
   return sent;
@@ -5377,15 +5457,24 @@ async function submitRun(){
   var r = await netPost("/score", run);
 
   if(r && r.ok){
-    el("bzSubmitNote").innerHTML = r.body.approved === 1
-      ? "On the board at number <b>" + r.body.rank + "</b>."
-      : "Sent. Your score is on the board at number <b>" + r.body.rank +
-        "</b>, and your name appears once your teacher has approved it.";
+    /* approved is THREE-state (SPEC 32): 1 shown, 0 waiting, -1 rejected. */
+    var ap = r.body.approved, rk = "<b>" + r.body.rank + "</b>";
+    /* The board shows each name once, at its best (v0.45). A run below that
+       best is kept but is not the line on the board, so say so. */
+    if(r.body.isBest === false)
+      el("bzSubmitNote").innerHTML = "Sent. Your best on this board is still <b>" + r.body.best +
+        "</b>, and that is the one on the board.";
+    else el("bzSubmitNote").innerHTML = ap === 1
+      ? "On the board at number " + rk + "."
+      : ap === -1
+      ? "Sent. Your score is on the board at number " + rk + ". That name is not shown on the board, so try a different one next time."
+      : "Sent. Your score is on the board at number " + rk +
+        ", and your name appears once your teacher has approved it.";
     el("bzSubmitRow").style.display = "none";
     el("bzSeeBoard").style.display = "";
   } else if(r && !r.ok){
     var err = r.body && r.body.error;
-    if(err === "bad class code"){
+    if(netRetry(r)){
       /* We sent no class code, so an old worker is refusing a request a new one
          accepts. That is a VERSION SKEW, not a permanent refusal: it will work
          the moment the worker is deployed, so it queues like an outage rather
@@ -5396,7 +5485,7 @@ async function submitRun(){
       el("bzSubmitRow").style.display = "none";
     } else {
       el("bzSubmitNote").textContent = err === "bad nickname"
-        ? "That name will not work. Try something shorter."
+        ? "That name will not work. Try letters and numbers."
         : "That one could not be saved. Your best is still kept on this device.";
       el("bzSubmit").disabled = false;
     }
@@ -5481,8 +5570,19 @@ async function showBoard(board){
    Reached at ?teacher only. Deliberately not on the menu: it is not a
    secret, but nothing is served by putting it where a class will tap it.
    ================================================================== */
-function teacherKey(){ try{ return localStorage.getItem("wcc_tkey") || ""; }catch(e){ return ""; } }
-function setTeacherKey(k){ try{ localStorage.setItem("wcc_tkey", k); }catch(e){} }
+/* The password lives for the TAB only (sessionStorage), and is written only once
+   the service has accepted it. Before v0.45 it sat in localStorage, pre-filled
+   for the next person to open ?teacher on a shared class laptop (audit, worker 7). */
+function teacherKey(){
+  var k = ""; try{ k = sessionStorage.getItem("wcc_tkey") || ""; }catch(e){}
+  return k || (el("tKey") ? el("tKey").value.trim() : "");
+}
+function setTeacherKey(k){ try{ sessionStorage.setItem("wcc_tkey", k); }catch(e){} }
+function forgetTeacherKey(){
+  try{ sessionStorage.removeItem("wcc_tkey"); }catch(e){}
+  try{ localStorage.removeItem("wcc_tkey"); }catch(e){}
+  el("tKey").value = ""; el("tBody").innerHTML = '<p class="dim">Password forgotten on this device.</p>';
+}
 
 function startTeacher(){
   go("teacher");
@@ -5490,9 +5590,9 @@ function startTeacher(){
      it was a cached page: the browser was serving the old index.html and there
      was no way to tell by looking. A number here answers that in one glance. */
   el("tVer").textContent = VER;
+  try{ localStorage.removeItem("wcc_tkey"); }catch(e){}   /* a pre-v0.45 copy */
   el("tKey").value = teacherKey();
-  var st = store();
-  el("tCls").value = st.cls || "";
+  el("tCls").value = "";
   el("tBody").innerHTML = "";
 }
 /* The PASSWORD is what gets you in. The class box is a filter and nothing more.
@@ -5501,14 +5601,15 @@ function startTeacher(){
    the server knows and they do not. Each row now carries its own class and the
    Approve button sends that row's class, so it is never typed. */
 async function teacherLoad(){
-  setTeacherKey(el("tKey").value.trim());
-  if(!teacherKey()){
+  var typed = el("tKey").value.trim();
+  if(!typed){
     el("tBody").innerHTML = '<p class="dim">Type the teacher password first.</p>'; return;
   }
   var filter = (el("tCls").value || "").trim().toUpperCase();
   el("tBody").innerHTML = '<p class="dim">Loading...</p>';
   var body = filter ? { cls: filter } : {};
-  var r = await netPost("/admin/pending", body, { "X-Teacher-Key": teacherKey() });
+  var r = await netPost("/admin/pending", body, { "X-Teacher-Key": typed });
+  if(r && r.ok) setTeacherKey(typed);
   if(!r){ el("tBody").innerHTML = '<p class="dim">Could not reach the board.</p>'; return; }
   if(!r.ok){
     /* The site and the worker deploy separately (SPEC 19.7), so a site that has
@@ -5519,9 +5620,11 @@ async function teacherLoad(){
       why = "The board service has no teacher password set at all, so nothing you type " +
             "here can work yet. Set one with: npx wrangler secret put TEACHER_KEY";
     else if(err === "no") why = "That password was not accepted.";
-    else if(!filter) why = "The board service has not been updated yet. Deploy the worker " +
-                           "(deploy-worker.bat), or put a class code in the box for now.";
-    else why = "That did not work.";
+    else if(!filter && (err === "bad class code" || err === "not found"))
+      why = "The board service has not been updated yet. Deploy the worker " +
+            "(deploy-worker.bat), or put a class code in the box for now.";
+    else why = "The board service answered with an error" + (err ? ": " + esc(err) : "") +
+               ". Try again in a minute.";
     el("tBody").innerHTML = '<p class="dim">' + why + '</p>';
     return;
   }
@@ -5632,7 +5735,8 @@ async function teacherJudge(what, cls, nick){
 async function teacherClear(){
   var cls = (el("tCls").value || "").trim().toUpperCase();
   var what = cls ? ("every score in " + cls) : "every score on every board";
-  if(!confirm("Delete " + what + "? This cannot be undone.")) return;
+  if(!confirm("Delete " + what + ", and every approve or reject decision" + (cls ? " in " + cls : "") +
+               "? Names will need approving again. This cannot be undone.")) return;
   /* all:true is sent explicitly rather than inferred from an absent class, so a
      malformed request can never be the thing that wipes the board. */
   await netPost("/admin/clear", cls ? { cls: cls } : { all: true },
@@ -5770,6 +5874,8 @@ function startBlitz(board){
   B.correct = 0; B.wrong = 0; B.close = 0; B.neutral = 0; B.quit = false;
   B.board = board; B.secs = CHALLENGES[board].secs;
   B.step = 0; B.ustep = { wc:0, punc:0, tense:0, tech:0 };
+  B.topLevel = 0;
+  B.saved = blitzSnapshot();
   B.endsAt = nowMs() + B.secs * 1000;
   document.body.classList.add("testing");     /* reuse: hides feedback and chips */
   document.body.classList.add("blitz");
@@ -5780,6 +5886,34 @@ function startBlitz(board){
   B.tick = setInterval(blitzTick, 100);
   blitzTick();
   blitzNext();
+}
+
+/* A run borrows the Practice activities, and serving a question sets their
+   level, type and class. Before v0.45 nothing put them back, so a pupil on
+   Easiest came back from a run to find Hardest pressed, and the run had also
+   written its answers into the Practice seen and revisit lists (audit A3, A4).
+   Snapshot on the way in, restore on the way out. */
+var BZ_KEEP = { S:["act","cls","lvl"], Y:["cls"], K:["lvl"], F:["lvl"], C:["lvl"], R:["lvl"],
+  PN:["type","lvl"], PF:["type","lvl"], CS:["lvl"], CM:["type","lvl"], PP:["lvl"],
+  VT:["type","lvl"], VF:["type","lvl"], VP:["lvl"], XF:["type","lvl"], KT:["mode"], EIX:["mode"] };
+function blitzSnapshot(){
+  var snap = { g:{} }, objs = bzObjs();
+  for(var n in BZ_KEEP){ snap.g[n] = {};
+    BZ_KEEP[n].forEach(function(f){ snap.g[n][f] = objs[n][f]; }); }
+  var st = store();
+  snap.seen = JSON.stringify(st.seen || {}); snap.revisit = JSON.stringify(st.revisit || {});
+  return snap;
+}
+function blitzRestore(snap){
+  if(!snap) return;
+  var objs = bzObjs();
+  for(var n in snap.g) for(var f in snap.g[n]) objs[n][f] = snap.g[n][f];
+  var st = store();
+  st.seen = JSON.parse(snap.seen); st.revisit = JSON.parse(snap.revisit);
+}
+function bzObjs(){
+  return { S:S, Y:Y, K:K, F:F, C:C, R:R, PN:PN, PF:PF, CS:CS, CM:CM, PP:PP,
+           VT:VT, VF:VF, VP:VP, XF:XF, KT:KT, EIX:EIX };
 }
 
 function blitzTick(){
@@ -5878,6 +6012,7 @@ function blitzRecord(ok, outcome){
     B.score += blitzMult();
     B.correct++; B.chain++;
     if(B.chain > B.bestChain) B.bestChain = B.chain;
+    B.topLevel = Math.max(B.topLevel || 0, LEVELS.indexOf(blitzLevel()));
     flash("ok");
   } else {
     /* Clamped as it happens, not tidied up at the end: the falling number IS
@@ -5908,13 +6043,18 @@ function blitzFinish(){
   /* Freeze the run's figures: the result screen submits them, possibly a while
      later, and B is reset the moment the student presses Go again. */
   B.lastScore = B.score; B.lastCorrect = B.correct; B.lastWrong = B.wrong;
-  B.lastChain = B.bestChain; B.lastLevel = blitzLevel(); B.lastBoard = B.board;
+  B.lastChain = B.bestChain; B.lastBoard = B.board;
+  B.lastLevel = LEVELS[B.topLevel || 0];     /* deepest reached, as the schema says */
+  blitzRestore(B.saved); B.saved = null;
 
   var st = store();
   if(!st.best) st.best = {};
   var bk = bestKey(B.board);
   var prev = st.best[bk] || null;
-  var isBest = !prev || B.score > prev.score;
+  /* A stopped run is not a best (audit A7): before v0.45 it was, so a pupil who
+     quit at -3 was told -3 was their best, and a stopped Word classes run opened
+     Ultimate through the legacy best.blitz fallback in chDone(). */
+  var isBest = !B.quit && (!prev || B.score > prev.score);
   if(isBest) st.best[bk] = { score:B.score, chain:B.bestChain };
   /* a run that ran out the clock counts towards opening Ultimate; Stop does not */
   var wasLocked = !ultUnlocked();
@@ -5936,7 +6076,9 @@ function blitzFinish(){
   el("bzScore").textContent = B.score;
   el("bzBestChain").textContent = B.bestChain;
   var note = "";
-  if(isBest && prev) note = "New best. You beat " + prev.score + ".";
+  if(B.quit) note = prev ? "Stopped early, so it does not count. Your best is still " + prev.score + "."
+                         : "Stopped early, so it does not count as a best.";
+  else if(isBest && prev) note = "New best. You beat " + prev.score + ".";
   else if(isBest) note = "That is your first run, so it is your best by default.";
   else note = "Your best is still " + prev.score + ".";
   el("bzBest").textContent = note;
@@ -7846,7 +7988,9 @@ function xfCheck(){
     else if(isT && !sel){ b.className = "qchip q-miss"; right = false; }
     else if(!isT && sel){ b.className = "qchip q-bad"; right = false; over++; }
   }
-  el("xfScore").textContent = right ? "Right" : "Not quite";
+  /* Some of them found is Close, the rule every find-them-all round uses (v0.45) */
+  var close = !right && found > 0;
+  el("xfScore").textContent = right ? "Right" : (close ? "Close" : "Not that one");
   var fb = '<li>' + (right
       ? 'All ' + it.tr.length + ' of those carry across, and nothing else does.'
       : (over && found === it.tr.length
@@ -7871,7 +8015,7 @@ function xfCheck(){
   save(st);
   el("xfCheck").style.display = "none";
   el("xfNextBar").style.display = "";
-  chRecord(right);
+  chRecord(right, close ? "close" : null);
 }
 
 /* ============ KNOW THE TECHNIQUES (SPEC 46, from Analysis Acrobat) ==========
@@ -7973,9 +8117,10 @@ function ktSort(j, c){
   el("kts"+j+"b").setAttribute("aria-pressed", c===1 ? "true" : "false");
   el("ktCheck").disabled = Object.keys(KT.assign).length < KT.opts.length;
 }
-function ktFinish(right, key, fb){
+function ktFinish(right, key, fb, close){
   KT.done = true;
-  el("ktScore").textContent = right ? "Right" : "Not that one";
+  close = !right && !!close;
+  el("ktScore").textContent = right ? "Right" : (close ? "Close" : "Not that one");
   el("ktFb").innerHTML = fb;
   var st = store();
   if(right && key && KT.item){
@@ -7986,7 +8131,7 @@ function ktFinish(right, key, fb){
   save(st);
   el("ktCheck").style.display = "none";
   el("ktNextBar").style.display = "";
-  chRecord(right);
+  chRecord(right, close ? "close" : null);
 }
 function ktPick(i){
   if(KT.done) return;
@@ -8034,7 +8179,8 @@ function ktCheck(){
     ktFinish(right, "kt:spot", '<li>'+(right ? 'All '+total+' found, and nothing else.' :
       'You found '+found+' of '+total+'. Dashed means you missed it; crossed out is not '+esc(T)+'.')+
       '</li><li><b>'+esc(T)+' here:</b> '+list.join(', ')+
-      (T === "Metaphor" ? ' <span class="dim">(personification is a kind of metaphor, so it counts too)</span>' : '')+'</li>');
+      (T === "Metaphor" ? ' <span class="dim">(personification is a kind of metaphor, so it counts too)</span>' : '')+'</li>',
+      found > 0);   /* partly found is Close, as in every other find-them-all round */
   } else if(KT.mode === "sort"){
     var ok = 0;
     for(i=0;i<KT.opts.length;i++){
@@ -10075,8 +10221,9 @@ function linkCopy(){
   var t = el("lkOut").textContent;
   try{
     if(navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(t);
-      el("lkNote").textContent = "Copied";
+      navigator.clipboard.writeText(t).then(
+        function(){ el("lkNote").textContent = "Copied"; },
+        function(){ el("lkNote").textContent = "Select the link above and copy it"; });
       return;
     }
   }catch(e){}

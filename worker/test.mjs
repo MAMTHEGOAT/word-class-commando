@@ -223,7 +223,9 @@ await test("moderation: approve, reject, and judge a name only once", async () =
   r = await req("/board?cls=9B");
   b = await r.json();
   const named = b.board.filter(x => x.nick === "Aisha");
-  check("the approved name now appears", named.length === 2, JSON.stringify(b.board));
+  /* one line per name since v0.45: Aisha's two runs show as her best one */
+  check("the approved name now appears, once, at its best",
+    named.length === 1 && named[0].score === Math.max(...b.board.map(x => x.score)), JSON.stringify(b.board));
   check("the unjudged name still does not",
     JSON.stringify(b.board).indexOf("Rude One") < 0, JSON.stringify(b.board));
 
@@ -345,7 +347,7 @@ await test("the one shared board", async () => {
 
   r = await req("/board");
   let b = await r.json();
-  check("the board with no class is the shared one", r.status === 200 && b.board.length >= 2,
+  check("the board with no class is the shared one (one line per name)", r.status === 200 && b.board.length >= 1,
     JSON.stringify(b).slice(0, 160));
 
   /* A code still filters, so nothing posted under one before the change is
@@ -357,7 +359,7 @@ await test("the one shared board", async () => {
     b.board.length === 1, JSON.stringify(b.board));
   r = await req("/board");
   b = await r.json();
-  check("and the shared board contains it too", b.board.length >= 3, b.board.length);
+  check("and the shared board contains it too", b.board.length >= 2, b.board.length);
 
   /* Clearing is the one thing that must never be a slip. */
   r = await req("/admin/clear", { method: "POST", body: {},
@@ -470,6 +472,61 @@ await test("each board has its own physical bounds", async () => {
   check("two hundred answers is impossible in sixty seconds", r.status === 400, "got " + r.status);
   r = await post("ult", 200);
   check("but possible in the two-minute Ultimate run", r.status === 200, "got " + r.status);
+});
+
+await test("audit 2026-09-22: the -5 floor, name variants, rank, one line per name, clear", async () => {
+  const H = { "X-Teacher-Key": KEY };
+  /* twelve wrong at the floor, then ten right: the app scores 17 */
+  let r = await req("/score", { method: "POST",
+    body: { nick: "Floor", correct: 10, wrong: 12, chain: 10, level: "secure", score: 17 } });
+  check("an honest run that recovered from the -5 floor is accepted", r.status === 200, "got " + r.status);
+  r = await req("/score", { method: "POST",
+    body: { nick: "Floor", correct: 10, wrong: 12, chain: 10, level: "secure", score: 46 } });
+  check("but the bound still refuses the impossible", r.status === 400, "got " + r.status);
+
+  /* one decision covers every spelling */
+  await req("/score", { method: "POST", body: { ...good, cls: undefined, nick: "Rude" } });
+  await req("/admin/reject", { method: "POST", body: { cls: "ALL", nick: "Rude" }, headers: H });
+  for (const v of ["RUDE", "R u d e", "rude"]) {
+    r = await req("/score", { method: "POST", body: { ...good, cls: undefined, nick: v } });
+    const b = await r.json();
+    check("rejecting Rude also rejects " + JSON.stringify(v), b.approved === -1, JSON.stringify(b));
+  }
+  r = await req("/admin/pending", { method: "POST", body: {}, headers: H });
+  let b = await r.json();
+  check("and none of the variants refill the queue",
+    !b.pending.some(p => p.nick.replace(/ /g, "").toLowerCase() === "rude"), JSON.stringify(b.pending));
+
+  /* invisible characters */
+  r = await req("/score", { method: "POST", body: { ...good, cls: undefined, nick: "\u200B\u200B" } });
+  check("a name of only zero-width characters is refused", r.status === 400, "got " + r.status);
+  r = await req("/score", { method: "POST", body: { ...good, cls: undefined, nick: "\u202EhsiA" } });
+  b = await r.json();
+  check("a direction override is stripped from a name", r.status === 200 && b.nick === "hsiA", JSON.stringify(b));
+
+  /* one line per name, and rank counted the same way */
+  await req("/score", { method: "POST", body: { ...good, cls: undefined, nick: "Keen", score: 50, correct: 25 } });
+  await req("/score", { method: "POST", body: { ...good, cls: undefined, nick: "Keen", score: 45, correct: 25 } });
+  await req("/score", { method: "POST", body: { ...good, cls: undefined, nick: "keen", score: 44, correct: 25 } });
+  r = await req("/board");
+  b = await r.json();
+  const scores = b.board.map(x => x.score);
+  check("one pupil's several runs are one line on the board, at their best",
+    scores.filter(x => x === 50).length === 1 && scores.indexOf(45) < 0 && scores.indexOf(44) < 0, JSON.stringify(scores));
+  r = await req("/score", { method: "POST", body: { ...good, cls: undefined, nick: "Next", score: 40, correct: 25 } });
+  b = await r.json();
+  const board = (await (await req("/board")).json()).board;
+  const pos = board.findIndex(x => x.score === 40) + 1;
+  check("rank in the reply matches the line on the public board", b.rank === pos, b.rank + " vs " + pos);
+  r = await req("/score", { method: "POST", body: { ...good, cls: undefined, nick: "Keen", score: 10, correct: 25 } });
+  b = await r.json();
+  check("and a run below the pupil's best says so", b.isBest === false && b.best === 50, JSON.stringify(b));
+
+  /* a clear also clears the name decisions */
+  await req("/admin/clear", { method: "POST", body: { all: true }, headers: H });
+  r = await req("/score", { method: "POST", body: { ...good, cls: undefined, nick: "Rude" } });
+  b = await r.json();
+  check("after a full clear, an old decision no longer applies", b.approved === 0, JSON.stringify(b));
 });
 
 await test("an old database gets its board column on the first request", async () => {

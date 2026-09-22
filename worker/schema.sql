@@ -21,7 +21,8 @@ CREATE TABLE IF NOT EXISTS runs (
   correct INTEGER NOT NULL,
   wrong   INTEGER NOT NULL,
   chain   INTEGER NOT NULL,          -- longest combo chain in the run
-  level   TEXT    NOT NULL,          -- deepest level reached
+  level   TEXT    NOT NULL,          -- deepest level reached in the run (v0.45; before
+                                     -- that, the level when the clock ran out)
   created INTEGER NOT NULL,          -- unix seconds, server clock not client clock
   board   TEXT    NOT NULL DEFAULT 'wc'  -- which challenge (SPEC 50). On a database
                                      -- made before v0.39 the worker adds this column
@@ -30,18 +31,23 @@ CREATE TABLE IF NOT EXISTS runs (
                                      -- too, for the same reason.
 );
 
--- The board query: top scores for one class.
+-- Older indexes from the per-class design. Kept (they cost nothing); the hot
+-- queries since the one shared board are served by the two below and by
+-- idx_runs_kind (board, score DESC), which the worker creates itself.
 CREATE INDEX IF NOT EXISTS idx_runs_board ON runs (cls, score DESC);
-
--- The rate-limit query: how many runs has this class posted in the last minute.
--- Rate limiting reads this table rather than tracking IP addresses, so that no
--- request metadata has to be stored to make it work.
 CREATE INDEX IF NOT EXISTS idx_runs_recent ON runs (cls, created);
-
--- The moderation queue: everything still waiting on a teacher.
 CREATE INDEX IF NOT EXISTS idx_runs_pending ON runs (cls, approved);
 
--- A name is judged ONCE per class, not once per run. Without this a teacher
+-- The rate-limit query: how many runs in the last minute, app-wide. Rate
+-- limiting reads this table rather than tracking IP addresses, so that no
+-- request metadata has to be stored to make it work.
+CREATE INDEX IF NOT EXISTS idx_runs_created ON runs (created);
+
+-- The moderation queue: everything still waiting on a teacher, grouped by name.
+CREATE INDEX IF NOT EXISTS idx_runs_waiting ON runs (approved, cls, nick);
+
+-- A name is judged ONCE per class, not once per run, and "Rude", "RUDE" and
+-- "R u d e" are one name: the worker compares lower-case with spaces removed. Without this a teacher
 -- approves the same thirty names every lesson, which is how a moderation queue
 -- stops being used. A decision here is applied to that student's future runs
 -- automatically, and retrospectively to any of theirs still pending.

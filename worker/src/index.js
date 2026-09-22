@@ -12,7 +12,7 @@
  *  2. Scores cannot be trusted and that is unfixable (SPEC 19.4). The run
  *     happens in a browser and the source is public. So this rejects the
  *     IMPOSSIBLE rather than pretending to verify the plausible: arithmetic
- *     that could not have happened, more items than sixty seconds allows, a
+ *     that could not have happened, more items than the run's time allows, a
  *     chain longer than the correct answers. Everything past that is a social
  *     problem, and in a class of thirty a social problem is manageable.
  *
@@ -47,7 +47,11 @@ const NICK_MAX = 16;
  *  judging it. The judging is a person's job and happens later. */
 function cleanNick(v) {
   if (typeof v !== "string") return null;
-  let s = v.replace(/[\u0000-\u001F\u007F]/g, " ")   // control characters
+  let s = v.normalize("NFKC")                         // fullwidth and look-alike forms
+           .replace(/[\u0000-\u001F\u007F-\u009F]/g, " ")  // control characters
+           /* zero-width, direction overrides, word joiners, BOM: invisible, so a
+              "name" of nothing but these reached the queue as a blank card */
+           .replace(/[\u00AD\u200B-\u200F\u202A-\u202E\u2060-\u206F\uFEFF]/g, "")
            .replace(/[<>]/g, "")                       // never worth storing
            .replace(/\s+/g, " ")
            .trim();
@@ -55,6 +59,12 @@ function cleanNick(v) {
   if ([...s].length > NICK_MAX) return null;
   return s;
 }
+
+/* One name, however it is typed. "Rude", "RUDE" and "R u d e" are one decision
+   and one line on the board (audit 2026-09-22). Done IN SQL on both sides of every
+   comparison, so the stored display form never has to change and old rows fold
+   exactly as new ones do. cleanNick has already turned every space into " ". */
+const FOLD = (col) => "lower(replace(" + col + ", ' ', ''))";
 
 const LEVELS = ["foundation", "developing", "secure", "challenge"];
 
@@ -94,6 +104,7 @@ function cleanKind(v) {
 }
 const MAX_MULTIPLIER = 5;        // combo multiplier ceiling, mirrored in the app
 const WRONG_PENALTY = 3;
+const SCORE_FLOOR = -5;          // the running floor, mirrored in the app (SPEC 31)
 
 /* Rate limit, measured off the runs table so that no request metadata (IP,
    headers, fingerprint) has to be stored to make it work. */
@@ -160,7 +171,11 @@ function cleanClass(v) {
  * pretending otherwise would be the "verify the plausible" trap of SPEC 19.4.
  */
 function maxPossibleScore(correct, wrong) {
-  return correct * MAX_MULTIPLIER - wrong * WRONG_PENALTY;
+  /* The app floors the RUNNING total at SCORE_FLOOR (SPEC 31), so wrong answers
+     taken at the floor cost nothing and at most |SCORE_FLOOR| is ever lost to
+     them. Before v0.45 this subtracted every wrong answer in full, and an honest
+     run of twelve wrong then ten right (17) was refused as impossible (14). */
+  return correct * MAX_MULTIPLIER - Math.min(wrong * WRONG_PENALTY, -SCORE_FLOOR);
 }
 
 /* ----------------------------------------------------------------- handlers */
@@ -228,7 +243,8 @@ async function postScore(request, env) {
      carries over, so a student who has been approved once is not re-queued
      every single run. */
   const prior = await env.DB
-    .prepare("SELECT status FROM names WHERE cls = ? AND nick = ?")
+    .prepare("SELECT status FROM names WHERE cls = ? AND " + FOLD("nick") + " = " + FOLD("?") +
+             " ORDER BY decided DESC LIMIT 1")
     .bind(cls, nick)
     .first();
   const approved = prior ? prior.status : 0;
@@ -241,15 +257,25 @@ async function postScore(request, env) {
     .bind(cls, nick, approved, score, correct, wrong, chain, body.level, now, board)
     .run();
 
-  /* Tell the student where they landed, which is the only thing they want to
-     know and saves the app a second request. */
+  /* Tell the student where they landed, counted exactly as the public board
+     counts: one line per name, across every class unless a class was sent. */
+  const explicitCls = cls !== DEFAULT_BOARD;
   const rank = await env.DB
-    .prepare("SELECT COUNT(*) AS n FROM runs WHERE cls = ? AND board = ? AND score > ?")
-    .bind(cls, board, score)
+    .prepare("SELECT COUNT(DISTINCT cls || '|' || " + FOLD("nick") + ") AS n FROM runs " +
+             "WHERE board = ? AND score > ? AND NOT (cls = ? AND " + FOLD("nick") + " = " + FOLD("?") + ")" +
+             (explicitCls ? " AND cls = ?" : ""))
+    .bind(...(explicitCls ? [board, score, cls, nick, cls] : [board, score, cls, nick]))
     .first();
+  const mine = await env.DB
+    .prepare("SELECT MAX(score) AS best FROM runs WHERE board = ? AND cls = ? AND " +
+             FOLD("nick") + " = " + FOLD("?"))
+    .bind(board, cls, nick)
+    .first();
+  const best = mine && typeof mine.best === "number" ? mine.best : score;
 
   return json(env, { ok: true, nick: nick, approved: approved, board: board,
-                     rank: (rank ? rank.n : 0) + 1 });
+                     rank: (rank ? rank.n : 0) + 1,
+                     isBest: score >= best, best: best });
 }
 
 /** The board. `cls` is OPTIONAL: with none given this is the one shared board
@@ -271,9 +297,14 @@ async function getBoard(url, env) {
   if (limit > BOARD_MAX) limit = BOARD_MAX;
 
   await ensureBoardColumn(env);
+  /* ONE line per name: each name's best run on this board (v0.45). Before, one
+     keen pupil could fill the whole top five with their own history. */
   const sql =
-    "SELECT id, nick, approved, score, correct, wrong, chain, level, created FROM runs " +
-    "WHERE board = ? " + (cls ? "AND cls = ? " : "") + "ORDER BY score DESC, created ASC LIMIT ?";
+    "SELECT id, nick, approved, score, correct, wrong, chain, level, created FROM (" +
+    "SELECT *, ROW_NUMBER() OVER (PARTITION BY cls, " + FOLD("nick") +
+    " ORDER BY score DESC, created ASC) AS rn FROM runs " +
+    "WHERE board = ? " + (cls ? "AND cls = ? " : "") +
+    ") WHERE rn = 1 ORDER BY score DESC, created ASC LIMIT ?";
   const rows = await (cls ? env.DB.prepare(sql).bind(board, cls, limit)
                           : env.DB.prepare(sql).bind(board, limit)).all();
 
@@ -361,10 +392,10 @@ async function adminPending(request, env) {
      `boards` only tells the teacher where the name has been seen. */
   await ensureBoardColumn(env);
   const sql =
-    "SELECT cls, nick, COUNT(*) AS runs, MAX(score) AS best, MIN(created) AS first, " +
+    "SELECT cls, MIN(nick) AS nick, COUNT(*) AS runs, MAX(score) AS best, MIN(created) AS first, " +
     "GROUP_CONCAT(DISTINCT board) AS boards " +
     "FROM runs WHERE approved = 0 " + (cls ? "AND cls = ? " : "") +
-    "GROUP BY cls, nick ORDER BY first ASC LIMIT 200";
+    "GROUP BY cls, " + FOLD("nick") + " ORDER BY first ASC LIMIT 200";
   const stmt = cls ? env.DB.prepare(sql).bind(cls) : env.DB.prepare(sql);
   const rows = await stmt.all();
   return json(env, { cls: cls, pending: (rows && rows.results) || [] });
@@ -384,6 +415,11 @@ async function adminJudge(request, env, status) {
   if (!nick) return json(env, { error: "bad nickname" }, 400);
 
   const now = Math.floor(Date.now() / 1000);
+  /* one decision per folded name: drop any earlier spelling's row first */
+  await env.DB
+    .prepare("DELETE FROM names WHERE cls = ? AND " + FOLD("nick") + " = " + FOLD("?"))
+    .bind(cls, nick)
+    .run();
   await env.DB
     .prepare("INSERT INTO names (cls, nick, status, decided) VALUES (?, ?, ?, ?) " +
              "ON CONFLICT(cls, nick) DO UPDATE SET status = excluded.status, " +
@@ -391,7 +427,7 @@ async function adminJudge(request, env, status) {
     .bind(cls, nick, status, now)
     .run();
   const r = await env.DB
-    .prepare("UPDATE runs SET approved = ? WHERE cls = ? AND nick = ?")
+    .prepare("UPDATE runs SET approved = ? WHERE cls = ? AND " + FOLD("nick") + " = " + FOLD("?"))
     .bind(status, cls, nick)
     .run();
   return json(env, { ok: true, nick: nick, status: status,
@@ -439,13 +475,18 @@ async function adminClear(request, env) {
     return json(env, { error: auth === "unset" ? "no key set" : "no" }, 403);
   let body;
   try { body = await request.json(); } catch (e) { return json(env, { error: "bad json" }, 400); }
+  /* A wipe clears the NAME decisions in the same scope (v0.45, Michael's ruling):
+     a fresh board starts with a fresh queue, rather than every name ever approved
+     staying approved and open for anyone to post under. */
   let r;
   if (body.all === true) {
     r = await env.DB.prepare("DELETE FROM runs").run();
+    await env.DB.prepare("DELETE FROM names").run();
   } else {
     const cls = cleanClass(body.cls);
     if (!cls) return json(env, { error: "name a class, or send all: true" }, 400);
     r = await env.DB.prepare("DELETE FROM runs WHERE cls = ?").bind(cls).run();
+    await env.DB.prepare("DELETE FROM names WHERE cls = ?").bind(cls).run();
   }
   return json(env, { ok: true, cleared: (r.meta && r.meta.changes) || 0 });
 }
