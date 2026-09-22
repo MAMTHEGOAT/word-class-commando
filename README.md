@@ -1,8 +1,9 @@
 # Word Class Commando
 
-A single-file browser app for practising English word classes: nouns, verbs, adjectives and
-adverbs. Students find the words in a sentence and name the job each one is doing.
-Deterministic and offline: no accounts, no backend, no AI, and nothing leaves the browser.
+A single-file browser app for KS3 and IGCSE English: word classes, literary techniques,
+punctuation, verb tenses and the vocabulary of analytical writing. Written for a British
+curriculum classroom with many EAL pupils. No accounts and no AI. Practice stays in the
+browser; only a Challenge score a pupil chooses to submit goes to the leaderboard.
 
 **Live app:** https://mamthegoat.github.io/word-class-commando/
 
@@ -12,37 +13,41 @@ teaches Cambridge 0500 language analysis. This one sits a level below it: you ca
 
 ## What is in it
 
-**Learn.** One card per class: what it is in plain English, a check you can actually apply
-inside a sentence, a worked example, and an honest list of the exceptions.
+Six domains, 32 activities, each with a Learn page:
 
-**Practice.** Four activities, across four difficulty levels:
+| Domain | What pupils do |
+|---|---|
+| Word classes | Find, name and use nouns, verbs, adjectives and adverbs (eight activities) |
+| Techniques (SOAPMAPS) | Know, find and take apart the SOAPMAPS techniques, plus alliteration and hyperbole |
+| Techniques (Expanded) | The harder techniques: find them, animal or human, semantic field, and the terms for writing about them |
+| Punctuation | Spot the mistake, find it then fix it, proofread a paragraph, put the commas in, comma or full stop |
+| Verb tenses | Spot the wrong tense in a sentence or a paragraph, and put the right tense in |
+| Analytical language | Words to use instead of "the writer shows": their meanings, their jobs, and which one is true of an extract |
 
-- **Click the word** and **Click all the words** — find the class in a real sentence.
-- **Where does it fit?** — one word, three gaps, which one takes it? This covers all four
-  classes already, so adjectives and adverbs are taught here first.
-- **Yes or no** — one word marked in its sentence, one question, a streak to beat.
+**Practise** has no timer and no score. Most activities have four levels (Easiest to Hardest).
 
-Nouns and verbs are scored in the click rounds; adjectives and adverbs are coming.
+**Challenge** is timed, with a leaderboard for each skill: Word classes (one minute),
+Punctuation, Verb tenses and Techniques (two minutes each), and Ultimate Champion (four
+minutes, every discipline in turn). A wrong answer costs three points and breaks the chain.
+Nicknames only appear on the board once a teacher has approved them.
 
 Three things it tries to do differently:
 
-- **It never tells you a true thing is false.** Click a word that really is an adverb in a
-  round asking for a different kind, and it says so and moves on, without marking you down.
-- **A verb can be more than one word.** *Was reading*, *did not bark*, *has never eaten*,
-  *picked the box up*. On the easier levels the app marks the whole verb for you. On the
-  harder ones you have to find every part yourself, because spotting the helper word is the
-  skill.
-- **The feedback teaches the check, not the answer.** Every wrong click comes back with the
-  test you should have applied, not just a cross.
+- **It never tells you a true thing is false.** Tap a word that really is an adverb in a
+  round asking for a different kind, and it says so without marking you down.
+- **The feedback teaches the check, not the answer.** Every wrong tap comes back with the
+  test you should have applied.
+- **Nothing about the shape of a question answers it.** The banks are measured so that
+  position, length or a word ending cannot stand in for knowing the grammar.
 
 ## Running it
 
-Open `index.html` in any browser. That is the whole thing.
+Open `index.html` in any browser. That is the whole thing. The leaderboard only works from
+the live site.
 
 ## For developers
 
-`index.html?validate` runs the content validator and prints a report. It must show
-**0 ERRORS** after any change to the word banks. It also prints the lemma map, the pool
-sizes per activity and level, and any word carrying two classes.
+`index.html?validate` runs the content validator; it must show **0 ERRORS**. The leaderboard
+service is in `worker/` (see its README).
 
 Built by an English teacher with Claude. All content is original.

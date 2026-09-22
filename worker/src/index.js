@@ -72,7 +72,7 @@ const LEVELS = ["foundation", "developing", "secure", "challenge"];
    its own run length, which is what the physical bounds below are computed from.
    A run with no board is a Word classes run: that is every run posted before
    v0.39, and every run from an app that has not been updated yet. */
-const BOARDS = { wc: 60, punc: 90, tense: 90, tech: 90, ult: 120 };
+const BOARDS = { wc: 60, punc: 120, tense: 120, tech: 120, ult: 240 };
 const DEFAULT_KIND = "wc";
 
 /* Physical bounds for a run. Deliberately generous: this is here to reject
