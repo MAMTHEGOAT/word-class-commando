@@ -4106,7 +4106,7 @@ var AMBIG = ["answer","answers","back","bark","barks","book","books","brush","br
 <script>
 "use strict";
 
-var APP = "wcc", VER = "v0.43", BANK_REV = 31;
+var APP = "wcc", VER = "v0.44", BANK_REV = 31;
 var BUG_FORM_URL = "";   /* paste the Office 365 form link to switch the report button on */
 
 /* ---------- the four tests: one source for the Learn screen AND every
@@ -4868,7 +4868,7 @@ function check(){
   }
   /* Neutral must not cost anything (invariant 3). A tap that was true of the
      language but not what this round asked is neither credit nor penalty. */
-  testRecord(!!credited.length && !wrong.length && !missed.length && !partial.length,
+  chRecord(!!credited.length && !wrong.length && !missed.length && !partial.length,
              (!wrong.length && !credited.length && neutral.length) ? "neutral" : null);
 }
 
@@ -4986,7 +4986,7 @@ function frCheck(){
 
   el("frCheck").style.display="none";
   el("frNextBar").style.display="";
-  testRecord(ok);
+  chRecord(ok);
 }
 
 /* ==================================================================
@@ -5107,7 +5107,7 @@ function ynAnswer(said){
   el("ynTime").textContent = secs.toFixed(1) + "s";
   el("ynYes").style.display="none"; el("ynNo").style.display="none";
   el("ynNextBar").style.display="";
-  testRecord(ok);
+  chRecord(ok);
 }
 function aOrAn(w){ return ("aeiou".indexOf(w.charAt(0))>=0 ? "an " : "a ") + w; }
 
@@ -5225,7 +5225,7 @@ function czCheck(){
   if(ok && seen.indexOf(it.id)<0) seen.push(it.id);
   st2.seen[key]=seen; save(st2);
   el("czCheck").style.display="none"; el("czNextBar").style.display="";
-  testRecord(ok);
+  chRecord(ok);
 }
 
 function famLine(fam){
@@ -5978,18 +5978,23 @@ function blitzQuit(){
 
 /* Test mode was removed at v0.33 on Michael's ruling: it was Challenge with
    the fun taken out, and nobody chose it. What survives is the one-line hook
-   every activity's check function calls, which now only feeds Challenge. */
-function testRecord(ok, outcome){
+   every activity's check function calls, which now only feeds Challenge.
+   Renamed from testRecord at v0.44 so the name says what it does. */
+function chRecord(ok, outcome){
   if(B.on) return blitzRecord(ok, outcome);
 }
 
 function nowMs(){ return new Date().getTime(); }
 
 /* ==================================================================
-   WHAT I KEEP GETTING WRONG  (SPEC 22)
+   MISCONCEPTION CARDS  (SPEC 22; DORMANT since v0.35)
 
-   The misconception counters have been written on every wrong answer
-   since v0.2 and shown to nobody. This is the screen that shows them.
+   The "What I keep getting wrong" screen was removed at v0.35 on
+   Michael's ruling. The counters are still written on every wrong answer
+   and DIAG / DIAG_ACT / diagCard below are kept, unused by the page, as
+   the named reading of them, so the screen can return (or move to the
+   teacher page) without rebuilding. Tests still exercise diagCard so the
+   wording cannot rot while it waits. Original notes follow.
 
    Teacher ruling 2026-08-25: misconceptions ONLY. No percentage, no
    items-done, no streak, nothing countable. Practice carries no score
@@ -6454,7 +6459,7 @@ function kCheck(){
   if(ok && seen.indexOf(it.id)<0) seen.push(it.id);
   st2.seen[key]=seen; save(st2);
   el("kCheck").style.display="none"; el("kNextBar").style.display="";
-  testRecord(ok);
+  chRecord(ok);
 }
 
 /* ------------- same word, different job (SPEC 9.7) -------------
@@ -6567,7 +6572,7 @@ function shCheck(){
   if(allOk && seen.indexOf(SH.item.id)<0) seen.push(SH.item.id);
   st2.seen[key]=seen; save(st2);
   el("shCheck").style.display="none"; el("shNextBar").style.display="";
-  testRecord(allOk);
+  chRecord(allOk);
 }
 
 /* ---------------- change the word ---------------- */
@@ -6626,7 +6631,7 @@ function trCheck(){
   if(ok && seen.indexOf(it.id)<0) seen.push(it.id);
   st2.seen[key]=seen; save(st2);
   el("trCheck").style.display="none"; el("trNextBar").style.display="";
-  testRecord(ok);
+  chRecord(ok);
 }
 
 /* ==================================================================
@@ -6786,7 +6791,7 @@ function cmCheck(){
   }
   save(st);
   el("cmNextBar").style.display = "";
-  testRecord(right);
+  chRecord(right);
 }
 
 /* the sentence written out with its required commas back in */
@@ -6901,7 +6906,7 @@ function pnCheck(){
   }
   save(st);
   el("pnNextBar").style.display = "";
-  testRecord(ok);
+  chRecord(ok);
 }
 
 /* ============= PUNCTUATION: find it, then fix it (SPEC 45) ================
@@ -7019,7 +7024,7 @@ function pfPick(i){
   if(!fixed)  st.err["puncfix_"+it.type] = (st.err["puncfix_"+it.type]||0) + 1;
   save(st);
   el("pfNextBar").style.display = "";
-  testRecord(score === "Right", score === "Close" ? "close" : null);
+  chRecord(score === "Right", score === "Close" ? "close" : null);
 }
 
 /* ================= COMMA RULES, ONE AT A TIME (SPEC 47) =================
@@ -7107,7 +7112,7 @@ function csPick(a){
   } else st.err.commas_splice = (st.err.commas_splice||0) + 1;
   save(st);
   el("csNextBar").style.display = "";
-  testRecord(right);
+  chRecord(right);
 }
 
 /* ===================== TECHNIQUES: find it (SPEC 35) =====================
@@ -7668,7 +7673,7 @@ function vtCheck(){
   }
   save(st);
   el("vtNextBar").style.display = "";
-  testRecord(right);
+  chRecord(right);
 }
 
 /* ---------------- round two: put the right one in ---------------------- */
@@ -7738,7 +7743,7 @@ function vfPick(i){
   }
   save(st);
   el("vfNextBar").style.display = "";
-  testRecord(right);
+  chRecord(right);
 }
 
 /* ===================== WHAT TRANSFERS (SPEC 41) =============================
@@ -7866,7 +7871,7 @@ function xfCheck(){
   save(st);
   el("xfCheck").style.display = "none";
   el("xfNextBar").style.display = "";
-  testRecord(right);
+  chRecord(right);
 }
 
 /* ============ KNOW THE TECHNIQUES (SPEC 46, from Analysis Acrobat) ==========
@@ -7981,7 +7986,7 @@ function ktFinish(right, key, fb){
   save(st);
   el("ktCheck").style.display = "none";
   el("ktNextBar").style.display = "";
-  testRecord(right);
+  chRecord(right);
 }
 function ktPick(i){
   if(KT.done) return;
@@ -8136,7 +8141,7 @@ function eiPick(i){
   } else st.err["ei_"+EIX.mode] = (st.err["ei_"+EIX.mode]||0) + 1;
   save(st);
   el("eiNextBar").style.display = "";
-  testRecord(score === "Right", score === "Close" ? "close" : null);
+  chRecord(score === "Right", score === "Close" ? "close" : null);
 }
 
 /* ============ PROOFREAD A PARAGRAPH: PUNCTUATION (SPEC 49) =================
@@ -8210,7 +8215,7 @@ function ppCheck(){
   } else st.err.punc_para = (st.err.punc_para||0) + 1;
   save(st);
   el("ppNextBar").style.display = "";
-  testRecord(score === "Right", score === "Close" ? "close" : null);
+  chRecord(score === "Right", score === "Close" ? "close" : null);
 }
 
 /* ============ SPOT THE MISTAKES IN A PARAGRAPH (SPEC 48) ====================
@@ -8279,7 +8284,7 @@ function vpCheck(){
   } else st.err.tense_para = (st.err.tense_para||0) + 1;
   save(st);
   el("vpNextBar").style.display = "";
-  testRecord(score === "Right", score === "Close" ? "close" : null);
+  chRecord(score === "Right", score === "Close" ? "close" : null);
 }
 
 /* ============ TECHNIQUES (EXPANDED), SECOND WAVE (SPEC 53) =================
@@ -8332,7 +8337,7 @@ function xtPick(i){
   else st.err.xterm = (st.err.xterm||0) + 1;
   save(st);
   el("xtNextBar").style.display = "";
-  testRecord(right);
+  chRecord(right);
 }
 
 var SF = { lvl:"all", item:null, sel:{}, done:false };
@@ -8383,7 +8388,7 @@ function sfCheck(){
   else st.err.semf = (st.err.semf||0) + 1;
   save(st);
   el("sfNextBar").style.display = "";
-  testRecord(score === "Right", score === "Close" ? "close" : null);
+  chRecord(score === "Right", score === "Close" ? "close" : null);
 }
 
 /* ================= ANALYTICAL LANGUAGE (SPEC 52) ===========================
@@ -8563,7 +8568,7 @@ function alPick(i){
   if(!right) st.err["al_"+AL.mode] = (st.err["al_"+AL.mode]||0) + 1;
   save(st);
   el("alNextBar").style.display = "";
-  testRecord(right);
+  chRecord(right);
 }
 
 /* ================= ZOOMORPHISM OR ANTHROPOMORPHISM (SPEC 40) ================

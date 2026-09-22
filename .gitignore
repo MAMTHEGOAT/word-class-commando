@@ -89,3 +89,10 @@ techx_bank.py
 # Teaching resources kept beside the app, never published
 *.pptx
 *.pdf
+
+# v0.44: build logos, test runner, reviewer brief, and every generated bank file
+build-assets/
+run-tests.sh
+AUDIT-BRIEF.md
+*.jsonl
+*.json
