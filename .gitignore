@@ -85,3 +85,7 @@ anal_bank.py
 # Techniques (Expanded) second-wave sources (v0.42): authoring, not site
 build_techx.py
 techx_bank.py
+
+# Teaching resources kept beside the app, never published
+*.pptx
+*.pdf
