@@ -81,3 +81,7 @@ imagery_bank.py
 # Analytical language sources (v0.41): authoring, not site
 build_anal.py
 anal_bank.py
+
+# Techniques (Expanded) second-wave sources (v0.42): authoring, not site
+build_techx.py
+techx_bank.py
