@@ -362,6 +362,23 @@ button.yn{min-width:110px;font-size:1.05rem}
    already puts the words a pupil has to read on the cream paper panel and keeps
    the instruction on the dark page around it. These rounds had both in one
    paragraph, told apart only by a line break and a heavier weight. */
+/* KEYS AS WELL AS TAPS (v0.53). Year 9: "the modes have keybinds for answers".
+   The number is drawn by a counter rather than written into each round's markup,
+   so the numeral a pupil reads and the button the key presses are the same list
+   by construction and cannot drift apart. Hidden on a touch screen, where there
+   are no number keys and the badge is clutter. */
+/* The characters that differ between near-identical options (v0.53). Marked in
+   every option, never only the right one, or the mark would be the answer. */
+.odiff{background:rgba(190,150,80,.30);border-radius:3px;padding:0 1px;font-weight:700}
+.ref .akeys{margin-left:14px}
+.ref .akeys code{font-size:.92em}
+.kb{counter-reset:kb}
+.kb button::before{counter-increment:kb;content:counter(kb);
+  display:inline-block;min-width:1.1em;margin-right:8px;padding:0 4px;
+  border-radius:5px;background:rgba(0,0,0,.30);color:var(--dim);
+  font-size:.76em;font-weight:700;vertical-align:.1em}
+@media (pointer:coarse){ .kb button::before{display:none} }
+
 /* Reading and practising are different acts, and the menu should say so
    (v0.52). Four of fifteen Year 9s said they had never opened an explanation
    section; the cards sat in a group that looked like all the others. */
@@ -546,7 +563,7 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
   <div class="chips" id="frLevels"></div>
   <p class="prompt">Which gap does this word fit?</p>
   <div class="bigword" id="frWord"></div>
-  <div id="frSlots"></div>
+  <div id="frSlots" class="kb"></div>
   <div class="bar">
     <button class="go checkbtn" id="frCheck" onclick="frCheck()" disabled>Check</button>
     <span class="score" id="frScore"></span>
@@ -571,8 +588,8 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
   <p class="prompt" id="ynPrompt"></p>
   <div class="sent" id="ynSent"></div>
   <div class="bar">
-    <button class="go yn" onclick="ynAnswer(true)" id="ynYes">Yes</button>
-    <button class="ghost yn" onclick="ynAnswer(false)" id="ynNo">No</button>
+    <span class="kb"><button class="go yn" onclick="ynAnswer(true)" id="ynYes">Yes</button>
+    <button class="ghost yn" onclick="ynAnswer(false)" id="ynNo">No</button></span>
   </div>
   <ul class="fb" id="ynFb"></ul>
   <div class="bar nextbar" id="ynNextBar" style="display:none">
@@ -589,7 +606,7 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
   <div class="chips" id="czLevels"></div>
   <p class="prompt">Which word fills the gap?</p>
   <div class="sent" id="czSent"></div>
-  <div id="czOpts"></div>
+  <div id="czOpts" class="kb"></div>
   <div class="bar">
     <button class="go checkbtn" id="czCheck" onclick="czCheck()" disabled>Check</button>
     <span class="score" id="czScore"></span>
@@ -720,7 +737,7 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
   <div class="chips" id="kLevels"></div>
   <p class="prompt">Which word class fills the gap?</p>
   <div class="sent" id="kSent"></div>
-  <div id="kOpts"></div>
+  <div id="kOpts" class="kb"></div>
   <div class="bar">
     <button class="go checkbtn" id="kCheck" onclick="kCheck()" disabled>Check</button>
     <span class="score" id="kScore"></span>
@@ -739,7 +756,7 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
   <div class="chips" id="trLevels"></div>
   <p class="prompt" id="trPrompt"></p>
   <div class="bigword" id="trWord"></div>
-  <div id="trOpts"></div>
+  <div id="trOpts" class="kb"></div>
   <div class="bar">
     <button class="go checkbtn" id="trCheck" onclick="trCheck()" disabled>Check</button>
     <span class="score" id="trScore"></span>
@@ -790,7 +807,7 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
   <p class="step" id="tqStep" style="display:none"></p>
   <p class="prompt" id="tqPrompt"></p>
   <div class="sent" id="tqSent"></div>
-  <div class="chips opts" id="tqOpts" style="display:none"></div>
+  <div class="chips opts kb" id="tqOpts" style="display:none"></div>
   <div class="bar">
     <button class="go checkbtn" id="tqCheck" onclick="tqCheck()" disabled>Check</button>
     <span class="score" id="tqScore"></span>
@@ -867,7 +884,7 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
   <div class="chips" id="vfLevels"></div>
   <p class="prompt" id="vfPrompt"></p>
   <div class="sent" id="vfSent"></div>
-  <div class="chips opts" id="vfOpts"></div>
+  <div class="chips opts kb" id="vfOpts"></div>
   <div class="bar"><span class="score" id="vfScore"></span></div>
   <ul class="fb" id="vfFb"></ul>
   <div class="bar nextbar" id="vfNextBar" style="display:none">
@@ -886,7 +903,7 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
   <p class="prompt" id="xfPrompt"></p>
   <div class="sent" id="xfSent"></div>
   <p class="small" id="xfKey"></p>
-  <div class="chips opts" id="xfOpts"></div>
+  <div class="chips opts kb" id="xfOpts"></div>
   <div class="bar">
     <button class="go checkbtn keep" id="xfCheck" onclick="xfCheck()" disabled>Check</button>
     <span class="score" id="xfScore"></span>
@@ -983,7 +1000,7 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
   <div class="chips" id="ktModes"></div>
   <p class="small dim">New to these? <button class="linkbtn" onclick="go('aalearn')">The techniques explained</button></p>
   <p class="prompt" id="ktPrompt"></p>
-  <div id="ktArea"></div>
+  <div id="ktArea" class="kb"></div>
   <div class="bar">
     <button class="go checkbtn keep" id="ktCheck" onclick="ktCheck()" style="display:none" disabled>Check</button>
     <span class="score" id="ktScore"></span>
@@ -1012,7 +1029,7 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
   </details>
   <div class="aa-phrase" id="eiPhrase"></div>
   <p class="prompt" id="eiPrompt"></p>
-  <div id="eiArea"></div>
+  <div id="eiArea" class="kb"></div>
   <div class="bar"><span class="score" id="eiScore"></span></div>
   <ul class="fb" id="eiFb"></ul>
   <div class="bar nextbar" id="eiNextBar" style="display:none">
@@ -1044,7 +1061,7 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
   <div class="aa-stmt" id="alExtract" style="display:none"></div>
   <p class="prompt" id="alPrompt"></p>
   <div class="target" id="alTarget" style="display:none"></div>
-  <div id="alArea"></div>
+  <div id="alArea" class="kb"></div>
   <div class="bar"><span class="score" id="alScore"></span></div>
   <ul class="fb" id="alFb"></ul>
   <div class="bar nextbar" id="alNextBar" style="display:none">
@@ -1059,7 +1076,7 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
   <p class="small dim">New to these? <button class="linkbtn" onclick="showTechXLearn()">The harder techniques</button></p>
   <p class="prompt" id="xtPrompt"></p>
   <div class="target" id="xtTarget" style="display:none"></div>
-  <div id="xtArea"></div>
+  <div id="xtArea" class="kb"></div>
   <div class="bar"><span class="score" id="xtScore"></span></div>
   <ul class="fb" id="xtFb"></ul>
   <div class="bar nextbar" id="xtNextBar" style="display:none">
@@ -1092,7 +1109,7 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
   <div class="chips" id="zaLevels"></div>
   <p class="prompt" id="zaPrompt"></p>
   <div class="sent" id="zaSent"></div>
-  <div class="chips opts" id="zaOpts"></div>
+  <div class="chips opts kb" id="zaOpts"></div>
   <div class="bar"><span class="score" id="zaScore"></span></div>
   <ul class="fb" id="zaFb"></ul>
   <div class="bar nextbar" id="zaNextBar" style="display:none">
@@ -1135,7 +1152,7 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
     <span class="score" id="pfStep1"></span>
   </div>
   <p class="prompt" id="pfAsk" style="display:none"></p>
-  <div class="chips opts" id="pfOpts"></div>
+  <div class="chips opts kb" id="pfOpts"></div>
   <div class="bar"><span class="score" id="pfScore"></span></div>
   <ul class="fb" id="pfFb"></ul>
   <div class="bar nextbar" id="pfNextBar" style="display:none">
@@ -1181,7 +1198,7 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
   <div class="chips" id="csLevels"></div>
   <p class="prompt">What goes in the gap: a <b>comma</b> or a <b>full stop</b>?</p>
   <div class="sent" id="csSent"></div>
-  <div class="bar" id="csOpts">
+  <div class="bar kb" id="csOpts">
     <button class="qchip" id="csComma" onclick="csPick('comma')">Comma</button>
     <button class="qchip" id="csStop" onclick="csPick('stop')">Full stop</button>
     <span class="score" id="csScore"></span>
@@ -4289,7 +4306,7 @@ var AMBIG = ["answer","answers","back","bark","barks","book","books","brush","br
 <script>
 "use strict";
 
-var APP = "wcc", VER = "v0.52", BANK_REV = 33;
+var APP = "wcc", VER = "v0.53", BANK_REV = 33;
 var BUG_FORM_URL = "";   /* paste the Office 365 form link to switch the report button on */
 
 /* ---------- the four tests: one source for the Learn screen AND every
@@ -4812,6 +4829,71 @@ function go(id){
   if(typeof paintCode === "function") paintCode(id);
   window.scrollTo(0,0);
 }
+
+/* ==================== KEYS AS WELL AS TAPS (v0.53, SPEC 63) =================
+   Year 9, and Michael's second point: "the modes have keybinds for answers".
+
+   It matters most in Challenge, where the round IS a speed test and reaching for
+   a trackpad is the slow part, and it matters every day for anyone who finds a
+   mouse hard work.
+
+   Three keys and nothing clever. A digit presses the answer with that numeral on
+   it. Enter presses Next if an answer has been given and Check if one has not,
+   which is the same button a pupil would reach for. Escape goes back.
+
+   The buttons a digit can reach are exactly the buttons the CSS numbers: both
+   read `.kb button` inside the open screen, in document order. One list, so the
+   numeral and the key can never disagree, which is the failure this whole design
+   is arranged to make impossible. */
+function kbButtons(){
+  var scr = document.querySelector(".screen.on");
+  if(!scr) return [];
+  var out = [], all = scr.querySelectorAll(".kb button"), i;
+  for(i=0;i<all.length;i++) if(all[i].offsetParent !== null) out.push(all[i]);
+  return out;
+}
+/** The one button that moves the round on. A visible Next means the answer is in
+ *  and the pupil is waiting; otherwise it is Check. */
+function kbPrimary(){
+  var scr = document.querySelector(".screen.on");
+  if(!scr) return null;
+  var bars = scr.querySelectorAll(".nextbar"), i, bt;
+  for(i=0;i<bars.length;i++){
+    if(bars[i].offsetParent === null) continue;
+    bt = bars[i].querySelector("button:not([disabled])");
+    if(bt) return bt;
+  }
+  var ck = scr.querySelectorAll(".checkbtn");
+  for(i=0;i<ck.length;i++)
+    if(!ck[i].disabled && ck[i].offsetParent !== null) return ck[i];
+  return null;
+}
+function kbBack(){
+  var scr = document.querySelector(".screen.on");
+  var bt = scr && scr.querySelector(".topbar .back");
+  return bt && bt.offsetParent !== null ? bt : null;
+}
+document.addEventListener("keydown", function(e){
+  if(e.ctrlKey || e.metaKey || e.altKey) return;
+  /* never while somebody is typing a nickname or a password */
+  var t = e.target, tag = t && t.tagName;
+  if(tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || (t && t.isContentEditable)) return;
+  var bt = null;
+  if(e.key >= "1" && e.key <= "9"){
+    bt = kbButtons()[parseInt(e.key, 10) - 1];
+    if(bt && bt.disabled) return;          /* answered already: the key does nothing */
+  } else if(e.key === "Enter" || e.key === " "){
+    /* Space only when nothing is focused, or it would double-press the button a
+       pupil has just tabbed to and is about to press themselves. */
+    if(e.key === " " && t && t !== document.body) return;
+    bt = kbPrimary();
+  } else if(e.key === "Escape"){
+    bt = kbBack();
+  } else return;
+  if(!bt) return;
+  e.preventDefault();
+  bt.click();
+});
 
 function renderTests(){
   var h="";
@@ -6841,6 +6923,23 @@ function paintCode(scr){
   if(!c){ if(tag) tag.remove(); return; }
   if(!tag){ tag = document.createElement("span"); tag.className = "acode"; box.insertBefore(tag, box.firstChild); }
   tag.innerHTML = "Code: <code>" + esc(c) + "</code>";
+  paintKeys(sec);
+}
+
+/** Say that the keys exist, on the screens where they do (v0.53). A shortcut
+ *  nobody is told about is a shortcut nobody uses, and this is the line a pupil
+ *  reads while waiting for the next question. Nothing on a touch screen, where
+ *  there are no keys to press. */
+function paintKeys(sec){
+  var box = sec && sec.querySelector(".ref");
+  if(!box) return;
+  var hint = box.querySelector(".akeys");
+  var touch = window.matchMedia && window.matchMedia("(pointer:coarse)").matches;
+  var has = sec.querySelector(".kb button") || sec.querySelector(".kb");
+  if(!has || touch){ if(hint) hint.remove(); return; }
+  if(!hint){ hint = document.createElement("span"); hint.className = "akeys"; box.appendChild(hint); }
+  hint.innerHTML = "Keys: <code>1</code> to <code>9</code> to answer, " +
+                   "<code>Enter</code> for check and next";
 }
 
 /* The four domains this app is growing into.
@@ -7623,10 +7722,50 @@ function pfCheck(){
   el("pfAsk").innerHTML = "<b>Step 2.</b> What is the fix? Choose the version that is written correctly." +
     " Some fixes add a word as well as a mark.";
   el("pfAsk").style.display = "";
-  var h = "";
+  var h = "", marks = optDiff(PF.opts);
   for(i=0;i<PF.opts.length;i++)
-    h += '<button class="qchip" id="pfo'+i+'" onclick="pfPick('+i+')">'+esc(PF.opts[i])+'</button> ';
+    h += '<button class="qchip" id="pfo'+i+'" onclick="pfPick('+i+')">'+marks[i]+'</button> ';
   el("pfOpts").innerHTML = h;
+}
+
+/* ---- make three near-identical options readable (v0.53) ----
+   A Year 9 student reported "two of the choices were the same". The sweep in
+   opttest.py found what they meant: in Find it, then fix it, 84 of 100 questions
+   offer options that differ only by a capital letter or a full stop, because
+   capitalisation IS the question. They are genuinely different answers that look
+   identical at a glance, which is a reading test rather than a punctuation one.
+
+   So the characters that differ BETWEEN the options are marked. Not the "right"
+   ones, which would give the answer away: every position where the options do
+   not all agree, in all of them, so a pupil can see at once what the choice
+   actually is and then decide which version is correct.
+
+   Character by character rather than word by word, because a whole marked word
+   would hide which letter is the point. */
+function optDiff(opts){
+  var i, j, n = 0, esced = [];
+  for(i=0;i<opts.length;i++) n = Math.max(n, opts[i].length);
+  var differs = [];
+  for(j=0;j<n;j++){
+    var c = null, same = true;
+    for(i=0;i<opts.length;i++){
+      var ch = j < opts[i].length ? opts[i][j] : null;
+      if(c === null && i === 0) c = ch;
+      else if(ch !== c){ same = false; break; }
+    }
+    differs.push(!same);
+  }
+  for(i=0;i<opts.length;i++){
+    var out = "", open = false;
+    for(j=0;j<opts[i].length;j++){
+      if(differs[j] && !open){ out += '<span class="odiff">'; open = true; }
+      else if(!differs[j] && open){ out += '</span>'; open = false; }
+      out += esc(opts[i][j]);
+    }
+    if(open) out += '</span>';
+    esced.push(out);
+  }
+  return esced;
 }
 function pfPick(i){
   if(PF.step !== 2 || PF.done) return;
