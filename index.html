@@ -929,7 +929,12 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
   <div class="sent" id="tqSent"></div>
   <div class="chips opts kb" id="tqOpts" style="display:none"></div>
   <div class="bar">
-    <button class="go checkbtn" id="tqCheck" onclick="tqCheck()" disabled>Check</button>
+    <!-- `keep` since v0.60: challenge hides `.checkbtn` so a level picker cannot
+         survive into a run, and this round joined a challenge cycle at v0.60.
+         Without it the Check button is display:none mid-run and the question
+         cannot be answered at all. Same family as the v0.12 Yes button and the
+         v0.39 `.chips` rule; `chtest.py` is what caught it. -->
+    <button class="go checkbtn keep" id="tqCheck" onclick="tqCheck()" disabled>Check</button>
     <span class="score" id="tqScore"></span>
   </div>
   <ul class="fb" id="tqFb"></ul>
@@ -4639,7 +4644,7 @@ var AMBIG = ["answer","answers","back","bark","barks","book","books","brush","br
 <script>
 "use strict";
 
-var APP = "wcc", VER = "v0.59", BANK_REV = 37;
+var APP = "wcc", VER = "v0.60", BANK_REV = 37;
 var BUG_FORM_URL = "";   /* paste the Office 365 form link to switch the report button on */
 
 /* ---------- the four tests: one source for the Learn screen AND every
@@ -4904,7 +4909,11 @@ var _lastRaw = null, _base = null;   /* the record as this tab last read or wrot
                               not been written back yet */
 
 function _blankProfile(name){
-  return { name: name || "Player 1", seen:{}, revisit:{}, err:{}, best:{}, tried:{} };
+  /* `dx` is the diagnostic history (v0.60, SPEC 70): one entry per sitting,
+     oldest first. It is deliberately NOT part of `seen` or `revisit` and is
+     never touched by _pruneToBank: a sitting is a record of what happened, and
+     a retired item does not un-happen. See dxKeep(). */
+  return { name: name || "Player 1", seen:{}, revisit:{}, err:{}, best:{}, tried:{}, dx:[] };
 }
 function _blankRoot(){
   return { v:REC_VERSION, bankRev:BANK_REV, active:"p1",
@@ -4931,12 +4940,157 @@ function _blankRoot(){
     the first that cost student data rather than a red test. `banktest.py`
     derives the expected list from splice.py, which is the one place a bank
     cannot fail to be registered and still reach the page at all. */
+/* ==================================================================
+   THE DIAGNOSTIC: SCAFFOLDING (v0.60, SPEC 70)
+
+   Step 5 of the diagnostic plan. No questions, no screens: the record
+   format the sitting will write, and the version stamp that keeps its
+   statistics honest. It is built before the test because it cannot be
+   added afterwards. The response rows from the first sitting are what
+   a difficulty scale is eventually built from, and nobody can go back
+   and collect them.
+
+   Two ideas do the work.
+
+   THE ITEM STAMP. The moment an item is reworded its old statistics
+   stop describing it, so the responses have to be bucketed by content
+   rather than by id. The stamp is a hash of everything in the item
+   except its id, computed on demand rather than stored, so it cannot
+   be forgotten, cannot go stale, and adds nothing to the page. That is
+   the same reasoning as `ans` and `neutral` in SPEC 2: a derived field
+   nobody hand-writes is a field nobody can get wrong.
+
+   THE ANCHOR. About twenty screener items appear in every form and
+   every sitting UNCHANGED, which is what puts different forms and
+   different years on one scale. `ANCHORS` records each one's stamp at
+   the moment it became an anchor, and the build fails if the current
+   stamp differs: an anchor that has been edited is no longer an
+   anchor, and the failure has to be loud, because the damage is
+   invisible and appears a year later as a scale that quietly drifted.
+   ================================================================== */
+/* The row format has a version of its own. A statistics script reading
+   a folder of reports from several releases needs to know which shape
+   it is looking at, and "the app version" is the wrong answer: the row
+   format changes far less often than the app does. */
+var DX_ROW_V = 1;
+
+/* FNV-1a, 32 bits, as eight hex characters. Chosen because it is four
+   lines in both JavaScript and Python and gives the same answer in
+   both, which is the only property that matters here: the build gates
+   the anchors and the page records the stamps, so the two must agree.
+   It is not a security hash and nothing here needs one. */
+function _fnv1a(s){
+  var h = 0x811c9dc5, i;
+  for(i=0;i<s.length;i++){
+    h ^= s.charCodeAt(i) & 0xff;
+    if(s.charCodeAt(i) > 0xff) h ^= (s.charCodeAt(i) >> 8);
+    h = (h + ((h << 1) + (h << 4) + (h << 7) + (h << 8) + (h << 24))) >>> 0;
+  }
+  return ("0000000" + h.toString(16)).slice(-8);
+}
+/* Canonical JSON: keys sorted, no whitespace. Both sides must produce
+   byte-identical text or the stamps disagree, so the shape is written
+   out here rather than left to JSON.stringify's key order. */
+function _canon(v){
+  if(v === null || typeof v !== "object") return JSON.stringify(v);
+  if(Array.isArray(v)) return "[" + v.map(_canon).join(",") + "]";
+  var keys = Object.keys(v).sort(), i, out = [];
+  for(i=0;i<keys.length;i++)
+    out.push(JSON.stringify(keys[i]) + ":" + _canon(v[keys[i]]));
+  return "{" + out.join(",") + "}";
+}
+/** The stamp for one item: everything about it EXCEPT its id.
+ *
+ *  Deliberately conservative. Retagging a distractor, rewording a
+ *  feedback line and changing the answer all bump it, even though only
+ *  the last certainly changes what the item measures. A spurious bump
+ *  splits one statistics bucket into two, which costs a little data; a
+ *  missed bump merges two different questions into one bucket, which
+ *  produces a confident wrong number. Those are not the same mistake. */
+function itemStamp(item){
+  if(!item || typeof item !== "object") return "";
+  var copy = {}, k;
+  for(k in item) if(Object.prototype.hasOwnProperty.call(item, k) && k !== "id") copy[k] = item[k];
+  return _fnv1a(_canon(copy));
+}
+
+/** One response. The plan's list, short keys because a sitting is 95 of
+ *  these and they travel inside a downloadable report.
+ *    n  position in the test, from 1
+ *    id the item's id          v  its stamp at the moment it was served
+ *    g  the reporting group    a  the activity that served it
+ *    st stage: 1 screener, 2 deep dive
+ *    l  the level served       r  1 right, 0 wrong
+ *    w  the wrong option chosen, where the round has options; "" otherwise
+ *    s  seconds, to one decimal
+ *  The FORM and the ROUTE are properties of the sitting and are recorded
+ *  once there rather than 95 times here; a row is always read with its
+ *  sitting. */
+function dxRow(n, item, group, act, stage, level, right, chose, secs){
+  return { n:n, id:(item && item.id) || "", v:itemStamp(item), g:group, a:act,
+           st:stage, l:level, r:right ? 1 : 0, w:chose || "",
+           s:Math.round((secs || 0) * 10) / 10 };
+}
+/** A sitting. `form` is which screener form was used and `route` which
+ *  deep dive was taken, both fixed for the whole sitting. */
+function dxSitting(form, route){
+  return { id:"dx" + Date.now().toString(36) + Math.floor(Math.random()*1e6).toString(36),
+           at:Math.floor(Date.now()/1000), app:VER, bank:BANK_REV, fmt:DX_ROW_V,
+           form:form || "", route:route || "", done:false, rows:[] };
+}
+/* Every row the statistics script needs, and nothing optional. A row
+   that is missing one of these is worse than a row that is absent,
+   because it looks like data. */
+var DX_ROW_KEYS = ["n","id","v","g","a","st","l","r","w","s"];
+function dxRowOk(r){
+  if(!r || typeof r !== "object") return false;
+  for(var i=0;i<DX_ROW_KEYS.length;i++)
+    if(!Object.prototype.hasOwnProperty.call(r, DX_ROW_KEYS[i])) return false;
+  return typeof r.n === "number" && typeof r.id === "string" && r.id.length > 0 &&
+         typeof r.v === "string" && r.v.length === 8 &&
+         (r.r === 0 || r.r === 1) && (r.st === 1 || r.st === 2) &&
+         typeof r.s === "number" && r.s >= 0;
+}
+
+/* How many sittings are kept. Two a term is six a year, so twenty is
+   three years of history, and a sitting is about six kilobytes. The
+   OLDEST goes when the cap is reached: a three-year-old sitting is not
+   the comparison anybody makes, and the alternative (silently refusing
+   to record a new one) loses the data that is actually being asked for. */
+var DX_KEEP = 20;
+function dxSave(sitting){
+  var st = store();
+  if(!Array.isArray(st.dx)) st.dx = [];
+  var i = -1, j;
+  for(j=0;j<st.dx.length;j++) if(st.dx[j] && st.dx[j].id === sitting.id) i = j;
+  if(i >= 0) st.dx[i] = sitting; else st.dx.push(sitting);
+  while(st.dx.length > DX_KEEP) st.dx.shift();
+  save(st);
+  return sitting;
+}
+/* The sittings worth comparing: finished ones, oldest first. An
+   abandoned sitting is kept on the device so a pupil can be told what
+   happened, and is never a data point. */
+function dxDone(){
+  var st = store();
+  return (st.dx || []).filter(function(s){ return s && s.done && (s.rows||[]).length; });
+}
+
 function allBanks(){
   return [SENTENCES, FRAMES, CLOZE, KLASS, TRANSFORM, SHIFTERS, TECHNIQUES, PUNCT,
           COMMAS, TENSES, TENSEPARAS, PUNCPARAS, IMAGERY, TECHDEFS, NAMEEX, SPOT, EI, SPLICE,
           ALW, ALCTX, ALUPG, SEMF, XTERMS];
 }
 
+/* NOTE (v0.60): this prunes `seen` and `revisit` and NOTHING ELSE. A diagnostic
+   sitting under `dx` is a record of what a pupil answered on a particular day,
+   and an item being retired afterwards does not un-answer it; pruning one would
+   destroy the only copy of data that cannot be collected again.
+   This is the v0.16-to-v0.20 lesson from the other direction: there, a
+   hand-written list of banks meant a whole activity's history was deleted in
+   silence. Here the danger is the pruner being widened later to "tidy up" a key
+   it was never meant to see. `dxtest.py` asserts that a sitting survives a bank
+   revision with ids no bank contains. */
 function _pruneToBank(root){
   var live = {}, i, j, banks = allBanks();
   for(i=0;i<banks.length;i++)
@@ -5007,6 +5161,7 @@ function _load(){
     if(!pr.err) pr.err = {};
     if(!pr.best) pr.best = {};
     if(!pr.tried) pr.tried = {};
+    if(!Array.isArray(pr.dx)) pr.dx = [];      /* v0.60: the diagnostic history */
     if(!pr.name) pr.name = "Player 1";
   }
   if(root.bankRev !== BANK_REV){ _pruneToBank(root); root.bankRev = BANK_REV; _dirty = true; }
@@ -6981,12 +7136,30 @@ var CHALLENGES = {
   tech:  { name:"Techniques (SOAPMAPS)", secs:120,
            cycle:["ktname", "eiclass", "ktdef", "xf", "eipick", "ktname", "ktspot"],
            desc:"Name the technique, match the definition, said or suggested, what the image carries, and spot them all." },
+  /* The fifth discipline (v0.60, SPEC 71), step 13 of the diagnostic plan. It
+     was held back until steps 2 and 3 had doubled its banks, which they have:
+     the harder techniques now run to forty items each and the semantic fields
+     to sixty, which is enough for a two-minute run not to repeat itself.
+     The board id is `texp` and not `techx`, because `techx` is already an
+     ACTIVITY id and a DOMAIN id, and a single-file app has one namespace in
+     practice however many it has in principle (CLAUDE.md, v0.29). */
+  texp:  { name:"Techniques (Expanded)", secs:120,
+           cycle:["xterm", "techx", "za", "xterm", "semf", "za"],
+           desc:"Know the terms, hunt the harder techniques down, animal or human, and tap a whole semantic field." },
   ult:   { name:"Ultimate Champion", secs:240, cycle:null,
            desc:"Every discipline in turn, the same share of each for everybody." }
 };
-var CH_DISC = ["wc", "punc", "tense", "tech"];     /* the four Ultimate is made of */
+/* The disciplines Ultimate is made of. FIVE since v0.60. The run is still four
+   minutes: Ultimate interleaves one question per discipline in turn rather than
+   giving each a block of time, so a fifth discipline means each gets a fifth of
+   the questions rather than a quarter, and "the same share of each for
+   everybody" stays true. Lengthening the run instead was rejected: four minutes
+   is already the longest thing in the app, and the cycle board empties every
+   fortnight, so the comparison that matters is made between runs of the new
+   shape. */
+var CH_DISC = ["wc", "punc", "tense", "tech", "texp"];
 /* Ultimate first: it is the prestige board (Michael, v0.47) */
-var CH_BOARDS = ["ult", "wc", "punc", "tense", "tech"];
+var CH_BOARDS = ["ult", "wc", "punc", "tense", "tech", "texp"];
 /* kept for anything that still reads it: the Word classes run length */
 var BLITZ_ACTS = CHALLENGES.wc.cycle;
 
@@ -7025,10 +7198,9 @@ function showChallenges(){
          '<span class="mode-d">' + chSecs(c.secs) + '. ' + esc(c.desc) + '</span>' +
          '<span class="ch-best">' + (best ? 'Your best: <b>' + best.score + '</b>' : 'Not played yet') + '</span>' +
          '</button>';
-    if(b === "tech")
-      h += '<button class="mode" id="ch_techx" disabled><span class="mode-n">Techniques (Expanded)</span>' +
-           '<span class="mode-d">The harder techniques.</span>' +
-           '<span class="mode-k">Coming soon.</span></button>';
+    /* The "Coming soon" placeholder that stood here from v0.47 is gone: the
+       board it promised is real at v0.60 and is rendered by the loop above,
+       from CH_BOARDS, like every other one. */
   }
   el("chTiles").innerHTML = h;
 }
@@ -7038,7 +7210,11 @@ function startBlitz(board){
   B.on = true; B.score = 0; B.chain = 0; B.bestChain = 0;
   B.correct = 0; B.wrong = 0; B.close = 0; B.neutral = 0; B.quit = false;
   B.board = board; B.secs = CHALLENGES[board].secs;
-  B.step = 0; B.ustep = { wc:0, punc:0, tense:0, tech:0 };
+  B.step = 0; B.ustep = {};
+  /* built from CH_DISC rather than typed, because a hand-written list of the
+     disciplines is exactly the kind that goes stale when a sixth arrives
+     (CLAUDE.md: assertions about "how many" are read from the app). */
+  for(var di=0; di<CH_DISC.length; di++) B.ustep[CH_DISC[di]] = 0;
   B.topLevel = 0;
   B.saved = blitzSnapshot();
   B.endsAt = nowMs() + B.secs * 1000;
@@ -7160,6 +7336,20 @@ function blitzServe(act){
     EIX.mode = act === "eiclass" ? "classify" : "pick"; go("ei"); eiNext();
   } else if(act === "xf"){
     XF.type = "all"; XF.lvl = bzLvl(xfPool("all", "all")); go("xf"); xfNext();
+  } else if(act === "techx"){
+    /* The harder techniques, through the same screen the practice round uses.
+       tqEnter keeps its own section, so the seen ids do not mix with SOAPMAPS
+       (see tqKey). */
+    /* TQ.sec is set FIRST so tqEnter does not reset the level it was just
+       given: it resets tech and level only when the section changes. */
+    TQ.sec = "exp"; TQ.tech = "all"; TQ.lvl = bzLvl(techPool("all", "all", "exp"));
+    tqEnter("exp", "techx");
+  } else if(act === "za"){
+    ZA.lvl = bzLvl(zaPool("all")); startZA();
+  } else if(act === "xterm"){
+    startXT();
+  } else if(act === "semf"){
+    SF.lvl = bzLvl(SEMF); startSF();
   }
 }
 
@@ -8901,6 +9091,10 @@ function tqCheck(){
   /* "close" is deliberately neither: the student found the right place and drew
      the edges wrongly, which is not the mistake this round is about. */
   save(st);
+  /* In a challenge this round scores and moves on (v0.60). The tenor and
+     transfer steps are teaching and belong in practice; offering them against a
+     clock would stall the run on a button nobody meant to press. */
+  if(B.on){ chRecord(res.v === "exact", res.v === "close" ? "close" : null); return; }
   if(tqSteps(it) > 1) tqOffer("Now the tenor");
   else el("tqNextBar").style.display = "";
 }
@@ -10216,6 +10410,11 @@ function zaPick(pick){
   recordSeen("za:"+ZA.lvl, it.id, right);
   save(st);
   el("zaNextBar").style.display = "";
+  /* v0.60: this round joined a challenge cycle, and until now it was the only
+     scored round in the app that never told the challenge anything. A round
+     that does not call chRecord looks identical from practice and answers
+     nothing in a run. */
+  chRecord(right);
 }
 
 function validate(){

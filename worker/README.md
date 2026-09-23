@@ -48,7 +48,7 @@ The board and the submit work only from the live site: CORS is locked to
 |---|---|---|---|
 | `/health` | GET | anyone | liveness |
 | `/score` | POST | the app | submit one run |
-| `/board?board=punc&limit=20` | GET | the app | one board, THIS CYCLE: each name once, at its best |
+| `/board?board=punc&limit=20` | GET | the app | one board (`wc`, `punc`, `tense`, `tech`, `texp`, `ult`), THIS CYCLE: each name once, at its best |
 | `/board?scope=all` | GET | the app | the same board, all time: the hall of fame |
 | `/cycle` | GET | anyone | which cycle, which week, which school day, when it resets |
 | `/admin/board` | POST | teacher | every row with its real name and decision |
