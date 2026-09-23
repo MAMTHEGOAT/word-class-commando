@@ -356,6 +356,27 @@ button.yn{min-width:110px;font-size:1.05rem}
 .linkbtn{background:none;border:none;color:var(--brass);text-decoration:underline;padding:0;font:inherit;cursor:pointer}
 .aa-stmt{background:var(--paper);color:var(--ink);border-radius:10px;padding:10px 14px;margin:10px 0}
 .aa-phrase{font-size:1.15rem;font-weight:700;margin:8px 0}
+/* THE LANGUAGE TO BE READ, separated from the instruction that asks about it
+   (v0.52). Year 9: "the instructions and the target language use the same colour
+   and font, it is visually confusing for the students". Every other domain
+   already puts the words a pupil has to read on the cream paper panel and keeps
+   the instruction on the dark page around it. These rounds had both in one
+   paragraph, told apart only by a line break and a heavier weight. */
+/* Reading and practising are different acts, and the menu should say so
+   (v0.52). Four of fifteen Year 9s said they had never opened an explanation
+   section; the cards sat in a group that looked like all the others. */
+.learn-group{border:1px solid var(--brass);border-radius:14px;padding:14px 14px 4px;
+  margin-bottom:26px;background:rgba(190,150,80,.06)}
+.learn-group h3{margin-top:0}
+.learn-group .menu-btn{border-color:var(--brass)}
+.target{background:var(--paper);color:var(--ink);border-radius:10px;
+  padding:14px 16px;margin:6px 0 14px;font-size:1.16rem;line-height:1.6}
+.target .hi{font-weight:700;border-bottom:2px solid var(--ink)}
+.target .blank{font-weight:700;letter-spacing:.06em}
+/* The Learn card, offered again when a round is not going well (v0.52). Quiet:
+   one line at the end of the feedback, never a box and never a pop-up. */
+.fb li.k-learn{color:var(--brass)}
+.fb li.k-learn .linkbtn{color:var(--brass);font-weight:650}
 .aa-mark{background:var(--neubg);border-bottom:2px solid var(--neu);color:#4d3200;padding:0 2px}
 .aa-opts{display:flex;flex-direction:column;gap:8px;margin:10px 0}
 .aa-opts .qchip{text-align:left}
@@ -1022,6 +1043,7 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
   <p class="small dim">New to these? <button class="linkbtn" onclick="showALLearn()">Better than shows</button></p>
   <div class="aa-stmt" id="alExtract" style="display:none"></div>
   <p class="prompt" id="alPrompt"></p>
+  <div class="target" id="alTarget" style="display:none"></div>
   <div id="alArea"></div>
   <div class="bar"><span class="score" id="alScore"></span></div>
   <ul class="fb" id="alFb"></ul>
@@ -1036,6 +1058,7 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
   <div class="topbar"><button class="back" onclick="openDomain('techx')">&larr; Harder techniques</button><img alt="" class="tb-logo"></div>
   <p class="small dim">New to these? <button class="linkbtn" onclick="showTechXLearn()">The harder techniques</button></p>
   <p class="prompt" id="xtPrompt"></p>
+  <div class="target" id="xtTarget" style="display:none"></div>
   <div id="xtArea"></div>
   <div class="bar"><span class="score" id="xtScore"></span></div>
   <ul class="fb" id="xtFb"></ul>
@@ -4266,7 +4289,7 @@ var AMBIG = ["answer","answers","back","bark","barks","book","books","brush","br
 <script>
 "use strict";
 
-var APP = "wcc", VER = "v0.51", BANK_REV = 33;
+var APP = "wcc", VER = "v0.52", BANK_REV = 33;
 var BUG_FORM_URL = "";   /* paste the Office 365 form link to switch the report button on */
 
 /* ---------- the four tests: one source for the Learn screen AND every
@@ -5411,6 +5434,11 @@ function pickUnseen(pool, key){
  *  it into the wrong pile, and out of done if it was there, because an item you
  *  used to know and have just missed is exactly what the wrong pile is for. */
 function recordSeen(key, id, right){
+  /* The nudge rides with the recording deliberately. v0.51 exists because half a
+     rule was copied into twenty-three rounds and the other half was not; a
+     separate call at twenty-three sites is the same trap with a new name. The
+     two things an answer does are done in one place. */
+  nudge(right);
   if(!key || !id) return;
   var st = store(), i;
   var seen = st.seen[key] = st.seen[key] || [];
@@ -6748,6 +6776,54 @@ function screenAct(scr){
             commas:"commas", crules:"crules" };
   return m[scr] || null;
 }
+/* ---- offering the Learn page again when a round is going badly (v0.52) ----
+   Michael, after the survey: "having more links to the learn appear if students
+   get things wrong". Four of fifteen said they had never opened an explanation
+   section at all, which is a placement problem rather than a writing one.
+
+   The rule is deliberately not "every wrong answer". A link on every miss is
+   noise, and noise is how a class learns to stop reading feedback. It appears on
+   the SECOND consecutive wrong answer in an activity, and every second one after
+   that, which is the point at which a pupil is not having a bad moment but is
+   missing the thing the Learn page teaches. A right answer resets the count.
+
+   In memory only: this is about the run of questions in front of the pupil, not
+   about their history, and nothing here is worth writing to storage. */
+var LEARN_MISS = {};
+function learnFor(act){
+  for(var i=0;i<ACTIVITY_LIST.length;i++)
+    if(ACTIVITY_LIST[i][0] === act){
+      var d = domainById(ACTIVITY_LIST[i][3]);
+      if(d && d.learn) return d.learn;
+      return null;
+    }
+  return null;
+}
+/** A quiet line for the end of a feedback list, or "" for most answers. */
+function learnNudge(act, right){
+  if(!act) return "";
+  if(right){ LEARN_MISS[act] = 0; return ""; }
+  var n = LEARN_MISS[act] = (LEARN_MISS[act] || 0) + 1;
+  if(n < 2 || n % 2) return "";
+  var L = learnFor(act);
+  if(!L) return "";
+  return '<li class="k-learn">That is two in a row. <button class="linkbtn" onclick="' +
+         L[1] + '">' + esc(L[0]) + '</button> goes through it again.</li>';
+}
+
+/** Append the nudge to whichever feedback list is on screen, if this answer has
+ *  earned one. No map of screen to element: every round's feedback is the one
+ *  `ul.fb` inside its own section, which is a fact about the markup that a list
+ *  in here could only get wrong. */
+function nudge(right){
+  var scr = document.querySelector(".screen.on");
+  if(!scr) return;
+  var html = learnNudge(screenAct(scr.id), right);
+  if(!html) return;
+  var ul = scr.querySelector("ul.fb");
+  if(ul) ul.innerHTML += html;
+}
+
 /* The code for the screen on display, with its level if it has one chosen. */
 function screenCode(scr){
   var id = screenAct(scr);
@@ -6898,7 +6974,7 @@ function openDomain(id){
     h += '</div>';
   }
   if(d.learn)
-    h = '<div class="group"><h3>Before you start</h3>' +
+    h = '<div class="group learn-group"><h3>Before you start</h3>' +
         '<p class="why">' + esc(d.learnWhy || 'What each technique is, with an example of each.') + '</p>' +
         '<button class="menu-btn" onclick="' + d.learn[1] + '">' + esc(d.learn[0]) +
         '<span class="sub">' + esc(d.learn[2] || 'The eight letters, and which two live in Word classes') + '</span>' +
@@ -8817,6 +8893,10 @@ function vpCheck(){
    is. Semantic field: its words are scattered, so it is tap-every-word, not a
    span. All found and nothing else is Right; some found is Close. */
 var XT = { item:null, opts:[], ans:-1, dir:"t2d", done:false };
+function xtTarget(html){
+  var t = el("xtTarget"); if(!t) return;
+  t.innerHTML = html; t.style.display = html ? "" : "none";
+}
 function startXT(){ go("xt"); xtNext(); }
 function xtNext(){
   XT.done = false;
@@ -8827,11 +8907,13 @@ function xtNext(){
   if(XT.dir === "t2d"){
     opts = shuffled([it.def].concat(others.map(function(t){ return t.def; })));
     XT.ans = opts.indexOf(it.def);
-    el("xtPrompt").innerHTML = "What does <b>" + esc(it.name) + "</b> mean?";
+    el("xtPrompt").textContent = "What does this term mean?";
+    xtTarget(esc(it.name));
   } else {
     opts = shuffled([it.name].concat(others.map(function(t){ return t.name; })));
     XT.ans = opts.indexOf(it.name);
-    el("xtPrompt").innerHTML = "Which term means <b>" + esc(it.def) + "</b>?";
+    el("xtPrompt").textContent = "Which term means this?";
+    xtTarget(esc(it.def));
   }
   XT.opts = opts;
   var h = '<div class="aa-opts">';
@@ -8986,10 +9068,17 @@ function alOthers(g, n, exclude){
   }
   return out;
 }
+/** The language the question is ABOUT, on the cream panel, never inside the
+ *  instruction that asks about it (v0.52, Year 9 feedback). */
+function alTarget(html){
+  var t = el("alTarget"); if(!t) return;
+  t.innerHTML = html; t.style.display = html ? "" : "none";
+}
 function alNext(){
   AL.done = false;
   el("alScore").textContent = ""; el("alFb").innerHTML = ""; el("alNextBar").style.display = "none";
   el("alExtract").style.display = "none";
+  el("alTarget").style.display = "none"; el("alTarget").innerHTML = "";
   var it, opts, h = "", i;
   if(AL.mode === "mean"){
     it = AL.item = pickUnseen(lvlPool(ALW, AL.lvl), "al:mean:"+AL.lvl);
@@ -9003,18 +9092,21 @@ function alNext(){
     if(AL.dir === "w2m"){
       opts = shuffled([it.mean].concat(others.map(function(w){ return w.mean; })));
       AL.ans = opts.indexOf(it.mean);
-      el("alPrompt").innerHTML = "What does <b>" + esc(it.w) + "</b> mean?";
+      el("alPrompt").textContent = "What does this word mean?";
+      alTarget(esc(it.w));
     } else {
       opts = shuffled([it.w].concat(others.map(function(w){ return w.w; })));
       AL.ans = opts.indexOf(it.w);
-      el("alPrompt").innerHTML = "Which word means <b>" + esc(it.mean) + "</b>?";
+      el("alPrompt").textContent = "Which word means this?";
+      alTarget(esc(it.mean));
     }
   } else if(AL.mode === "job"){
     it = AL.item = pickUnseen(lvlPool(ALW, AL.lvl), "al:job:"+AL.lvl);
     var gs = shuffled(ALMETA.groups.filter(function(g){ return !alClash(g.id, it.group); })).slice(0,3);
     opts = shuffled([alJob(it.group)].concat(gs.map(function(g){ return g.job; })));
     AL.ans = opts.indexOf(alJob(it.group));
-    el("alPrompt").innerHTML = "What job does <b>" + esc(it.w) + "</b> do? It...";
+    el("alPrompt").textContent = "What job does this word do? It...";
+    alTarget(esc(it.w));
   } else if(AL.mode === "odd"){
     /* three from one group, at or below the level; one from a group that does not overlap it */
     var cap = AL.lvl === "all" ? 3 : alLvlRank(AL.lvl);
@@ -9039,11 +9131,17 @@ function alNext(){
     AL.ans = opts.indexOf(it.right);
     if(AL.mode === "true"){
       el("alExtract").textContent = it.extract; el("alExtract").style.display = "";
-      el("alPrompt").innerHTML = "Which word makes this sentence <b>true</b> of the extract?<br>" +
-        '<span class="aa-phrase">' + esc(it.frame).replace("___", "______") + '</span>';
+      el("alPrompt").textContent = "Which word makes this sentence true of the extract?";
+      alTarget(esc(it.frame).replace("___", '<span class="blank">______</span>'));
     } else {
-      el("alPrompt").innerHTML = "Upgrade <b>shows</b> to the word that says what is really happening." +
-        '<br><span class="aa-phrase">' + esc(it.frame).replace(/\*shows\*/, "<u>shows</u>") + '</span>';
+      /* The weak verb is read from the item rather than named in the
+         instruction (v0.52). It was hardcoded as "shows", which is also what
+         all thirty-two items happened to use, so the round could be answered by
+         finding the one word in italics without reading anything else. */
+      var weak = (/\*([^*]+)\*/.exec(it.frame) || [null, "shows"])[1];
+      el("alPrompt").innerHTML = "Upgrade the <b>underlined</b> word to the one that says what is " +
+        "really happening.";
+      alTarget(esc(it.frame).replace("*" + esc(weak) + "*", '<span class="hi">' + esc(weak) + '</span>'));
     }
   }
   AL.opts = opts;
@@ -9074,7 +9172,15 @@ function alPick(i){
   } else {
     var R = alWord(it.right);
     fb = '<li>' + esc(it.why) + '</li>';
-    if(R) fb += '<li class="dim"><b>' + esc(R.w) + '</b>: ' + esc(R.mean) + '.</li>';
+    /* The second line used to be the definition, which the `why` above has just
+       said in almost the same words (Michael and a Year 9 student, both
+       independently: "the definition and the praise are pretty much the same").
+       So a right answer gets the word WORKING somewhere else, which is the thing
+       that turns a word you recognise into a word you can use; a wrong answer
+       gets the definition, because that is where the meaning is what is missing. */
+    if(R) fb += right
+      ? '<li class="dim"><b>' + esc(R.w) + '</b> again, in another sentence: <i>' + esc(R.eg) + '</i></li>'
+      : '<li class="dim"><b>' + esc(R.w) + '</b>: ' + esc(R.mean) + '.</li>';
     if(!right){
       var W = alWord(AL.opts[i]);
       if(W) fb += '<li class="dim"><b>' + esc(W.w) + '</b> would mean it ' + esc(W.mean) + ', which is not what happens here.</li>';
@@ -9087,6 +9193,7 @@ function alPick(i){
      to file it under and no pile for it to sit in */
   if(it.id && it.id.indexOf("odd:") !== 0)
     recordSeen("al:"+AL.mode+":"+AL.lvl, it.id, right);
+  else nudge(right);      /* odd one out files nothing, but it still counts */
   save(st);
   el("alNextBar").style.display = "";
   chRecord(right);
