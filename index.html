@@ -4266,7 +4266,7 @@ var AMBIG = ["answer","answers","back","bark","barks","book","books","brush","br
 <script>
 "use strict";
 
-var APP = "wcc", VER = "v0.50", BANK_REV = 33;
+var APP = "wcc", VER = "v0.51", BANK_REV = 33;
 var BUG_FORM_URL = "";   /* paste the Office 365 form link to switch the report button on */
 
 /* ---------- the four tests: one source for the Learn screen AND every
@@ -4573,7 +4573,8 @@ function _pruneToBank(root){
     for(k in prof.seen)
       prof.seen[k] = (prof.seen[k]||[]).filter(function(id){ return live[id]; });
     for(k in prof.revisit)
-      prof.revisit[k] = (prof.revisit[k]||[]).filter(function(r){ return live[r.id]; });
+      prof.revisit[k] = (prof.revisit[k]||[]).filter(function(r){
+        return live[r && typeof r === "object" ? r.id : r]; });
   }
 }
 
@@ -4618,6 +4619,18 @@ function _load(){
     var pr = root.profiles[p];
     if(!pr.seen) pr.seen = {};
     if(!pr.revisit) pr.revisit = {};
+    /* v0.51: `revisit` was [{id, due}] for one round and unused by the other
+       twenty-two. It is now the WRONG PILE for all of them, a flat list of ids,
+       so an older record is normalised here rather than discarded. The due
+       counter goes with it: the rule is no longer "back after three others", it
+       is "after everything you have never seen" (Michael, 2026-09-23). */
+    for(var rk in pr.revisit){
+      var rv = pr.revisit[rk];
+      if(!Array.isArray(rv)){ pr.revisit[rk] = []; continue; }
+      for(var ri=0; ri<rv.length; ri++)
+        if(rv[ri] && typeof rv[ri] === "object") rv[ri] = rv[ri].id;
+      pr.revisit[rk] = rv.filter(function(x){ return typeof x === "string"; });
+    }
     if(!pr.err) pr.err = {};
     if(!pr.best) pr.best = {};
     if(!pr.tried) pr.tried = {};
@@ -4832,27 +4845,12 @@ function next(){
                  el("fb").innerHTML=""; el("nextBar").style.display="none"; return; }
   if(B.on){ S.item = p[Math.floor(Math.random()*p.length)]; S.sel = {}; S.done = false;
             render(); return; }                 /* a run draws uniformly (SPEC 24) */
-  var st = store(), key = poolKey(), seen = st.seen[key] || [];
-
-  /* an item answered wrong comes back before an unseen one, after N others */
-  var rev = st.revisit[key] || [];
-  var pick = null;
-  for(var r=0;r<rev.length;r++){
-    if(rev[r].due<=0){
-      for(var q=0;q<p.length;q++) if(p[q].id===rev[r].id){ pick=p[q]; break; }
-      if(pick){ rev.splice(r,1); break; }
-    }
-  }
-  if(!pick){
-    var un=[];
-    for(var i=0;i<p.length;i++) if(seen.indexOf(p[i].id)<0) un.push(p[i]);
-    if(!un.length){ seen=[]; un=p.slice(); }            /* reset THIS pool only */
-    pick = un[Math.floor(Math.random()*un.length)];
-  }
-  for(var k=0;k<rev.length;k++) rev[k].due--;
-  st.revisit[key]=rev; st.seen[key]=seen; save(st);
-
-  S.item = pick; S.sel = {}; S.done = false;
+  /* v0.51: this round used to have its own picker, and its own version of the
+     rule: a wrong item came back BEFORE an unseen one, after three others. That
+     is the opposite of Michael's ruling, and being the only round with any
+     scheduling at all is how twenty-two others ended up with none. Same picker
+     as everything else now. */
+  S.item = pickUnseen(p, poolKey()); S.sel = {}; S.done = false;
   render();
 }
 
@@ -5065,18 +5063,11 @@ function check(){
   el("fb").innerHTML = out.map(function(o){
     return '<li class="'+o[0]+'">'+o[1]+'</li>'; }).join("");
 
-  /* seen / revisit bookkeeping */
-  var key = poolKey();
-  var seen = st.seen[key] || [];
+  /* which pile this item goes in (v0.51). A partly right answer counts as wrong
+     here, because the pupil has not finished with the item. */
   var clean = !wrong.length && !missed.length && !partial.length;
-  if(clean){ if(seen.indexOf(s.id)<0) seen.push(s.id); }
-  else {
-    var rev = st.revisit[key] || [];
-    var here=false; for(var r=0;r<rev.length;r++) if(rev[r].id===s.id){ rev[r].due=3; here=true; }
-    if(!here) rev.push({id:s.id, due:3});
-    st.revisit[key]=rev;
-  }
-  st.seen[key]=seen; save(st);
+  save(st);
+  recordSeen(poolKey(), s.id, clean);
 
   el("checkBtn").style.display="none";
   el("dunnoBtn").style.display="none";
@@ -5141,11 +5132,7 @@ function frLvl(l){ F.lvl=l; frChips(); frNext(); }
 function frNext(){
   var p = framePool(F.lvl);
   if(!p.length){ el("frWord").textContent="Nothing here yet."; el("frSlots").innerHTML=""; return; }
-  var st = store(), key = "frames:"+F.lvl, seen = st.seen[key] || [];
-  var un=[]; for(var i=0;i<p.length;i++) if(seen.indexOf(p[i].id)<0) un.push(p[i]);
-  if(!un.length){ seen=[]; un=p.slice(); }
-  st.seen[key]=seen; save(st);
-  F.item = un[Math.floor(Math.random()*un.length)];
+  F.item = pickUnseen(p, "frames:"+F.lvl);   /* its own copy of the picker, until v0.51 */
   F.pick = -1; F.done = false;
   frRender();
 }
@@ -5202,10 +5189,10 @@ function frCheck(){
   out.push(['k-miss', "<b>How to check for " + TESTS[it.cls].plural + ".</b> " + TESTS[it.cls].test]);
   el("frFb").innerHTML = out.map(function(o){ return '<li class="'+o[0]+'">'+o[1]+'</li>'; }).join("");
 
-  var st = store(), key="frames:"+F.lvl, seen = st.seen[key] || [];
-  if(ok){ if(seen.indexOf(it.id)<0) seen.push(it.id); }
-  else { st.err["frame_"+it.cls] = (st.err["frame_"+it.cls]||0)+1; }
-  st.seen[key]=seen; save(st);
+  var st = store();
+  if(!ok) st.err["frame_"+it.cls] = (st.err["frame_"+it.cls]||0)+1;
+  save(st);
+  recordSeen("frames:"+F.lvl, it.id, ok);
 
   el("frCheck").style.display="none";
   el("frNextBar").style.display="";
@@ -5364,13 +5351,78 @@ function lvlChips(elId, bank, cur, fn){
   }
   el(elId).innerHTML = h;
 }
+/* ================= THREE PILES (v0.51) =====================================
+   Michael, after the Year 9 survey: "questions that are answered wrong should go
+   in a separate pile, after ones they have never seen, but before ones they have
+   gotten right already."
+
+   What this replaces, and why it was wrong. Every round used to record an item as
+   seen ONLY when it was answered correctly, so an item answered wrong stayed in
+   the unseen pool and could be drawn again on the very next question. Three
+   students reported the same symptom independently ("I got the grandma's noodle
+   shop 5 times"), which is the fastest way to lose a class.
+
+   The old design had a second half that only ONE round implemented: a revisit
+   queue that held a wrong item back for three questions. Twenty-two rounds were
+   given the first half without the second. So the rule now lives in one place and
+   every round gets it, in one order:
+
+     1. never served
+     2. served and answered wrong, and not right since
+     3. answered right
+
+   It is also a teaching position rather than a scheduling one, and Michael's: a
+   pupil who meets a question a second time knows a wrong answer already, which is
+   more than they had going in blind. So wrong items are not punished with an
+   immediate repeat, they are queued behind everything new, and the pile they sit
+   in is the one a revision round can later be built from.
+
+   One extra rule, which is what actually kills the noodle shop: the item just
+   served is never the next one, whatever pile it is in.
+   =========================================================================== */
+var LAST_SERVED = {};
 function pickUnseen(pool, key){
   if(B.on) return pool[Math.floor(Math.random()*pool.length)];   /* a run draws uniformly (SPEC 24) */
-  var st = store(), seen = st.seen[key] || [], un=[], i;
-  for(i=0;i<pool.length;i++) if(seen.indexOf(pool[i].id)<0) un.push(pool[i]);
-  if(!un.length){ seen=[]; un=pool.slice(); }
-  st.seen[key]=seen; save(st);
-  return un[Math.floor(Math.random()*un.length)];
+  var st = store(), seen = st.seen[key] || [], miss = st.revisit[key] || [];
+  var fresh=[], wrong=[], done=[], i, id;
+  for(i=0;i<pool.length;i++){
+    id = pool[i].id;
+    if(seen.indexOf(id) >= 0) done.push(pool[i]);
+    else if(miss.indexOf(id) >= 0) wrong.push(pool[i]);
+    else fresh.push(pool[i]);
+  }
+  var pile = fresh.length ? fresh : (wrong.length ? wrong : done);
+  if(!pile.length) pile = pool;            /* nothing to choose from but the pool */
+  /* never the same item twice running. With a pool of one there is no choice,
+     and repeating it is then the honest thing to do. */
+  if(pile.length > 1 && LAST_SERVED[key]){
+    var other = [];
+    for(i=0;i<pile.length;i++) if(pile[i].id !== LAST_SERVED[key]) other.push(pile[i]);
+    if(other.length) pile = other;
+  }
+  var chosen = pile[Math.floor(Math.random()*pile.length)];
+  LAST_SERVED[key] = chosen.id;
+  return chosen;
+}
+
+/** Record an answer against the three piles. ONE function, because the fault it
+ *  replaces was twenty-two rounds each holding their own copy of half a rule.
+ *  Right moves an item into the done pile and out of the wrong one; wrong moves
+ *  it into the wrong pile, and out of done if it was there, because an item you
+ *  used to know and have just missed is exactly what the wrong pile is for. */
+function recordSeen(key, id, right){
+  if(!key || !id) return;
+  var st = store(), i;
+  var seen = st.seen[key] = st.seen[key] || [];
+  var miss = st.revisit[key] = st.revisit[key] || [];
+  if(right){
+    if(seen.indexOf(id) < 0) seen.push(id);
+    i = miss.indexOf(id); if(i >= 0) miss.splice(i, 1);
+  } else {
+    i = seen.indexOf(id); if(i >= 0) seen.splice(i, 1);
+    if(miss.indexOf(id) < 0) miss.push(id);
+  }
+  save(st);
 }
 function optButtons(target, item, handler){
   var h="";
@@ -5445,9 +5497,7 @@ function czCheck(){
   if(fam) out.push(['k-miss', "<b>The whole family</b>" + famLine(fam)]);
   el("czFb").innerHTML = out.map(function(o){return '<li class="'+o[0]+'">'+o[1]+'</li>';}).join("");
 
-  var st2=store(), key="cloze:"+C.lvl, seen=st2.seen[key]||[];
-  if(ok && seen.indexOf(it.id)<0) seen.push(it.id);
-  st2.seen[key]=seen; save(st2);
+  recordSeen("cloze:"+C.lvl, it.id, ok);
   el("czCheck").style.display="none"; el("czNextBar").style.display="";
   chRecord(ok);
 }
@@ -6982,9 +7032,7 @@ function kCheck(){
                       + "one, but every word that fits is " + aOrAn(CLASSNAME[it.answerClass]) + "."]);
   el("kFb").innerHTML = out.map(function(o){return '<li class="'+o[0]+'">'+o[1]+'</li>';}).join("");
 
-  var st2=store(), key="klass:"+K.lvl, seen=st2.seen[key]||[];
-  if(ok && seen.indexOf(it.id)<0) seen.push(it.id);
-  st2.seen[key]=seen; save(st2);
+  recordSeen("klass:"+K.lvl, it.id, ok);
   el("kCheck").style.display="none"; el("kNextBar").style.display="";
   chRecord(ok);
 }
@@ -7094,9 +7142,7 @@ function shCheck(){
        "always change, which is exactly why it has to be checked rather than assumed.")]);
   el("shFb").innerHTML = out.map(function(o){return '<li class="'+o[0]+'">'+o[1]+'</li>';}).join("");
 
-  var st2=store(), key="shift:"+SH.lvl, seen=st2.seen[key]||[];
-  if(allOk && seen.indexOf(SH.item.id)<0) seen.push(SH.item.id);
-  st2.seen[key]=seen; save(st2);
+  recordSeen("shift:"+SH.lvl, SH.item.id, allOk);
   el("shCheck").style.display="none"; el("shNextBar").style.display="";
   chRecord(allOk);
 }
@@ -7153,9 +7199,7 @@ function trCheck(){
   }
   if(fam) out.push(['k-miss', "<b>The whole family</b>" + famLine(fam)]);
   el("trFb").innerHTML = out.map(function(o){return '<li class="'+o[0]+'">'+o[1]+'</li>';}).join("");
-  var st2=store(), key="trans:"+R.lvl, seen=st2.seen[key]||[];
-  if(ok && seen.indexOf(it.id)<0) seen.push(it.id);
-  st2.seen[key]=seen; save(st2);
+  recordSeen("trans:"+R.lvl, it.id, ok);
   el("trCheck").style.display="none"; el("trNextBar").style.display="";
   chRecord(ok);
 }
@@ -7307,13 +7351,8 @@ function cmCheck(){
   el("cmFb").innerHTML = fb;
 
   var st = store();
-  if(right){
-    var key = "commas:"+CM.type+":"+CM.lvl;
-    st.seen[key] = st.seen[key] || [];
-    if(st.seen[key].indexOf(it.id) < 0) st.seen[key].push(it.id);
-  } else {
-    st.err["commas_"+it.type] = (st.err["commas_"+it.type]||0) + 1;
-  }
+  if(!right) st.err["commas_"+it.type] = (st.err["commas_"+it.type]||0) + 1;
+  recordSeen("commas:"+CM.type+":"+CM.lvl, it.id, right);
   save(st);
   el("cmNextBar").style.display = "";
   chRecord(right);
@@ -7421,13 +7460,8 @@ function pnCheck(){
     fb += '<li class="dim">Nothing is wrong with <b>' + esc(it.words[PN.pick]) + '</b> here.</li>';
   el("pnFb").innerHTML = fb;
   var st = store();
-  if(ok){
-    var key = "punc:"+PN.type+":"+PN.lvl;
-    st.seen[key] = st.seen[key] || [];
-    if(st.seen[key].indexOf(it.id) < 0) st.seen[key].push(it.id);
-  } else {
-    st.err["punc_"+it.type] = (st.err["punc_"+it.type]||0) + 1;
-  }
+  if(!ok) st.err["punc_"+it.type] = (st.err["punc_"+it.type]||0) + 1;
+  recordSeen("punc:"+PN.type+":"+PN.lvl, it.id, ok);
   save(st);
   el("pnNextBar").style.display = "";
   chRecord(ok);
@@ -7538,11 +7572,7 @@ function pfPick(i){
     fb += '<li class="dim">You chose <b>' + esc(chosen) + '</b>, which is still not written correctly.</li>';
   el("pfFb").innerHTML = fb;
   var st = store();
-  if(PF.hit && fixed){
-    var key = "pf:"+PF.type+":"+PF.lvl;
-    st.seen[key] = st.seen[key] || [];
-    if(st.seen[key].indexOf(it.id) < 0) st.seen[key].push(it.id);
-  }
+  recordSeen("pf:"+PF.type+":"+PF.lvl, it.id, !!(PF.hit && fixed));
   if(!PF.hit) st.err["punc_"+it.type] = (st.err["punc_"+it.type]||0) + 1;
   if(!fixed)  st.err["puncfix_"+it.type] = (st.err["puncfix_"+it.type]||0) + 1;
   save(st);
@@ -7627,11 +7657,8 @@ function csPick(a){
   el("csScore").textContent = right ? "Right" : "Not that one";
   el("csFb").innerHTML = '<li>'+esc(it.why)+'</li><li>It should read: <b>'+esc(csFixed(it))+'</b></li>';
   var st = store();
-  if(right){
-    var key = "cs:"+CS.lvl;
-    st.seen[key] = st.seen[key] || [];
-    if(st.seen[key].indexOf(it.id) < 0) st.seen[key].push(it.id);
-  } else st.err.commas_splice = (st.err.commas_splice||0) + 1;
+  if(!right) st.err.commas_splice = (st.err.commas_splice||0) + 1;
+  recordSeen("cs:"+CS.lvl, it.id, right);
   save(st);
   el("csNextBar").style.display = "";
   chRecord(right);
@@ -7945,13 +7972,10 @@ function tqCheck(){
   el("tqFb").innerHTML = fb;
 
   var st = store();
-  if(res.v === "exact"){
-    var key = tqKey();
-    st.seen[key] = st.seen[key] || [];
-    if(st.seen[key].indexOf(it.id) < 0) st.seen[key].push(it.id);
-  } else if(res.v === "miss"){
-    st.err["tech_"+it.tech] = (st.err["tech_"+it.tech]||0) + 1;
-  }
+  if(res.v === "miss") st.err["tech_"+it.tech] = (st.err["tech_"+it.tech]||0) + 1;
+  /* Close is not finished with, but it is not a miss either: it goes in the
+     wrong pile like any other unfinished item (v0.51). */
+  recordSeen(tqKey(), it.id, res.v === "exact");
   /* "close" is deliberately neither: the student found the right place and drew
      the edges wrongly, which is not the mistake this round is about. */
   save(st);
@@ -8185,13 +8209,8 @@ function vtCheck(){
     + esc(it.why) + '</li>'
     + '<li class="dim">It should read: ' + esc(it.fixed) + '</li>';
   var st = store();
-  if(right){
-    var key = "vt:"+VT.type+":"+VT.lvl;
-    st.seen[key] = st.seen[key] || [];
-    if(st.seen[key].indexOf(it.id) < 0) st.seen[key].push(it.id);
-  } else {
-    st.err["tense_"+it.type] = (st.err["tense_"+it.type]||0) + 1;
-  }
+  if(!right) st.err["tense_"+it.type] = (st.err["tense_"+it.type]||0) + 1;
+  recordSeen("vt:"+VT.type+":"+VT.lvl, it.id, right);
   save(st);
   el("vtNextBar").style.display = "";
   chRecord(right);
@@ -8254,13 +8273,8 @@ function vfPick(i){
     + (right ? '' : '<li class="dim">You chose <b>' + esc(chosen) + '</b>.</li>')
     + '<li class="dim">It reads: ' + esc(it.fixed) + '</li>';
   var st = store();
-  if(right){
-    var key = "vf:"+VF.type+":"+VF.lvl;
-    st.seen[key] = st.seen[key] || [];
-    if(st.seen[key].indexOf(it.id) < 0) st.seen[key].push(it.id);
-  } else {
-    st.err["tense_"+it.type] = (st.err["tense_"+it.type]||0) + 1;
-  }
+  if(!right) st.err["tense_"+it.type] = (st.err["tense_"+it.type]||0) + 1;
+  recordSeen("vf:"+VF.type+":"+VF.lvl, it.id, right);
   save(st);
   el("vfNextBar").style.display = "";
   chRecord(right);
@@ -8382,13 +8396,8 @@ function xfCheck(){
   el("xfFb").innerHTML = fb;
 
   var st = store();
-  if(right){
-    var key = xfKeyName();
-    st.seen[key] = st.seen[key] || [];
-    if(st.seen[key].indexOf(it.id) < 0) st.seen[key].push(it.id);
-  } else {
-    st.err["transfer_"+xfType(it)] = (st.err["transfer_"+xfType(it)]||0) + 1;
-  }
+  if(!right) st.err["transfer_"+xfType(it)] = (st.err["transfer_"+xfType(it)]||0) + 1;
+  recordSeen(xfKeyName(), it.id, right);
   save(st);
   el("xfCheck").style.display = "none";
   el("xfNextBar").style.display = "";
@@ -8499,11 +8508,8 @@ function ktFinish(right, key, fb, close){
   el("ktScore").textContent = right ? "Right" : (close ? "Close" : "Not that one");
   el("ktFb").innerHTML = fb;
   var st = store();
-  if(right && key && KT.item){
-    st.seen[key] = st.seen[key] || [];
-    if(st.seen[key].indexOf(KT.item.id) < 0) st.seen[key].push(KT.item.id);
-  }
   if(!right) st.err["know_"+KT.mode] = (st.err["know_"+KT.mode]||0) + 1;
+  if(key && KT.item) recordSeen(key, KT.item.id, right);
   save(st);
   el("ktCheck").style.display = "none";
   el("ktNextBar").style.display = "";
@@ -8662,11 +8668,8 @@ function eiPick(i){
     '<li class="dim"><b>Explicit:</b> '+esc(it.explicit)+'</li>' +
     '<li class="dim"><b>Implied:</b> '+esc(it.implied)+'</li>';
   var st = store();
-  if(score === "Right"){
-    var key = "ei:"+EIX.mode;
-    st.seen[key] = st.seen[key] || [];
-    if(st.seen[key].indexOf(it.id) < 0) st.seen[key].push(it.id);
-  } else st.err["ei_"+EIX.mode] = (st.err["ei_"+EIX.mode]||0) + 1;
+  if(score !== "Right") st.err["ei_"+EIX.mode] = (st.err["ei_"+EIX.mode]||0) + 1;
+  recordSeen("ei:"+EIX.mode, it.id, score === "Right");
   save(st);
   el("eiNextBar").style.display = "";
   chRecord(score === "Right", score === "Close" ? "close" : null);
@@ -8735,11 +8738,8 @@ function ppCheck(){
   fb += '<li class="dim">It should read: '+esc(it.fixed)+'</li>';
   el("ppFb").innerHTML = fb;
   var st = store();
-  if(score === "Right"){
-    var key = "pp:"+PP.lvl;
-    st.seen[key] = st.seen[key] || [];
-    if(st.seen[key].indexOf(it.id) < 0) st.seen[key].push(it.id);
-  } else st.err.punc_para = (st.err.punc_para||0) + 1;
+  if(score !== "Right") st.err.punc_para = (st.err.punc_para||0) + 1;
+  recordSeen("pp:"+PP.lvl, it.id, score === "Right");
   save(st);
   el("ppNextBar").style.display = "";
   chRecord(score === "Right", score === "Close" ? "close" : null);
@@ -8803,11 +8803,8 @@ function vpCheck(){
     fb += '<li class="dim">Nothing is wrong with <b>'+extra.map(esc).join('</b> or <b>')+'</b>.</li>';
   el("vpFb").innerHTML = fb;
   var st = store();
-  if(score === "Right"){
-    var key = "vp:"+VP.lvl;
-    st.seen[key] = st.seen[key] || [];
-    if(st.seen[key].indexOf(it.id) < 0) st.seen[key].push(it.id);
-  } else st.err.tense_para = (st.err.tense_para||0) + 1;
+  if(score !== "Right") st.err.tense_para = (st.err.tense_para||0) + 1;
+  recordSeen("vp:"+VP.lvl, it.id, score === "Right");
   save(st);
   el("vpNextBar").style.display = "";
   chRecord(score === "Right", score === "Close" ? "close" : null);
@@ -8859,9 +8856,9 @@ function xtPick(i){
   }
   el("xtFb").innerHTML = fb;
   var st = store();
-  if(right){ st.seen.xt = st.seen.xt || []; if(st.seen.xt.indexOf(it.id) < 0) st.seen.xt.push(it.id); }
-  else st.err.xterm = (st.err.xterm||0) + 1;
+  if(!right) st.err.xterm = (st.err.xterm||0) + 1;
   save(st);
+  recordSeen("xt", it.id, right);
   el("xtNextBar").style.display = "";
   chRecord(right);
 }
@@ -8910,8 +8907,8 @@ function sfCheck(){
                          (extra.length === 1 ? 'does' : 'do') + ' not belong to it.</li>';
   el("sfFb").innerHTML = fb;
   var st = store();
-  if(score === "Right"){ var key = "sf:"+SF.lvl; st.seen[key] = st.seen[key] || []; if(st.seen[key].indexOf(it.id) < 0) st.seen[key].push(it.id); }
-  else st.err.semf = (st.err.semf||0) + 1;
+  if(score !== "Right") st.err.semf = (st.err.semf||0) + 1;
+  recordSeen("sf:"+SF.lvl, it.id, score === "Right");
   save(st);
   el("sfNextBar").style.display = "";
   chRecord(score === "Right", score === "Close" ? "close" : null);
@@ -9085,12 +9082,11 @@ function alPick(i){
   }
   el("alFb").innerHTML = fb;
   var st = store();
-  if(right && it.id && it.id.indexOf("odd:") !== 0){
-    var key = "al:"+AL.mode+":"+AL.lvl;
-    st.seen[key] = st.seen[key] || [];
-    if(st.seen[key].indexOf(it.id) < 0) st.seen[key].push(it.id);
-  }
   if(!right) st.err["al_"+AL.mode] = (st.err["al_"+AL.mode]||0) + 1;
+  /* the odd-one-out round assembles its item at serve time, so there is no id
+     to file it under and no pile for it to sit in */
+  if(it.id && it.id.indexOf("odd:") !== 0)
+    recordSeen("al:"+AL.mode+":"+AL.lvl, it.id, right);
   save(st);
   el("alNextBar").style.display = "";
   chRecord(right);
@@ -9178,13 +9174,8 @@ function zaPick(pick){
   el("zaFb").innerHTML = fb;
 
   var st = store();
-  if(right){
-    var key = "za:"+ZA.lvl;
-    st.seen[key] = st.seen[key] || [];
-    if(st.seen[key].indexOf(it.id) < 0) st.seen[key].push(it.id);
-  } else {
-    st.err["za_"+it.tech] = (st.err["za_"+it.tech]||0) + 1;
-  }
+  if(!right) st.err["za_"+it.tech] = (st.err["za_"+it.tech]||0) + 1;
+  recordSeen("za:"+ZA.lvl, it.id, right);
   save(st);
   el("zaNextBar").style.display = "";
 }
