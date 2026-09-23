@@ -9,10 +9,16 @@
 
 CREATE TABLE IF NOT EXISTS runs (
   id      INTEGER PRIMARY KEY AUTOINCREMENT,
-  cls     TEXT    NOT NULL,          -- ONE shared board since 2026-08-25 (SPEC 30):
-                                     -- runs land under ALL unless a code is sent.
-                                     -- Kept, not dropped, so per-class boards can
-                                     -- return without a migration.
+  cls     TEXT    NOT NULL,          -- THE YEAR GROUP since v0.50 (SPEC 60): Y7, Y8,
+                                     -- Y9, KS4, OTHER, and ALL for everything posted
+                                     -- before year groups existed. This column was
+                                     -- kept rather than dropped when the app went to
+                                     -- one shared board, with a note saying per-class
+                                     -- boards could return without a migration: this
+                                     -- is that. A name is judged once per cls and the
+                                     -- board shows one line per (cls, nick), which is
+                                     -- exactly what a year group needs, so no second
+                                     -- column was added.
   nick    TEXT    NOT NULL,          -- what the student typed. Free text (SPEC 19.3,
                                      -- revised 2026-08-25), and therefore NEVER shown
                                      -- on a board until a teacher has approved it.

@@ -52,7 +52,7 @@ function req(path, opts) {
   return worker.fetch(new Request("https://board.example.com" + path, init), env);
 }
 
-const good = { cls: "9b", nick: "Aisha", correct: 20, wrong: 2, chain: 8, level: "secure", score: 30 };
+const good = { cls: "y9", nick: "Aisha", correct: 20, wrong: 2, chain: 8, level: "secure", score: 30 };
 
 /* ------------------------------------------------------------------ runner */
 let pass = 0;
@@ -101,7 +101,7 @@ await test("a valid score is accepted and ranked", async () => {
   b = await r.json();
   check("lower score ranks third", b.rank === 3, String(b.rank));
 
-  r = await req("/board?cls=9B");
+  r = await req("/board?cls=Y9");
   b = await r.json();
   check("board returns all three", b.board.length === 3, String(b.board.length));
   check("board is ordered high to low",
@@ -111,16 +111,16 @@ await test("a valid score is accepted and ranked", async () => {
      unapproved shape matters most: `nick` must be ABSENT, not null or masked. */
   check("an unapproved row carries no nick field at all",
     Object.keys(b.board[0]).sort().join(",") ===
-    "chain,correct,created,id,level,score,status,wrong",
+    "chain,cls,correct,created,id,level,score,status,wrong",
     Object.keys(b.board[0]).sort().join(","));
-  await req("/admin/approve", { method: "POST", body: { cls: "9B", nick: "Ben" },
+  await req("/admin/approve", { method: "POST", body: { cls: "Y9", nick: "Ben" },
                                 headers: { "X-Teacher-Key": KEY } });
-  r = await req("/board?cls=9B");
+  r = await req("/board?cls=Y9");
   b = await r.json();
   const approvedRow = b.board.filter(x => x.nick === "Ben")[0];
   check("an approved row adds nick and nothing else",
     approvedRow && Object.keys(approvedRow).sort().join(",") ===
-    "chain,correct,created,id,level,nick,score,status,wrong",
+    "chain,cls,correct,created,id,level,nick,score,status,wrong",
     approvedRow && Object.keys(approvedRow).sort().join(","));
 });
 
@@ -135,7 +135,7 @@ await test("free-text nicknames are accepted but never shown unapproved", async 
   check("and starts unapproved", b.approved === 0, String(b.approved));
   check("but the score still ranks immediately", b.rank === 1, String(b.rank));
 
-  r = await req("/board?cls=9B");
+  r = await req("/board?cls=Y9");
   b = await r.json();
   const raw = JSON.stringify(b);
   check("the public board does NOT contain the unapproved name",
@@ -162,37 +162,37 @@ await test("moderation: approve, reject, and judge a name only once", async () =
   await req("/score", { method: "POST", body: { ...good, nick: "Aisha", score: 20 } });
   await req("/score", { method: "POST", body: { ...good, nick: "Rude One", score: 30 } });
 
-  let r = await req("/admin/pending", { method: "POST", body: { cls: "9B" } });
+  let r = await req("/admin/pending", { method: "POST", body: { cls: "Y9" } });
   check("pending needs the teacher key", r.status === 403, "got " + r.status);
-  r = await req("/admin/pending", { method: "POST", body: { cls: "9B" },
+  r = await req("/admin/pending", { method: "POST", body: { cls: "Y9" },
                                     headers: { "X-Teacher-Key": KEY } });
   let b = await r.json();
   check("pending lists NAMES not runs", b.pending.length === 2, JSON.stringify(b.pending));
   const aisha = b.pending.filter(p => p.nick === "Aisha")[0];
   check("and groups a repeat player into one decision", aisha && aisha.runs === 2,
     JSON.stringify(aisha));
-  check("every pending row carries its own class", b.pending.every(p => p.cls === "9B"),
+  check("every pending row carries its own year group", b.pending.every(p => p.cls === "Y9"),
     JSON.stringify(b.pending));
 
   /* The class is a FILTER, not a credential. A teacher does not necessarily
      know which class a name was posted under, and the key is what authorises
      this route, so asking them to name the class is asking for something the
      server already knows. */
-  await req("/score", { method: "POST", body: { ...good, cls: "7C", nick: "Farid", score: 11 } });
+  await req("/score", { method: "POST", body: { ...good, cls: "Y7", nick: "Farid", score: 11 } });
   r = await req("/admin/pending", { method: "POST", body: {},
                                     headers: { "X-Teacher-Key": KEY } });
   b = await r.json();
-  check("with no class given, pending spans every class",
-    b.pending.length === 3 && b.pending.some(p => p.cls === "7C"), JSON.stringify(b.pending));
+  check("with no year group given, pending spans every year",
+    b.pending.length === 3 && b.pending.some(p => p.cls === "Y7"), JSON.stringify(b.pending));
   check("and it still needs the key",
     (await req("/admin/pending", { method: "POST", body: {} })).status === 403);
   r = await req("/admin/pending", { method: "POST", body: { cls: "" },
                                     headers: { "X-Teacher-Key": KEY } });
-  check("an empty class string means all classes, not a bad request", r.status === 200,
+  check("an empty year string means all years, not a bad request", r.status === 200,
     "got " + r.status);
-  r = await req("/admin/pending", { method: "POST", body: { cls: "not a class!!" },
+  r = await req("/admin/pending", { method: "POST", body: { cls: "not a year!!" },
                                     headers: { "X-Teacher-Key": KEY } });
-  check("but a class code that is junk is still refused", r.status === 400, "got " + r.status);
+  check("but a year group that is junk is still refused", r.status === 400, "got " + r.status);
 
   /* A worker with no secret set must say so rather than blaming the password.
      Michael hit this: the page said "that password was not accepted" when the
@@ -212,15 +212,15 @@ await test("moderation: approve, reject, and judge a name only once", async () =
                                   headers: { "X-Teacher-Key": KEY } });
   check("clearing a board still demands an explicit class", r.status === 400, "got " + r.status);
 
-  await req("/admin/reject", { method: "POST", body: { cls: "7C", nick: "Farid" },
+  await req("/admin/reject", { method: "POST", body: { cls: "Y7", nick: "Farid" },
                                headers: { "X-Teacher-Key": KEY } });
 
-  r = await req("/admin/approve", { method: "POST", body: { cls: "9B", nick: "Aisha" },
+  r = await req("/admin/approve", { method: "POST", body: { cls: "Y9", nick: "Aisha" },
                                     headers: { "X-Teacher-Key": KEY } });
   b = await r.json();
   check("approving updates every run that name posted", b.runsUpdated === 2, JSON.stringify(b));
 
-  r = await req("/board?cls=9B");
+  r = await req("/board?cls=Y9");
   b = await r.json();
   const named = b.board.filter(x => x.nick === "Aisha");
   /* one line per name since v0.45: Aisha's two runs show as her best one */
@@ -235,14 +235,14 @@ await test("moderation: approve, reject, and judge a name only once", async () =
   check("a later run by an approved name is approved on arrival", b.approved === 1,
     String(b.approved));
 
-  r = await req("/admin/reject", { method: "POST", body: { cls: "9B", nick: "Rude One" },
+  r = await req("/admin/reject", { method: "POST", body: { cls: "Y9", nick: "Rude One" },
                                    headers: { "X-Teacher-Key": KEY } });
   b = await r.json();
   check("rejecting works", b.status === -1, JSON.stringify(b));
   r = await req("/score", { method: "POST", body: { ...good, nick: "Rude One", score: 55 } });
   b = await r.json();
   check("a rejected name stays rejected on its next run", b.approved === -1, String(b.approved));
-  r = await req("/board?cls=9B");
+  r = await req("/board?cls=Y9");
   b = await r.json();
   check("and never reaches the board",
     JSON.stringify(b.board).indexOf("Rude One") < 0, JSON.stringify(b.board));
@@ -259,7 +259,8 @@ await test("the impossible is rejected", async () => {
     ["negative correct", { correct: -1 }],
     ["a level that does not exist", { level: "impossible" }],
     ["a non-integer score", { score: 12.5 }],
-    ["a class code with markup in it", { cls: "<script>" }]
+    ["a year group with markup in it", { cls: "<script>" }],
+    ["a year group that is not one of the five", { cls: "Y13" }]
   ];
   for (const [name, patch] of cases) {
     const r = await req("/score", { method: "POST", body: { ...good, ...patch } });
@@ -302,7 +303,7 @@ await test("the teacher can see and undo a rejection", async () => {
      rejected rows read as "waiting for approval" with an empty queue. */
   await req("/score", { method: "POST", body: { ...good, nick: "Rude One", score: 40 } });
   await req("/score", { method: "POST", body: { ...good, nick: "Fine One", score: 20 } });
-  await req("/admin/reject", { method: "POST", body: { cls: "9B", nick: "Rude One" },
+  await req("/admin/reject", { method: "POST", body: { cls: "Y9", nick: "Rude One" },
                                headers: { "X-Teacher-Key": KEY } });
 
   let r = await req("/admin/pending", { method: "POST", body: {},
@@ -330,7 +331,7 @@ await test("the teacher can see and undo a rejection", async () => {
     b.board.length === 2, b.board.length);
 
   /* and the decision can be reversed */
-  await req("/admin/approve", { method: "POST", body: { cls: "9B", nick: "Rude One" },
+  await req("/admin/approve", { method: "POST", body: { cls: "Y9", nick: "Rude One" },
                                 headers: { "X-Teacher-Key": KEY } });
   r = await req("/board");
   b = await r.json();
@@ -341,7 +342,7 @@ await test("the teacher can see and undo a rejection", async () => {
 await test("the one shared board", async () => {
   /* Students are not asked for a class code any more (2026-08-25). */
   let r = await req("/score", { method: "POST", body: { ...good, cls: undefined } });
-  check("a score with no class code is accepted", r.status === 200, "got " + r.status);
+  check("a score with no year group is accepted", r.status === 200, "got " + r.status);
   r = await req("/score", { method: "POST", body: { ...good, cls: "" } });
   check("and an empty one means the same thing", r.status === 200, "got " + r.status);
 
@@ -352,10 +353,10 @@ await test("the one shared board", async () => {
 
   /* A code still filters, so nothing posted under one before the change is
      stranded, and per-class boards stay possible without a migration. */
-  await req("/score", { method: "POST", body: { ...good, cls: "7C", nick: "Farid" } });
-  r = await req("/board?cls=7C");
+  await req("/score", { method: "POST", body: { ...good, cls: "Y7", nick: "Farid" } });
+  r = await req("/board?cls=Y7");
   b = await r.json();
-  check("a class code still filters when one is given",
+  check("a year group still filters when one is given",
     b.board.length === 1, JSON.stringify(b.board));
   r = await req("/board");
   b = await r.json();
@@ -390,8 +391,8 @@ await test("rate limiting", async () => {
      the ceiling is the whole app and a flood stops everyone. That is the honest
      trade of a single board, and it is survivable because a refused submit is
      queued on the device and retried rather than lost (invariant 4). */
-  const other = await req("/score", { method: "POST", body: { ...good, cls: "7A" } });
-  check("the ceiling is app-wide now, so naming a class does not dodge it",
+  const other = await req("/score", { method: "POST", body: { ...good, cls: "KS4" } });
+  check("the ceiling is app-wide now, so naming a year group does not dodge it",
     other.status === 429, "got " + other.status);
 });
 
@@ -407,23 +408,23 @@ await test("teacher routes", async () => {
   let b = await r.json();
   check("delete with the right key works", r.status === 200 && b.deleted === 1, JSON.stringify(b));
 
-  r = await req("/admin/clear", { method: "POST", body: { cls: "9B" }, headers: { "X-Teacher-Key": KEY } });
+  r = await req("/admin/clear", { method: "POST", body: { cls: "Y9" }, headers: { "X-Teacher-Key": KEY } });
   b = await r.json();
   check("clear removes the rest of the class", b.cleared === 1, JSON.stringify(b));
-  r = await req("/board?cls=9B");
+  r = await req("/board?cls=Y9");
   b = await r.json();
   check("board is empty after a clear", b.board.length === 0, String(b.board.length));
 });
 
 await test("an unset teacher key fails closed", async () => {
   env = { DB: makeDB(), ALLOWED_ORIGIN: "x" };            // no TEACHER_KEY at all
-  const r = await req("/admin/clear", { method: "POST", body: { cls: "9B" }, headers: { "X-Teacher-Key": "" } });
+  const r = await req("/admin/clear", { method: "POST", body: { cls: "Y9" }, headers: { "X-Teacher-Key": "" } });
   check("with no secret set, admin refuses rather than opening", r.status === 403, "got " + r.status);
 });
 
 await test("board query hygiene", async () => {
   await req("/score", { method: "POST", body: good });
-  let r = await req("/board?cls=9B&limit=99999");
+  let r = await req("/board?cls=Y9&limit=99999");
   let b = await r.json();
   check("an absurd limit is capped, not obeyed", r.status === 200 && b.board.length <= 100);
   r = await req("/board?cls=%3Cscript%3E");
@@ -527,6 +528,139 @@ await test("audit 2026-09-22: the -5 floor, name variants, rank, one line per na
   r = await req("/score", { method: "POST", body: { ...good, cls: undefined, nick: "Rude" } });
   b = await r.json();
   check("after a full clear, an old decision no longer applies", b.approved === 0, JSON.stringify(b));
+});
+
+await test("year groups (v0.50)", async () => {
+  const H = { "X-Teacher-Key": KEY };
+  await req("/admin/clear", { method: "POST", body: { all: true }, headers: H });
+
+  /* The list is closed. The app is the only client, so an open field would let a
+     typo quietly create a sixth year group that nobody can see is wrong. */
+  for (const bad of ["Y13", "9B", "YEAR8", "ALLX"]) {
+    const r = await req("/score", { method: "POST", body: { ...good, cls: bad } });
+    check("refused as a year group: " + bad, r.status === 400, bad + " got " + r.status);
+  }
+  for (const okYear of ["Y7", "Y8", "Y9", "KS4", "OTHER", "ALL"]) {
+    const r = await req("/score", { method: "POST", body: { ...good, cls: okYear, nick: "N" + okYear } });
+    check("accepted: " + okYear, r.status === 200, okYear + " got " + r.status);
+  }
+  let r = await req("/score", { method: "POST", body: { ...good, cls: "ks4", nick: "Lower" } });
+  check("a lower-case year group is the same year group", r.status === 200, "got " + r.status);
+
+  /* Michael's ruling: a Year 7 Dragon and a Year 9 Dragon are two pupils. */
+  await req("/admin/clear", { method: "POST", body: { all: true }, headers: H });
+  await req("/score", { method: "POST", body: { ...good, cls: "Y7", nick: "Dragon", score: 20 } });
+  await req("/score", { method: "POST", body: { ...good, cls: "Y9", nick: "Dragon", score: 40 } });
+  r = await req("/board");
+  let b = await r.json();
+  check("the same name in two years is two lines on the all-years board",
+    b.board.length === 2, JSON.stringify(b.board.map(x => x.cls + ":" + x.score)));
+  check("and each line carries the year it came from",
+    b.board.map(x => x.cls).sort().join(",") === "Y7,Y9", JSON.stringify(b.board));
+  r = await req("/admin/pending", { method: "POST", body: {}, headers: H });
+  b = await r.json();
+  check("and each is its own decision for the teacher", b.pending.length === 2,
+    JSON.stringify(b.pending));
+  await req("/admin/approve", { method: "POST", body: { cls: "Y7", nick: "Dragon" }, headers: H });
+  r = await req("/board?cls=Y9");
+  b = await r.json();
+  check("approving one does not show the other",
+    b.board.length === 1 && b.board[0].nick === undefined, JSON.stringify(b.board));
+
+  /* Two ranks, because the app opens on the all-years board and a pupil plays in
+     one year. Before v0.50 sending a class code made the ONLY rank a within-class
+     one, which would have quietly changed what every pupil was told. */
+  r = await req("/score", { method: "POST", body: { ...good, cls: "Y7", nick: "Kit", score: 30 } });
+  b = await r.json();
+  check("the rank is across every year", b.rank === 2, JSON.stringify(b));
+  check("and the year rank is beside it", b.yearRank === 1, JSON.stringify(b));
+  check("the run says which year it landed in", b.cls === "Y7", JSON.stringify(b));
+
+  /* Which filters have anything behind them, so the app offers the years that
+     exist rather than five chips leading to four empty boards. */
+  r = await req("/board");
+  b = await r.json();
+  check("the board says which years are on it",
+    (b.years || []).sort().join(",") === "Y7,Y9", JSON.stringify(b.years));
+  r = await req("/board?cls=Y13");
+  check("and a year group that is not one of the five is refused here too",
+    r.status === 400, "got " + r.status);
+});
+
+await test("filing an old board by year group (v0.50)", async () => {
+  const H = { "X-Teacher-Key": KEY };
+  await req("/admin/clear", { method: "POST", body: { all: true }, headers: H });
+  /* The board existed for a year before year groups did, so this is what every
+     run already on it looks like. */
+  await req("/score", { method: "POST", body: { ...good, cls: undefined, nick: "Dragon", score: 20 } });
+  await req("/score", { method: "POST", body: { ...good, cls: undefined, nick: "dragon", score: 44 } });
+  await req("/score", { method: "POST", body: { ...good, cls: undefined, nick: "Aisha", score: 12 } });
+
+  let r = await req("/admin/names", { method: "POST", body: {} });
+  check("the name list needs the teacher key", r.status === 403, "got " + r.status);
+  r = await req("/admin/names", { method: "POST", body: {}, headers: H });
+  let b = await r.json();
+  check("it lists names, not runs", b.names.length === 2, JSON.stringify(b.names));
+  const dragon = b.names.filter(n => n.nick.toLowerCase() === "dragon")[0];
+  check("two spellings of one name are one row", dragon && dragon.runs === 2,
+    JSON.stringify(dragon));
+  check("and it says where that name currently counts", dragon.cls === "ALL", dragon.cls);
+
+  r = await req("/admin/assign", { method: "POST", body: { cls: "ALL", nick: "Dragon", year: "Y9" } });
+  check("assigning needs the teacher key", r.status === 403, "got " + r.status);
+  r = await req("/admin/assign", { method: "POST",
+    body: { cls: "ALL", nick: "Dragon", year: "Y13" }, headers: H });
+  check("and the target has to be a real year group", r.status === 400, "got " + r.status);
+
+  r = await req("/admin/assign", { method: "POST",
+    body: { cls: "ALL", nick: "Dragon", year: "Y9" }, headers: H });
+  b = await r.json();
+  check("every run that name has posted moves at once", b.moved === 2, JSON.stringify(b));
+  r = await req("/board?cls=Y9");
+  b = await r.json();
+  check("and they are all in the new year", b.board.length === 1 && b.board[0].score === 44,
+    JSON.stringify(b.board));
+  r = await req("/board?cls=ALL");
+  b = await r.json();
+  check("with nothing left behind in Not stated",
+    b.board.length === 1, JSON.stringify(b.board));
+
+  /* The decision travels, or an approved name arrives in its new year still
+     waiting and the teacher approves the same pupil twice. */
+  await req("/admin/approve", { method: "POST", body: { cls: "ALL", nick: "Aisha" }, headers: H });
+  r = await req("/admin/assign", { method: "POST",
+    body: { cls: "ALL", nick: "Aisha", year: "Y8" }, headers: H });
+  b = await r.json();
+  check("an approved name stays approved when it moves", b.status === 1, JSON.stringify(b));
+  r = await req("/board?cls=Y8");
+  b = await r.json();
+  check("and its name still shows", b.board[0] && b.board[0].nick === "Aisha",
+    JSON.stringify(b.board));
+
+  /* Moving a name into a year that already has it is the teacher ASSERTING they
+     are the same pupil, which is the knowledge the route exists to capture. The
+     decision already made in that year wins. */
+  await req("/score", { method: "POST", body: { ...good, cls: "Y7", nick: "Twin", score: 15 } });
+  await req("/score", { method: "POST", body: { ...good, cls: undefined, nick: "twin", score: 25 } });
+  await req("/admin/reject", { method: "POST", body: { cls: "Y7", nick: "Twin" }, headers: H });
+  r = await req("/admin/assign", { method: "POST",
+    body: { cls: "ALL", nick: "Twin", year: "Y7" }, headers: H });
+  b = await r.json();
+  check("merging keeps the decision already made in the year moved into",
+    b.status === -1, JSON.stringify(b));
+  r = await req("/board?cls=Y7");
+  b = await r.json();
+  const twin = b.board.filter(x => x.score === 25)[0];
+  check("and the arriving runs take that decision with them",
+    twin && twin.status === -1 && twin.nick === undefined, JSON.stringify(b.board));
+  check("one pupil, one line", b.board.filter(x => x.status === -1).length === 1,
+    JSON.stringify(b.board));
+
+  r = await req("/admin/assign", { method: "POST",
+    body: { cls: "Y7", nick: "Twin", year: "Y7" }, headers: H });
+  b = await r.json();
+  check("moving a name to the year it is already in does nothing and says so",
+    r.status === 200 && b.moved === 0, JSON.stringify(b));
 });
 
 await test("an old database gets its board column on the first request", async () => {

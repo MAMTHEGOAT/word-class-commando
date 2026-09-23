@@ -117,10 +117,30 @@ const RATE_WINDOW_SECONDS = 60;
    by the Remove button and the moderation queue, a stuck lesson is not. */
 const RATE_MAX_PER_WINDOW = 240;
 
-/* Every run lands here unless a class code is explicitly given. Keeping the
-   column rather than dropping it means per-class boards remain possible later
-   without a migration, and existing rows keep working. */
+/* Every run lands here unless a year group is explicitly given. This is now
+   the bucket for runs posted BEFORE v0.50, when nothing was asked, and for a
+   run from an app that has not been updated yet. The teacher moves a name out
+   of it with /admin/assign. */
 const DEFAULT_BOARD = "ALL";
+
+/* YEAR GROUPS (v0.50, Michael). The `cls` column was kept rather than dropped
+   when the app went to one shared board, with a note saying per-class boards
+   could return without a migration. This is that moment, and the column is
+   reused rather than a second one added, because everything that has to be true
+   of a year group is already true of `cls`:
+     - a name is judged once per cls (the `names` table), so a Year 7 Dragon and
+       a Year 9 Dragon are two people needing two approvals, which is Michael's
+       ruling;
+     - the board's one-line-per-name window partitions by (cls, nick), so both
+       Dragons appear on the all-years board, each at their own best;
+     - /board already filters by cls, so the year filter needs no new route.
+   A second column would have had to reproduce all three.
+
+   The list is closed. The app is the only thing that posts, and an open field
+   would let a typo quietly create a sixth year group that nobody can see is
+   wrong. ALL is accepted because old rows and old app versions carry it. */
+const YEARS = ["Y7", "Y8", "Y9", "KS4", "OTHER"];
+function isYear(v) { return YEARS.indexOf(v) >= 0 || v === DEFAULT_BOARD; }
 
 const BOARD_DEFAULT = 20;
 const BOARD_MAX = 100;
@@ -188,12 +208,13 @@ async function postScore(request, env) {
     return json(env, { error: "bad json" }, 400);
   }
 
-  /* The class code is optional. One shared board is the default and students
-     are not asked for a code at all; a code still works if one is sent. */
+  /* The year group. Optional on the wire, because an app from before v0.50 does
+     not send one and its runs must still land somewhere; required in the app,
+     which is where a pupil can be asked. */
   let cls = DEFAULT_BOARD;
   if (body.cls !== undefined && body.cls !== null && String(body.cls).trim() !== "") {
     cls = cleanClass(body.cls);
-    if (!cls) return json(env, { error: "bad class code" }, 400);
+    if (!cls || !isYear(cls)) return json(env, { error: "bad year group" }, 400);
   }
 
   const nick = cleanNick(body.nick);
@@ -258,13 +279,23 @@ async function postScore(request, env) {
     .run();
 
   /* Tell the student where they landed, counted exactly as the public board
-     counts: one line per name, across every class unless a class was sent. */
-  const explicitCls = cls !== DEFAULT_BOARD;
+     counts: one line per name.
+
+     TWO ranks since v0.50, because there are now two boards a pupil cares about
+     and the app opens on the first of them: the all-years board is the headline
+     and is never filtered here, and the year rank is the one they can realistically
+     win. Before v0.50 sending a class code silently made the ONLY rank a within-class
+     one, which would have quietly changed what every pupil was told the moment
+     the year group became required. */
   const rank = await env.DB
     .prepare("SELECT COUNT(DISTINCT cls || '|' || " + FOLD("nick") + ") AS n FROM runs " +
-             "WHERE board = ? AND score > ? AND NOT (cls = ? AND " + FOLD("nick") + " = " + FOLD("?") + ")" +
-             (explicitCls ? " AND cls = ?" : ""))
-    .bind(...(explicitCls ? [board, score, cls, nick, cls] : [board, score, cls, nick]))
+             "WHERE board = ? AND score > ? AND NOT (cls = ? AND " + FOLD("nick") + " = " + FOLD("?") + ")")
+    .bind(board, score, cls, nick)
+    .first();
+  const yrRank = await env.DB
+    .prepare("SELECT COUNT(DISTINCT " + FOLD("nick") + ") AS n FROM runs " +
+             "WHERE board = ? AND cls = ? AND score > ? AND " + FOLD("nick") + " <> " + FOLD("?"))
+    .bind(board, cls, score, nick)
     .first();
   const mine = await env.DB
     .prepare("SELECT MAX(score) AS best FROM runs WHERE board = ? AND cls = ? AND " +
@@ -274,7 +305,9 @@ async function postScore(request, env) {
   const best = mine && typeof mine.best === "number" ? mine.best : score;
 
   return json(env, { ok: true, nick: nick, approved: approved, board: board,
+                     cls: cls, years: YEARS,
                      rank: (rank ? rank.n : 0) + 1,
+                     yearRank: (yrRank ? yrRank.n : 0) + 1,
                      isBest: score >= best, best: best });
 }
 
@@ -286,7 +319,7 @@ async function getBoard(url, env) {
   let cls = null;
   if (raw !== null && raw.trim() !== "") {
     cls = cleanClass(raw);
-    if (!cls) return json(env, { error: "bad class code" }, 400);
+    if (!cls || !isYear(cls)) return json(env, { error: "bad year group" }, 400);
   }
 
   const board = cleanKind(url.searchParams.get("board"));
@@ -300,7 +333,7 @@ async function getBoard(url, env) {
   /* ONE line per name: each name's best run on this board (v0.45). Before, one
      keen pupil could fill the whole top five with their own history. */
   const sql =
-    "SELECT id, nick, approved, score, correct, wrong, chain, level, created FROM (" +
+    "SELECT id, cls, nick, approved, score, correct, wrong, chain, level, created FROM (" +
     "SELECT *, ROW_NUMBER() OVER (PARTITION BY cls, " + FOLD("nick") +
     " ORDER BY score DESC, created ASC) AS rn FROM runs " +
     "WHERE board = ? " + (cls ? "AND cls = ? " : "") +
@@ -316,13 +349,28 @@ async function getBoard(url, env) {
     const out = {
       id: r.id, score: r.score, correct: r.correct, wrong: r.wrong,
       chain: r.chain, level: r.level, created: r.created,
-      status: r.approved
+      status: r.approved,
+      /* The year group travels with the row (v0.50) so the all-years board can
+         show which year a score came from. It is a bucket of tens of pupils, not
+         an identifier of one, and it is the label the board is being filtered by:
+         SPEC 19.3 amended to say so rather than left to be inferred. */
+      cls: r.cls
     };
     if (r.approved === 1) out.nick = r.nick;
     return out;
   });
 
-  return json(env, { cls: cls, kind: board, board: out });
+  /* Which year filters have anything behind them, so the app can offer the ones
+     that exist instead of five chips leading to four empty boards. Counted on
+     this board only, because a year can be busy on Word classes and empty on
+     Ultimate Champion. */
+  const seen = await env.DB
+    .prepare("SELECT DISTINCT cls FROM runs WHERE board = ?")
+    .bind(board)
+    .all();
+  const years = ((seen && seen.results) || []).map(function (r) { return r.cls; });
+
+  return json(env, { cls: cls, kind: board, board: out, years: years, allYears: YEARS });
 }
 
 /** Teacher routes. One shared secret, set with `wrangler secret put TEACHER_KEY`.
@@ -469,6 +517,113 @@ async function adminBoard(request, env) {
   return json(env, { board: (rows && rows.results) || [] });
 }
 
+/** Every NAME on the board, with the year group it currently sits under.
+ *
+ *  This is the list the retroactive assignment tool is built on (v0.50). The
+ *  board was a year old before year groups existed, so every run already posted
+ *  sits under ALL; Michael knows who these pupils are by their nicknames, and
+ *  this route is what lets him say so. Grouped by name rather than by run, for
+ *  the same reason the moderation queue is: he is filing PEOPLE, and a pupil who
+ *  has played nine times is one decision.
+ *
+ *  Behind the teacher key, because it returns unapproved names. */
+async function adminNames(request, env) {
+  const auth = teacherState(request, env);
+  if (auth !== "ok")
+    return json(env, { error: auth === "unset" ? "no key set" : "no" }, 403);
+  let body;
+  try { body = await request.json(); } catch (e) { return json(env, { error: "bad json" }, 400); }
+
+  let only = null;
+  if (body.cls !== undefined && body.cls !== null && String(body.cls).trim() !== "") {
+    only = cleanClass(body.cls);
+    if (!only || !isYear(only)) return json(env, { error: "bad year group" }, 400);
+  }
+
+  await ensureBoardColumn(env);
+  const sql =
+    "SELECT cls, MIN(nick) AS nick, COUNT(*) AS runs, MAX(score) AS best, " +
+    "MAX(approved) AS approved, MIN(created) AS first, " +
+    "GROUP_CONCAT(DISTINCT board) AS boards " +
+    "FROM runs " + (only ? "WHERE cls = ? " : "") +
+    "GROUP BY cls, " + FOLD("nick") + " ORDER BY cls ASC, best DESC LIMIT 400";
+  const rows = await (only ? env.DB.prepare(sql).bind(only) : env.DB.prepare(sql)).all();
+  return json(env, { names: (rows && rows.results) || [], years: YEARS });
+}
+
+/** Move a NAME, and everything it has ever posted, into a year group.
+ *
+ *  The unit is the name and not the run, because a pupil is one pupil: filing
+ *  nine runs one at a time is how a tool stops being used, and leaving eight of
+ *  them behind would put the same nickname on the board twice.
+ *
+ *  If the target year already holds that name, the two become one. That is not
+ *  a collision to refuse: a teacher moving ALL/Dragon into Y8 where a Y8 Dragon
+ *  already plays is ASSERTING they are the same pupil, which is exactly the
+ *  knowledge this route exists to capture. The target's existing decision wins,
+ *  so a name already approved in that year does not go back into the queue. */
+async function adminAssign(request, env) {
+  const auth = teacherState(request, env);
+  if (auth !== "ok")
+    return json(env, { error: auth === "unset" ? "no key set" : "no" }, 403);
+  let body;
+  try { body = await request.json(); } catch (e) { return json(env, { error: "bad json" }, 400); }
+
+  const from = cleanClass(body.cls);
+  if (!from || !isYear(from)) return json(env, { error: "bad year group" }, 400);
+  const to = cleanClass(body.year);
+  if (!to || YEARS.indexOf(to) < 0)
+    return json(env, { error: "year must be one of " + YEARS.join(", ") }, 400);
+  const nick = cleanNick(body.nick);
+  if (!nick) return json(env, { error: "bad nickname" }, 400);
+  if (from === to) return json(env, { ok: true, moved: 0, nick: nick, year: to, status: null });
+
+  const now = Math.floor(Date.now() / 1000);
+  await ensureBoardColumn(env);
+
+  /* Whose decision survives: the one already made in the year being moved INTO,
+     otherwise the one travelling with the name. Read before anything moves. */
+  const there = await env.DB
+    .prepare("SELECT status FROM names WHERE cls = ? AND " + FOLD("nick") + " = " + FOLD("?"))
+    .bind(to, nick)
+    .first();
+  const here = await env.DB
+    .prepare("SELECT status FROM names WHERE cls = ? AND " + FOLD("nick") + " = " + FOLD("?"))
+    .bind(from, nick)
+    .first();
+  const status = there ? there.status : (here ? here.status : null);
+
+  const r = await env.DB
+    .prepare("UPDATE runs SET cls = ? WHERE cls = ? AND " + FOLD("nick") + " = " + FOLD("?"))
+    .bind(to, from, nick)
+    .run();
+
+  await env.DB
+    .prepare("DELETE FROM names WHERE cls = ? AND " + FOLD("nick") + " = " + FOLD("?"))
+    .bind(from, nick)
+    .run();
+  if (status !== null) {
+    await env.DB
+      .prepare("DELETE FROM names WHERE cls = ? AND " + FOLD("nick") + " = " + FOLD("?"))
+      .bind(to, nick)
+      .run();
+    await env.DB
+      .prepare("INSERT INTO names (cls, nick, status, decided) VALUES (?, ?, ?, ?)")
+      .bind(to, nick, status, now)
+      .run();
+    /* The runs carry the decision with them, so a name approved in one year does
+       not arrive in another still waiting, and a rejected one does not arrive
+       showing. */
+    await env.DB
+      .prepare("UPDATE runs SET approved = ? WHERE cls = ? AND " + FOLD("nick") + " = " + FOLD("?"))
+      .bind(status, to, nick)
+      .run();
+  }
+
+  return json(env, { ok: true, nick: nick, year: to,
+                     moved: (r.meta && r.meta.changes) || 0, status: status });
+}
+
 async function adminClear(request, env) {
   const auth = teacherState(request, env);
   if (auth !== "ok")
@@ -484,7 +639,7 @@ async function adminClear(request, env) {
     await env.DB.prepare("DELETE FROM names").run();
   } else {
     const cls = cleanClass(body.cls);
-    if (!cls) return json(env, { error: "name a class, or send all: true" }, 400);
+    if (!cls) return json(env, { error: "name a year group, or send all: true" }, 400);
     r = await env.DB.prepare("DELETE FROM runs WHERE cls = ?").bind(cls).run();
     await env.DB.prepare("DELETE FROM names WHERE cls = ?").bind(cls).run();
   }
@@ -511,6 +666,10 @@ export default {
         return await adminPending(request, env);
       if (url.pathname === "/admin/board" && request.method === "POST")
         return await adminBoard(request, env);
+      if (url.pathname === "/admin/names" && request.method === "POST")
+        return await adminNames(request, env);
+      if (url.pathname === "/admin/assign" && request.method === "POST")
+        return await adminAssign(request, env);
       if (url.pathname === "/admin/approve" && request.method === "POST")
         return await adminJudge(request, env, 1);
       if (url.pathname === "/admin/reject" && request.method === "POST")

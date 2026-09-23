@@ -55,6 +55,8 @@ The board and the submit work only from the live site: CORS is locked to
 | `/admin/pending` | POST | teacher | names awaiting a decision |
 | `/admin/approve` | POST | teacher | let a name be seen |
 | `/admin/reject` | POST | teacher | keep a name hidden for good |
+| `/admin/names` | POST | teacher | every name on the board, with the year group it counts under |
+| `/admin/assign` | POST | teacher | move a name, and everything it has posted, into a year group |
 
 Teacher routes need an `X-Teacher-Key` header matching the `TEACHER_KEY` secret.
 **If that secret has never been set, they refuse rather than defaulting to open.**
@@ -62,9 +64,19 @@ Teacher routes need an `X-Teacher-Key` header matching the `TEACHER_KEY` secret.
 ### POST /score
 
 ```json
-{ "nick": "Aisha", "correct": 20, "wrong": 2, "chain": 8,
+{ "nick": "Aisha", "cls": "Y8", "correct": 20, "wrong": 2, "chain": 8,
   "level": "secure", "score": 30, "board": "wc" }
 ```
+
+`cls` is the **year group** (v0.50): one of `Y7`, `Y8`, `Y9`, `KS4`, `OTHER`, and
+anything else is refused. A run that arrives without one lands under `ALL`, which
+is where every run posted before v0.50 sits and where an app that has not been
+updated still posts. The list is closed because the app is the only client, so an
+open field buys nothing and lets a typo create a sixth year group nobody can see
+is wrong.
+
+The reply carries **two ranks**: `rank` across every year, which is the board the
+app opens on, and `yearRank` within the year group the run was filed under.
 
 **Nicknames are free text and therefore moderated** (SPEC 19.3, revised
 2026-08-25 on the teacher's ruling; an earlier version composed them from word
@@ -75,11 +87,16 @@ returns a name that has not been approved. Not masked, not filtered on the
 client, not sent at all. The score ranks immediately, because holding a score
 hostage to a teacher's attention would make the board useless.
 
-**A name is judged once per class, not once per run**, and spellings that differ
-only in capitals or spaces ("Rude", "RUDE", "R u d e") are one name. Approving *Aisha* in 9B
-updates every run she has posted and every run she posts afterwards. Without
-that, a teacher approves the same thirty names every lesson, which is how a
-moderation queue stops being used.
+**A name is judged once per year group, not once per run**, and spellings that
+differ only in capitals or spaces ("Rude", "RUDE", "R u d e") are one name.
+Approving *Aisha* in Year 8 updates every run she has posted and every run she
+posts afterwards. Without that, a teacher approves the same thirty names every
+lesson, which is how a moderation queue stops being used.
+
+Per YEAR GROUP is deliberate (v0.50, Michael's ruling): a Year 7 Dragon and a
+Year 9 Dragon are two pupils, so they are two lines on the board and two
+decisions. It costs a second approval for a repeated name and it stops one
+pupil's score hiding another's.
 
 ### Moderating
 
@@ -91,6 +108,21 @@ moderation queue stops being used.
 
 A rejected student's **scores still count and still rank**; only the name stays
 hidden.
+
+### Filing the old board by year group
+
+The board ran for a year before year groups existed, so everything already on it
+sits under `ALL`. `/admin/names` lists every name with the year it counts under;
+`/admin/assign` takes `{cls, nick, year}` and moves that name, and every run it
+has ever posted, into `year`.
+
+The unit is the **name**, not the run: a pupil is one pupil, filing nine runs one
+at a time is how a tool stops being used, and leaving eight behind would put the
+same nickname on the board twice. If the destination year already holds that
+name the two become one, which is the teacher asserting they are the same pupil
+rather than a collision to refuse. The decision already made in the destination
+wins, so a name approved there does not go back into the queue and a rejected one
+does not arrive showing.
 
 ## What is validated, and what is not
 
