@@ -30,11 +30,17 @@ CREATE TABLE IF NOT EXISTS runs (
   level   TEXT    NOT NULL,          -- deepest level reached in the run (v0.45; before
                                      -- that, the level when the clock ran out)
   created INTEGER NOT NULL,          -- unix seconds, server clock not client clock
-  board   TEXT    NOT NULL DEFAULT 'wc'  -- which challenge (SPEC 50). On a database
+  board   TEXT    NOT NULL DEFAULT 'wc', -- which challenge (SPEC 50). On a database
                                      -- made before v0.39 the worker adds this column
                                      -- itself on the first request; see
                                      -- ensureBoardColumn(). Its index is made there
                                      -- too, for the same reason.
+  ver     TEXT    NOT NULL DEFAULT ''   -- the app version this run was posted from
+                                     -- (v0.58), shown beside a record in the hall of
+                                     -- fame. Empty on everything posted before v0.58,
+                                     -- which is the truth rather than a gap. Added to
+                                     -- an existing database by ensureBoardColumn(),
+                                     -- exactly as `board` was.
 );
 
 -- Older indexes from the per-class design. Kept (they cost nothing); the hot
@@ -63,4 +69,27 @@ CREATE TABLE IF NOT EXISTS names (
   status  INTEGER NOT NULL,          -- 1 approved, -1 rejected
   decided INTEGER NOT NULL,
   PRIMARY KEY (cls, nick)
+);
+
+-- THE CYCLE (v0.58, SPEC 68). Michael's school runs a two-week timetable and he
+-- rewards the top of each skill and year group every cycle, so the student board
+-- shows the current cycle only and empties at local midnight between Sunday and
+-- Monday. Boundaries are ROWS rather than arithmetic on an offset: a cycle that
+-- has happened is a fact about the past, and if the bounds were computed from an
+-- anchor then moving the anchor would move history and rewrite who won cycle 3.
+--
+-- Rows are created lazily, by the first request after a boundary passes; nothing
+-- here runs on a timer. A run is not stamped with its cycle, because `created`
+-- already says which one it falls in.
+--
+-- The worker creates this itself on the first request too (ensureCycleTable), so
+-- a database made before v0.58 needs nothing done to it.
+CREATE TABLE IF NOT EXISTS cycles (
+  n       INTEGER PRIMARY KEY AUTOINCREMENT,
+  start   INTEGER NOT NULL,          -- unix seconds. A Monday 00:00 in Phuket (UTC+7).
+  end     INTEGER NOT NULL           -- normally start + 14 days. SHORTER when a
+                                     -- one-week break moved the timetable and a
+                                     -- teacher said so on /admin/cycle: the cycle in
+                                     -- progress is closed early and a new one opens,
+                                     -- which is what a break does to a timetable.
 );

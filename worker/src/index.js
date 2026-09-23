@@ -94,8 +94,31 @@ async function ensureBoardColumn(env) {
   } catch (e) {
     if (!/duplicate column/i.test(String(e && e.message || e))) throw e;
   }
+  /* The app version a record was set on (v0.58), for the hall of fame. Added
+     the same way and for the same reason as `board`. It is empty on every run
+     posted before v0.58, which is correct rather than unfortunate: those records
+     were set on a version nobody wrote down. */
+  try {
+    await env.DB.prepare("ALTER TABLE runs ADD COLUMN ver TEXT NOT NULL DEFAULT ''").run();
+  } catch (e) {
+    if (!/duplicate column/i.test(String(e && e.message || e))) throw e;
+  }
   await env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_runs_kind ON runs (board, score DESC)").run();
+  /* The cycle board asks for one fortnight of one board, which without this is
+     a scan of the whole table on every load of the leaderboard. */
+  await env.DB.prepare(
+    "CREATE INDEX IF NOT EXISTS idx_runs_when ON runs (board, created, score DESC)").run();
   boardColumnReady = true;
+}
+
+/* The app version, as a label and nothing more. It is shown next to a record in
+   the hall of fame, so it is cleaned exactly as hard as a class code and no
+   harder: anything unexpected becomes no version rather than a bad request,
+   because a run must never be refused over a cosmetic field. */
+function cleanVer(v) {
+  if (typeof v !== "string") return "";
+  const s = v.trim();
+  return /^v[0-9]{1,3}\.[0-9]{1,3}$/.test(s) ? s : "";
 }
 
 function cleanKind(v) {
@@ -144,6 +167,106 @@ function isYear(v) { return YEARS.indexOf(v) >= 0 || v === DEFAULT_BOARD; }
 
 const BOARD_DEFAULT = 20;
 const BOARD_MAX = 100;
+
+/* ============================== THE CYCLE (v0.58) ==========================
+ * Michael's school runs a two-week timetable and he rewards the top of each
+ * skill and year group at the end of every cycle. So the student board is the
+ * CURRENT cycle only, and it empties at local midnight between the Sunday and
+ * the Monday. Past cycles are the teacher's, behind the key.
+ *
+ * Three things this design refuses to do:
+ *
+ *  1. It does not compute a cycle from an offset. Cycle boundaries are ROWS, in
+ *     a table, created as time passes. A cycle that has happened is a fact about
+ *     the past, and the moment a boundary is computed from "the anchor plus n
+ *     times fourteen days", moving the anchor moves history, which would quietly
+ *     rewrite who won cycle 3.
+ *
+ *  2. It does not store a cycle number on a run. `created` already says which
+ *     cycle a run belongs to, and a stored number would need backfilling the
+ *     first time a boundary moved.
+ *
+ *  3. It does not use the server's timezone. Cloudflare runs in UTC and
+ *     Michael's midnight is seven hours earlier, so the offset is written down
+ *     rather than inherited. Thailand has no daylight saving, which is the one
+ *     thing that makes a fixed offset honest here.
+ *
+ * A one-week break offsets the real timetable, so /admin/cycle lets a teacher
+ * say "this week is Week A" or "this week is Week B". That CLOSES the cycle in
+ * progress at the new boundary and opens a new one, which is what a break
+ * actually does: it interrupts the cycle rather than renumbering the year.
+ */
+const TZ_OFFSET = 7 * 3600;              // Asia/Bangkok. No daylight saving.
+const DAY = 86400;
+const CYCLE_SECONDS = 14 * DAY;
+/* Cycle 1 begins Monday 14 September 2026, 00:00 in Phuket. Michael, 2026-09-23:
+   "this week is Week B" and "today is day 8", on Wednesday 23 September, which
+   puts day 1 on Monday 14 September and the first reset at midnight Sunday 27
+   into Monday 28 September. */
+const CYCLE_ANCHOR = Date.UTC(2026, 8, 13, 17, 0, 0) / 1000;
+
+/** The Monday 00:00 (local) of the week containing `ts`, as a real timestamp. */
+function localMonday(ts) {
+  const day = Math.floor((ts + TZ_OFFSET) / DAY);   // days since epoch, locally
+  const dow = (day + 4) % 7;                        // 1970-01-01 was a Thursday
+  return (day - ((dow + 6) % 7)) * DAY - TZ_OFFSET;
+}
+
+let cycleTableReady = false;
+async function ensureCycleTable(env) {
+  if (cycleTableReady) return;
+  await env.DB.prepare(
+    "CREATE TABLE IF NOT EXISTS cycles (n INTEGER PRIMARY KEY AUTOINCREMENT, " +
+    "start INTEGER NOT NULL, end INTEGER NOT NULL)").run();
+  cycleTableReady = true;
+}
+
+/** The cycle containing `now`, creating any that have elapsed since the last
+ *  request. Cycles roll forward lazily because nothing here runs on a timer:
+ *  the first request after a Monday midnight is what closes Sunday's cycle. */
+async function currentCycle(env, now) {
+  await ensureCycleTable(env);
+  let row = await env.DB.prepare("SELECT n, start, end FROM cycles ORDER BY n DESC LIMIT 1").first();
+  if (!row) {
+    await env.DB.prepare("INSERT INTO cycles (start, end) VALUES (?, ?)")
+      .bind(CYCLE_ANCHOR, CYCLE_ANCHOR + CYCLE_SECONDS).run();
+    row = await env.DB.prepare("SELECT n, start, end FROM cycles ORDER BY n DESC LIMIT 1").first();
+  }
+  /* Bounded: a worker asleep for a term rolls a term's worth, and the loop stops
+     at a hundred rather than running until the request times out. */
+  let guard = 0;
+  while (row.end <= now && guard++ < 100) {
+    await env.DB.prepare("INSERT INTO cycles (start, end) VALUES (?, ?)")
+      .bind(row.end, row.end + CYCLE_SECONDS).run();
+    row = await env.DB.prepare("SELECT n, start, end FROM cycles ORDER BY n DESC LIMIT 1").first();
+  }
+  return row;
+}
+
+/** Where in the cycle today is: Week A or B, and the school day 1 to 10.
+ *  A weekend has no day number, because the timetable has no day there. */
+function cyclePlace(start, now) {
+  const d = Math.floor((now + TZ_OFFSET) / DAY) - Math.floor((start + TZ_OFFSET) / DAY);
+  if (d < 0 || d > 13) return { week: null, day: null, weekend: false, index: d };
+  const inWeek = d % 7;                                  // 0 Monday .. 6 Sunday
+  return {
+    week: d < 7 ? "A" : "B",
+    day: inWeek <= 4 ? (d < 7 ? inWeek + 1 : inWeek + 6) : null,
+    weekend: inWeek > 4,
+    index: d
+  };
+}
+
+/** What every caller is told about the cycle. `now` travels with it so a device
+ *  with a wrong clock still counts down to the right moment. */
+function cycleState(row, now) {
+  const place = cyclePlace(row.start, now);
+  return {
+    cycle: row.n, start: row.start, end: row.end, now: now,
+    week: place.week, day: place.day, weekend: place.weekend,
+    resetIn: Math.max(0, row.end - now), tz: TZ_OFFSET
+  };
+}
 
 /* ------------------------------------------------------------------ helpers */
 
@@ -272,11 +395,18 @@ async function postScore(request, env) {
 
   await env.DB
     .prepare(
-      "INSERT INTO runs (cls, nick, approved, score, correct, wrong, chain, level, created, board) " +
-      "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+      "INSERT INTO runs (cls, nick, approved, score, correct, wrong, chain, level, created, board, ver) " +
+      "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
     )
-    .bind(cls, nick, approved, score, correct, wrong, chain, body.level, now, board)
+    .bind(cls, nick, approved, score, correct, wrong, chain, body.level, now, board, cleanVer(body.ver))
     .run();
+
+  /* Which cycle this landed in. The ranks below are counted INSIDE it, because
+     that is the board the pupil is about to look at: telling a pupil they are
+     fourth of an all-time list they cannot see would be answering a question
+     nobody asked (v0.58). */
+  const cyc = await currentCycle(env, now);
+  const CYC = " AND created >= " + cyc.start + " AND created < " + cyc.end + " ";
 
   /* Tell the student where they landed, counted exactly as the public board
      counts: one line per name.
@@ -289,26 +419,44 @@ async function postScore(request, env) {
      the year group became required. */
   const rank = await env.DB
     .prepare("SELECT COUNT(DISTINCT cls || '|' || " + FOLD("nick") + ") AS n FROM runs " +
-             "WHERE board = ? AND score > ? AND NOT (cls = ? AND " + FOLD("nick") + " = " + FOLD("?") + ")")
+             "WHERE board = ? AND score > ? AND NOT (cls = ? AND " + FOLD("nick") + " = " + FOLD("?") + ")" + CYC)
     .bind(board, score, cls, nick)
     .first();
   const yrRank = await env.DB
     .prepare("SELECT COUNT(DISTINCT " + FOLD("nick") + ") AS n FROM runs " +
-             "WHERE board = ? AND cls = ? AND score > ? AND " + FOLD("nick") + " <> " + FOLD("?"))
+             "WHERE board = ? AND cls = ? AND score > ? AND " + FOLD("nick") + " <> " + FOLD("?") + CYC)
     .bind(board, cls, score, nick)
     .first();
+  /* Two bests, and they answer different questions. The CYCLE best is the line
+     this pupil has on the board they can see; the ALL-TIME best is the one the
+     hall of fame holds and the one it would take a personal record to beat. */
   const mine = await env.DB
+    .prepare("SELECT MAX(score) AS best FROM runs WHERE board = ? AND cls = ? AND " +
+             FOLD("nick") + " = " + FOLD("?") + CYC)
+    .bind(board, cls, nick)
+    .first();
+  const ever = await env.DB
     .prepare("SELECT MAX(score) AS best FROM runs WHERE board = ? AND cls = ? AND " +
              FOLD("nick") + " = " + FOLD("?"))
     .bind(board, cls, nick)
     .first();
   const best = mine && typeof mine.best === "number" ? mine.best : score;
+  const allBest = ever && typeof ever.best === "number" ? ever.best : score;
+  /* Did this run take the all-time record on this board? The hall of fame is
+     public, so this is checked against every year group and not only this one. */
+  const held = await env.DB
+    .prepare("SELECT MAX(score) AS top FROM runs WHERE board = ?")
+    .bind(board)
+    .first();
 
   return json(env, { ok: true, nick: nick, approved: approved, board: board,
                      cls: cls, years: YEARS,
                      rank: (rank ? rank.n : 0) + 1,
                      yearRank: (yrRank ? yrRank.n : 0) + 1,
-                     isBest: score >= best, best: best });
+                     isBest: score >= best, best: best,
+                     allBest: allBest,
+                     record: !!(held && typeof held.top === "number" && score >= held.top),
+                     cycle: cycleState(cyc, now) });
 }
 
 /** The board. `cls` is OPTIONAL: with none given this is the one shared board
@@ -329,14 +477,30 @@ async function getBoard(url, env) {
   if (!Number.isInteger(limit) || limit < 1) limit = BOARD_DEFAULT;
   if (limit > BOARD_MAX) limit = BOARD_MAX;
 
+  /* TWO public boards since v0.58, and only two. `scope=cycle` (the default) is
+     the fortnight running now, which is the one students compete on; `scope=all`
+     is the hall of fame, every score ever set on this board.
+     What this route deliberately does NOT accept is a cycle NUMBER. Students see
+     the cycle they are in and the all-time records, and nothing else; a past
+     cycle is the teacher's, behind the key, on /admin/cycles. That is a property
+     of the route rather than of the app, for the same reason an unapproved name
+     is (SPEC 19.3): a rule the client enforces is a rule anybody can edit. */
+  const scope = url.searchParams.get("scope") || "cycle";
+  if (scope !== "cycle" && scope !== "all") return json(env, { error: "bad scope" }, 400);
+
   await ensureBoardColumn(env);
+  const now = Math.floor(Date.now() / 1000);
+  const cyc = await currentCycle(env, now);
+  const WHEN = scope === "cycle"
+    ? " AND created >= " + cyc.start + " AND created < " + cyc.end + " " : " ";
+
   /* ONE line per name: each name's best run on this board (v0.45). Before, one
      keen pupil could fill the whole top five with their own history. */
   const sql =
-    "SELECT id, cls, nick, approved, score, correct, wrong, chain, level, created FROM (" +
+    "SELECT id, cls, nick, approved, score, correct, wrong, chain, level, created, ver FROM (" +
     "SELECT *, ROW_NUMBER() OVER (PARTITION BY cls, " + FOLD("nick") +
     " ORDER BY score DESC, created ASC) AS rn FROM runs " +
-    "WHERE board = ? " + (cls ? "AND cls = ? " : "") +
+    "WHERE board = ? " + (cls ? "AND cls = ? " : "") + WHEN +
     ") WHERE rn = 1 ORDER BY score DESC, created ASC LIMIT ?";
   const rows = await (cls ? env.DB.prepare(sql).bind(board, cls, limit)
                           : env.DB.prepare(sql).bind(board, limit)).all();
@@ -354,7 +518,10 @@ async function getBoard(url, env) {
          show which year a score came from. It is a bucket of tens of pupils, not
          an identifier of one, and it is the label the board is being filtered by:
          SPEC 19.3 amended to say so rather than left to be inferred. */
-      cls: r.cls
+      cls: r.cls,
+      /* The hall of fame says when a record was set and on which version of the
+         app. Empty on anything posted before v0.58, which is the truth. */
+      ver: r.ver || ""
     };
     if (r.approved === 1) out.nick = r.nick;
     return out;
@@ -363,14 +530,17 @@ async function getBoard(url, env) {
   /* Which year filters have anything behind them, so the app can offer the ones
      that exist instead of five chips leading to four empty boards. Counted on
      this board only, because a year can be busy on Word classes and empty on
-     Ultimate Champion. */
+     Ultimate Champion, and within THIS scope, because a year that played last
+     term is not a year with a chip on this fortnight's board. */
   const seen = await env.DB
-    .prepare("SELECT DISTINCT cls FROM runs WHERE board = ?")
+    .prepare("SELECT DISTINCT cls FROM runs WHERE board = ?" + WHEN)
     .bind(board)
     .all();
   const years = ((seen && seen.results) || []).map(function (r) { return r.cls; });
 
-  return json(env, { cls: cls, kind: board, board: out, years: years, allYears: YEARS });
+  return json(env, { cls: cls, kind: board, scope: scope, board: out,
+                     years: years, allYears: YEARS,
+                     cycle: cycleState(cyc, now) });
 }
 
 /** Teacher routes. One shared secret, set with `wrangler secret put TEACHER_KEY`.
@@ -510,9 +680,9 @@ async function adminBoard(request, env) {
   const board = kind ? cleanKind(kind) : null;
   if (kind && !board) return json(env, { error: "bad board" }, 400);
   const rows = await (board
-    ? env.DB.prepare("SELECT id, cls, nick, approved, score, created, board FROM runs " +
+    ? env.DB.prepare("SELECT id, cls, nick, approved, score, created, board, ver FROM runs " +
                      "WHERE board = ? ORDER BY score DESC, created ASC LIMIT ?").bind(board, limit)
-    : env.DB.prepare("SELECT id, cls, nick, approved, score, created, board FROM runs " +
+    : env.DB.prepare("SELECT id, cls, nick, approved, score, created, board, ver FROM runs " +
                      "ORDER BY score DESC, created ASC LIMIT ?").bind(limit)).all();
   return json(env, { board: (rows && rows.results) || [] });
 }
@@ -624,6 +794,111 @@ async function adminAssign(request, env) {
                      moved: (r.meta && r.meta.changes) || 0, status: status });
 }
 
+/** Where the cycle is, for anybody. Public, because the splash screen shows the
+ *  week and the day to every student, and because it says nothing about anyone:
+ *  it is a school timetable, which is on the wall. */
+async function getCycle(env) {
+  const now = Math.floor(Date.now() / 1000);
+  const cyc = await currentCycle(env, now);
+  return json(env, cycleState(cyc, now));
+}
+
+/** Move the cycle. Michael: "sometimes we have a one-week break which offsets
+ *  the cycle", so he needs to be able to say which week this one is.
+ *
+ *  Saying "this week is Week B" when the server thinks it is Week A does NOT
+ *  renumber the year. It closes the cycle in progress at the new boundary and
+ *  opens a new one, because that is what a break does to a timetable: cycle 4
+ *  ended early, and cycle 5 is the one you are in. Past cycles keep the dates
+ *  they actually had, so the winners of cycle 3 stay the winners of cycle 3. */
+async function adminCycle(request, env) {
+  const auth = teacherState(request, env);
+  if (auth !== "ok")
+    return json(env, { error: auth === "unset" ? "no key set" : "no" }, 403);
+  let body;
+  try { body = await request.json(); } catch (e) { return json(env, { error: "bad json" }, 400); }
+
+  const now = Math.floor(Date.now() / 1000);
+  let cyc = await currentCycle(env, now);
+  const week = body.week;
+  if (week !== "A" && week !== "B") return json(env, { error: "week must be A or B" }, 400);
+
+  /* "This week is Week A" means the cycle starts on the Monday just gone.
+     "Week B" means it started on the Monday before that. */
+  const monday = localMonday(now);
+  const want = week === "A" ? monday : monday - 7 * DAY;
+  if (want === cyc.start)
+    return json(env, { ok: true, changed: false, cycle: cycleState(cyc, now) });
+
+  if (want > cyc.start) {
+    /* The cycle in progress is cut short here and a new one begins. */
+    await env.DB.prepare("UPDATE cycles SET end = ? WHERE n = ?").bind(want, cyc.n).run();
+    await env.DB.prepare("INSERT INTO cycles (start, end) VALUES (?, ?)")
+      .bind(want, want + CYCLE_SECONDS).run();
+  } else {
+    /* The cycle in progress actually began earlier than recorded, so it is
+       stretched back and whatever came before it ends where this one starts. */
+    await env.DB.prepare("UPDATE cycles SET start = ?, end = ? WHERE n = ?")
+      .bind(want, want + CYCLE_SECONDS, cyc.n).run();
+    await env.DB.prepare("UPDATE cycles SET end = ? WHERE n < ? AND end > ?")
+      .bind(want, cyc.n, want).run();
+  }
+  cyc = await currentCycle(env, now);
+  return json(env, { ok: true, changed: true, cycle: cycleState(cyc, now) });
+}
+
+/** Past cycles, and who won them. The teacher's half of the feature.
+ *
+ *  With no `cycle` this lists every cycle that has anything in it. With one, it
+ *  returns that cycle's winners: the top name on each board in each year group,
+ *  which is the list Michael reads out when he hands out the rewards. A name
+ *  still waiting or rejected is returned with its real spelling, exactly as
+ *  /admin/board does, because this route is behind the key. */
+async function adminCycles(request, env) {
+  const auth = teacherState(request, env);
+  if (auth !== "ok")
+    return json(env, { error: auth === "unset" ? "no key set" : "no" }, 403);
+  let body;
+  try { body = await request.json(); } catch (e) { return json(env, { error: "bad json" }, 400); }
+
+  await ensureBoardColumn(env);
+  const now = Math.floor(Date.now() / 1000);
+  const cur = await currentCycle(env, now);
+
+  if (body.cycle === undefined || body.cycle === null) {
+    const rows = await env.DB.prepare(
+      "SELECT c.n, c.start, c.end, " +
+      "(SELECT COUNT(*) FROM runs r WHERE r.created >= c.start AND r.created < c.end) AS runs " +
+      "FROM cycles c ORDER BY c.n DESC LIMIT 60").all();
+    return json(env, { cycles: (rows && rows.results) || [], current: cur.n,
+                       cycle: cycleState(cur, now) });
+  }
+
+  if (!isInt(body.cycle, 1, Number.MAX_SAFE_INTEGER))
+    return json(env, { error: "bad cycle" }, 400);
+  const row = await env.DB.prepare("SELECT n, start, end FROM cycles WHERE n = ?")
+    .bind(body.cycle).first();
+  if (!row) return json(env, { error: "no such cycle" }, 404);
+
+  /* One winner per board per year group. Ties go to whoever got there first,
+     which is the rule the board itself already sorts by. */
+  const win = await env.DB.prepare(
+    "SELECT board, cls, nick, score, created, approved, ver FROM (" +
+    "SELECT *, ROW_NUMBER() OVER (PARTITION BY board, cls ORDER BY score DESC, created ASC) AS rn " +
+    "FROM runs WHERE created >= ? AND created < ?" +
+    ") WHERE rn = 1 ORDER BY board ASC, cls ASC").bind(row.start, row.end).all();
+
+  const all = await env.DB.prepare(
+    "SELECT board, cls, nick, score, created, approved, ver FROM runs " +
+    "WHERE created >= ? AND created < ? ORDER BY score DESC, created ASC LIMIT ?")
+    .bind(row.start, row.end, BOARD_MAX).all();
+
+  return json(env, { cycle: row.n, start: row.start, end: row.end,
+                     current: cur.n, live: row.n === cur.n,
+                     winners: (win && win.results) || [],
+                     board: (all && all.results) || [] });
+}
+
 async function adminClear(request, env) {
   const auth = teacherState(request, env);
   if (auth !== "ok")
@@ -660,6 +935,12 @@ export default {
         return await postScore(request, env);
       if (url.pathname === "/board" && request.method === "GET")
         return await getBoard(url, env);
+      if (url.pathname === "/cycle" && request.method === "GET")
+        return await getCycle(env);
+      if (url.pathname === "/admin/cycle" && request.method === "POST")
+        return await adminCycle(request, env);
+      if (url.pathname === "/admin/cycles" && request.method === "POST")
+        return await adminCycles(request, env);
       if (url.pathname === "/admin/delete" && request.method === "POST")
         return await adminDelete(request, env);
       if (url.pathname === "/admin/pending" && request.method === "POST")
@@ -688,7 +969,7 @@ export default {
           ok: true,
           note: "This is the score service, not the app. The app is at " +
                 "https://mamthegoat.github.io/word-class-commando/",
-          routes: ["/health", "/board"]
+          routes: ["/health", "/board", "/cycle"]
         });
 
       return json(env, { error: "not found" }, 404);

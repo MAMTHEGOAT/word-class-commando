@@ -98,6 +98,15 @@ button{font:inherit;cursor:pointer}
 .bd-years .chip{font-size:.85rem;padding:5px 11px}
 .bd-yr{color:var(--dim);font-size:.78rem;padding-left:8px}
 /* teacher page tabs (v0.57): one job on screen at a time */
+/* the cycle line on the splash (v0.58) */
+.cyc{text-align:center;margin:22px 0 16px;font-size:.82rem;letter-spacing:.04em;
+  text-transform:uppercase;color:var(--brass)}
+.cyc .cyc-r{display:block;margin-top:4px;letter-spacing:.03em;text-transform:none;
+  color:var(--dim);font-size:.8rem}
+/* the scope chips above the board tabs: this cycle, or all time */
+.bd-scope{margin:6px 0 14px}
+.bd-scope .chip{font-size:.85rem;padding:5px 11px}
+.bd-when{color:var(--dim);font-size:.76rem;padding-left:8px;white-space:nowrap}
 .t-tabs{margin:18px 0 16px}
 .t-pane{display:none}
 .t-pane.on{display:block}
@@ -464,8 +473,14 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
     </button>
   </div>
 
+  <!-- where the timetable is (v0.58). The week and the day come from the same
+       two-week cycle the school runs on, so a pupil reads the same thing here
+       as on the wall of their form room. -->
+  <p class="cyc" id="cycNow" style="display:none"><span id="cycWeek"></span><span
+     class="cyc-r" id="cycReset"></span></p>
+
   <button class="diag-entry" onclick="showBoard()">Leaderboard
-    <span class="sub">Challenge scores, one board for each challenge</span></button>
+    <span class="sub">This cycle's challenge scores, one board for each challenge</span></button>
 
   <p class="small dim" style="margin-top:28px">Sister app to
     <b>Analysis Acrobat</b>, which teaches you to analyse the language you find here.</p>
@@ -661,8 +676,9 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
 <section id="board" class="screen">
   <div class="topbar"><button class="back" onclick="go('splash')">&larr; Menu</button><img alt="" class="tb-logo"></div>
   <h2>Leaderboard</h2>
-  <p class="dim">Challenge scores, everyone together. A name shows once a teacher has
-     approved it.</p>
+  <p class="dim" id="bdBlurb">Challenge scores, everyone together. A name shows once a
+     teacher has approved it.</p>
+  <div class="chips bd-scope" id="boardScope"></div>
   <div class="chips bd-tabs" id="boardTabs"></div>
   <p class="lbl" id="bdYearLbl" style="display:none">Year group</p>
   <div class="chips bd-years" id="boardYears"></div>
@@ -723,7 +739,28 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
     <div id="yrBody"></div>
   </div>
 
-  <!-- 4. the homework link builder. No password, no network. -->
+  <!-- 4. the cycle (v0.58) -->
+  <div class="t-pane" id="tp_cycle">
+    <p class="dim">The student board is the cycle running now and empties at midnight
+       between the Sunday and the Monday. Past cycles are here and nowhere else: the
+       board service will not serve one to a student at all.</p>
+    <div class="sent" id="cycNowBox" style="font-size:.95rem;line-height:1.6"></div>
+    <p class="lbl" style="margin-top:16px">If a break has moved the timetable</p>
+    <p class="dim small">Saying which week this one is closes the cycle in progress at
+       the new boundary and starts a new one. Cycles that have already finished keep
+       the dates they had, so their winners do not change.</p>
+    <div class="board-form">
+      <button class="ghost" onclick="cycleSet('A')">This week is Week A</button>
+      <button class="ghost" onclick="cycleSet('B')">This week is Week B</button>
+    </div>
+    <p class="lbl" style="margin-top:20px">Past cycles</p>
+    <div class="board-form">
+      <select id="cycPick" class="tin" onchange="cycleShow()"></select>
+    </div>
+    <div id="cycBody"></div>
+  </div>
+
+  <!-- 5. the homework link builder. No password, no network. -->
   <div class="t-pane" id="tp_link">
     <p class="dim">Builds a link that opens straight into one activity at one level.
        No menu, no wrong chip, nothing to explain. Send it as it is.</p>
@@ -740,7 +777,7 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
     </div>
   </div>
 
-  <!-- 5. the wipe. Its own tab, and its own scope.
+  <!-- 6. the wipe. Its own tab, and its own scope.
        Until v0.57 the scope of this came from the queue's filter box, so a box
        you typed in to LOOK at one year group silently decided how much a later
        press of Clear would delete. The scope is now chosen here, nowhere else,
@@ -4580,7 +4617,7 @@ var AMBIG = ["answer","answers","back","bark","barks","book","books","brush","br
 <script>
 "use strict";
 
-var APP = "wcc", VER = "v0.57", BANK_REV = 36;
+var APP = "wcc", VER = "v0.58", BANK_REV = 36;
 var BUG_FORM_URL = "";   /* paste the Office 365 form link to switch the report button on */
 
 /* ---------- the four tests: one source for the Learn screen AND every
@@ -6065,9 +6102,14 @@ async function submitRun(){
   var who = boardId();
 
   /* The year group travels with the run and is what the board is filtered by. */
+  /* `ver` rides along from v0.58 so the hall of fame can say which version a
+     record was set on. It is a label: a worker that does not know the field
+     ignores it, and one that does refuses a malformed one without refusing the
+     run, because nobody should lose a score over a cosmetic field. */
   var run = { nick: who.nick, cls: yr, score: B.lastScore,
               correct: B.lastCorrect, wrong: B.lastWrong,
-              chain: B.lastChain, level: B.lastLevel, board: B.lastBoard || "wc" };
+              chain: B.lastChain, level: B.lastLevel, board: B.lastBoard || "wc",
+              ver: VER };
 
   el("bzSubmit").disabled = true;
   el("bzSubmitNote").textContent = "Sending...";
@@ -6097,15 +6139,19 @@ async function submitRun(){
        twice when the two differ. */
     var yrk = r.body.yearRank, where = "number " + rk +
       (yrk && yrk !== r.body.rank ? ", and number <b>" + yrk + "</b> in " + esc(yearName(yr)) : "");
+    /* The rank is counted inside THIS CYCLE (v0.58), which is the board the
+       pupil is about to open. Taking the all-time record is the one thing worth
+       saying on top of it, because that is the line that does not reset. */
+    var crown = r.body.record ? " That is the highest score anybody has ever posted on this board." : "";
     if(r.body.isBest === false)
-      el("bzSubmitNote").innerHTML = "Sent. Your best on this board is still <b>" + r.body.best +
-        "</b>, and that is the one on the board.";
-    else el("bzSubmitNote").innerHTML = ap === 1
+      el("bzSubmitNote").innerHTML = "Sent. Your best this cycle is still <b>" + r.body.best +
+        "</b>, and that is the one on the board." + crown;
+    else el("bzSubmitNote").innerHTML = (ap === 1
       ? "On the board at " + where + "."
       : ap === -1
       ? "Sent. Your score is on the board at " + where + ". That name is not shown on the board, so try a different one next time."
       : "Sent. Your score is on the board at " + where +
-        ", and your name appears once your teacher has approved it.";
+        ", and your name appears once your teacher has approved it.") + crown;
     el("bzSubmitRow").style.display = "none";
     el("bzSeeBoard").style.display = "";
   } else if(r && !r.ok){
@@ -6134,12 +6180,116 @@ async function submitRun(){
   }
 }
 
+/* ==================================================================
+   THE CYCLE (v0.58, SPEC 68)
+
+   Michael's school runs a two-week timetable and he rewards the top of
+   each skill and year group at the end of every cycle, so the student
+   board is the CURRENT cycle and it empties at local midnight between
+   the Sunday and the Monday.
+
+   The worker owns the boundaries, because a teacher can move them and
+   because a pupil's tablet clock cannot be trusted with when a
+   competition ends. What lives here is the same arithmetic as a
+   FALLBACK, for the case the service cannot be reached: the splash
+   still says which week it is, which is the half of this that is a
+   timetable rather than a leaderboard.
+   ================================================================== */
+var TZ_OFFSET = 7 * 3600;          /* Asia/Bangkok, no daylight saving */
+var DAY_S = 86400, CYCLE_S = 14 * DAY_S;
+/* Cycle 1 begins Monday 14 September 2026, 00:00 in Phuket. Michael,
+   2026-09-23: this week is Week B and today is day 8. */
+var CYCLE_ANCHOR = Date.UTC(2026, 8, 13, 17, 0, 0) / 1000;
+var CYCLE = null;        /* what the worker said, or what we worked out */
+var CYCLE_SKEW = 0;      /* server clock minus this device's, in seconds */
+var CYCLE_TICK = null;
+function cycleNow(){ return Math.floor(Date.now() / 1000) + CYCLE_SKEW; }
+/* Week A or B, and the school day 1 to 10. A weekend has no day number,
+   because the timetable has no day there. */
+function cyclePlace(start, now){
+  var d = Math.floor((now + TZ_OFFSET) / DAY_S) - Math.floor((start + TZ_OFFSET) / DAY_S);
+  if(d < 0 || d > 13) return { week:null, day:null, weekend:false };
+  var inWeek = d % 7;
+  return { week: d < 7 ? "A" : "B",
+           day: inWeek <= 4 ? (d < 7 ? inWeek + 1 : inWeek + 6) : null,
+           weekend: inWeek > 4 };
+}
+function cycleGuess(now){
+  var n = Math.floor((now - CYCLE_ANCHOR) / CYCLE_S);
+  var start = CYCLE_ANCHOR + n * CYCLE_S, end = start + CYCLE_S;
+  var p = cyclePlace(start, now);
+  return { cycle: n + 1, start: start, end: end, now: now, week: p.week,
+           day: p.day, weekend: p.weekend, resetIn: Math.max(0, end - now),
+           guess: true };
+}
+/* Asked once per load, and never waited on: the splash renders without it and
+   fills in when it arrives (SPEC 19.2). */
+var CYCLE_SEQ = 0;
+async function cycleLoad(){
+  /* A request that has not come back yet must never land on top of a later
+     answer. The one on page load takes six seconds to give up, so without this
+     it overwrites anything asked for in the meantime, a second at a time, with
+     the offline guess. */
+  var seq = ++CYCLE_SEQ;
+  var r = await netGet("/cycle");
+  if(seq !== CYCLE_SEQ) return;
+  if(r && r.ok && r.body && typeof r.body.start === "number"){
+    CYCLE = r.body;
+    CYCLE_SKEW = r.body.now - Math.floor(Date.now() / 1000);
+  }else{
+    /* No service. The week is still the week, so say it and say nothing
+       about the leaderboard, which is not there to reset. */
+    CYCLE = cycleGuess(Math.floor(Date.now() / 1000));
+  }
+  cyclePaint();
+  if(!CYCLE_TICK) CYCLE_TICK = setInterval(cyclePaint, 30000);
+}
+/* "4 days", "6 hours", "12 minutes". Rounded DOWN at every step, because a
+   countdown that rounds up tells a pupil they have longer than they do. */
+function cycleLeft(secs){
+  if(secs <= 0) return "any moment";
+  if(secs >= 2 * DAY_S) return Math.floor(secs / DAY_S) + " days";
+  if(secs >= DAY_S) return "1 day";
+  if(secs >= 2 * 3600) return Math.floor(secs / 3600) + " hours";
+  if(secs >= 3600) return "1 hour";
+  if(secs >= 120) return Math.floor(secs / 60) + " minutes";
+  return "1 minute";
+}
+function cycleLine(){
+  if(!CYCLE || !CYCLE.week) return "";
+  var s = "Week " + CYCLE.week;
+  s += CYCLE.day ? ", day " + CYCLE.day + " of 10" : ", weekend";
+  return s;
+}
+/* The splash, every thirty seconds. The clock is the SERVER's, carried
+   across as an offset at load, so a tablet set to the wrong day still
+   counts down to the right midnight. */
+function cyclePaint(){
+  var box = el("cycNow"); if(!box) return;
+  if(!CYCLE){ box.style.display = "none"; return; }
+  var now = cycleNow(), left = Math.max(0, CYCLE.end - now);
+  /* The boundary can pass while the app is open on a Sunday night, and the
+     numbers would then be a fortnight stale. Recompute from the anchor and
+     ask the service again. */
+  if(left <= 0 && !CYCLE.guess){ cycleLoad(); return; }
+  var p = cyclePlace(CYCLE.start, now);
+  CYCLE.week = p.week; CYCLE.day = p.day; CYCLE.weekend = p.weekend;
+  box.style.display = "";
+  el("cycWeek").textContent = cycleLine();
+  el("cycReset").textContent = CYCLE.guess
+    ? "" : "Leaderboard resets in " + cycleLeft(left);
+}
+
 /* ---- the board ---- */
 /* One board per challenge (SPEC 50), chosen by the tabs. The screen remembers
    which one it was last showing, and the result screen opens the one just played. */
 /* `year` null is ALL YEARS, which is what the board opens on (Michael's ruling):
    one board is still the headline, and the filter is a chip under it. */
-var BD = { board:"wc", year:null, seen:[] };
+/* `scope` is the two public boards and only those (v0.58): the fortnight running
+   now, which is what a pupil is competing in, and the hall of fame, which is
+   every score ever set. A PAST cycle is not one of them: that is the teacher's,
+   behind the key, and it is the worker rather than this file that says so. */
+var BD = { board:"wc", year:null, seen:[], scope:"cycle" };
 function boardTabs(){
   var h = "";
   for(var i=0;i<CH_BOARDS.length;i++){
@@ -6149,6 +6299,28 @@ function boardTabs(){
   }
   el("boardTabs").innerHTML = h;
 }
+var BD_SCOPES = [["cycle","This cycle"],["all","Hall of fame"]];
+function boardScope(){
+  var wrap = el("boardScope"); if(!wrap) return;
+  var h = "", i;
+  for(i=0;i<BD_SCOPES.length;i++)
+    h += '<button class="chip" id="bs_' + BD_SCOPES[i][0] + '" aria-pressed="' +
+         (BD.scope === BD_SCOPES[i][0]) + '" onclick="showScope(\'' +
+         BD_SCOPES[i][0] + '\')">' + esc(BD_SCOPES[i][1]) + '</button>';
+  wrap.innerHTML = h;
+  /* The blurb is the one place that says what you are looking at, so it says
+     it in full rather than leaving a pupil to infer it from a chip. */
+  var blurb = el("bdBlurb"); if(!blurb) return;
+  if(BD.scope === "all")
+    blurb.textContent = "The highest score ever set on each board, since the app began. " +
+      "These do not reset.";
+  else
+    blurb.textContent = "This cycle only" + (cycleLine() ? ", " + cycleLine().charAt(0).toLowerCase() +
+      cycleLine().slice(1) : "") +
+      ". It empties at midnight on Sunday and everybody starts level. " +
+      "A name shows once a teacher has approved it.";
+}
+function showScope(s){ BD.scope = s; showBoard(); }
 /* Only the years that have somebody on THIS board get a chip. Five chips leading
    to four empty boards teaches a class that the filter is broken. Not stated is
    offered last and only while runs from before v0.50 are still unfiled. */
@@ -6171,6 +6343,17 @@ function boardYears(){
          '" onclick="showBoard(null, \'' + NOT_STATED + '\')">' + esc(yearName(NOT_STATED)) + '</button>';
   wrap.innerHTML = h;
 }
+/* "14 Sep 2026". Built by hand rather than with toLocaleDateString, because the
+   school laptops, the phones and the iPads would otherwise each pick their own
+   order and a date is meant to be read across a class. */
+var MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+function shortDate(secs){
+  if(!secs) return "";
+  /* Shifted into Phuket time first, so a record set at nine on a Monday evening
+     is not shown as the Monday before it by a browser reading UTC. */
+  var d = new Date((secs + TZ_OFFSET) * 1000);
+  return d.getUTCDate() + " " + MONTHS[d.getUTCMonth()] + " " + d.getUTCFullYear();
+}
 function boardHaveAGo(){ startBlitz(BD.board); }
 /* `year` is three-valued on purpose: undefined leaves the filter alone (the
    challenge tabs call it that way), null is all years, a code filters. */
@@ -6178,16 +6361,37 @@ async function showBoard(board, year){
   if(CHALLENGES[board]) BD.board = board;
   if(year !== undefined) BD.year = year;
   board = BD.board;
-  go("board"); boardTabs(); boardYears();
+  go("board"); boardTabs(); boardScope(); boardYears();
   var who = boardId();
   el("boardBody").innerHTML = '<p class="dim">Loading...</p>';
   /* One board, so it loads for anybody. It used to need a class code stored on
      this device, which meant the board was blank until you had submitted from
      this very browser: the commonest way to meet it was to find nothing. */
-  var want = BD.year;
+  var want = BD.year, scope = BD.scope;
   var r = await netGet("/board?limit=25" + (board === "wc" ? "" : "&board=" + board) +
-                       (want ? "&cls=" + encodeURIComponent(want) : ""));
-  if(board !== BD.board || want !== BD.year) return;   /* another chip was tapped meanwhile */
+                       (want ? "&cls=" + encodeURIComponent(want) : "") +
+                       (scope === "all" ? "&scope=all" : ""));
+  if(board !== BD.board || want !== BD.year || scope !== BD.scope) return;   /* another chip was tapped meanwhile */
+  /* A worker from before v0.58 does not know what a scope is and answers with
+     every score ever, which on the cycle board is the wrong fortnight and on the
+     hall of fame happens to be right. Say so rather than showing last term's
+     winner as this cycle's (SPEC 19.7: the site and the worker deploy apart). */
+  if(r && r.ok && r.body && r.body.scope === undefined){
+    el("boardBody").innerHTML = '<p class="dim">The board service has not been updated ' +
+      'yet, so it cannot yet tell this cycle apart from every other one. Run ' +
+      'deploy-worker.bat and this board is the fortnight again.</p>';
+    if(el("bdYearLbl")) el("bdYearLbl").style.display = "none";
+    el("boardYears").innerHTML = "";
+    return;
+  }
+  /* The cycle travels with the board, so the chips and the blurb are never a
+     fortnight behind what the service is actually serving. */
+  if(r && r.ok && r.body && r.body.cycle){
+    CYCLE_SEQ++;                      /* this answer is newer than any in flight */
+    CYCLE = r.body.cycle;
+    CYCLE_SKEW = r.body.cycle.now - Math.floor(Date.now() / 1000);
+    boardScope(); cyclePaint();
+  }
   if(r && r.ok && board !== "wc" && !(r.body && r.body.kind === board)){
     /* an old worker, answering with the Word classes board: say so, do not
        show the wrong board under this tab's name */
@@ -6209,9 +6413,12 @@ async function showBoard(board, year){
   if(r.body.years){ BD.seen = r.body.years; boardYears(); }
   var rows = r.body.board || [];
   if(!rows.length){
+    /* An empty cycle board is the normal state of a Monday morning and means
+       something quite different from an empty hall of fame. */
+    var since = BD.scope === "cycle" ? " this cycle" : " yet";
     el("boardBody").innerHTML = '<p class="dim">' + (BD.year
-      ? 'Nobody from ' + esc(yearName(BD.year)) + ' has been on this board yet. Be first.'
-      : 'Nothing on this board yet. Be first.') + '</p>';
+      ? 'Nobody from ' + esc(yearName(BD.year)) + ' has been on this board' + since + '. Be first.'
+      : 'Nothing on this board' + since + '. Be first.') + '</p>';
     return;
   }
   var h = '<table class="restab">';
@@ -6230,7 +6437,13 @@ async function showBoard(board, year){
        the board is already filtered to one, where it would be on every line. */
     var yr = (!BD.year && row.cls && row.cls !== NOT_STATED)
       ? '<span class="bd-yr">' + esc(yearName(row.cls)) + '</span>' : '';
-    h += '<tr' + mine + '><td class="num dim">' + (i+1) + '</td><td>' + name + yr +
+    /* On the hall of fame a record is a piece of history, so it says WHEN and
+       on which version of the app. A run posted before v0.58 carries no version,
+       and then only the date is shown rather than an invented one. */
+    var when = BD.scope === "all"
+      ? '<span class="bd-when">' + esc(shortDate(row.created)) +
+        (row.ver ? " · " + esc(row.ver) : "") + '</span>' : '';
+    h += '<tr' + mine + '><td class="num dim">' + (i+1) + '</td><td>' + name + yr + when +
          '</td><td class="num">' + row.score + '</td></tr>';
   }
   h += '</table>';
@@ -6259,6 +6472,8 @@ function forgetTeacherKey(){
   el("tBody").innerHTML = '<p class="dim">Password forgotten on this device.</p>';
   if(el("tBoardWrap")) el("tBoardWrap").innerHTML = "";
   if(el("yrBody")) el("yrBody").innerHTML = "";
+  if(el("cycBody")) el("cycBody").innerHTML = "";
+  if(el("cycNowBox")) el("cycNowBox").innerHTML = "";
   if(el("tState")) el("tState").textContent = "Password forgotten on this device.";
 }
 
@@ -6268,8 +6483,8 @@ function forgetTeacherKey(){
    `key` says whether the pane needs the password, which is what the note under
    the bar is told. */
 var T_TABS = [["queue","Waiting",true],["board","The board",true],
-              ["years","Year groups",true],["link","Homework link",false],
-              ["danger","Danger",true]];
+              ["years","Year groups",true],["cycle","Cycle",true],
+              ["link","Homework link",false],["danger","Danger",true]];
 var T_TAB = "queue";
 function teacherTabs(){
   var h = "", i;
@@ -6306,6 +6521,8 @@ function startTeacher(){
   el("tBody").innerHTML = "";
   el("tBoardWrap").innerHTML = "";
   el("yrBody").innerHTML = "";
+  el("cycBody").innerHTML = "";
+  el("cycNowBox").innerHTML = "";
 }
 /* The queue's filter was a free-text box eight characters wide, and the only
    values it could usefully hold are the five in the closed year list, so every
@@ -6402,6 +6619,7 @@ async function teacherLoad(){
   el("tState").textContent = "Loaded. The password is remembered for this tab only.";
   teacherBoard();
   yearsLoad();
+  cycleLoadT();
 }
 
 /* Where a name has been seen, for the one queue (SPEC 50). The decision covers
@@ -6550,6 +6768,114 @@ async function yearsAssign(i, cls, nick){
     return;
   }
   yearsLoad();
+}
+
+/* ---- the cycle, on the teacher page (v0.58) ----
+   Michael rewards the top of each skill and each year group every cycle, so the
+   thing this has to do well is produce that list. Everything else here is in
+   service of it: the list of cycles is how you reach a past one, and the A/B
+   buttons exist because a one-week break offsets the real timetable. */
+function cycleWhen(a, b){
+  /* The end is the midnight AFTER the last day, so the range a person reads is
+     one second short of it. */
+  return shortDate(a) + " to " + shortDate(b - 1);
+}
+async function cycleLoadT(){
+  var key = teacherKey();
+  if(!key){ el("cycBody").innerHTML = '<p class="dim">Type the teacher password first.</p>'; return; }
+  var r = await netPost("/admin/cycles", {}, { "X-Teacher-Key": key });
+  if(!r || !r.ok){
+    var err = r && r.body && r.body.error;
+    el("cycNowBox").innerHTML = '<span class="dim">' + (err === "not found"
+      ? "The board service has not been updated yet, so it does not know about cycles. " +
+        "Run deploy-worker.bat and this appears."
+      : "That did not load" + (err ? ": " + esc(err) : "") + ".") + '</span>';
+    el("cycBody").innerHTML = "";
+    return;
+  }
+  var cyc = r.body.cycle, list = r.body.cycles || [], i, h;
+  /* A worker that answers this route but sends no cycle is one that has the
+     route and not the feature, which is a version skew and not a failure. */
+  if(!cyc){
+    el("cycNowBox").innerHTML = '<span class="dim">The board service answered but said ' +
+      'nothing about cycles. Run deploy-worker.bat and this appears.</span>';
+    el("cycBody").innerHTML = "";
+    return;
+  }
+  el("cycNowBox").innerHTML =
+    '<b>Cycle ' + cyc.cycle + '</b>, ' + esc(cycleWhen(cyc.start, cyc.end)) + '<br>' +
+    'Right now: <b>' + esc(cycleLine() || ("week " + cyc.week)) + '</b><br>' +
+    'The board empties in ' + esc(cycleLeft(Math.max(0, cyc.end - cyc.now))) + '.';
+  h = '<option value="">Pick a cycle...</option>';
+  for(i=0;i<list.length;i++)
+    h += '<option value="' + list[i].n + '">Cycle ' + list[i].n + ': ' +
+         esc(cycleWhen(list[i].start, list[i].end)) +
+         (list[i].n === r.body.current ? " (running now)" : "") +
+         " · " + list[i].runs + (list[i].runs === 1 ? " run" : " runs") + '</option>';
+  el("cycPick").innerHTML = h;
+  el("cycBody").innerHTML = "";
+}
+async function cycleShow(){
+  var n = parseInt(el("cycPick").value, 10);
+  if(!n){ el("cycBody").innerHTML = ""; return; }
+  el("cycBody").innerHTML = '<p class="dim">Loading...</p>';
+  var r = await netPost("/admin/cycles", { cycle: n }, { "X-Teacher-Key": teacherKey() });
+  if(!r || !r.ok){ el("cycBody").innerHTML = '<p class="dim">That did not load.</p>'; return; }
+  var w = r.body.winners || [], i, h;
+  h = '<h3 class="diag-h">Winners, cycle ' + r.body.cycle + ' (' +
+      esc(cycleWhen(r.body.start, r.body.end)) + ')</h3>';
+  if(r.body.live)
+    h += '<p class="dim small">This cycle is still running, so these can still change.</p>';
+  if(!w.length) h += '<p class="dim">Nobody posted a score in this cycle.</p>';
+  else{
+    h += '<table class="restab">';
+    for(i=0;i<w.length;i++){
+      var bn = CHALLENGES[w[i].board] ? CHALLENGES[w[i].board].name : w[i].board;
+      /* The real name whatever its state, exactly as the board tab does, because
+         a teacher handing out a reward needs to know who it is even if the
+         nickname was never approved for public display. */
+      var st = w[i].approved === 1 ? "" :
+               (w[i].approved === -1 ? ' <span class="dim small">rejected</span>'
+                                     : ' <span class="dim small">waiting</span>');
+      h += '<tr><td>' + esc(bn) + '</td><td class="dim">' + esc(yearName(w[i].cls)) +
+           '</td><td>' + esc(w[i].nick) + st + '</td><td class="num">' + w[i].score + '</td></tr>';
+    }
+    h += '</table>';
+  }
+  var all = r.body.board || [];
+  h += '<h3 class="diag-h">Every score in that cycle (' + all.length + ')</h3>';
+  if(all.length){
+    h += '<table class="restab">';
+    for(i=0;i<all.length;i++){
+      var b2 = CHALLENGES[all[i].board] ? CHALLENGES[all[i].board].name : all[i].board;
+      h += '<tr><td class="num dim">' + (i+1) + '</td><td>' + esc(all[i].nick) +
+           '<br><span class="dim small">' + esc(b2) + ", " + esc(yearName(all[i].cls)) +
+           ", " + esc(shortDate(all[i].created)) + '</span></td><td class="num">' +
+           all[i].score + '</td></tr>';
+    }
+    h += '</table>';
+  }
+  el("cycBody").innerHTML = h;
+}
+async function cycleSet(week){
+  if(!confirm("Tell the board service that this week is Week " + week + "? The cycle " +
+              "running now is closed at the new boundary and a new one starts. Cycles " +
+              "that have already finished are not touched.")) return;
+  var r = await netPost("/admin/cycle", { week: week }, { "X-Teacher-Key": teacherKey() });
+  if(!r || !r.ok){
+    el("cycBody").innerHTML = '<p class="dim">That did not save' +
+      (r && r.body && r.body.error ? ": " + esc(r.body.error) : "") + '.</p>';
+    return;
+  }
+  /* The app's own idea of the week came from the service, so it is replaced
+     rather than left a week out until the next reload. */
+  if(r.body.cycle){
+    CYCLE_SEQ++;
+    CYCLE = r.body.cycle;
+    CYCLE_SKEW = r.body.cycle.now - Math.floor(Date.now() / 1000);
+    cyclePaint();
+  }
+  cycleLoadT();
 }
 
 async function teacherClear(){
@@ -11126,6 +11452,33 @@ function validate(){
     }
   }
 
+  /* ---- the cycle, checked against itself (v0.58, SPEC 68) ----
+     The app and the worker each hold this arithmetic: the worker because it owns
+     the boundaries, the app because the splash must still say which week it is
+     with the service unreachable. Two copies of one rule is how SPEC 61 happened,
+     so the copy here is checked against the facts Michael gave, which are the
+     only ones that make it wrong in a way nobody would notice: a timezone
+     dropped, or an anchor a week out, both of which look perfectly fine on a
+     Wednesday and put the reset on the wrong night. */
+  (function(){
+    var cases = [[Date.UTC(2026,8,14,5)/1000, "A", 1], [Date.UTC(2026,8,18,5)/1000, "A", 5],
+                 [Date.UTC(2026,8,19,5)/1000, "A", null], [Date.UTC(2026,8,21,5)/1000, "B", 6],
+                 [Date.UTC(2026,8,23,5)/1000, "B", 8], [Date.UTC(2026,8,25,5)/1000, "B", 10]];
+    for(var c=0;c<cases.length;c++){
+      var g = cycleGuess(cases[c][0]);
+      if(g.week !== cases[c][1] || g.day !== cases[c][2])
+        E.push("cycle: " + new Date(cases[c][0]*1000).toISOString().slice(0,10) +
+               " should be week " + cases[c][1] + " day " + cases[c][2] +
+               ", the app makes it week " + g.week + " day " + g.day);
+    }
+    /* A cycle begins and ends at a LOCAL midnight. If TZ_OFFSET were ever
+       dropped the reset would land at seven in the morning, which is a lesson. */
+    if((CYCLE_ANCHOR + TZ_OFFSET) % DAY_S !== 0)
+      E.push("cycle: the anchor is not a local midnight");
+    if(CYCLE_S !== 14 * DAY_S) E.push("cycle: a cycle is not a fortnight");
+    if(cycleGuess(CYCLE_ANCHOR).cycle !== 1) E.push("cycle: the anchor is not day one of cycle one");
+  })();
+
   /* mojibake tripwire */
   var pageSrc = (typeof document!=="undefined" && document.documentElement)
                 ? document.documentElement.innerHTML : "";
@@ -11363,6 +11716,9 @@ function boot(){
   /* Anything that could not be sent last time goes up now, silently. A student
      who lost wifi mid-lesson should never have to think about it again. */
   try{ flushQueue(); }catch(e){}
+  /* Which week of the timetable it is (v0.58). Asked for and never waited on:
+     the splash is already on screen and the line appears when it arrives. */
+  try{ cycleLoad(); }catch(e){}
 }
 if(typeof document!=="undefined" && document.addEventListener)
   document.addEventListener("pointerup", function(){ try{ tqUp(); }catch(e){} });

@@ -111,7 +111,7 @@ await test("a valid score is accepted and ranked", async () => {
      unapproved shape matters most: `nick` must be ABSENT, not null or masked. */
   check("an unapproved row carries no nick field at all",
     Object.keys(b.board[0]).sort().join(",") ===
-    "chain,cls,correct,created,id,level,score,status,wrong",
+    "chain,cls,correct,created,id,level,score,status,ver,wrong",
     Object.keys(b.board[0]).sort().join(","));
   await req("/admin/approve", { method: "POST", body: { cls: "Y9", nick: "Ben" },
                                 headers: { "X-Teacher-Key": KEY } });
@@ -120,7 +120,7 @@ await test("a valid score is accepted and ranked", async () => {
   const approvedRow = b.board.filter(x => x.nick === "Ben")[0];
   check("an approved row adds nick and nothing else",
     approvedRow && Object.keys(approvedRow).sort().join(",") ===
-    "chain,cls,correct,created,id,level,nick,score,status,wrong",
+    "chain,cls,correct,created,id,level,nick,score,status,ver,wrong",
     approvedRow && Object.keys(approvedRow).sort().join(","));
 });
 
@@ -672,12 +672,196 @@ await test("an old database gets its board column on the first request", async (
   db.exec("INSERT INTO runs (cls, nick, approved, score, correct, wrong, chain, level, created) " +
           "VALUES ('ALL', 'Old', 1, 40, 20, 0, 20, 'secure', 1)");
   const mod = await import(join(HERE, "src/index.js") + "?fresh=" + Date.now());
-  const r = await mod.default.fetch(new Request("https://board.example.com/board"), env);
+  /* scope=all since v0.58: this row is dated the first second of 1970, so the
+     CURRENT cycle is rightly empty and the hall of fame is where it lives. */
+  const r = await mod.default.fetch(new Request("https://board.example.com/board?scope=all"), env);
   const b = await r.json();
   check("the old row is still there, on the word classes board", r.status === 200 && b.board.length === 1 && b.board[0].score === 40,
         r.status + " " + JSON.stringify(b));
   const again = await mod.default.fetch(new Request("https://board.example.com/board?board=punc"), env);
   check("and asking twice does not trip over the column it added", again.status === 200, "got " + again.status);
+});
+
+/* ======================= THE CYCLE (v0.58, SPEC 68) ======================= */
+
+const DAYS = 86400;
+/* Every timestamp below is checked against the Phuket midnight the worker is
+   supposed to use, not the container's timezone, which is what the bug would
+   look like if TZ_OFFSET were ever dropped. */
+const ANCHOR = Date.UTC(2026, 8, 13, 17, 0, 0) / 1000;   // Mon 14 Sep, 00:00 local
+
+/* The database is made fresh per test, so `created` is what decides a run's
+   cycle. This plants a run at a chosen moment without going through /score. */
+function plant(when, nick, score, board, cls) {
+  env.DB._raw.exec(
+    "INSERT INTO runs (cls, nick, approved, score, correct, wrong, chain, level, created, board, ver) " +
+    "VALUES ('" + (cls || "Y9") + "', '" + nick + "', 1, " + score +
+    ", 20, 0, 5, 'secure', " + when + ", '" + (board || "wc") + "', 'v0.58')");
+}
+
+await test("the cycle is where Michael says it is", async () => {
+  /* Wednesday 23 September 2026, noon in Phuket. Michael: week B, day 8. */
+  const now = Date.UTC(2026, 8, 23, 5, 0, 0) / 1000;
+  plant(now, "Anchor", 1);
+  const r = await req("/cycle");
+  const b = await r.json();
+  check("day 1 is the Monday Michael named", b.start === ANCHOR,
+        b.start + " vs " + ANCHOR);
+  check("and the cycle runs a fortnight", b.end - b.start === 14 * DAYS, String(b.end - b.start));
+  check("the reset is a local midnight, not a UTC one",
+        (b.end + b.tz) % DAYS === 0, String((b.end + b.tz) % DAYS));
+  check("and the offset is Phuket's", b.tz === 7 * 3600, String(b.tz));
+});
+
+await test("week and day are read from the cycle, not from the calendar", async () => {
+  await req("/cycle");                              // create cycle 1
+  const rows = [
+    [Date.UTC(2026, 8, 14, 5), "A", 1],             // Mon, week A
+    [Date.UTC(2026, 8, 18, 5), "A", 5],             // Fri, week A
+    [Date.UTC(2026, 8, 19, 5), "A", null],          // Sat: the timetable has no day
+    [Date.UTC(2026, 8, 21, 5), "B", 6],             // Mon, week B
+    [Date.UTC(2026, 8, 23, 5), "B", 8],             // Michael's own example
+    [Date.UTC(2026, 8, 25, 5), "B", 10]             // Fri, week B
+  ];
+  const mod = await import(join(HERE, "src/index.js") + "?cyc=" + Date.now());
+  for (const [ms, week, day] of rows) {
+    const real = Date.now;
+    Date.now = () => ms;
+    const r = await mod.default.fetch(new Request("https://board.example.com/cycle"), env);
+    const b = await r.json();
+    Date.now = real;
+    check("that day is week " + week + " day " + day,
+          b.week === week && b.day === day, JSON.stringify({ w: b.week, d: b.day }));
+  }
+});
+
+await test("the student board is this cycle and the hall of fame is all of it", async () => {
+  const now = Date.UTC(2026, 8, 23, 5, 0, 0) / 1000;
+  const real = Date.now;
+  Date.now = () => now * 1000;
+  await req("/cycle");
+  plant(now - 1 * DAYS, "ThisCycle", 20);
+  plant(ANCHOR - 3 * DAYS, "LastTerm", 99);
+  let b = await (await req("/board")).json();
+  check("the default board is the cycle running now",
+        b.board.length === 1 && b.board[0].nick === "ThisCycle", JSON.stringify(b.board));
+  check("and it says which cycle that is", b.cycle && b.cycle.cycle === 1, JSON.stringify(b.cycle));
+  b = await (await req("/board?scope=all")).json();
+  check("the hall of fame reaches back past the first cycle",
+        b.board.length === 2 && b.board[0].nick === "LastTerm", JSON.stringify(b.board.map(x => x.nick)));
+  check("and carries the version a record was set on",
+        b.board[0].ver !== undefined && b.board.some(x => x.ver === "v0.58"),
+        JSON.stringify(b.board.map(x => x.ver)));
+  const bad = await req("/board?scope=cycle3");
+  check("a scope that is not one of the two is refused", bad.status === 400, "got " + bad.status);
+  const num = await req("/board?scope=all&cycle=1");
+  check("and a cycle number on the public route is simply not a thing it reads",
+        num.status === 200, "got " + num.status);
+  Date.now = real;
+});
+
+await test("a past cycle is the teacher's, and a student cannot ask for one", async () => {
+  const H = { "X-Teacher-Key": KEY };
+  const now = Date.UTC(2026, 9, 7, 5, 0, 0) / 1000;    // Wed 7 Oct: cycle 2
+  const real = Date.now;
+  Date.now = () => now * 1000;
+  await req("/cycle");                                  // rolls 1 forward into 2
+  plant(ANCHOR + 2 * DAYS, "WonCycleOne", 60, "wc", "Y9");
+  plant(ANCHOR + 2 * DAYS, "WonY8", 55, "wc", "Y8");
+  plant(ANCHOR + 2 * DAYS, "LostCycleOne", 30, "wc", "Y9");
+  plant(now - DAYS, "WinningNow", 70, "wc", "Y9");
+
+  let b = await (await req("/cycle")).json();
+  check("the cycle rolled forward on its own, with no timer anywhere",
+        b.cycle === 2 && b.start === ANCHOR + 14 * DAYS, JSON.stringify(b));
+
+  b = await (await req("/board")).json();
+  check("and last cycle's winner is off the student board",
+        b.board.length === 1 && b.board[0].nick === "WinningNow",
+        JSON.stringify(b.board.map(x => x.nick)));
+
+  let r = await req("/admin/cycles", { method: "POST", body: {} });
+  check("past cycles need the key", r.status === 403, "got " + r.status);
+  b = await (await req("/admin/cycles", { method: "POST", body: {}, headers: H })).json();
+  check("the teacher gets the list of cycles", b.cycles.length === 2, JSON.stringify(b.cycles));
+  check("newest first, and the live one is named",
+        b.cycles[0].n === 2 && b.current === 2, JSON.stringify(b.cycles.map(c => c.n)));
+  check("with how many runs are in each", b.cycles[1].runs === 3, JSON.stringify(b.cycles));
+
+  b = await (await req("/admin/cycles", { method: "POST", body: { cycle: 1 }, headers: H })).json();
+  const names = b.winners.map(w => w.nick).sort();
+  check("one winner per board per year group, which is the reward list",
+        names.join(",") === "WonCycleOne,WonY8", names.join(","));
+  check("the runner-up is not a winner", names.indexOf("LostCycleOne") < 0, names.join(","));
+  check("and cycle 1 is not the live one", b.live === false, JSON.stringify(b.live));
+  r = await req("/admin/cycles", { method: "POST", body: { cycle: 99 }, headers: H });
+  check("a cycle that never happened is a 404, not an empty list", r.status === 404, "got " + r.status);
+  Date.now = real;
+});
+
+await test("a one-week break moves the cycle without moving history", async () => {
+  const H = { "X-Teacher-Key": KEY };
+  const now = Date.UTC(2026, 8, 23, 5, 0, 0) / 1000;    // Wed 23 Sep: week B, day 8
+  const real = Date.now;
+  Date.now = () => now * 1000;
+  await req("/cycle");
+  plant(ANCHOR + 2 * DAYS, "CycleOneWinner", 60);
+
+  let r = await req("/admin/cycle", { method: "POST", body: { week: "A" } });
+  check("shifting the cycle needs the key", r.status === 403, "got " + r.status);
+  r = await req("/admin/cycle", { method: "POST", body: { week: "C" }, headers: H });
+  check("and a week that is not A or B is refused", r.status === 400, "got " + r.status);
+
+  let b = await (await req("/admin/cycle", { method: "POST", body: { week: "B" }, headers: H })).json();
+  check("saying what is already true changes nothing", b.changed === false, JSON.stringify(b));
+
+  b = await (await req("/admin/cycle", { method: "POST", body: { week: "A" }, headers: H })).json();
+  check("saying this week is week A starts a new cycle on Monday just gone",
+        b.changed === true && b.cycle.week === "A" && b.cycle.day === 3, JSON.stringify(b.cycle));
+  check("and that Monday is the one three days ago",
+        b.cycle.start === ANCHOR + 7 * DAYS, b.cycle.start + " vs " + (ANCHOR + 7 * DAYS));
+
+  b = await (await req("/admin/cycles", { method: "POST", body: { cycle: 1 }, headers: H })).json();
+  check("the cycle that was interrupted keeps the winner it had",
+        b.winners.length === 1 && b.winners[0].nick === "CycleOneWinner", JSON.stringify(b.winners));
+  check("and it ends where the new one begins, rather than a fortnight after it started",
+        b.end === ANCHOR + 7 * DAYS, String(b.end));
+  Date.now = real;
+});
+
+await test("the version stamp is a label and never a reason to refuse a run", async () => {
+  let b = await (await req("/score", { method: "POST", body: { ...good, ver: "v0.58" } })).json();
+  check("a version is kept", b.ok === true, JSON.stringify(b));
+  b = await (await req("/board?scope=all&cls=Y9")).json();
+  check("and comes back on the board", b.board[0].ver === "v0.58", JSON.stringify(b.board[0]));
+  let r = await req("/score", { method: "POST", body: { ...good, nick: "Nogood", ver: "<script>" } });
+  check("a version that is not one is not a bad request", r.status === 200, "got " + r.status);
+  /* An unapproved name never leaves the public route, so this reads the row on
+     the teacher's, which is the whole point of that route existing. */
+  b = await (await req("/admin/board", { method: "POST", headers: { "X-Teacher-Key": KEY } })).json();
+  const row = b.board.filter(x => x.nick === "Nogood")[0];
+  check("it is simply dropped", row && row.ver === "", JSON.stringify(row));
+  b = await (await req("/score", { method: "POST", body: { ...good, nick: "Older" } })).json();
+  check("and an app that sends none still posts", b.ok === true, JSON.stringify(b));
+});
+
+await test("what a pupil is told after a run is about the board they will see", async () => {
+  const now = Date.UTC(2026, 8, 23, 5, 0, 0) / 1000;
+  const real = Date.now;
+  Date.now = () => now * 1000;
+  await req("/cycle");
+  plant(ANCHOR - 30 * DAYS, "Legend", 400, "wc", "Y9");
+  let b = await (await req("/score", { method: "POST", body: { ...good, nick: "Aisha", score: 30 } })).json();
+  check("the rank is counted inside this cycle, not against every score ever",
+        b.rank === 1, JSON.stringify({ rank: b.rank }));
+  check("the cycle comes back with it", b.cycle && b.cycle.week === "B", JSON.stringify(b.cycle));
+  check("and a score below an all-time record is not called a record",
+        b.record === false, JSON.stringify({ record: b.record, allBest: b.allBest }));
+  b = await (await req("/score", { method: "POST", body: { ...good, nick: "Aisha",
+                                   correct: 120, wrong: 0, chain: 40, score: 401 } })).json();
+  check("a score above every score ever set on that board is",
+        b.record === true, JSON.stringify({ record: b.record }));
+  Date.now = real;
 });
 
 console.log("\npassed: " + pass + "   failed: " + fails.length);
