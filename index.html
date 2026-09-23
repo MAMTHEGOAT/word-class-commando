@@ -176,6 +176,10 @@ body.testing .score{visibility:hidden}
   padding:14px 15px;margin-bottom:9px;min-height:48px;line-height:1.3}
 .menu-btn:hover{border-color:var(--brass)}
 .menu-btn .sub{display:block;color:var(--dim);font-size:.8rem;margin-top:3px}
+/* The activity code (v0.48): quiet, but there whenever a student is choosing */
+.menu-btn .mcode{display:inline-block;min-width:3.1em;margin-right:9px;color:var(--brass);
+  font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.82rem;letter-spacing:.04em}
+.ref .acode code{color:var(--brass)}
 .menu-btn[disabled]{opacity:.42;cursor:default}
 .menu-btn[disabled]:hover{border-color:var(--line)}
 
@@ -633,6 +637,7 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
     <select id="lkLvl" class="tin" onchange="linkBuild()"></select>
   </div>
   <div class="sent" id="lkOut" style="font-size:.95rem;line-height:1.6;word-break:break-all"></div>
+  <p class="dim small">Or just write the code in their book: <code id="lkCode"></code></p>
   <div class="bar">
     <button class="go" onclick="linkCopy()">Copy link</button>
     <span class="score" id="lkNote"></span>
@@ -4118,7 +4123,7 @@ var AMBIG = ["answer","answers","back","bark","barks","book","books","brush","br
 <script>
 "use strict";
 
-var APP = "wcc", VER = "v0.47", BANK_REV = 32;
+var APP = "wcc", VER = "v0.48", BANK_REV = 32;
 var BUG_FORM_URL = "";   /* paste the Office 365 form link to switch the report button on */
 
 /* ---------- the four tests: one source for the Learn screen AND every
@@ -4625,6 +4630,7 @@ function go(id){
   var scr = document.querySelectorAll(".screen");
   for(var i=0;i<scr.length;i++) scr[i].classList.remove("on");
   el(id).classList.add("on");
+  if(typeof paintCode === "function") paintCode(id);
   window.scrollTo(0,0);
 }
 
@@ -6314,6 +6320,100 @@ var ACTIVITY_LIST = [
   ["alupg",  "Upgrade the sentence",       "startAL('upg')",  "anal", "use",  "Swap shows for the word that says what is really happening"]
 ];
 
+/* ------------------------------------------------------------------
+   ACTIVITY CODES (v0.48)
+
+   Michael, 2026-09-23: a teacher writes three characters in a book and the
+   student knows where to go. Domain letter, group number, activity letter:
+   W1A is Click the word, P3A is Put the commas in. A level suffix picks the
+   level, so W1A-3 is that activity at Harder.
+
+   FROZEN, and that is the whole point. The codes are written out here rather
+   than computed from the menu order, because a code computed from position
+   renames every activity after the one you insert, and a code in a student's
+   book then means something else. A new activity takes the next free letter in
+   its group and nothing already written down changes. validate() checks that
+   every activity has one, that they are unique, and that each one agrees with
+   the domain and group the activity is registered under.
+   ------------------------------------------------------------------ */
+var DOM_LETTER = { wc:"W", tech:"S", techx:"H", punc:"P", tense:"V", anal:"A" };
+var ACT_CODES = {
+  one:"W1A", all:"W1B",
+  yesno:"W2A", klass:"W2B", shift:"W2C",
+  frames:"W3A", cloze:"W3B", trans:"W3C",
+  ktdef:"S1A", ktname:"S1B", ktsort:"S1C",
+  tech:"S2A", ktspot:"S2B",
+  xf:"S3A", ei:"S3B",
+  xterm:"H1A",
+  techx:"H2A", semf:"H2B",
+  za:"H3A",
+  punc:"P1A", pp:"P1B",
+  pf:"P2A",
+  commas:"P3A", crules:"P3B",
+  vt:"V1A", vp:"V1B",
+  vf:"V2A",
+  almean:"A1A", aljob:"A1B", alodd:"A1C",
+  altrue:"A2A", alupg:"A2B"
+};
+function codeOf(id){ return ACT_CODES[id] || ""; }
+function actOfCode(code){
+  code = String(code || "").toUpperCase();
+  for(var k in ACT_CODES) if(ACT_CODES[k] === code) return k;
+  return null;
+}
+/* A code plus an optional level: W1A-3. Returns {act, lvl} or null. */
+function readCode(txt){
+  var m = /^([A-Z]\d[A-Z])(?:-([1-4]))?$/.exec(String(txt || "").toUpperCase());
+  if(!m) return null;
+  var act = actOfCode(m[1]);
+  return act ? { act: act, lvl: m[2] ? LEVELS[+m[2] - 1] : null } : null;
+}
+
+/* Where an activity keeps the level a student chose. Null where it has none.
+   One place, read by the code chip, the homework links and the link builder. */
+function actState(id){
+  var m = { one:S, all:S, klass:K, frames:F, cloze:C, trans:R, shift:SH,
+            tech:TQ, techx:TQ, xf:XF, semf:SF, za:ZA,
+            vt:VT, vf:VF, vp:VP, punc:PN, pp:PP, pf:PF, commas:CM, crules:CS,
+            almean:AL, aljob:AL, alodd:AL, altrue:AL, alupg:AL };
+  return m[id] || null;
+}
+function actHasLevel(id){ var st = actState(id); return !!(st && typeof st.lvl === "string"); }
+
+/* Which activity a screen is showing. Five screens serve more than one, so the
+   activity is read from the state the screen is actually in rather than from a
+   list that could go stale. */
+function screenAct(scr){
+  if(scr === "play")   return S.act === "all" ? "all" : "one";
+  if(scr === "kt")     return "kt" + KT.mode;
+  if(scr === "al")     return "al" + AL.mode;
+  if(scr === "tech")   return TQ.sec === "exp" ? "techx" : "tech";
+  if(scr === "cs")     return "crules";
+  var m = { yesno:"yesno", klass:"klass", frames:"frames", cloze:"cloze", trans:"trans",
+            shift:"shift", ei:"ei", xf:"xf", xt:"xterm", sf:"semf", za:"za",
+            vt:"vt", vf:"vf", vp:"vp", punc:"punc", pp:"pp", pf:"pf",
+            commas:"commas", crules:"crules" };
+  return m[scr] || null;
+}
+/* The code for the screen on display, with its level if it has one chosen. */
+function screenCode(scr){
+  var id = screenAct(scr);
+  if(!id || !codeOf(id)) return "";
+  var st = actState(id), lv = st && st.lvl, n = lv ? LEVELS.indexOf(lv) : -1;
+  return codeOf(id) + (n >= 0 ? "-" + (n + 1) : "");
+}
+/* Painted into the Reference line of whichever screen is showing, so a student
+   can read back the code a teacher gave them and a teacher can see it while
+   looking over a shoulder. */
+function paintCode(scr){
+  var sec = el(scr), c = screenCode(scr), box = sec && sec.querySelector(".ref");
+  if(!box) return;
+  var tag = box.querySelector(".acode");
+  if(!c){ if(tag) tag.remove(); return; }
+  if(!tag){ tag = document.createElement("span"); tag.className = "acode"; box.insertBefore(tag, box.firstChild); }
+  tag.innerHTML = "Code: <code>" + esc(c) + "</code>";
+}
+
 /* The four domains this app is growing into.
 
    A domain with no activities registered against it is shown DESCRIBED AND
@@ -6433,7 +6533,8 @@ function openDomain(id){
     if(!acts.length) continue;
     h += '<div class="group"><h3>' + esc(g[1]) + '</h3><p class="why">' + esc(g[2]) + '</p>';
     for(j=0;j<acts.length;j++)
-      h += '<button class="menu-btn" onclick="' + acts[j][2] + '">' + esc(acts[j][1]) +
+      h += '<button class="menu-btn" onclick="' + acts[j][2] + '"><span class="mcode">' +
+           esc(codeOf(acts[j][0])) + '</span>' + esc(acts[j][1]) +
            '<span class="sub">' + esc(acts[j][5]) + '</span></button>';
     h += '</div>';
   }
@@ -10036,6 +10137,31 @@ function validate(){
     });
   })();
 
+  /* ---- activity codes (v0.48): one per activity, unique, and agreeing with
+     the domain and group the activity is registered under ---- */
+  (function(){
+    var seen = {}, gnum = {};
+    DOMAINS.forEach(function(d){ d.groups.forEach(function(g, gi){ gnum[d.id + ":" + g[0]] = gi + 1; }); });
+    ACTIVITY_LIST.forEach(function(a){
+      var id = a[0], code = ACT_CODES[id];
+      if(!code){ E.push("activity codes: '" + id + "' has no code"); return; }
+      if(!/^[A-Z]\d[A-Z]$/.test(code)) E.push(code + ": a code is a letter, a digit and a letter");
+      if(seen[code]) E.push("activity codes: " + code + " is used by both " + seen[code] + " and " + id);
+      seen[code] = id;
+      var want = DOM_LETTER[a[3]];
+      if(want && code.charAt(0) !== want)
+        E.push(code + " (" + id + "): the domain letter for " + a[3] + " is " + want);
+      var gi = gnum[a[3] + ":" + a[4]];
+      if(gi && code.charAt(1) !== String(gi))
+        E.push(code + " (" + id + "): " + a[4] + " is group " + gi + " in " + a[3]);
+      if(readCode(code) === null || readCode(code).act !== id)
+        E.push(code + ": does not read back as " + id);
+    });
+    for(var k in ACT_CODES)
+      if(!ACTIVITY_LIST.some(function(a){ return a[0] === k; }))
+        E.push("activity codes: " + ACT_CODES[k] + " points at '" + k + "', which is not an activity");
+  })();
+
   /* pool floor */
   var acts=["one","all"], floorFails=[];
   for(i=0;i<acts.length;i++) for(j=0;j<SCORED.length;j++){
@@ -10169,12 +10295,29 @@ function linkAct(id){
   if(LINK_ACTS[id]) return LINK_ACTS[id];
   for(var i=0;i<ACTIVITY_LIST.length;i++) if(ACTIVITY_LIST[i][0] === id){
     var call = ACTIVITY_LIST[i][2];
-    return function(){ (new Function(call))(); };
+    return function(q){
+      var st = actState(id), want = q && q.lvl;
+      if(st && want && LEVELS.indexOf(want) >= 0) st.lvl = want;
+      (new Function(call))();
+      /* Some activities reset their level as they open (a technique round does,
+         when the section changes), so the level is set the way a student would
+         set it: by pressing the chip, which also leaves the chip pressed. */
+      if(st && want && st.lvl !== want){
+        var scr = document.querySelector(".screen.on"), hit = null;
+        if(scr) [].forEach.call(scr.querySelectorAll(".chips .chip"), function(c){
+          if(!hit && !c.disabled && (c.getAttribute("onclick") || "").indexOf("('" + want + "')") > 0) hit = c; });
+        if(hit) hit.click(); else st.lvl = want;
+      }
+    };
   }
   return null;
 }
 
 function openLink(q){
+  /* A link may name the activity by its id (?a=one) or by its code
+     (?a=W1A, ?a=W1A-3), which is what a teacher has written down (v0.48). */
+  var code = readCode(q.a);
+  if(code){ q = { a: code.act, cls: q.cls, lvl: q.lvl || code.lvl }; }
   var f = linkAct(q.a);
   if(!f) return false;
   if(q.cls && SCORED.indexOf(q.cls) < 0) delete q.cls;
@@ -10183,8 +10326,8 @@ function openLink(q){
 }
 
 /* the builder on the teacher page */
-var LINK_NEEDS = { one:"cls", all:"cls", yesno:"cls",
-                   klass:"lvl", frames:"lvl", cloze:"lvl", trans:"lvl", shift:"lvl" };
+var LINK_NEEDS = { one:"cls", all:"cls", yesno:"cls" };
+function linkNeed(id){ return LINK_NEEDS[id] || (actHasLevel(id) ? "lvl" : ""); }
 function linkInit(){
   /* grouped by domain, from the same registry the student menu renders from */
   var a="", i, j, live = liveDomains(), acts;
@@ -10192,7 +10335,7 @@ function linkInit(){
     acts = domActs(live[i].id);
     a += '<optgroup label="'+esc(live[i].name)+'">';
     for(j=0;j<acts.length;j++)
-      a += '<option value="'+acts[j][0]+'">'+esc(acts[j][1])+'</option>';
+      a += '<option value="'+acts[j][0]+'">'+esc(codeOf(acts[j][0]))+'  '+esc(acts[j][1])+'</option>';
     a += '</optgroup>';
   }
   el("lkAct").innerHTML = a;
@@ -10207,13 +10350,17 @@ function linkInit(){
   linkBuild();
 }
 function linkBuild(){
-  var act = el("lkAct").value, need = LINK_NEEDS[act];
+  var act = el("lkAct").value, need = linkNeed(act);
   el("lkCls").style.display = (need==="cls") ? "" : "none";
-  el("lkLvl").style.display = (need==="lvl" || act==="one" || act==="all") ? "" : "none";
-  var u = location.origin + location.pathname + "?a=" + act;
+  el("lkLvl").style.display = (need==="lvl" || actHasLevel(act)) ? "" : "none";
+  /* The link carries the CODE, so the link and the thing written in a book are
+     the same string (v0.48). The level rides in the suffix where there is one. */
+  var lvl = (el("lkLvl").style.display !== "none" && el("lkLvl").value) ? el("lkLvl").value : "";
+  var n = LEVELS.indexOf(lvl);
+  var u = location.origin + location.pathname + "?a=" + (codeOf(act) || act) + (n >= 0 ? "-" + (n + 1) : "");
   if(el("lkCls").style.display!=="none" && el("lkCls").value) u += "&cls=" + el("lkCls").value;
-  if(el("lkLvl").style.display!=="none" && el("lkLvl").value) u += "&lvl=" + el("lkLvl").value;
   el("lkOut").textContent = u;
+  el("lkCode").textContent = codeOf(act) ? (codeOf(act) + (n >= 0 ? "-" + (n + 1) : "")) : "";
   el("lkNote").textContent = "";
 }
 function linkCopy(){
