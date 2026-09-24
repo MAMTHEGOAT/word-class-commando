@@ -112,3 +112,7 @@ build_dx.py
 dx_holdout.py
 dx_bank.abandoned.txt
 wcc-v*.tgz
+
+# Screener blind-gate material (v0.61): rendered from the app, read by reviewers
+dxrender.py
+dx-review-*.md
