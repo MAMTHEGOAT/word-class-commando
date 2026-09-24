@@ -4636,6 +4636,14 @@ var POLICY = {"bus":{"c":"noun","note":"bank sense: the vehicle. Never as a verb
 /* forms known to be class-ambiguous in English, independent of this bank. */
 var AMBIG = ["answer","answers","back","bark","barks","book","books","brush","brushes","bus","camp","camps","cheer","cheers","climb","climbs","close","closes","cook","cooks","cover","covers","cries","crowd","crowds","cry","cut","cuts","dress","dries","drink","drinks","drive","drives","dry","face","faces","fast","film","films","finish","fire","fires","fish","flood","floods","garden","guard","guards","hand","hands","hard","help","helps","home","jump","jumps","just","kick","kicks","laugh","laughs","left","light","lights","like","line","match","matches","move","moves","paint","paints","park","parks","pause","pauses","place","places","plant","plants","play","plays","race","races","rain","rains","ran","rest","right","ring","rings","roll","rolls","round","run","runs","shadow","shadows","shelter","shelters","shine","shines","shout","shouts","sign","signs","sleep","sleeps","smell","smells","smile","smiles","snow","snows","sound","sounds","still","stop","stops","storm","storms","swim","swims","taste","tastes","test","tests","touch","touches","train","trains","turn","turns","walk","walks","wash","washes","watch","watches","water","waters","wave","waves","well","whisper","whispers","wind","winds","wish","wishes","work","works"];
 /* >>> BANK:AMBIG END >>> */
+
+/* >>> BANK:DXREG START >>> */
+/* The screener's REGISTER: [id, reporting group, form, activity]. The questions
+   themselves are not here. They are written in the banks above, which is what
+   makes them pass the gates those banks have learned, and `dxSplit()` lifts
+   them out before any round can reach them (SPEC 72). */
+var DXREG = [];
+/* >>> BANK:DXREG END >>> */
 </script>
 
 <!-- ==================================================================
@@ -4644,8 +4652,72 @@ var AMBIG = ["answer","answers","back","bark","barks","book","books","brush","br
 <script>
 "use strict";
 
-var APP = "wcc", VER = "v0.60", BANK_REV = 37;
+/* BANK_REV stays at 37: v0.61 adds no items and retires none. It bumps when the
+   banks change, and bumping it for a code change makes every pupil's record run
+   the pruner for nothing. */
+var APP = "wcc", VER = "v0.61", BANK_REV = 37;
 var BUG_FORM_URL = "";   /* paste the Office 365 form link to switch the report button on */
+
+/* ================= HELD OUT (v0.61, SPEC 72) ================================
+   The screener's questions are written in the ordinary banks so they inherit
+   the ordinary gates. That leaves one job: practice must never serve them, or
+   the diagnostic measures how much practice a pupil happened to get.
+
+   v0.61 tried it as a filter inside the picker and it was WRONG. The yes-or-no
+   round walks SENTENCES itself, the odd-one-out round walks ALW itself, and the
+   sorting round walks NAMEEX itself. A filter has to be remembered at every
+   door; taking the items OUT of the arrays before the first door opens cannot
+   be forgotten, because there is nothing left to serve.
+
+   dxLeak() is the gate on the list below: it scans every global array for a
+   held-out record still sitting in one, so a bank left off the list is an
+   error rather than a silent leak. */
+var DXPOOL = [];
+var DX_BANKS = ["SENTENCES", "FRAMES", "CLOZE", "KLASS", "SHIFTERS", "TECHNIQUES", "PUNCT",
+                "COMMAS", "SPLICE", "TENSES", "PUNCPARAS", "TENSEPARAS", "IMAGERY", "TECHDEFS",
+                "NAMEEX", "SPOT", "EI", "ALW", "ALCTX", "ALUPG", "SEMF", "XTERMS", "TRANSFORM",
+                "FAMILIES"];
+function dxBank(name){
+  return (typeof window !== "undefined" && window[name] && window[name].length !== undefined)
+    ? window[name] : null;
+}
+/* Runs once at load. It is written to survive running again anyway: emptying
+   DXPOOL first would mean a second call, from a test or from a screen that
+   reloads a bank, silently threw the screener away. */
+function dxSplit(){
+  var have = {}, i, j, B, r;
+  for(i=0;i<DXPOOL.length;i++) have[DXPOOL[i].id] = 1;
+  for(i=0;i<DX_BANKS.length;i++){
+    B = dxBank(DX_BANKS[i]);
+    if(!B) continue;
+    for(j=B.length-1;j>=0;j--)
+      if(B[j] && B[j].dx === true){
+        r = B.splice(j,1)[0];
+        if(!have[r.id]){ have[r.id] = 1; DXPOOL.push(r); }
+      }
+  }
+  return DXPOOL.length;
+}
+function dxItem(id){
+  for(var i=0;i<DXPOOL.length;i++) if(DXPOOL[i].id === id) return DXPOOL[i];
+  return null;
+}
+/* Every global array, not just the listed banks: the point is to catch the bank
+   that was NOT listed. */
+function dxLeak(){
+  var out = [], names, i, j, v;
+  if(typeof window === "undefined" || typeof Object.getOwnPropertyNames !== "function") return out;
+  names = Object.getOwnPropertyNames(window);
+  for(i=0;i<names.length;i++){
+    if(names[i] === "DXPOOL") continue;
+    try{ v = window[names[i]]; }catch(e){ continue; }
+    if(!v || typeof v !== "object" || Object.prototype.toString.call(v) !== "[object Array]") continue;
+    for(j=0;j<v.length;j++)
+      if(v[j] && typeof v[j] === "object" && v[j].dx === true){ out.push(names[i]); break; }
+  }
+  return out;
+}
+dxSplit();
 
 /* ---------- the four tests: one source for the Learn screen AND every
      feedback string, so the two cannot drift (SPEC section 8). ---------- */
@@ -5010,7 +5082,11 @@ function _canon(v){
 function itemStamp(item){
   if(!item || typeof item !== "object") return "";
   var copy = {}, k;
-  for(k in item) if(Object.prototype.hasOwnProperty.call(item, k) && k !== "id") copy[k] = item[k];
+  /* `dx` is administration, not content (v0.61): claiming an item for the
+     screener does not change the question, and if it bumped the stamp then
+     registering an anchor would break that anchor on the same build. */
+  for(k in item)
+    if(Object.prototype.hasOwnProperty.call(item, k) && k !== "id" && k !== "dx") copy[k] = item[k];
   return _fnv1a(_canon(copy));
 }
 
@@ -5076,10 +5152,16 @@ function dxDone(){
   return (st.dx || []).filter(function(s){ return s && s.done && (s.rows||[]).length; });
 }
 
+/* v0.61: this was a second hand-kept list of the banks, one short of DX_BANKS
+   (FAMILIES was missing, so a family item a pupil had seen was pruned out of
+   their history on every load). One list now, plus the held-out items, which
+   are still items and still have to be stamped and still must not be pruned
+   out of a pupil's record. */
 function allBanks(){
-  return [SENTENCES, FRAMES, CLOZE, KLASS, TRANSFORM, SHIFTERS, TECHNIQUES, PUNCT,
-          COMMAS, TENSES, TENSEPARAS, PUNCPARAS, IMAGERY, TECHDEFS, NAMEEX, SPOT, EI, SPLICE,
-          ALW, ALCTX, ALUPG, SEMF, XTERMS];
+  var out = [], i, B;
+  for(i=0;i<DX_BANKS.length;i++){ B = dxBank(DX_BANKS[i]); if(B) out.push(B); }
+  out.push(DXPOOL);
+  return out;
 }
 
 /* NOTE (v0.60): this prunes `seen` and `revisit` and NOTHING ELSE. A diagnostic
@@ -5930,9 +6012,24 @@ function famById(id){
   for(var i=0;i<FAMILIES.length;i++) if(FAMILIES[i].id===id) return FAMILIES[i];
   return null;
 }
+/* ---- HELD OUT (v0.61, SPEC 72) ----
+   Diagnostic items live in the SAME banks as practice items, so they pass every
+   gate those banks have built up: one finite verb per tense sentence, exactly
+   one class per frame, one word of the class asked for. A parallel bank
+   inherits none of that, which is why the first attempt at the screener never
+   converged (CLAUDE.md, v0.61).
+
+   `dx` marks them, and these are the ONLY TWO PLACES they are kept out of
+   practice: the one picker every round serves through (SPEC 61) and the one
+   pool the level chips count from. A filter copied into twenty-three rounds is
+   a filter that holds in one of them. */
+/* v0.61: held-out items used to be filtered here and in pickUnseen. Two copies
+   of one rule, and three rounds that use neither door. dxSplit() empties them
+   out of the banks at load instead. */
 function lvlPool(bank, lvl){
   var out=[];
-  for(var i=0;i<bank.length;i++) if(lvl==="all" || bank[i].level===lvl) out.push(bank[i]);
+  for(var i=0;i<bank.length;i++)
+    if(lvl==="all" || bank[i].level===lvl) out.push(bank[i]);
   return out;
 }
 function lvlChips(elId, bank, cur, fn){
@@ -5975,6 +6072,7 @@ function lvlChips(elId, bank, cur, fn){
    =========================================================================== */
 var LAST_SERVED = {};
 function pickUnseen(pool, key){
+  if(!pool || !pool.length) return null;
   if(B.on) return pool[Math.floor(Math.random()*pool.length)];   /* a run draws uniformly (SPEC 24) */
   var st = store(), seen = st.seen[key] || [], miss = st.revisit[key] || [];
   var fresh=[], wrong=[], done=[], i, id;
@@ -11831,6 +11929,20 @@ function validate(){
   }
   for(i=0;i<hardShift.length;i++)
     E.push("hard shifter, "+hardShift[i]+". A lemma may not carry two scored classes in this bank (SPEC 4).");
+
+  /* ---- held out (v0.61, SPEC 72) ----
+     A screener question still sitting in a bank is a question practice can
+     serve, which is the one thing the design has to prevent. The scan is over
+     EVERY global array rather than the listed ones, so a bank added later and
+     left off DX_BANKS is caught here instead of leaking quietly. */
+  var leak = dxLeak();
+  for(i=0;i<leak.length;i++)
+    E.push("held out: "+leak[i]+" still contains a diagnostic item, so practice can serve it. "+
+           "Add it to DX_BANKS (SPEC 72).");
+  for(i=0;i<DXREG.length;i++)
+    if(!dxItem(DXREG[i][0]))
+      E.push("held out: "+DXREG[i][0]+" is on the screener register but is not in any bank, "+
+             "so form "+DXREG[i][2]+" is a question short.");
 
   return {E:E, W:W, info:INFO, floor:floorFails, lemmas:lm, shifty:hardShift, soft:softShift, levels:lc};
 }

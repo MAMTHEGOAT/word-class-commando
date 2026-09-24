@@ -104,3 +104,11 @@ xterm_ids.py
 # v0.50: anything of the students' own, kept beside the app and never published
 Student Surveys/
 yeartest.py
+
+# Diagnostic screener sources (v0.61): authoring, not site. The register and the
+# assembler are build-time; the abandoned parallel bank is kept only as raw
+# material for step 6 (SPEC 72.1).
+build_dx.py
+dx_holdout.py
+dx_bank.abandoned.txt
+wcc-v*.tgz
