@@ -5017,7 +5017,7 @@ var STAMPMETA = {"fmt":1,"skip":["id","dx"],"strict":["secure","challenge"]};
 /* BANK_REV stays at 37: v0.61 adds no items and retires none. It bumps when the
    banks change, and bumping it for a code change makes every pupil's record run
    the pruner for nothing. */
-var APP = "wcc", VER = "v0.65.1", BANK_REV = 40;
+var APP = "wcc", VER = "v0.66", BANK_REV = 40;
 var BUG_FORM_URL = "";   /* paste the Office 365 form link to switch the report button on */
 
 /* ================= HELD OUT (v0.61, SPEC 72) ================================
@@ -5438,7 +5438,23 @@ function _blankRoot(){
    a folder of reports from several releases needs to know which shape
    it is looking at, and "the app version" is the wrong answer: the row
    format changes far less often than the app does. */
-var DX_ROW_V = 1;
+/* v2 (v0.66): rows carry the MIDDLE OUTCOME. Three rounds in this app
+   score right, close or wrong: selecting a span is Close when the pupil
+   found the right place and drew the edges wrongly, and a tap on a word
+   that is true of the language but not what the round asked for is
+   Neutral and costs nothing. SPEC 72.9 kept span rounds out of the
+   SCREENER for exactly this reason, because thirty-four questions
+   scored right-or-wrong cannot use a round with three outcomes. The
+   deep dive is not a binary form, and `dx_holdout.UNSCREENED` already
+   records the ruling that goes with it: "the deep dive measures finding
+   directly, with feedback, where Close can mean Close."
+   So `r` stays binary and means FULLY right, and `o` says which of the
+   other things it was. Reading `r` alone therefore counts Close as
+   wrong, which is the safe direction for anything that forgets `o`
+   exists; the report and the statistics script read both. No sitting
+   has been recorded anywhere yet, which is why this is free today and
+   would not have been in a month. */
+var DX_ROW_V = 2;
 
 /* FNV-1a, 32 bits, as eight hex characters. Chosen because it is four
    lines in both JavaScript and Python and gives the same answer in
@@ -5492,17 +5508,25 @@ function itemStamp(item){
  *    id the item's id          v  its stamp at the moment it was served
  *    g  the reporting group    a  the activity that served it
  *    st stage: 1 screener, 2 deep dive
- *    l  the level served       r  1 right, 0 wrong
+ *    l  the level served       r  1 FULLY right, 0 otherwise
+ *    o  the middle outcome: "close", "neutral", or "" for neither
  *    w  the wrong option chosen, where the round has options; "" otherwise
  *    s  seconds, to one decimal
  *  The FORM and the ROUTE are properties of the sitting and are recorded
  *  once there rather than 95 times here; a row is always read with its
  *  sitting. */
-function dxRow(n, item, group, act, stage, level, right, chose, secs){
+function dxRow(n, item, group, act, stage, level, right, chose, secs, outcome){
   return { n:n, id:(item && item.id) || "", v:itemStamp(item), g:group, a:act,
-           st:stage, l:level, r:right ? 1 : 0, w:chose || "",
-           s:Math.round((secs || 0) * 10) / 10 };
+           st:stage, l:level, r:right ? 1 : 0, o:DX_OUTCOMES[outcome] ? outcome : "",
+           w:chose || "", s:Math.round((secs || 0) * 10) / 10 };
 }
+/* The middle outcomes a round may report, with what each one MEANS, so a
+   round cannot invent a third by passing a new string and have it land
+   silently in the data. */
+var DX_OUTCOMES = {
+  close:   "the right place in the sentence, with the edges drawn wrongly",
+  neutral: "true of the language, but not the thing this round asked for"
+};
 /** A sitting. `form` is which screener form was used and `route` which
  *  deep dive was taken, both fixed for the whole sitting. */
 function dxSitting(form, route){
@@ -5513,7 +5537,7 @@ function dxSitting(form, route){
 /* Every row the statistics script needs, and nothing optional. A row
    that is missing one of these is worse than a row that is absent,
    because it looks like data. */
-var DX_ROW_KEYS = ["n","id","v","g","a","st","l","r","w","s"];
+var DX_ROW_KEYS = ["n","id","v","g","a","st","l","r","o","w","s"];
 function dxRowOk(r){
   if(!r || typeof r !== "object") return false;
   for(var i=0;i<DX_ROW_KEYS.length;i++)
@@ -5521,6 +5545,9 @@ function dxRowOk(r){
   return typeof r.n === "number" && typeof r.id === "string" && r.id.length > 0 &&
          typeof r.v === "string" && r.v.length === 8 &&
          (r.r === 0 || r.r === 1) && (r.st === 1 || r.st === 2) &&
+         (r.o === "" || !!DX_OUTCOMES[r.o]) &&
+         /* A row cannot be fully right AND something in between. */
+         !(r.r === 1 && r.o) &&
          typeof r.s === "number" && r.s >= 0;
 }
 
@@ -6039,7 +6066,7 @@ function dxRecord(ok, outcome){
   if(!DX.on || !DX.q) return;
   var q = DX.q, secs = (nowMs() - DX.t0) / 1000;
   DX.sit.rows.push(dxRow(DX.sit.rows.length + 1, DX.item, q.g, q.a, q.st, q.l,
-                         ok, dxChose(q.a), secs));
+                         ok, dxChose(q.a), secs, outcome));
   if(q.st === 2 && DX.blocks[DX.b]){
     var bl = DX.blocks[DX.b];
     bl.done++;
@@ -6268,8 +6295,14 @@ function dxDeepPick(cell, lvl, used){
 
 /* What the report calls each deep-dive cell, written by the build from the
    same CELLS table the assembler gates against. One list, two readers. */
-var DEEPMETA = {"cells":{"cm:address":"commas for names, yes and no","cm:drop":"commas round dropped-in information","cm:list":"commas in a list","cm:subj":"no comma between subject and verb","pn:apos":"apostrophes","pn:cap":"capital letters","pn:comma":"missing commas","pn:end":"full stops and question marks","pn:speech":"speech punctuation","pn:splice":"comma splices","vt:be":"was, were, is and are","vt:irrpast":"the irregular past","vt:mixed":"which time the sentence is in","vt:regpast":"spelling the regular past","vt:sform":"he, she and it in the present","wc:adj":"adjectives","wc:adv":"adverbs","wc:noun":"nouns","wc:verb":"verbs"}};
+var DEEPMETA = {"cells":{"cm:address":"commas for names, yes and no","cm:drop":"commas round dropped-in information","cm:list":"commas in a list","cm:subj":"no comma between subject and verb","pn:apos":"apostrophes","pn:cap":"capital letters","pn:comma":"missing commas","pn:end":"full stops and question marks","pn:speech":"speech punctuation","pn:splice":"comma splices","vt:be":"was, were, is and are","vt:irrpast":"the irregular past","vt:mixed":"which time the sentence is in","vt:regpast":"spelling the regular past","vt:sform":"he, she and it in the present","wc:adj":"adjectives","wc:adv":"adverbs","wc:noun":"nouns","wc:verb":"verbs"},"middle":{"tech":"close","techx":"close","one":"neutral"},"means":{"close":"the right place in the sentence, with the edges drawn wrongly","neutral":"true of the language, but not the thing this round asked for"}};
 var DX_CELL_NAME = DEEPMETA.cells || {};
+/* Which rounds end in something other than right or wrong, and what that
+   something means, written by the build from the same table the assembler
+   gates against. The page's own DX_OUTCOMES is checked against this at
+   validate time, so the two cannot drift. */
+var DX_MIDDLE = DEEPMETA.middle || {};
+var DX_MEANS = DEEPMETA.means || {};
 function DX_ROUTE_NAME_OF(k){
   for(var i=0;i<DX_ROUTES.length;i++) if(DX_ROUTES[i].k === k) return DX_ROUTES[i].name;
   return k;
@@ -6534,6 +6567,30 @@ function dxReportBody(sit){
          '. They move as you go: two wrong takes you down one, three right takes you up one.</p>';
   } else {
     h += '<p>No second half was recorded.</p>';
+  }
+
+  /* ---- the answers that were neither right nor wrong ----
+     Three rounds do not end in right or wrong. Selecting a span is Close when
+     the pupil found the right place and drew the edges wrongly; a tap that is
+     true of the language but not the thing asked for is Neutral. Both count as
+     not-right in every number above, which is the safe direction, and both are
+     worth a pupil knowing about because neither is the mistake the round is
+     about. A report that folded them into "wrong" would be telling a pupil who
+     very nearly had it that they did not. */
+  var mid = {};
+  for(i=0;i<sit.rows.length;i++)
+    if(sit.rows[i].o) mid[sit.rows[i].o] = (mid[sit.rows[i].o] || 0) + 1;
+  var midKeys = [];
+  for(k in mid) midKeys.push(k);
+  if(midKeys.length){
+    h += '<h2>Nearly, rather than wrong</h2><ul>';
+    for(i=0;i<midKeys.length;i++)
+      h += '<li><b>' + mid[midKeys[i]] +
+           (mid[midKeys[i]] === 1 ? ' answer</b> was ' : ' answers</b> were ') +
+           esc(DX_MEANS[midKeys[i]] || midKeys[i]) + '.</li>';
+    h += '</ul><p class="note">Those are counted with the wrong ones in every number ' +
+         'above, which is harsher than they deserve. They are here because neither of ' +
+         'them is the mistake the question was about.</p>';
   }
 
   /* ---- what was NOT looked at ---- */
@@ -13400,6 +13457,17 @@ function validate(){
      them, at which point the diagnostic serves a blank screen and records a
      row saying the pupil got it wrong. That is the worst kind of failure
      this app can have: it looks like data. */
+  /* The page's own list of middle outcomes and the build's must agree, or a
+     round reports one the row format refuses and the answer lands as a plain
+     wrong answer with nothing saying so. */
+  for(var mk in DX_MIDDLE)
+    if(!DX_OUTCOMES[DX_MIDDLE[mk]])
+      E.push("diagnostic: the build says '"+mk+"' can end '"+DX_MIDDLE[mk]+"' and the page "+
+             "does not know that outcome, so it would be dropped from the row.");
+  for(var ok2 in DX_OUTCOMES)
+    if(!DX_MEANS[ok2])
+      E.push("diagnostic: the page knows the outcome '"+ok2+"' and the build does not "+
+             "define what it means, so the report cannot name it.");
   var dxacts = {}, j2;
   for(i=0;i<DXREG.length;i++) dxacts[DXREG[i][3]] = 1;
   for(i=0;i<DEEPREG.length;i++) dxacts[DEEPREG[i][2]] = 1;
