@@ -23,6 +23,16 @@ smoke.py
 # and the standalone measurement tools the gates are built on (SPEC 27)
 poscheck.py
 
+# Authoring sources that splice.py inserts INTO index.html. The site needs the
+# spliced result and never these, and the file list above has twice been a name
+# short of what was actually on disk (storetest.py, fix8.py), so this is a
+# pattern from the start: everything the diagnostic is written in is dx*.
+dx*.js
+dx*.json
+*.jsonl
+deepmeta.json
+stampmeta.json
+
 # One-off patch scripts. Pattern, not a list: naming them one by one meant
 # fix8.py was committed the moment it was written (2026-08-25), which is the
 # same mistake the test-file list made a day earlier.
