@@ -4998,10 +4998,17 @@ var AMBIG = ["answer","answers","back","bark","barks","book","books","brush","br
    makes them pass the gates those banks have learned, and `dxSplit()` lifts
    them out before any round can reach them (SPEC 72). */
 var DXREG = [["wc-ac065","anal.use","B","altrue","developing","held",""],["wc-ac066","anal.use","*","altrue","challenge","held",""],["wc-ac067","anal.use","A","altrue","challenge","held",""],["wc-aw002","anal.know","B","aljob","foundation","taught",""],["wc-aw036","anal.know","A","aljob","secure","taught",""],["wc-aw046","anal.know","*","aljob","secure","taught",""],["wc-aw090","anal.know","*","aljob","challenge","taught",""],["wc-c110","wc.use","A","cloze","foundation","held",""],["wc-c111","wc.use","B","cloze","developing","held",""],["wc-c112","wc.use","*","cloze","secure","held",""],["wc-c113","wc.use","*","cloze","challenge","held",""],["wc-cm121","punc.use","B","commas","foundation","held",""],["wc-cm122","punc.use","A","commas","developing","held",""],["wc-cm123","punc.use","*","commas","secure","held",""],["wc-ei101","tech.apart","A","ei","developing","held","implied"],["wc-ei102","tech.apart","*","ei","secure","held","explicit"],["wc-ei103","tech.apart","B","ei","challenge","held","implied"],["wc-k131","wc.name","*","klass","foundation","held",""],["wc-k132","wc.name","*","klass","developing","held",""],["wc-k133","wc.name","A","klass","secure","held",""],["wc-k134","wc.name","B","klass","challenge","held",""],["wc-nx161","tech.know","*","ktname","foundation","held",""],["wc-nx162","tech.know","*","ktname","developing","held",""],["wc-nx163","tech.know","B","ktname","secure","held",""],["wc-nx164","tech.know","A","ktname","challenge","held",""],["wc-pn145","punc.find","*","punc","foundation","held",""],["wc-pn146","punc.fix","*","pf","developing","held",""],["wc-pn147","punc.find","B","punc","developing","held",""],["wc-pn148","punc.fix","A","pf","foundation","held",""],["wc-pn149","punc.fix","B","pf","secure","held",""],["wc-pn150","punc.find","A","punc","challenge","held",""],["wc-s366","wc.find","*","one","foundation","held","verb"],["wc-s367","wc.find","A","one","developing","held","adj"],["wc-s368","wc.find","B","one","challenge","held","adv"],["wc-tq725","techx.name","*","za","foundation","held",""],["wc-tq726","techx.name","B","za","developing","held",""],["wc-tq727","techx.name","A","za","challenge","held",""],["wc-tq728","techx.find","B","za","foundation","held",""],["wc-tq729","techx.find","A","za","secure","held",""],["wc-tq730","techx.find","*","za","challenge","held",""],["wc-vt161","tense.find","*","vt","secure","held",""],["wc-vt162","tense.find","A","vt","developing","held",""],["wc-vt163","tense.find","B","vt","foundation","held",""],["wc-vt164","tense.use","*","vf","challenge","held",""],["wc-vt165","tense.use","A","vf","secure","held",""],["wc-vt166","tense.use","B","vf","challenge","held",""],["wc-xt014","techx.know","A","xterm","foundation","taught",""],["wc-xt016","techx.know","*","xterm","developing","taught",""],["wc-xt018","techx.know","B","xterm","secure","taught",""]];
-/* The deep dive's REGISTER: [id, cell, activity, level, ask]. Same shape and the
-   same reason as the screener's, one field shorter because a pool has no form
-   and its mode is always held (SPEC 73). */
-var DEEPREG = [["wc-c114","wc:noun","cloze","foundation",""],["wc-c115","wc:noun","cloze","developing",""],["wc-c116","wc:noun","cloze","secure",""],["wc-c117","wc:noun","cloze","challenge",""],["wc-c118","wc:verb","cloze","foundation",""],["wc-c119","wc:verb","cloze","developing",""],["wc-c120","wc:verb","cloze","secure",""],["wc-c121","wc:verb","cloze","challenge",""],["wc-c122","wc:adj","cloze","foundation",""],["wc-c123","wc:adj","cloze","developing",""],["wc-c124","wc:adj","cloze","secure",""],["wc-c125","wc:adj","cloze","challenge",""],["wc-c126","wc:adv","cloze","foundation",""],["wc-c127","wc:adv","cloze","developing",""],["wc-c128","wc:adv","cloze","secure",""],["wc-c129","wc:adv","cloze","challenge",""],["wc-cm124","cm:list","commas","foundation",""],["wc-cm125","cm:list","commas","foundation",""],["wc-cm126","cm:list","commas","developing",""],["wc-cm127","cm:list","commas","developing",""],["wc-cm128","cm:list","commas","secure",""],["wc-cm129","cm:list","commas","secure",""],["wc-cm130","cm:list","commas","challenge",""],["wc-cm131","cm:list","commas","challenge",""],["wc-cm132","cm:drop","commas","foundation",""],["wc-cm133","cm:drop","commas","foundation",""],["wc-cm134","cm:drop","commas","developing",""],["wc-cm135","cm:drop","commas","developing",""],["wc-cm136","cm:drop","commas","secure",""],["wc-cm137","cm:drop","commas","secure",""],["wc-cm138","cm:drop","commas","challenge",""],["wc-cm139","cm:drop","commas","challenge",""],["wc-cm140","cm:address","commas","foundation",""],["wc-cm141","cm:address","commas","foundation",""],["wc-cm142","cm:address","commas","developing",""],["wc-cm143","cm:address","commas","developing",""],["wc-cm144","cm:address","commas","secure",""],["wc-cm145","cm:address","commas","secure",""],["wc-cm146","cm:address","commas","challenge",""],["wc-cm147","cm:address","commas","challenge",""],["wc-cm148","cm:subj","commas","foundation",""],["wc-cm149","cm:subj","commas","foundation",""],["wc-cm150","cm:subj","commas","developing",""],["wc-cm151","cm:subj","commas","developing",""],["wc-cm152","cm:subj","commas","secure",""],["wc-cm153","cm:subj","commas","secure",""],["wc-cm154","cm:subj","commas","challenge",""],["wc-cm155","cm:subj","commas","challenge",""],["wc-k135","wc:noun","klass","foundation",""],["wc-k136","wc:noun","klass","developing",""],["wc-k137","wc:noun","klass","secure",""],["wc-k138","wc:noun","klass","challenge",""],["wc-k139","wc:verb","klass","foundation",""],["wc-k140","wc:verb","klass","developing",""],["wc-k141","wc:verb","klass","secure",""],["wc-k142","wc:verb","klass","challenge",""],["wc-k143","wc:adj","klass","foundation",""],["wc-k144","wc:adj","klass","developing",""],["wc-k145","wc:adj","klass","secure",""],["wc-k146","wc:adj","klass","challenge",""],["wc-k147","wc:adv","klass","foundation",""],["wc-k148","wc:adv","klass","developing",""],["wc-k149","wc:adv","klass","secure",""],["wc-k150","wc:adv","klass","challenge",""],["wc-pn151","pn:cap","pf","foundation",""],["wc-pn152","pn:cap","pf","foundation",""],["wc-pn153","pn:cap","pf","developing",""],["wc-pn154","pn:cap","pf","developing",""],["wc-pn155","pn:cap","pf","secure",""],["wc-pn156","pn:cap","pf","secure",""],["wc-pn157","pn:cap","pf","challenge",""],["wc-pn158","pn:cap","pf","challenge",""],["wc-pn159","pn:end","pf","foundation",""],["wc-pn160","pn:end","pf","foundation",""],["wc-pn161","pn:end","pf","developing",""],["wc-pn162","pn:end","pf","developing",""],["wc-pn163","pn:end","pf","secure",""],["wc-pn164","pn:end","pf","secure",""],["wc-pn165","pn:end","pf","challenge",""],["wc-pn166","pn:end","pf","challenge",""],["wc-pn167","pn:apos","pf","foundation",""],["wc-pn168","pn:apos","pf","foundation",""],["wc-pn169","pn:apos","pf","developing",""],["wc-pn170","pn:apos","pf","developing",""],["wc-pn171","pn:apos","pf","secure",""],["wc-pn172","pn:apos","pf","secure",""],["wc-pn173","pn:apos","pf","challenge",""],["wc-pn174","pn:apos","pf","challenge",""],["wc-pn175","pn:splice","pf","foundation",""],["wc-pn176","pn:splice","pf","foundation",""],["wc-pn177","pn:splice","pf","developing",""],["wc-pn178","pn:splice","pf","developing",""],["wc-pn179","pn:splice","pf","secure",""],["wc-pn180","pn:splice","pf","secure",""],["wc-pn181","pn:splice","pf","challenge",""],["wc-pn182","pn:splice","pf","challenge",""],["wc-pn183","pn:comma","pf","foundation",""],["wc-pn184","pn:comma","pf","foundation",""],["wc-pn185","pn:comma","pf","developing",""],["wc-pn186","pn:comma","pf","developing",""],["wc-pn187","pn:comma","pf","secure",""],["wc-pn188","pn:comma","pf","secure",""],["wc-pn189","pn:comma","pf","challenge",""],["wc-pn190","pn:comma","pf","challenge",""],["wc-pn191","pn:speech","pf","foundation",""],["wc-pn192","pn:speech","pf","foundation",""],["wc-pn193","pn:speech","pf","developing",""],["wc-pn194","pn:speech","pf","developing",""],["wc-pn195","pn:speech","pf","secure",""],["wc-pn196","pn:speech","pf","secure",""],["wc-pn197","pn:speech","pf","challenge",""],["wc-pn198","pn:speech","pf","challenge",""],["wc-s369","wc:noun","one","foundation","noun"],["wc-s370","wc:noun","one","developing","noun"],["wc-s371","wc:noun","one","secure","noun"],["wc-s372","wc:noun","one","challenge","noun"],["wc-s373","wc:verb","one","foundation","verb"],["wc-s374","wc:verb","one","developing","verb"],["wc-s375","wc:verb","one","secure","verb"],["wc-s376","wc:verb","one","challenge","verb"],["wc-s377","wc:adj","one","foundation","adj"],["wc-s378","wc:adj","one","developing","adj"],["wc-s379","wc:adj","one","secure","adj"],["wc-s380","wc:adj","one","challenge","adj"],["wc-s381","wc:adv","one","foundation","adv"],["wc-s382","wc:adv","one","developing","adv"],["wc-s383","wc:adv","one","secure","adv"],["wc-s384","wc:adv","one","challenge","adv"],["wc-vt167","vt:sform","vt","foundation","vt"],["wc-vt168","vt:sform","vf","foundation","vf"],["wc-vt169","vt:sform","vt","developing","vt"],["wc-vt170","vt:sform","vf","developing","vf"],["wc-vt171","vt:sform","vt","secure","vt"],["wc-vt172","vt:sform","vf","secure","vf"],["wc-vt173","vt:sform","vt","challenge","vt"],["wc-vt174","vt:sform","vf","challenge","vf"],["wc-vt175","vt:regpast","vf","foundation","vf"],["wc-vt176","vt:regpast","vf","foundation","vf"],["wc-vt177","vt:regpast","vf","developing","vf"],["wc-vt178","vt:regpast","vf","developing","vf"],["wc-vt179","vt:regpast","vf","secure","vf"],["wc-vt180","vt:regpast","vf","secure","vf"],["wc-vt181","vt:regpast","vf","challenge","vf"],["wc-vt182","vt:regpast","vf","challenge","vf"],["wc-vt183","vt:irrpast","vf","foundation","vf"],["wc-vt184","vt:irrpast","vf","foundation","vf"],["wc-vt185","vt:irrpast","vf","developing","vf"],["wc-vt186","vt:irrpast","vf","developing","vf"],["wc-vt187","vt:irrpast","vf","secure","vf"],["wc-vt188","vt:irrpast","vf","secure","vf"],["wc-vt189","vt:irrpast","vf","challenge","vf"],["wc-vt190","vt:irrpast","vf","challenge","vf"],["wc-vt191","vt:be","vt","foundation","vt"],["wc-vt192","vt:be","vf","foundation","vf"],["wc-vt193","vt:be","vt","developing","vt"],["wc-vt194","vt:be","vf","developing","vf"],["wc-vt195","vt:be","vt","secure","vt"],["wc-vt196","vt:be","vf","secure","vf"],["wc-vt197","vt:be","vt","challenge","vt"],["wc-vt198","vt:be","vf","challenge","vf"],["wc-vt199","vt:mixed","vt","foundation","vt"],["wc-vt200","vt:mixed","vf","foundation","vf"],["wc-vt201","vt:mixed","vt","developing","vt"],["wc-vt202","vt:mixed","vf","developing","vf"],["wc-vt203","vt:mixed","vt","secure","vt"],["wc-vt204","vt:mixed","vf","secure","vf"],["wc-vt205","vt:mixed","vt","challenge","vt"],["wc-vt206","vt:mixed","vf","challenge","vf"]];
+/* The deep dive's REGISTER: [id, cell, level, ask, sub]. Same reason as the
+   screener's, and no form or mode because a pool has no form and its mode is
+   always held (SPEC 73).
+
+   TWO UNITS (SPEC 79). `cell` is the ACTIVITY, which is what the report names
+   and what a block and its level ladder run over: one activity, one cell.
+   `sub` is the sub-skill the build measured the item as, which nothing prints;
+   the picker spreads a block across it so a cell of twenty-four punctuation
+   repairs is not eighteen apostrophes, and a stored row keeps it so step 12
+   can still count at that grain. */
+var DEEPREG = [["wc-c114","cloze","foundation","","wc:noun"],["wc-c115","cloze","developing","","wc:noun"],["wc-c116","cloze","secure","","wc:noun"],["wc-c117","cloze","challenge","","wc:noun"],["wc-c118","cloze","foundation","","wc:verb"],["wc-c119","cloze","developing","","wc:verb"],["wc-c120","cloze","secure","","wc:verb"],["wc-c121","cloze","challenge","","wc:verb"],["wc-c122","cloze","foundation","","wc:adj"],["wc-c123","cloze","developing","","wc:adj"],["wc-c124","cloze","secure","","wc:adj"],["wc-c125","cloze","challenge","","wc:adj"],["wc-c126","cloze","foundation","","wc:adv"],["wc-c127","cloze","developing","","wc:adv"],["wc-c128","cloze","secure","","wc:adv"],["wc-c129","cloze","challenge","","wc:adv"],["wc-cm124","commas","foundation","","cm:list"],["wc-cm125","commas","foundation","","cm:list"],["wc-cm126","commas","developing","","cm:list"],["wc-cm127","commas","developing","","cm:list"],["wc-cm128","commas","secure","","cm:list"],["wc-cm129","commas","secure","","cm:list"],["wc-cm130","commas","challenge","","cm:list"],["wc-cm131","commas","challenge","","cm:list"],["wc-cm132","commas","foundation","","cm:drop"],["wc-cm133","commas","foundation","","cm:drop"],["wc-cm134","commas","developing","","cm:drop"],["wc-cm135","commas","developing","","cm:drop"],["wc-cm136","commas","secure","","cm:drop"],["wc-cm137","commas","secure","","cm:drop"],["wc-cm138","commas","challenge","","cm:drop"],["wc-cm139","commas","challenge","","cm:drop"],["wc-cm140","commas","foundation","","cm:address"],["wc-cm141","commas","foundation","","cm:address"],["wc-cm142","commas","developing","","cm:address"],["wc-cm143","commas","developing","","cm:address"],["wc-cm144","commas","secure","","cm:address"],["wc-cm145","commas","secure","","cm:address"],["wc-cm146","commas","challenge","","cm:address"],["wc-cm147","commas","challenge","","cm:address"],["wc-cm148","commas","foundation","","cm:subj"],["wc-cm149","commas","foundation","","cm:subj"],["wc-cm150","commas","developing","","cm:subj"],["wc-cm151","commas","developing","","cm:subj"],["wc-cm152","commas","secure","","cm:subj"],["wc-cm153","commas","secure","","cm:subj"],["wc-cm154","commas","challenge","","cm:subj"],["wc-cm155","commas","challenge","","cm:subj"],["wc-k135","klass","foundation","","wc:noun"],["wc-k136","klass","developing","","wc:noun"],["wc-k137","klass","secure","","wc:noun"],["wc-k138","klass","challenge","","wc:noun"],["wc-k139","klass","foundation","","wc:verb"],["wc-k140","klass","developing","","wc:verb"],["wc-k141","klass","secure","","wc:verb"],["wc-k142","klass","challenge","","wc:verb"],["wc-k143","klass","foundation","","wc:adj"],["wc-k144","klass","developing","","wc:adj"],["wc-k145","klass","secure","","wc:adj"],["wc-k146","klass","challenge","","wc:adj"],["wc-k147","klass","foundation","","wc:adv"],["wc-k148","klass","developing","","wc:adv"],["wc-k149","klass","secure","","wc:adv"],["wc-k150","klass","challenge","","wc:adv"],["wc-pn151","pf","foundation","","pn:cap"],["wc-pn152","pf","foundation","","pn:cap"],["wc-pn153","pf","developing","","pn:cap"],["wc-pn154","pf","developing","","pn:cap"],["wc-pn155","pf","secure","","pn:cap"],["wc-pn156","pf","secure","","pn:cap"],["wc-pn157","pf","challenge","","pn:cap"],["wc-pn158","pf","challenge","","pn:cap"],["wc-pn159","pf","foundation","","pn:end"],["wc-pn160","pf","foundation","","pn:end"],["wc-pn161","pf","developing","","pn:end"],["wc-pn162","pf","developing","","pn:end"],["wc-pn163","pf","secure","","pn:end"],["wc-pn164","pf","secure","","pn:end"],["wc-pn165","pf","challenge","","pn:end"],["wc-pn166","pf","challenge","","pn:end"],["wc-pn167","pf","foundation","","pn:apos"],["wc-pn168","pf","foundation","","pn:apos"],["wc-pn169","pf","developing","","pn:apos"],["wc-pn170","pf","developing","","pn:apos"],["wc-pn171","pf","secure","","pn:apos"],["wc-pn172","pf","secure","","pn:apos"],["wc-pn173","pf","challenge","","pn:apos"],["wc-pn174","pf","challenge","","pn:apos"],["wc-pn175","pf","foundation","","pn:splice"],["wc-pn176","pf","foundation","","pn:splice"],["wc-pn177","pf","developing","","pn:splice"],["wc-pn178","pf","developing","","pn:splice"],["wc-pn179","pf","secure","","pn:splice"],["wc-pn180","pf","secure","","pn:splice"],["wc-pn181","pf","challenge","","pn:splice"],["wc-pn182","pf","challenge","","pn:splice"],["wc-pn183","pf","foundation","","pn:comma"],["wc-pn184","pf","foundation","","pn:comma"],["wc-pn185","pf","developing","","pn:comma"],["wc-pn186","pf","developing","","pn:comma"],["wc-pn187","pf","secure","","pn:comma"],["wc-pn188","pf","secure","","pn:comma"],["wc-pn189","pf","challenge","","pn:comma"],["wc-pn190","pf","challenge","","pn:comma"],["wc-pn191","pf","foundation","","pn:speech"],["wc-pn192","pf","foundation","","pn:speech"],["wc-pn193","pf","developing","","pn:speech"],["wc-pn194","pf","developing","","pn:speech"],["wc-pn195","pf","secure","","pn:speech"],["wc-pn196","pf","secure","","pn:speech"],["wc-pn197","pf","challenge","","pn:speech"],["wc-pn198","pf","challenge","","pn:speech"],["wc-s369","one","foundation","noun","wc:noun"],["wc-s370","one","developing","noun","wc:noun"],["wc-s371","one","secure","noun","wc:noun"],["wc-s372","one","challenge","noun","wc:noun"],["wc-s373","one","foundation","verb","wc:verb"],["wc-s374","one","developing","verb","wc:verb"],["wc-s375","one","secure","verb","wc:verb"],["wc-s376","one","challenge","verb","wc:verb"],["wc-s377","one","foundation","adj","wc:adj"],["wc-s378","one","developing","adj","wc:adj"],["wc-s379","one","secure","adj","wc:adj"],["wc-s380","one","challenge","adj","wc:adj"],["wc-s381","one","foundation","adv","wc:adv"],["wc-s382","one","developing","adv","wc:adv"],["wc-s383","one","secure","adv","wc:adv"],["wc-s384","one","challenge","adv","wc:adv"],["wc-vt167","vt","foundation","vt","vt:sform"],["wc-vt168","vf","foundation","vf","vt:sform"],["wc-vt169","vt","developing","vt","vt:sform"],["wc-vt170","vf","developing","vf","vt:sform"],["wc-vt171","vt","secure","vt","vt:sform"],["wc-vt172","vf","secure","vf","vt:sform"],["wc-vt173","vt","challenge","vt","vt:sform"],["wc-vt174","vf","challenge","vf","vt:sform"],["wc-vt175","vf","foundation","vf","vt:regpast"],["wc-vt176","vf","foundation","vf","vt:regpast"],["wc-vt177","vf","developing","vf","vt:regpast"],["wc-vt178","vf","developing","vf","vt:regpast"],["wc-vt179","vf","secure","vf","vt:regpast"],["wc-vt180","vf","secure","vf","vt:regpast"],["wc-vt181","vf","challenge","vf","vt:regpast"],["wc-vt182","vf","challenge","vf","vt:regpast"],["wc-vt183","vf","foundation","vf","vt:irrpast"],["wc-vt184","vf","foundation","vf","vt:irrpast"],["wc-vt185","vf","developing","vf","vt:irrpast"],["wc-vt186","vf","developing","vf","vt:irrpast"],["wc-vt187","vf","secure","vf","vt:irrpast"],["wc-vt188","vf","secure","vf","vt:irrpast"],["wc-vt189","vf","challenge","vf","vt:irrpast"],["wc-vt190","vf","challenge","vf","vt:irrpast"],["wc-vt191","vt","foundation","vt","vt:be"],["wc-vt192","vf","foundation","vf","vt:be"],["wc-vt193","vt","developing","vt","vt:be"],["wc-vt194","vf","developing","vf","vt:be"],["wc-vt195","vt","secure","vt","vt:be"],["wc-vt196","vf","secure","vf","vt:be"],["wc-vt197","vt","challenge","vt","vt:be"],["wc-vt198","vf","challenge","vf","vt:be"],["wc-vt199","vt","foundation","vt","vt:mixed"],["wc-vt200","vf","foundation","vf","vt:mixed"],["wc-vt201","vt","developing","vt","vt:mixed"],["wc-vt202","vf","developing","vf","vt:mixed"],["wc-vt203","vt","secure","vt","vt:mixed"],["wc-vt204","vf","secure","vf","vt:mixed"],["wc-vt205","vt","challenge","vt","vt:mixed"],["wc-vt206","vf","challenge","vf","vt:mixed"]];
 /* What the content stamp ignores, written by the build so the two copies of the
    rule cannot drift (SPEC 70, 72). */
 var STAMPMETA = {"fmt":1,"skip":["id","dx"],"strict":["secure","challenge"]};
@@ -5017,7 +5024,7 @@ var STAMPMETA = {"fmt":1,"skip":["id","dx"],"strict":["secure","challenge"]};
 /* BANK_REV stays at 37: v0.61 adds no items and retires none. It bumps when the
    banks change, and bumping it for a code change makes every pupil's record run
    the pruner for nothing. */
-var APP = "wcc", VER = "v0.67", BANK_REV = 41;
+var APP = "wcc", VER = "v0.68", BANK_REV = 41;
 var BUG_FORM_URL = "";   /* paste the Office 365 form link to switch the report button on */
 
 /* ================= HELD OUT (v0.61, SPEC 72) ================================
@@ -5971,7 +5978,7 @@ function dxNextQ(){
   while(DX.b < DX.blocks.length){
     var bl = DX.blocks[DX.b];
     if(bl.done >= bl.want){ DX.b++; continue; }
-    var q = dxDeepPick(bl.cell, bl.lvl, DX.used);
+    var q = dxDeepPick(bl.cell, bl.lvl, DX.used, bl.subs);
     if(!q){ bl.want = bl.done; DX.b++; continue; }   /* cell exhausted: move on */
     return q;
   }
@@ -6154,15 +6161,20 @@ function dxFinish(done){
    is something up there the honest thing is to record that the route was
    wanted and could not be offered, rather than to quietly send them back
    down and let the report imply they needed it. */
+/* A ROUTE'S CELLS ARE ACTIVITIES (Michael, 2026-09-25: "each activity should
+   only have one cell; students go practice that activity", and on scope, "yes,
+   everywhere"). They were sub-skills, so a weak pupil was told they were
+   patchy on apostrophes and left to find the door themselves. Every cell here
+   is a button on the practise menu. */
 var DX_ROUTES = [
   { k:"wc",   name:"word classes",     up:false, groups:["wc.find","wc.name","wc.use"],
-    cells:["wc:noun","wc:verb","wc:adj","wc:adv"] },
+    cells:["one","klass","cloze"] },
   { k:"punc", name:"punctuation",      up:false, groups:["punc.find","punc.fix"],
-    cells:["pn:cap","pn:end","pn:apos","pn:splice","pn:comma","pn:speech"] },
+    cells:["pf"] },
   { k:"cm",   name:"commas",           up:false, groups:["punc.use"],
-    cells:["cm:list","cm:drop","cm:address","cm:subj"] },
+    cells:["commas"] },
   { k:"vt",   name:"verb tenses",      up:false, groups:["tense.find","tense.use"],
-    cells:["vt:sform","vt:regpast","vt:irrpast","vt:be","vt:mixed"] },
+    cells:["vt","vf"] },
   { k:"tech", name:"techniques",       up:true,  groups:["tech.know","tech.apart"], cells:[] },
   { k:"techx",name:"harder techniques",up:true,
     groups:["techx.find","techx.name","techx.know"], cells:[] },
@@ -6213,17 +6225,50 @@ function dxRoute(rows){
            secure:secure, wanted:secure && wanted ? wanted.k : "" };
 }
 
-/* How many questions each cell of a route gets. Fixed total, spread as
-   evenly as the cell count allows, and the remainder goes to the cells
-   that come first in the route's own order rather than anywhere clever:
-   the screener reports by ROUND and the deep dive by CLASS or RULE, so
-   stage one cannot rank one cell of a route against another and a rule
-   that pretended it could would be making the numbers up. */
+/* No cell is emptied by one sitting. Above this share of a cell's pool the
+   next sitting draws the same questions in the same cell, and a pupil who
+   recognises a question stops answering it. The deep dive is not the half
+   that is compared between sittings, so this is not about the numbers being
+   comparable; it is about the second sitting still measuring anything. */
+var DX_VARY = 0.75;
+
+/* How many questions each cell of a route gets. Fixed total, spread as evenly
+   as the cell count allows, and the remainder to the cells that come first in
+   the route's own order rather than anywhere clever: the screener reports by
+   ROUND and the deep dive by ACTIVITY, so stage one cannot rank one cell of a
+   route against another and a rule that pretended it could would be making the
+   numbers up.
+
+   Then each block is capped at DX_VARY of what its cell actually holds, and
+   whatever that frees goes to the cells with room. The verb-tense route is why:
+   `vt` holds twelve questions because two of the five tense sub-skills cannot
+   be asked as a tap at all, and an even split would have served every one of
+   them every time. The TOTAL never changes, which is the invariant that
+   matters: otherwise the weakest pupil sits the shortest test. */
 function dxBlocks(route){
-  var n = route.cells.length, base = Math.floor(DX_DEEP_N / n), extra = DX_DEEP_N % n, out = [], i;
+  var n = route.cells.length, base = Math.floor(DX_DEEP_N / n), extra = DX_DEEP_N % n,
+      out = [], i, cap, spare = 0;
   for(i=0;i<n;i++) out.push({ cell:route.cells[i], want:base + (i < extra ? 1 : 0),
-                              lvl:"", run:0, miss:0, done:0 });
+                              lvl:"", run:0, miss:0, done:0, subs:{} });
+  for(i=0;i<n;i++){
+    cap = Math.floor(dxCellPool(out[i].cell) * DX_VARY);
+    if(out[i].want > cap){ spare += out[i].want - cap; out[i].want = cap; }
+  }
+  for(i=0;i<n && spare > 0;i++){
+    cap = Math.floor(dxCellPool(out[i].cell) * DX_VARY);
+    var room = Math.min(spare, cap - out[i].want);
+    if(room > 0){ out[i].want += room; spare -= room; }
+  }
   return out;
+}
+
+/* How many questions a cell holds, counted from the register rather than
+   written down anywhere: a number typed here would be the sixth stale copy of
+   a list the build already writes (CLAUDE.md). */
+function dxCellPool(cell){
+  var n = 0, i;
+  for(i=0;i<DEEPREG.length;i++) if(DEEPREG[i][1] === cell) n++;
+  return n;
 }
 
 function dxStartLevel(score){
@@ -6246,23 +6291,42 @@ function dxMove(bl, right){
    at the nearest level there is otherwise. A block that ran out of items
    at its level must not stop: the level is a description of the pupil, and
    the cell floors (SPEC 73.3) make running out a shortage of questions
-   rather than a statement about them. */
-function dxDeepPick(cell, lvl, used){
+   rather than a statement about them.
+
+   AND SPREAD ACROSS THE CELL'S SUB-SKILLS. This is the job the reporting
+   change handed to the picker. When a cell was `pn:apos` the pool could only
+   ask about apostrophes; now a cell is `pf` and holds all six punctuation
+   faults, and twenty-four draws at random from forty-eight come back lumpy
+   often enough to matter: a pupil could be told they are patchy at finding and
+   fixing punctuation on the strength of eighteen apostrophe questions. So the
+   least-served sub-skill wins, and chance only breaks the tie. `bl.subs` is
+   the count so far in this block. */
+function dxDeepPick(cell, lvl, used, subs){
   var here = [], near = [], i, r, d, best = 99;
   for(i=0;i<DEEPREG.length;i++){
-    r = DEEPREG[i];                       /* [id, cell, act, level, ask] */
+    r = DEEPREG[i];                       /* [id, cell, level, ask, sub] */
     if(r[1] !== cell || used[r[0]]) continue;
-    if(r[3] === lvl) here.push(r);
+    if(r[2] === lvl) here.push(r);
     else {
-      d = Math.abs(LEVELS.indexOf(r[3]) - LEVELS.indexOf(lvl));
+      d = Math.abs(LEVELS.indexOf(r[2]) - LEVELS.indexOf(lvl));
       if(d < best){ best = d; near = [r]; } else if(d === best) near.push(r);
     }
   }
   var pool = here.length ? here : near;
   if(!pool.length) return null;
+  pool = dxLeanest(pool, subs || {});
   r = pool[Math.floor(Math.random() * pool.length)];
   used[r[0]] = 1;
-  return { id:r[0], g:r[1], a:r[2], l:r[3], ask:r[4] || "", st:2 };
+  if(subs) subs[r[4]] = (subs[r[4]] || 0) + 1;
+  return { id:r[0], g:r[4], a:r[1], l:r[2], ask:r[3] || "", st:2 };
+}
+
+/* The rows of a pool whose sub-skill has been served least so far. */
+function dxLeanest(pool, subs){
+  var low = 1e9, i, c, out = [];
+  for(i=0;i<pool.length;i++){ c = subs[pool[i][4]] || 0; if(c < low) low = c; }
+  for(i=0;i<pool.length;i++) if((subs[pool[i][4]] || 0) === low) out.push(pool[i]);
+  return out;
 }
 
 
@@ -6293,9 +6357,11 @@ function dxDeepPick(cell, lvl, used){
    everything.
    ==================================================================== */
 
-/* What the report calls each deep-dive cell, written by the build from the
-   same CELLS table the assembler gates against. One list, two readers. */
-var DEEPMETA = {"cells":{"cm:address":"commas for names, yes and no","cm:drop":"commas round dropped-in information","cm:list":"commas in a list","cm:subj":"no comma between subject and verb","pn:apos":"apostrophes","pn:cap":"capital letters","pn:comma":"missing commas","pn:end":"full stops and question marks","pn:speech":"speech punctuation","pn:splice":"comma splices","vt:be":"was, were, is and are","vt:irrpast":"the irregular past","vt:mixed":"which time the sentence is in","vt:regpast":"spelling the regular past","vt:sform":"he, she and it in the present","wc:adj":"adjectives","wc:adv":"adverbs","wc:noun":"nouns","wc:verb":"verbs"},"middle":{"tech":"close","techx":"close","one":"neutral"},"means":{"close":"the right place in the sentence, with the edges drawn wrongly","neutral":"true of the language, but not the thing this round asked for"}};
+/* What the report calls each deep-dive cell. A cell is an ACTIVITY (SPEC 79),
+   so these are the names on the practise menu, written by the build out of the
+   app's own ACTIVITY_LIST. One list, two readers: a report that typed its own
+   names would be the sixth stale description of this app. */
+var DEEPMETA = {"cells":{"cloze":"Insert the word","commas":"Put the commas in","klass":"Which class fills the gap?","one":"Click the word","pf":"Find it, then fix it","vf":"Put the right tense in","vt":"Spot the tense mistake"},"middle":{"tech":"close","techx":"close","one":"neutral"},"means":{"close":"the right place in the sentence, with the edges drawn wrongly","neutral":"true of the language, but not the thing this round asked for"}};
 var DX_CELL_NAME = DEEPMETA.cells || {};
 /* Which rounds end in something other than right or wrong, and what that
    something means, written by the build from the same table the assembler
@@ -6474,14 +6540,29 @@ function dxRow2(label, band, count){
 }
 
 /* What the deep dive found, as a sentence per cell rather than a table,
-   because "reached Harder on nouns" is the thing a pupil can repeat to
-   themselves and 4/6 is not. */
+   because "reached Harder on Click the word" is the thing a pupil can repeat
+   to themselves and 4/6 is not. */
 function dxCellLine(cell, s){
   var name = DX_CELL_NAME[cell] || cell;
   var top = LEVEL_LABEL[s.top] || s.top, first = LEVEL_LABEL[s.first] || s.first;
   if(s.top === s.first)
     return "stayed at " + first + " on " + name;
   return "reached " + top + " on " + name;
+}
+
+/* The cell to send a pupil to, or nothing. A cell is named only if it has
+   enough questions behind it to say anything (DX_THIN) and is clearly the
+   weakest: a tie, or a margin of one answer in eight, is not a recommendation
+   and a report that made one anyway would be guessing in a confident voice. */
+function dxWorstCell(cells){
+  var ks = [], k;
+  for(k in cells) if(cells[k].n >= DX_THIN) ks.push(k);
+  /* A route with one cell has nothing to choose between, and the paragraph
+     above has already named it. */
+  if(ks.length < 2) return "";
+  ks.sort(function(a, b){ return (cells[a].r / cells[a].n) - (cells[b].r / cells[b].n); });
+  var lo = cells[ks[0]].r / cells[ks[0]].n, next = cells[ks[1]].r / cells[ks[1]].n;
+  return (next - lo) >= 0.15 ? ks[0] : "";
 }
 
 function dxReportBody(sit){
@@ -6565,6 +6646,15 @@ function dxReportBody(sit){
     h += '<p class="note">The levels are ' +
          esc(LEVELS.map(function(l){ return LEVEL_LABEL[l]; }).join(", ")) +
          '. They move as you go: two wrong takes you down one, three right takes you up one.</p>';
+    /* WHERE TO GO, by name, because that is the whole reason a cell is an
+       activity (Michael, 2026-09-25). Named only where the sitting supports
+       it: one cell has to be clearly behind the others, or this is a coin
+       toss told in a confident voice. */
+    var pick = dxWorstCell(cells);
+    if(pick)
+      h += '<p><b>Start with ' + esc(DX_CELL_NAME[pick] || pick) + '</b>' + dxStop(DX_CELL_NAME[pick] || pick) +
+           ' It is on the practise menu under that name, and it is the one of those ' +
+           'that went least well.</p>';
   } else {
     h += '<p>No second half was recorded.</p>';
   }
@@ -6654,12 +6744,12 @@ function dxTeacherBody(sit){
        'is what picks the two strengths and the two weaknesses. The banded statements worth ' +
        'quoting are the domain rows in the first half of this report.</p>';
 
-  h += '<h2>Deep dive, by cell</h2>';
+  h += '<h2>Deep dive, by activity</h2>';
   var ck = [];
   for(k in cells) ck.push(k);
   if(ck.length){
     ck.sort();
-    h += '<table class="rep"><thead><tr><th>Cell</th><th>Levels</th><th>Score</th></tr></thead><tbody>';
+    h += '<table class="rep"><thead><tr><th>Activity</th><th>Levels</th><th>Score</th></tr></thead><tbody>';
     for(i=0;i<ck.length;i++){
       s = cells[ck[i]];
       h += dxRow2(DX_CELL_NAME[ck[i]] || ck[i],
@@ -13470,7 +13560,7 @@ function validate(){
              "define what it means, so the report cannot name it.");
   var dxacts = {}, j2;
   for(i=0;i<DXREG.length;i++) dxacts[DXREG[i][3]] = 1;
-  for(i=0;i<DEEPREG.length;i++) dxacts[DEEPREG[i][2]] = 1;
+  for(i=0;i<DEEPREG.length;i++) dxacts[DEEPREG[i][1]] = 1;
   for(var act in dxacts){
     if(!DX_OPEN[act])
       E.push("diagnostic: a question is registered for '"+act+"' and DX_OPEN cannot open it.");
@@ -13478,8 +13568,9 @@ function validate(){
       E.push("diagnostic: '"+act+"' is not in DX_SCREEN, so a wrong answer there records "+
              "no wrong option and step 12 has nothing to analyse.");
   }
-  /* Every cell the deep register uses must belong to exactly one route, or a
-     question is in the pool and can never be served. */
+  /* A DEEP-DIVE CELL IS AN ACTIVITY (v0.68). Every cell the deep register uses
+     must belong to exactly one route, or a question is in the pool and can
+     never be served. */
   var inroute = {};
   for(i=0;i<DX_ROUTES.length;i++)
     for(j2=0;j2<DX_ROUTES[i].cells.length;j2++){
@@ -13493,14 +13584,19 @@ function validate(){
     if(!inroute[DEEPREG[i][1]])
       E.push("diagnostic: cell "+DEEPREG[i][1]+" has questions in it and no route reaches them.");
   }
-  /* And a route must be able to fill a deep dive, or the length stops being
-     fixed and the weakest pupil sits the shortest test. */
+  /* And a route must be able to fill a deep dive WITHOUT emptying a cell, or
+     the length stops being fixed and the weakest pupil sits the shortest test.
+     Counted at the cap the blocks actually use (DX_VARY), not at the raw pool
+     size: a route that can only reach twenty-four by serving every question it
+     has hands the same sitting back next term. */
   for(i=0;i<DX_ROUTES.length;i++){
     var R = DX_ROUTES[i], tot = 0;
-    for(j2=0;j2<R.cells.length;j2++) tot += percell[R.cells[j2]] || 0;
+    for(j2=0;j2<R.cells.length;j2++)
+      tot += Math.floor((percell[R.cells[j2]] || 0) * DX_VARY);
     if(R.cells.length && tot < DX_DEEP_N)
-      E.push("diagnostic: the "+R.name+" route has "+tot+" questions and a deep dive is "+
-             DX_DEEP_N+", so its length would depend on the route.");
+      E.push("diagnostic: the "+R.name+" route can serve "+tot+" questions without "+
+             "emptying one of its cells, and a deep dive is "+DX_DEEP_N+", so its length "+
+             "would depend on the route.");
     if(!R.cells.length && !R.up)
       E.push("diagnostic: the "+R.name+" route has no cells and is not marked as an "+
              "upward route, so a pupil sent there would sit nothing.");
