@@ -153,6 +153,32 @@ body.dx .wbtn.res-ok, body.dx .wbtn.res-bad, body.dx .wbtn.res-neu,
 body.dx .wbtn.res-miss, body.dx .wbtn.res-part{background:var(--paper);
   border-color:var(--line);border-style:solid;color:inherit}
 #dxBar{position:sticky;top:0;z-index:5;background:var(--bg);padding:10px 0 8px}
+/* The report reads as a document, so it sits on the paper panel the app already
+   uses for language a pupil has to READ (v0.52), and the download carries its own
+   copy of these rules because it has to open with no app around it. */
+#dxRep{background:var(--paper);color:var(--ink);border-radius:10px;padding:18px 22px;
+  font:16px/1.55 Georgia,serif}
+#dxRep h1{font-size:1.5rem;margin:0 0 .2em}
+#dxRep h2{font-size:1.05rem;margin:1.5em 0 .4em;border-bottom:1px solid #cfc79c;
+  padding-bottom:.2em}
+#dxRep .meta{color:#5b5637;margin:.2em 0 1em;font-size:.95rem}
+#dxRep .note{color:#5b5637;font-size:.9rem}
+#dxRep table.rep{border-collapse:collapse;width:100%;margin:.6em 0}
+#dxRep table.rep th,#dxRep table.rep td{border-bottom:1px solid #ddd5a8;padding:.4em .5em;
+  text-align:left;vertical-align:top}
+#dxRep table.rep thead th{border-bottom:2px solid #b9b083;font-size:.8rem;
+  text-transform:uppercase;letter-spacing:.04em}
+#dxRep td.b{width:10em;font-weight:bold}#dxRep td.c{width:13em;color:#5b5637}
+#dxRep .foot{margin-top:2em;color:#6a6448;font-size:.85rem;border-top:1px solid #cfc79c;
+  padding-top:.5em}
+@media print{
+  body{background:#fff}
+  .noprint,.topbar,#dxBar{display:none !important}
+  .screen{display:none !important}.screen.on{display:block !important}
+  #dxRep{background:#fff;color:#000;padding:0;border-radius:0}
+  #dxRep h1.tpage{page-break-before:always}
+  #dxRep h2{page-break-after:avoid}#dxRep table.rep,#dxRep ul{page-break-inside:avoid}
+}
 #dxTrack{height:6px;border-radius:3px;background:rgba(255,255,255,.14);overflow:hidden}
 #dxFill{height:100%;width:0;border-radius:3px;background:var(--ink);transition:width .25s}
 #dxCount{font-size:.85rem;opacity:.75;margin-top:6px;display:flex;justify-content:space-between}
@@ -1412,6 +1438,26 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
   <div class="bar">
     <button class="go" onclick="go('splash')">Back to the menu</button>
   </div>
+</section>
+
+<!-- The report. The name goes on before anything else, because a report with
+     nobody's name on it is the one that gets printed and then thrown away. -->
+<section id="dxRepS" class="screen">
+  <div class="topbar"><button class="back" onclick="go('splash')">&larr; Menu</button><img alt="" class="tb-logo"></div>
+  <div class="bar noprint" id="dxNameBar">
+    <label class="lbl" for="dxName">Your name</label>
+    <input id="dxName" class="tin" maxlength="40" placeholder="so you know whose this is"
+           oninput="dxSetName()">
+  </div>
+  <div class="paper" id="dxRep"></div>
+  <div class="bar noprint">
+    <button class="go" onclick="dxSave1()">Save a copy</button>
+    <button class="go" onclick="window.print()">Print or save as PDF</button>
+  </div>
+  <p class="dim small noprint">The copy is one file that opens in any browser, works with no
+     internet, and carries your answers inside it so the next time you sit this it can show
+     you what changed. Nothing is sent anywhere.</p>
+  <div class="bar noprint" id="dxPractise"></div>
 </section>
 
 <!-- =========================== VALIDATE =========================== -->
@@ -4961,7 +5007,7 @@ var STAMPMETA = {"fmt":1,"skip":["id","dx"],"strict":["secure","challenge"]};
 /* BANK_REV stays at 37: v0.61 adds no items and retires none. It bumps when the
    banks change, and bumping it for a code change makes every pupil's record run
    the pruner for nothing. */
-var APP = "wcc", VER = "v0.64", BANK_REV = 40;
+var APP = "wcc", VER = "v0.65", BANK_REV = 40;
 var BUG_FORM_URL = "";   /* paste the Office 365 form link to switch the report button on */
 
 /* ================= HELD OUT (v0.61, SPEC 72) ================================
@@ -5769,7 +5815,7 @@ function go(id){
       marked unfinished rather than thrown away.
    ==================================================================== */
 var DX = { on:false, sit:null, plan:[], i:0, t0:0, item:null, q:null, wait:0,
-           stage:1, blocks:[], b:0, used:{}, route:null, n:0, at:-1 };
+           stage:1, blocks:[], b:0, used:{}, route:null, n:0, at:-1, rep:null };
 
 /* HOW EACH ROUND IS OPENED, and with what. The same map `dxrender.py` uses
    to build the blind-review material: one list, two readers of it, so the
@@ -5905,6 +5951,8 @@ function dxEnterStage2(){
   DX.blocks = r.route ? dxBlocks(r.route) : [];
   var start = dxStartLevel(dxScore(DX.sit.rows, r.route ? r.route.groups : []));
   for(var i=0;i<DX.blocks.length;i++) DX.blocks[i].lvl = start;
+  DX.sit.start = start;
+  DX.sit.blocks = [];
   DX.b = 0;
   dxSave(DX.sit);
 }
@@ -5983,8 +6031,23 @@ function dxRecord(ok, outcome){
   DX.sit.rows.push(dxRow(DX.sit.rows.length + 1, DX.item, q.g, q.a, q.st, q.l,
                          ok, dxChose(q.a), secs));
   if(q.st === 2 && DX.blocks[DX.b]){
-    DX.blocks[DX.b].done++;
-    dxMove(DX.blocks[DX.b], ok);
+    var bl = DX.blocks[DX.b];
+    bl.done++;
+    dxMove(bl, ok);
+    /* WHAT THE LEVEL MOVEMENT CONCLUDED, recorded rather than worked out again
+       from the rows. A row carries the level of the ITEM that was served, which
+       is what step 12 needs; when a cell has run out of questions at the block's
+       level the picker serves the nearest one it has, and the two stop agreeing.
+       The report must say what the pupil reached, not what the pool happened to
+       have left, and re-deriving it would be a second copy of the rule. */
+    if(!DX.sit.blocks) DX.sit.blocks = [];
+    var rec = null, z;
+    for(z=0;z<DX.sit.blocks.length;z++) if(DX.sit.blocks[z].cell === bl.cell) rec = DX.sit.blocks[z];
+    if(!rec){ rec = { cell:bl.cell, start:bl.lvl, end:bl.lvl, top:bl.lvl, n:0, r:0 };
+              DX.sit.blocks.push(rec); }
+    rec.n++; rec.r += ok ? 1 : 0;
+    rec.end = bl.lvl;
+    if(LEVELS.indexOf(bl.lvl) > LEVELS.indexOf(rec.top)) rec.top = bl.lvl;
   }
   dxSave(DX.sit);
   DX.i++;
@@ -6025,12 +6088,15 @@ function dxFinish(done){
     dxSave(DX.sit);
   }
   var n = DX.sit ? DX.sit.rows.length : 0;
-  el("dxEndH").textContent = done ? "That is the lot" : "Stopped";
-  el("dxEndSub").textContent = done
-    ? "You answered " + n + " questions. Nothing about them was marked on screen " +
-      "while you worked, which is why the next part is worth reading."
-    : "You answered " + n + " before stopping. That is kept on this device, but it " +
-      "is not a result and it will not be compared with anything.";
+  /* A finished sitting goes straight to its report. An abandoned one does not
+     get one: it is not a result, and a report built from a third of a screener
+     would say things the questions do not support. */
+  if(done && DX.sit && n) return dxShowReport(DX.sit);
+  el("dxEndH").textContent = "Stopped";
+  el("dxEndSub").textContent =
+    "You answered " + n + " before stopping. That is kept on this device, but it " +
+    "is not a result, so there is no report for it and it will not be compared " +
+    "with anything. Starting again starts a fresh one.";
   el("dxEndFb").innerHTML = "";
   go("dxEndS");
 }
@@ -6160,6 +6226,510 @@ function dxDeepPick(cell, lvl, used){
   r = pool[Math.floor(Math.random() * pool.length)];
   used[r[0]] = 1;
   return { id:r[0], g:r[1], a:r[2], l:r[3], ask:r[4] || "", st:2 };
+}
+
+
+/* The report. Spliced from `dxreport.js`, same reason. */
+/* ====================================================================
+   THE DIAGNOSTIC REPORT (v0.65, SPEC 76)
+
+   Step 11. One report, two halves, built once and used twice: what is on
+   the screen and what is in the downloaded file are the same string, so
+   they cannot say different things.
+
+   The hard part of this is not the layout. It is not saying more than
+   the questions support. A screener group is three or four questions, and
+   three out of four is not 75% of anything: it is one wrong answer. So
+   groups get a BAND and the count it rests on, the firmer statements are
+   made at domain level where there are eight to eighteen questions behind
+   them, and the two strengths and two weaknesses are named at group level
+   because that is the grain a pupil can act on.
+
+   Three things the report has to say out loud, all of them about what it
+   does NOT know:
+     - which foundation was not examined closely, because the whole deep
+       dive went to the weaker one (Michael, 2026-09-23);
+     - that a pupil whose foundations are secure should have been taken
+       upward, and that there is nothing up there yet;
+     - what the instrument cannot see at all (SPEC 74.7).
+   A report that only lists what it measured reads as though it measured
+   everything.
+   ==================================================================== */
+
+/* What the report calls each deep-dive cell, written by the build from the
+   same CELLS table the assembler gates against. One list, two readers. */
+var DEEPMETA = {"cells":{"cm:address":"commas for names, yes and no","cm:drop":"commas round dropped-in information","cm:list":"commas in a list","cm:subj":"no comma between subject and verb","pn:apos":"apostrophes","pn:cap":"capital letters","pn:comma":"missing commas","pn:end":"full stops and question marks","pn:speech":"speech punctuation","pn:splice":"comma splices","vt:be":"was, were, is and are","vt:irrpast":"the irregular past","vt:mixed":"which time the sentence is in","vt:regpast":"spelling the regular past","vt:sform":"he, she and it in the present","wc:adj":"adjectives","wc:adv":"adverbs","wc:noun":"nouns","wc:verb":"verbs"}};
+var DX_CELL_NAME = DEEPMETA.cells || {};
+function DX_ROUTE_NAME_OF(k){
+  for(var i=0;i<DX_ROUTES.length;i++) if(DX_ROUTES[i].k === k) return DX_ROUTES[i].name;
+  return k;
+}
+
+/* "a, b and c", because "a; b; c" is a list a pupil skims. With one exception:
+   where an item already contains a comma, joining with "and" runs two lists
+   together. One of the comma cells is literally called "commas for names, yes
+   and no", which produced "... yes and no and reached Harder on ...". */
+function dxList(xs){
+  if(!xs.length) return "";
+  if(xs.length === 1) return xs[0];
+  var messy = false, i;
+  for(i=0;i<xs.length;i++) if(String(xs[i]).indexOf(",") >= 0) messy = true;
+  if(messy) return xs.join("; ");
+  return xs.slice(0, -1).join(", ") + " and " + xs[xs.length - 1];
+}
+
+/* A label that ends in its own punctuation does not take a full stop as well.
+   "Practise it in Where does it fit?." is the sort of thing a pupil reads as
+   carelessness, and then reads the rest of the report as careless too. */
+function dxStop(s){
+  return /[.?!]$/.test(String(s).trim()) ? "" : ".";
+}
+
+/* The bands. Deliberately few and deliberately wide: with four questions
+   there are five possible scores, and a scale with more resolution than
+   the data has is a lie told in numerals. The count is printed beside
+   every band for the same reason. */
+var DX_BANDS = [
+  [0.85, "Secure",          "you got nearly all of these"],
+  [0.60, "Mostly there",    "you got most of these"],
+  [0.35, "Patchy",          "some right and some wrong"],
+  [0.00, "Worth working on", "more wrong than right"]
+];
+var DX_THIN = 3;     /* below this, say so rather than banding it */
+
+function dxBand(r, n){
+  if(!n) return { band:"Not asked", why:"no questions on this", thin:true };
+  if(n < DX_THIN) return { band:"Too few to say", why:"only " + n +
+    (n === 1 ? " question" : " questions") + " on this", thin:true };
+  var p = r / n, i;
+  for(i=0;i<DX_BANDS.length;i++)
+    if(p >= DX_BANDS[i][0]) return { band:DX_BANDS[i][1], why:DX_BANDS[i][2], thin:false, p:p };
+  return { band:DX_BANDS[DX_BANDS.length-1][1], why:"", thin:false, p:p };
+}
+
+/* Names come from the app's own structures. A report that types its own
+   labels is a second description of the app, and this project has found
+   five of those stale (CLAUDE.md). */
+function dxGroupName(g){
+  var bits = String(g).split("."), d = domainById(bits[0]), i;
+  if(!d) return g;
+  for(i=0;i<(d.groups||[]).length;i++)
+    if(d.groups[i][0] === bits[1]) return d.name + ": " + d.groups[i][1];
+  return d.name;
+}
+function dxDomainName(id){ var d = domainById(id); return d ? d.name : id; }
+/* A route's name reads inside a sentence ("went into commas") and as a row
+   label in a table. Lower case is right in the first and looks like a typo in
+   the second, so the table asks for the capital rather than the name carrying
+   one it does not always want. */
+function dxCap(s){ return String(s).charAt(0).toUpperCase() + String(s).slice(1); }
+
+/* The first activity in a group, so a weakness can name somewhere to go. */
+function dxGroupAct(g){
+  var bits = String(g).split("."), i;
+  for(i=0;i<ACTIVITY_LIST.length;i++)
+    if(ACTIVITY_LIST[i][3] === bits[0] && ACTIVITY_LIST[i][4] === bits[1])
+      return { id:ACTIVITY_LIST[i][0], label:ACTIVITY_LIST[i][1], go:ACTIVITY_LIST[i][2] };
+  return null;
+}
+
+/* ---------------------------------------------------------- the counting */
+function dxTally(rows, key){
+  var out = {}, i, k;
+  for(i=0;i<rows.length;i++){
+    k = key(rows[i]);
+    if(!k) continue;
+    if(!out[k]) out[k] = { n:0, r:0 };
+    out[k].n++; out[k].r += rows[i].r;
+  }
+  return out;
+}
+function dxStage(sit, st){
+  return (sit.rows || []).filter(function(r){ return r.st === st; });
+}
+/* Groups and domains are the SCREENER's grain. The deep dive reports by
+   cell and is never mixed in: one measures progress on a fixed blueprint
+   and the other explains it, and adding them together would give a number
+   that is neither. */
+function dxGroups(sit){
+  return dxTally(dxStage(sit, 1), function(r){ return r.g; });
+}
+function dxDomains(sit){
+  return dxTally(dxStage(sit, 1), function(r){ return String(r.g).split(".")[0]; });
+}
+
+/* Per cell: how many, how many right, and the levels the pupil started and
+   finished on. That last pair is the whole point of the deep dive, and it
+   is what turns a score into "reached Harder on nouns, stayed at Easiest
+   on adverbs". */
+function dxCells(sit){
+  /* From what the level movement CONCLUDED, which the runner records, and not
+     from the level printed on each row. A row says which item was served, and
+     when a cell has run out of questions at the block's level the picker
+     serves the nearest one it has: reading the rows would then report a pupil
+     as having reached a level the pool handed them. */
+  var out = {}, i, b;
+  for(i=0;i<(sit.blocks || []).length;i++){
+    b = sit.blocks[i];
+    out[b.cell] = { n:b.n, r:b.r, first:b.start, last:b.end, top:b.top };
+  }
+  return out;
+}
+
+/* The two best and the two worst, at group level. A group is only named as
+   a strength if it actually looks like one, and only as a weakness if it
+   actually looks like one: with four questions, ranking alone would always
+   produce two of each and the bottom two of a strong sitting would be
+   reported as weaknesses. Thin groups are ranked but never named. */
+function dxPickEnds(groups){
+  var keys = [], k;
+  for(k in groups) if(groups[k].n >= DX_THIN) keys.push(k);
+  keys.sort(function(a, b){
+    var pa = groups[a].r / groups[a].n, pb = groups[b].r / groups[b].n;
+    if(pa !== pb) return pb - pa;
+    return groups[b].n - groups[a].n;      /* a firmer result wins a tie */
+  });
+  var strong = [], weak = [], i;
+  for(i=0;i<keys.length && strong.length < 2;i++)
+    if(groups[keys[i]].r / groups[keys[i]].n >= 0.60) strong.push(keys[i]);
+  for(i=keys.length-1;i>=0 && weak.length < 2;i--)
+    if(groups[keys[i]].r / groups[keys[i]].n < 0.60 && strong.indexOf(keys[i]) < 0)
+      weak.push(keys[i]);
+  return { strong:strong, weak:weak, ranked:keys };
+}
+
+/* ------------------------------------------------------------- comparison */
+/* ONLY THE SCREENER IS COMPARED. The deep dive is adaptive, so two sittings
+   answer different questions in it and a difference between them is mostly
+   a difference in routing. This is the trap the two-stage design exists to
+   avoid, and the report has to hold the line the design drew. */
+function dxCompare(sit){
+  var done = dxDone(), prev = null, i;
+  for(i=done.length-1;i>=0;i--)
+    if(done[i].id !== sit.id){ prev = done[i]; break; }
+  if(!prev) return null;
+  var now = dxDomains(sit), was = dxDomains(prev), out = [], k;
+  for(k in now){
+    if(!was[k] || was[k].n < DX_THIN || now[k].n < DX_THIN) continue;
+    out.push({ dom:k, nowR:now[k].r, nowN:now[k].n, wasR:was[k].r, wasN:was[k].n,
+               d:(now[k].r / now[k].n) - (was[k].r / was[k].n) });
+  }
+  out.sort(function(a, b){ return b.d - a.d; });
+  return { prev:prev, rows:out };
+}
+
+/* ------------------------------------------------------------ the writing */
+function dxWhen(sec){
+  var d = new Date((sec || 0) * 1000);
+  return d.getDate() + " " + ["January","February","March","April","May","June","July",
+    "August","September","October","November","December"][d.getMonth()] + " " + d.getFullYear();
+}
+
+function dxRow2(label, band, count){
+  return '<tr><th scope="row">' + esc(label) + '</th><td class="b">' + esc(band) +
+         '</td><td class="c">' + esc(count) + '</td></tr>';
+}
+
+/* What the deep dive found, as a sentence per cell rather than a table,
+   because "reached Harder on nouns" is the thing a pupil can repeat to
+   themselves and 4/6 is not. */
+function dxCellLine(cell, s){
+  var name = DX_CELL_NAME[cell] || cell;
+  var top = LEVEL_LABEL[s.top] || s.top, first = LEVEL_LABEL[s.first] || s.first;
+  if(s.top === s.first)
+    return "stayed at " + first + " on " + name;
+  return "reached " + top + " on " + name;
+}
+
+function dxReportBody(sit){
+  var groups = dxGroups(sit), doms = dxDomains(sit), cells = dxCells(sit);
+  var ends = dxPickEnds(groups), cmp = dxCompare(sit), h = "", k, i, s;
+
+  h += '<h1>What you can already do</h1>';
+  h += '<p class="meta"><b class="nm">' + esc(sit.who || "") + '</b> &middot; ' +
+       esc(dxWhen(sit.at)) + ' &middot; ' + esc(sit.rows.length) + ' questions</p>';
+  h += '<p class="lead">This is not a mark and it is not a comparison with anybody else. ' +
+       'It is a map of what you can already do, so you know which two things are worth ' +
+       'your next few weeks.</p>';
+
+  /* ---- the domains ---- */
+  h += '<h2>How each part went</h2>';
+  h += '<p class="note">Each line rests on the number of questions beside it. Where that ' +
+       'number is small, treat the line as a hint and not as a verdict.</p>';
+  h += '<table class="rep band"><tbody>';
+  for(i=0;i<DOMAINS.length;i++){
+    k = DOMAINS[i].id;
+    if(!doms[k]) continue;
+    s = dxBand(doms[k].r, doms[k].n);
+    h += dxRow2(DOMAINS[i].name, s.band, doms[k].r + " of " + doms[k].n);
+  }
+  h += '</tbody></table>';
+
+  /* ---- the two and two ---- */
+  h += '<h2>The two to be pleased about</h2>';
+  if(ends.strong.length){
+    h += '<ul>';
+    for(i=0;i<ends.strong.length;i++){
+      k = ends.strong[i];
+      h += '<li><b>' + esc(dxGroupName(k)) + '</b>: ' +
+           groups[k].r + ' of ' + groups[k].n + '.</li>';
+    }
+    h += '</ul>';
+  } else {
+    h += '<p>Nothing stood out as a clear strength this time, which usually means the ' +
+         'whole thing was hard rather than that you have none.</p>';
+  }
+
+  h += '<h2>The two worth working on</h2>';
+  if(ends.weak.length){
+    h += '<ul>';
+    for(i=0;i<ends.weak.length;i++){
+      k = ends.weak[i];
+      var act = dxGroupAct(k);
+      h += '<li><b>' + esc(dxGroupName(k)) + '</b>: ' + groups[k].r + ' of ' + groups[k].n +
+           (act ? '. Practise it in <i>' + esc(act.label) + '</i>' + dxStop(act.label)
+                : '.') + '</li>';
+    }
+    h += '</ul>';
+  } else {
+    h += '<p>Nothing stood out as a clear weakness, which is a good sitting. Pick the ' +
+         'lowest line in the table above and go there.</p>';
+  }
+
+  /* ---- the deep dive ---- */
+  var route = DX_ROUTE_NAME_OF(sit.route);
+  h += '<h2>Where the second half went</h2>';
+  if(Object.keys(cells).length){
+    /* Grouped by what happened rather than listed one cell at a time. Four
+       sentences that all begin "stayed at Easier on" is a list a pupil stops
+       reading at the second one. */
+    /* One line per outcome rather than one sentence, because the cells are
+       named in words and some of those names contain a comma and an "and" of
+       their own: "commas for names, yes and no" inside a list joined with
+       "and" produces a sentence nobody can parse. Grouped by outcome so a
+       pupil is not reading "stayed at Easier on" four times. */
+    var by = {};
+    for(k in cells){
+      var c = cells[k], key = (c.top === c.first ? "stayed at " : "reached ") +
+              (LEVEL_LABEL[c.top] || c.top);
+      (by[key] = by[key] || []).push(DX_CELL_NAME[k] || k);
+    }
+    h += '<p>The second half of the questions all went into <b>' + esc(route) +
+         '</b>, because that is where the first half said you would learn the most. ' +
+         'Inside it you:</p><ul>';
+    for(k in by) h += '<li>' + esc(k) + ' on ' + esc(by[k].join("; ")) + '</li>';
+    h += '</ul>';
+    h += '<p class="note">The levels are ' +
+         esc(LEVELS.map(function(l){ return LEVEL_LABEL[l]; }).join(", ")) +
+         '. They move as you go: two wrong takes you down one, three right takes you up one.</p>';
+  } else {
+    h += '<p>No second half was recorded.</p>';
+  }
+
+  /* ---- what was NOT looked at ---- */
+  h += '<h2>What this did not look at</h2><ul>';
+  for(i=0;i<DX_ROUTES.length;i++){
+    if(DX_ROUTES[i].up || DX_ROUTES[i].k === sit.route || !DX_ROUTES[i].cells.length) continue;
+    h += '<li>This only saw <b>' + esc(DX_ROUTES[i].name) + '</b> in the first half, so ' +
+         'it can say how that went and not much about why.</li>';
+  }
+  if(sit.secure)
+    h += '<li>Your foundations came out secure, so the second half should have gone ' +
+         '<b>upward</b> into the harder techniques and the analytical language instead. ' +
+         'Those questions are not written yet, so it went down into the foundations ' +
+         'anyway. Read that part of this report lightly.</li>';
+  h += '<li>Some things are not in this test at all: verbs with helper words like ' +
+       '<i>has finished</i> or <i>was walking</i>, anything beyond the simple past and ' +
+       'simple present, and any sentence about <i>I</i> or <i>you</i>.</li>';
+  h += '</ul>';
+
+  /* ---- progress ---- */
+  if(cmp && cmp.rows.length){
+    h += '<h2>Since last time</h2>';
+    h += '<p>Compared with ' + esc(dxWhen(cmp.prev.at)) + '. Only the first half is ' +
+         'compared: everybody sits the same questions there, so the two numbers mean the ' +
+         'same thing. The second half is chosen for you and changes between sittings, so ' +
+         'comparing it would mostly measure the choosing.</p>';
+    h += '<table class="rep"><tbody>';
+    for(i=0;i<cmp.rows.length;i++){
+      var c = cmp.rows[i];
+      h += dxRow2(dxDomainName(c.dom),
+                  c.d > 0.001 ? "Up" : (c.d < -0.001 ? "Down" : "The same"),
+                  c.wasR + " of " + c.wasN + " then, " + c.nowR + " of " + c.nowN + " now");
+    }
+    h += '</tbody></table>';
+  }
+  return h;
+}
+
+/* ------------------------------------------------------- the teacher half */
+function dxTeacherBody(sit){
+  var groups = dxGroups(sit), cells = dxCells(sit), h = "", k, s, i;
+  h += '<h1 class="tpage">For the teacher</h1>';
+  h += '<p class="meta">' + esc(sit.who || "(no name given)") + ' &middot; ' +
+       esc(dxWhen(sit.at)) + ' &middot; form ' + esc(sit.form || "?") +
+       ' &middot; route ' + esc(sit.route ? DX_ROUTE_NAME_OF(sit.route) : "none") +
+       ' &middot; ' + esc(sit.app || "") + ' / bank ' + esc(sit.bank) + '</p>';
+
+  h += '<h2>Screener, by reporting group</h2>';
+  h += '<table class="rep band"><thead><tr><th>Group</th><th>Band</th><th>Score</th></tr></thead><tbody>';
+  var keys = [];
+  for(k in groups) keys.push(k);
+  keys.sort();
+  for(i=0;i<keys.length;i++){
+    s = dxBand(groups[keys[i]].r, groups[keys[i]].n);
+    h += dxRow2(dxGroupName(keys[i]), s.band, groups[keys[i]].r + " / " + groups[keys[i]].n);
+  }
+  h += '</tbody></table>';
+  h += '<p class="note">A screener group is two to four questions, by design: the blueprint ' +
+       'spends its length on covering everything rather than on settling any one group. ' +
+       'Most groups are therefore too thin to band, and they are here to be RANKED, which ' +
+       'is what picks the two strengths and the two weaknesses. The banded statements worth ' +
+       'quoting are the domain rows in the first half of this report.</p>';
+
+  h += '<h2>Deep dive, by cell</h2>';
+  var ck = [];
+  for(k in cells) ck.push(k);
+  if(ck.length){
+    ck.sort();
+    h += '<table class="rep"><thead><tr><th>Cell</th><th>Levels</th><th>Score</th></tr></thead><tbody>';
+    for(i=0;i<ck.length;i++){
+      s = cells[ck[i]];
+      h += dxRow2(DX_CELL_NAME[ck[i]] || ck[i],
+                  "started " + (LEVEL_LABEL[s.first] || s.first) +
+                  ", ended " + (LEVEL_LABEL[s.last] || s.last) +
+                  ", best " + (LEVEL_LABEL[s.top] || s.top),
+                  s.r + " / " + s.n);
+    }
+    h += '</tbody></table>';
+  } else h += '<p>None recorded.</p>';
+
+  h += '<h2>How the route was chosen</h2><table class="rep"><tbody>';
+  for(i=0;i<DX_ROUTES.length;i++){
+    var R = DX_ROUTES[i], sc = dxScore(dxStage(sit, 1), R.groups);
+    h += dxRow2(dxCap(R.name) + (R.up ? " (upward, not built yet)" : ""),
+                R.k === sit.route ? "TAKEN" : "",
+                Math.round(100 * sc) + "% of its screener questions");
+  }
+  h += '</tbody></table>';
+  h += '<p class="note">The whole deep dive goes to one route, so the other foundations ' +
+       'are screener-only. Splitting it would give several answers too thin to act on.</p>';
+
+  h += '<h2>What this instrument cannot see</h2><ul>' +
+       '<li>Every subject in the verb questions is third person, so it cannot report on ' +
+       '<i>I walks</i> or <i>you walks</i>.</li>' +
+       '<li>No question anywhere shows a verb group of more than one word.</li>' +
+       '<li>The tense scope is the simple present, the simple past and <i>be</i>: no ' +
+       'progressive, no perfect, no negatives and no questions.</li>' +
+       '<li>Paragraph rounds are out of the diagnostic on purpose: one takes a minute ' +
+       'and would spend a twentieth of the test on one data point.</li>' +
+       '</ul>';
+  return h;
+}
+
+/* ------------------------------------------------------------ the styling */
+/* Inlined rather than shared with the app's stylesheet, because the
+   downloaded file has to open anywhere with no network and no app around
+   it. Light on purpose: this gets printed. */
+var DX_REP_CSS =
+  'body{font:16px/1.5 Georgia,serif;color:#111;background:#fff;margin:0;padding:28px;' +
+  'max-width:46em}' +
+  'h1{font-size:1.6rem;margin:0 0 .2em}h2{font-size:1.1rem;margin:1.6em 0 .4em;' +
+  'border-bottom:1px solid #ddd;padding-bottom:.2em}' +
+  '.meta{color:#555;margin:.2em 0 1.2em;font-size:.95rem}' +
+  '.lead{font-size:1.05rem}' +
+  '.note{color:#555;font-size:.9rem}' +
+  'table.rep{border-collapse:collapse;width:100%;margin:.6em 0}' +
+  'table.rep th,table.rep td{border-bottom:1px solid #e3e3e3;padding:.42em .5em;' +
+  'text-align:left;vertical-align:top}' +
+  'table.rep thead th{border-bottom:2px solid #bbb;font-size:.85rem;' +
+  'text-transform:uppercase;letter-spacing:.04em}' +
+  'table.rep td.b{width:10em;font-weight:bold}table.rep td.c{width:13em;color:#555}' +
+  'ul{margin:.4em 0 .8em;padding-left:1.2em}li{margin:.3em 0}' +
+  '.foot{margin-top:2.4em;color:#777;font-size:.85rem;border-top:1px solid #ddd;' +
+  'padding-top:.6em}' +
+  '@media print{body{padding:0;max-width:none;font-size:11.5pt}' +
+  'h1.tpage{page-break-before:always}h2{page-break-after:avoid}' +
+  'table.rep,ul{page-break-inside:avoid}.noprint{display:none}}';
+
+/* ---------------------------------------------------------- the two uses */
+function dxReportHtml(sit){
+  return dxReportBody(sit) + dxTeacherBody(sit) +
+    '<p class="foot">Word Class Commando ' + esc(sit.app || "") +
+    '. Everything here was worked out on the device this was sat on, and nothing ' +
+    'was sent anywhere.</p>';
+}
+
+/* The downloaded file. Self-contained, no network, and it carries the
+   response rows in a block a later sitting can read. The block is the part
+   that cannot be added afterwards: a sitting's rows are the only copy there
+   will ever be of that day (SPEC 70). */
+function dxReportFile(sit){
+  return '<!doctype html>\n<html lang="en"><head><meta charset="utf-8">' +
+    '<meta name="viewport" content="width=device-width,initial-scale=1">' +
+    '<title>' + esc((sit.who || "Diagnostic") + " " + dxWhen(sit.at)) + '</title>' +
+    '<style>' + DX_REP_CSS + '</style></head><body>' +
+    dxReportHtml(sit) +
+    '\n<script type="application/json" id="wcc-dx">\n' +
+    JSON.stringify(sit).replace(/<\//g, "<\\/") +
+    '\n</' + 'script>\n</body></html>\n';
+}
+
+/* ------------------------------------------------------- the two surfaces */
+/* One builder, two destinations. What is on the screen and what is in the
+   file are the same string, so they cannot come to say different things,
+   which is the fault this project has found in a hand-kept list five times. */
+function dxShowReport(sit){
+  DX.rep = sit;
+  el("dxName").value = sit.who || "";
+  dxPaint();
+  /* Somewhere to go next, which the downloaded file cannot offer because it
+     has no app around it. The report names the activity in words either way;
+     on screen it is also a button. */
+  var ends = dxPickEnds(dxGroups(sit)), h = "", i, a;
+  for(i=0;i<ends.weak.length;i++){
+    a = dxGroupAct(ends.weak[i]);
+    if(a) h += '<button class="go" onclick="' + esc(a.go) + '">' + esc(a.label) + '</button> ';
+  }
+  el("dxPractise").innerHTML = h;
+  go("dxRepS");
+}
+
+function dxPaint(){
+  if(DX.rep) el("dxRep").innerHTML = dxReportHtml(DX.rep);
+}
+
+/* The name is stored on the SITTING, not in a profile field, because it is a
+   property of that report and a pupil who hands one in under a nickname has
+   not renamed every report they ever sat. */
+function dxSetName(){
+  if(!DX.rep) return;
+  DX.rep.who = (el("dxName").value || "").slice(0, 40);
+  dxSave(DX.rep);
+  /* Repaint rather than patch the one element that shows it. The first draft
+     updated the student header and left the teacher half saying "(no name
+     given)" on the same page, which is exactly the kind of thing a person
+     notices on a printout and nothing else would. */
+  dxPaint();
+}
+
+function dxFileName(sit){
+  var who = (sit.who || "diagnostic").replace(/[^A-Za-z0-9 _-]/g, "").trim() || "diagnostic";
+  var d = new Date((sit.at || 0) * 1000), p = function(n){ return (n < 10 ? "0" : "") + n; };
+  return who.replace(/\s+/g, "-") + "-" +
+         d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate()) + ".html";
+}
+
+/* Saved with a Blob and an anchor, which every browser this runs on supports
+   and which needs no network. A report that had to be fetched would break the
+   one promise this whole feature makes: results stay on the device. */
+function dxSave1(){
+  if(!DX.rep) return;
+  var blob = new Blob([dxReportFile(DX.rep)], {type:"text/html;charset=utf-8"});
+  var url = URL.createObjectURL(blob), a = document.createElement("a");
+  a.href = url; a.download = dxFileName(DX.rep);
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
 }
 
 
