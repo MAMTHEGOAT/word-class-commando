@@ -188,6 +188,16 @@ body.dx .wbtn.res-miss, body.dx .wbtn.res-part{background:var(--paper);
    mid-run. The Test-mode bar's own rules went at v0.48. */
 .tb-quit{background:transparent;color:var(--dim);border:1px solid var(--line);
   border-radius:8px;padding:6px 11px;font-size:.78rem;min-height:44px}
+/* The Stop confirmation, in the page rather than in a browser dialog (v0.65.1).
+   A native confirm() blocks the event loop, so the timer's interval stops and
+   the number on screen FREEZES until the dialog is dismissed. The clock behind
+   it is wall-clock and keeps running, so the run is not actually extended, but
+   a frozen timer is an invitation: a pupil who believes it pauses will try it,
+   and will tell the rest of the class. It also stops the run ENDING while it is
+   open, because blitzFinish() is called from that same interval. */
+.tb-quit.arm{color:var(--bad);border-color:var(--bad)}
+.tb-keep{background:var(--brass);color:#1a1a1a;border:1px solid var(--brass);
+  border-radius:8px;padding:6px 11px;font-size:.78rem;min-height:44px;margin-left:6px}
 .tb-track{max-width:760px;margin:0 auto;height:4px;background:var(--line);border-radius:3px}
 .tb-fill{height:4px;background:var(--brass);border-radius:3px;transition:width .2s}
 body.testing{padding-bottom:150px}
@@ -885,7 +895,7 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
     <span class="bz-cell"><b id="blitzScore">0</b><span class="bz-lab">score</span></span>
     <span class="bz-cell"><b class="bz-mult" id="blitzMult">x1</b><span class="bz-lab">multiplier</span></span>
     <span class="bz-cell"><b id="blitzChain">0</b><span class="bz-lab">chain</span></span>
-    <button class="tb-quit" onclick="blitzQuit()">Stop</button>
+    <span id="blitzStopWrap"><button class="tb-quit" id="blitzStop" onclick="blitzQuit()">Stop</button></span>
   </div>
   <div class="tb-track"><div class="tb-fill" id="blitzTimeFill" style="width:100%"></div></div>
 </div>
@@ -5007,7 +5017,7 @@ var STAMPMETA = {"fmt":1,"skip":["id","dx"],"strict":["secure","challenge"]};
 /* BANK_REV stays at 37: v0.61 adds no items and retires none. It bumps when the
    banks change, and bumping it for a code change makes every pupil's record run
    the pruner for nothing. */
-var APP = "wcc", VER = "v0.65", BANK_REV = 40;
+var APP = "wcc", VER = "v0.65.1", BANK_REV = 40;
 var BUG_FORM_URL = "";   /* paste the Office 365 form link to switch the report button on */
 
 /* ================= HELD OUT (v0.61, SPEC 72) ================================
@@ -8608,7 +8618,8 @@ var CH_BOARDS = ["ult", "wc", "punc", "tense", "tech", "texp"];
 /* kept for anything that still reads it: the Word classes run length */
 var BLITZ_ACTS = CHALLENGES.wc.cycle;
 
-var B = { on:false, endsAt:0, score:0, chain:0, bestChain:0, board:"wc", secs:BLITZ_SECONDS,
+var B = { arm:false, armT:0,
+          on:false, endsAt:0, score:0, chain:0, bestChain:0, board:"wc", secs:BLITZ_SECONDS,
           step:0, ustep:{}, correct:0, wrong:0, close:0, neutral:0, tick:null, lvlIdx:0 };
 
 function blitzMult(){ return Math.min(MULT_CAP, 1 + Math.floor(B.chain / MULT_STEP)); }
@@ -8704,6 +8715,8 @@ function bzObjs(){
 
 function blitzTick(){
   if(!B.on) return;
+  /* The confirmation is disarmed by the run ending as well as by the pupil,
+     so a run that times out while Stop is armed does not come back armed. */
   var left = Math.max(0, B.endsAt - nowMs());
   el("blitzTime").textContent = (left / 1000).toFixed(1);
   el("blitzTimeFill").style.width = (100 * left / (B.secs * 1000)) + "%";
@@ -8800,6 +8813,9 @@ function blitzServe(act){
 
 function blitzRecord(ok, outcome){
   if(!B.on) return;
+  /* Answering disarms Stop. A pupil who tapped it and then carried on playing
+     must not find that their next tap on it ends the run without asking. */
+  if(B.arm) blitzDisarm();
   if(outcome === "neutral"){
     B.neutral++;                       /* costs nothing, keeps the chain */
   } else if(outcome === "close"){
@@ -8835,6 +8851,7 @@ function flash(kind){
 function blitzFinish(){
   if(!B.on) return;
   B.on = false;
+  if(B.arm) blitzDisarm();
   if(B.tick){ clearInterval(B.tick); B.tick = null; }
   document.body.classList.remove("testing");
   document.body.classList.remove("blitz");
@@ -8903,8 +8920,41 @@ function blitzFinish(){
   go("blitzResult");
 }
 
+/* Stop, in two taps, with the clock never stopping.
+
+   The first tap arms it and puts a second button beside it; the second tap on
+   Stop ends the run. Anything else disarms: pressing Carry on, answering a
+   question, or five seconds going by. The two properties that matter are that
+   the timer keeps ticking throughout and that the run can still END while the
+   confirmation is showing, neither of which a native confirm() allows.
+
+   Measured before the change, on a sixty-second run: opening the dialog and
+   holding it for four seconds froze the display at 58.5 and then jumped it to
+   54.2. The pupil LOST the four seconds. What they gained was a timer that had
+   apparently stopped, which is the part worth removing. */
 function blitzQuit(){
-  if(!confirm("Give up on this run?")) return;
+  if(!B.on) return;
+  if(B.arm){ return blitzStopNow(); }
+  B.arm = true;
+  var s = el("blitzStop");
+  if(s){ s.textContent = "Stop for good"; s.className = "tb-quit arm"; }
+  var w = el("blitzStopWrap");
+  if(w && !el("blitzKeep"))
+    w.insertAdjacentHTML("beforeend",
+      '<button class="tb-keep" id="blitzKeep" onclick="blitzDisarm()">Carry on</button>');
+  if(B.armT) clearTimeout(B.armT);
+  B.armT = setTimeout(blitzDisarm, 5000);
+}
+function blitzDisarm(){
+  B.arm = false;
+  if(B.armT){ clearTimeout(B.armT); B.armT = 0; }
+  var s = el("blitzStop");
+  if(s){ s.textContent = "Stop"; s.className = "tb-quit"; }
+  var k = el("blitzKeep");
+  if(k && k.parentNode) k.parentNode.removeChild(k);
+}
+function blitzStopNow(){
+  blitzDisarm();
   B.endsAt = 0; B.quit = true; blitzFinish();
 }
 
