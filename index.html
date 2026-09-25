@@ -5024,7 +5024,7 @@ var STAMPMETA = {"fmt":1,"skip":["id","dx"],"strict":["secure","challenge"]};
 /* BANK_REV stays at 37: v0.61 adds no items and retires none. It bumps when the
    banks change, and bumping it for a code change makes every pupil's record run
    the pruner for nothing. */
-var APP = "wcc", VER = "v0.68", BANK_REV = 41;
+var APP = "wcc", VER = "v0.69", BANK_REV = 41;
 var BUG_FORM_URL = "";   /* paste the Office 365 form link to switch the report button on */
 
 /* ================= HELD OUT (v0.61, SPEC 72) ================================
@@ -5871,6 +5871,7 @@ var DX_OPEN = {
   klass:  function(){ K.lvl = "all"; startKlass(); },
   cloze:  function(){ C.lvl = "all"; startCloze(); },
   ktname: function(){ startKT("name"); },
+  xf:     function(){ XF.lvl = "all"; XF.type = "all"; startXfer(); },
   tech:   function(){ TQ.lvl = "all"; TQ.tech = "all"; startTech(); },
   ei:     function(){ EIX.mode = "pick"; startEI(); },
   techx:  function(){ TQ.lvl = "all"; TQ.tech = "all"; startTechX(); },
@@ -5889,7 +5890,8 @@ var DX_OPEN = {
    pupil chose without knowing anything about the round. */
 var DX_SCREEN = { one:"play", klass:"klass", cloze:"cloze", ktname:"kt", tech:"tech",
                   ei:"ei", techx:"tech", za:"za", xterm:"xt", vt:"vt", vf:"vf",
-                  punc:"punc", pf:"pf", commas:"commas", aljob:"al", altrue:"al" };
+                  punc:"punc", pf:"pf", commas:"commas", aljob:"al", altrue:"al",
+                  xf:"xf" };
 
 /* ---------------------------------------------------------------- the plan */
 /* Stage one, from the register. A row is [id, group, form, act, level, mode,
@@ -5994,7 +5996,8 @@ function dxEnterStage2(){
   DX.sit.wanted = r.wanted;
   DX.blocks = r.route ? dxBlocks(r.route) : [];
   var start = dxStartLevel(dxScore(DX.sit.rows, r.route ? r.route.groups : []));
-  for(var i=0;i<DX.blocks.length;i++) DX.blocks[i].lvl = start;
+  for(var i=0;i<DX.blocks.length;i++)
+    DX.blocks[i].lvl = dxCellFlat(DX.blocks[i].cell) ? "" : start;
   DX.sit.start = start;
   DX.sit.blocks = [];
   DX.b = 0;
@@ -6271,6 +6274,20 @@ function dxCellPool(cell){
   return n;
 }
 
+/* A FLAT CELL HAS NO LADDER, and which cells are flat is read off the register
+   rather than listed. Naming a marked phrase and Said or suggested? show mode
+   chips and no level chips, and no item in either bank carries a level, so the
+   register's level column is empty for them and the build refuses a cell that
+   mixes the two. The block still asks its questions; what it does not do is
+   move, and the report gives it a score with no level attached rather than
+   inventing one. */
+function dxCellFlat(cell){
+  var i, any = false;
+  for(i=0;i<DEEPREG.length;i++)
+    if(DEEPREG[i][1] === cell){ any = true; if(DEEPREG[i][2]) return false; }
+  return any;
+}
+
 function dxStartLevel(score){
   for(var i=0;i<DX_START.length;i++) if(score < DX_START[i][0]) return DX_START[i][1];
   return "challenge";
@@ -6280,6 +6297,7 @@ function dxStartLevel(score){
    move, so a pupil does not arrive at a level already one answer from
    leaving it. */
 function dxMove(bl, right){
+  if(!bl.lvl) return;                 /* a flat cell has nowhere to move */
   var at = LEVELS.indexOf(bl.lvl);
   if(right){ bl.run++; bl.miss = 0; if(bl.run >= 3 && at < LEVELS.length - 1){
     bl.lvl = LEVELS[at + 1]; bl.run = 0; } }
@@ -6361,7 +6379,7 @@ function dxLeanest(pool, subs){
    so these are the names on the practise menu, written by the build out of the
    app's own ACTIVITY_LIST. One list, two readers: a report that typed its own
    names would be the sixth stale description of this app. */
-var DEEPMETA = {"cells":{"cloze":"Insert the word","commas":"Put the commas in","klass":"Which class fills the gap?","one":"Click the word","pf":"Find it, then fix it","vf":"Put the right tense in","vt":"Spot the tense mistake"},"middle":{"tech":"close","techx":"close","one":"neutral"},"means":{"close":"the right place in the sentence, with the edges drawn wrongly","neutral":"true of the language, but not the thing this round asked for"}};
+var DEEPMETA = {"cells":{"cloze":"Insert the word","commas":"Put the commas in","klass":"Which class fills the gap?","one":"Click the word","pf":"Find it, then fix it","vf":"Put the right tense in","vt":"Spot the tense mistake"},"middle":{"tech":"close","techx":"close","xf":"close","one":"neutral"},"means":{"close":"the right place in the sentence, with the edges drawn wrongly","neutral":"true of the language, but not the thing this round asked for"}};
 var DX_CELL_NAME = DEEPMETA.cells || {};
 /* Which rounds end in something other than right or wrong, and what that
    something means, written by the build from the same table the assembler
@@ -6544,6 +6562,7 @@ function dxRow2(label, band, count){
    to themselves and 4/6 is not. */
 function dxCellLine(cell, s){
   var name = DX_CELL_NAME[cell] || cell;
+  if(!s.top) return s.r + " of " + s.n + " on " + name;   /* a flat cell */
   var top = LEVEL_LABEL[s.top] || s.top, first = LEVEL_LABEL[s.first] || s.first;
   if(s.top === s.first)
     return "stayed at " + first + " on " + name;
@@ -6632,17 +6651,33 @@ function dxReportBody(sit){
        their own: "commas for names, yes and no" inside a list joined with
        "and" produces a sentence nobody can parse. Grouped by outcome so a
        pupil is not reading "stayed at Easier on" four times. */
-    var by = {};
+    var by = {}, flat = [];
     for(k in cells){
-      var c = cells[k], key = (c.top === c.first ? "stayed at " : "reached ") +
-              (LEVEL_LABEL[c.top] || c.top);
+      var c = cells[k];
+      /* A FLAT CELL HAS NO LEVEL TO REPORT. Two of the rounds the deep dive
+         uses have none: they ask what KIND of question to answer rather than
+         how hard it should be. Grouping them under "stayed at" would print a
+         level the activity does not have. */
+      if(!c.top){ flat.push(DX_CELL_NAME[k] || k); continue; }
+      var key = (c.top === c.first ? "stayed at " : "reached ") +
+                (LEVEL_LABEL[c.top] || c.top);
       (by[key] = by[key] || []).push(DX_CELL_NAME[k] || k);
     }
     h += '<p>The second half of the questions all went into <b>' + esc(route) +
          '</b>, because that is where the first half said you would learn the most. ' +
          'Inside it you:</p><ul>';
     for(k in by) h += '<li>' + esc(k) + ' on ' + esc(by[k].join("; ")) + '</li>';
+    for(i=0;i<flat.length;i++){
+      var fk = "", fj;
+      for(fj in cells) if((DX_CELL_NAME[fj] || fj) === flat[i]) fk = fj;
+      h += '<li>answered ' + cells[fk].r + ' of ' + cells[fk].n + ' on ' + esc(flat[i]) +
+           '</li>';
+    }
     h += '</ul>';
+    if(flat.length)
+      h += '<p class="note">' + esc(dxList(flat)) + (flat.length === 1 ? ' has' : ' have') +
+           ' no easier and harder settings, so there is no level to report on ' +
+           (flat.length === 1 ? 'it' : 'them') + ', only how many you got right.</p>';
     h += '<p class="note">The levels are ' +
          esc(LEVELS.map(function(l){ return LEVEL_LABEL[l]; }).join(", ")) +
          '. They move as you go: two wrong takes you down one, three right takes you up one.</p>';
@@ -6753,9 +6788,10 @@ function dxTeacherBody(sit){
     for(i=0;i<ck.length;i++){
       s = cells[ck[i]];
       h += dxRow2(DX_CELL_NAME[ck[i]] || ck[i],
-                  "started " + (LEVEL_LABEL[s.first] || s.first) +
-                  ", ended " + (LEVEL_LABEL[s.last] || s.last) +
-                  ", best " + (LEVEL_LABEL[s.top] || s.top),
+                  s.top ? ("started " + (LEVEL_LABEL[s.first] || s.first) +
+                           ", ended " + (LEVEL_LABEL[s.last] || s.last) +
+                           ", best " + (LEVEL_LABEL[s.top] || s.top))
+                        : "no levels in this activity",
                   s.r + " / " + s.n);
     }
     h += '</tbody></table>';
@@ -13578,12 +13614,21 @@ function validate(){
         E.push("diagnostic: cell "+DX_ROUTES[i].cells[j2]+" is in two routes.");
       inroute[DX_ROUTES[i].cells[j2]] = DX_ROUTES[i].k;
     }
-  var percell = {};
+  var percell = {}, cellLvl = {};
   for(i=0;i<DEEPREG.length;i++){
     percell[DEEPREG[i][1]] = (percell[DEEPREG[i][1]] || 0) + 1;
     if(!inroute[DEEPREG[i][1]])
       E.push("diagnostic: cell "+DEEPREG[i][1]+" has questions in it and no route reaches them.");
+    /* A cell either has levels or has none. Half a ladder means the runner
+       moves a pupil to a rung some of the cell's questions cannot be on, and
+       the report prints the move. The build gates this too: one rule, two
+       readers, and this is the half that runs in front of a pupil. */
+    (cellLvl[DEEPREG[i][1]] = cellLvl[DEEPREG[i][1]] || {})[DEEPREG[i][2] ? "y" : "n"] = 1;
   }
+  for(var cl in cellLvl)
+    if(cellLvl[cl].y && cellLvl[cl].n)
+      E.push("diagnostic: some questions in the "+cl+" cell carry a level and some do not, "+
+             "so the cell has half a ladder.");
   /* And a route must be able to fill a deep dive WITHOUT emptying a cell, or
      the length stops being fixed and the weakest pupil sits the shortest test.
      Counted at the cap the blocks actually use (DX_VARY), not at the raw pool
