@@ -116,3 +116,12 @@ wcc-v*.tgz
 # Screener blind-gate material (v0.61): rendered from the app, read by reviewers
 dxrender.py
 dx-review-*.md
+
+# Deep-dive sources and review material (v0.62): authoring, not site. Same
+# reason as the screener's above, and named here because the pattern lists that
+# cover build_*.py and *test*.py do not reach a bare `dx_deep.py`.
+dx_deep.py
+dx-deep-*.md
+
+# Student feedback plans (v0.62): a working document, kept beside the app
+FEEDBACK-PLAN.md
