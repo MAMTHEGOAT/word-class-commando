@@ -5076,7 +5076,7 @@ var STAMPMETA = {"fmt":1,"skip":["id","dx"],"strict":["secure","challenge"]};
 /* BANK_REV stays at 37: v0.61 adds no items and retires none. It bumps when the
    banks change, and bumping it for a code change makes every pupil's record run
    the pruner for nothing. */
-var APP = "wcc", VER = "v0.69", BANK_REV = 41;
+var APP = "wcc", VER = "v0.71", BANK_REV = 41;
 var BUG_FORM_URL = "";   /* paste the Office 365 form link to switch the report button on */
 
 /* ================= HELD OUT (v0.61, SPEC 72) ================================
@@ -6153,8 +6153,15 @@ function dxRecord(ok, outcome){
   DX.i++;
   /* A short pause, so a pupil sees their own tap land before the screen
      changes. Long enough to feel deliberate, short enough that nobody
-     reads anything into it. */
-  DX.wait = setTimeout(dxServe, 450);
+     reads anything into it.
+
+     NAMED, so the harness can set it to nothing (v0.71). A whole diagnostic is
+     58 questions, so at 450 each a suite that sits two of them spends 52
+     seconds of its minute waiting for this one number, which was a fifth of
+     the entire test run. Nothing asserted its value, which is why `dxruntest`
+     now pins the default: a constant a test is free to change is a constant
+     nobody is checking. */
+  DX.wait = setTimeout(dxServe, DX_PAUSE);
 }
 
 /* Which wrong option was chosen, read from the screen rather than passed in
@@ -6252,6 +6259,10 @@ var DX_SECURE = 0.8;
 /* Where a block starts. The screener has already measured this domain, so
    starting every block in the middle would spend the first two questions
    finding out what stage one has just been told. */
+/* The pause between a diagnostic answer landing and the next question. See
+   dxRecord. The harness sets it to 0; the default is what a pupil meets. */
+var DX_PAUSE = 450;
+
 var DX_START = [[0.34, "foundation"], [0.67, "developing"], [0.90, "secure"], [2, "challenge"]];
 
 function dxScore(rows, groups){
@@ -7846,10 +7857,33 @@ function famLine(fam){
 var WORKER = "https://wcc-board.mamthegoat.workers.dev";
 var NET_TIMEOUT = 6000;
 
+/* THE SERVICE IS NOT CALLED FROM file:// UNLESS ASKED (v0.71).
+
+   Measured 2026-09-26: a full build, test and render cycle made about 378 live
+   round trips to the worker, because every page load asks it for the cycle and
+   forty-two suites plus the review renderer load the page. From Thailand that
+   is minutes per run at a normal round trip and, at NET_TIMEOUT above, most of
+   an hour. None of those loads is testing the service.
+
+   The live site is served over https, so this changes nothing a pupil meets:
+   the guard is false there. What it changes is a page opened straight off the
+   disk, which is a developer or a test, and which now shows the board as
+   unreachable rather than waiting for it. That state already exists and is
+   already supported, because SPEC 19.1 requires the app to work completely
+   with the service unreachable.
+
+   A suite that IS testing the service sets `window.WCC_NET` before the page
+   runs, which the six suites that stub `fetch` do. `serve.ps1` serves over
+   http, so nothing about Michael's usual local check changes either. */
+function netOn(){
+  return location.protocol !== "file:" || !!window.WCC_NET;
+}
+
 /** fetch with a timeout that NEVER rejects. Returns null on any failure at all,
  *  so every caller has exactly one thing to handle. */
 function netPost(path, body, headers){
   return new Promise(function(resolve){
+    if(!netOn()) return resolve(null);
     var done = false;
     var timer = setTimeout(function(){ if(!done){ done = true; resolve(null); } }, NET_TIMEOUT);
     try{
@@ -7865,6 +7899,7 @@ function netPost(path, body, headers){
 }
 function netGet(path){
   return new Promise(function(resolve){
+    if(!netOn()) return resolve(null);
     var done = false;
     var timer = setTimeout(function(){ if(!done){ done = true; resolve(null); } }, NET_TIMEOUT);
     try{
