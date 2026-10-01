@@ -700,10 +700,20 @@ function plant(when, nick, score, board, cls) {
 }
 
 await test("the cycle is where Michael says it is", async () => {
-  /* Wednesday 23 September 2026, noon in Phuket. Michael: week B, day 8. */
+  /* Wednesday 23 September 2026, noon in Phuket. Michael: week B, day 8.
+     THE CLOCK IS FROZEN, and it was not until v0.72. The test asked /cycle
+     with the real clock and asserted that the answer was cycle 1, which was
+     true when it was written on 25 September and false from 28 September, when
+     the first fortnight ended and `currentCycle` quite correctly rolled
+     forward. A test about a date has to say which date it means; asserting a
+     stored boundary against the wall clock is the v0.58 lesson committed in a
+     test rather than in the worker. */
   const now = Date.UTC(2026, 8, 23, 5, 0, 0) / 1000;
+  const real = Date.now;
+  Date.now = () => now * 1000;
   plant(now, "Anchor", 1);
   const r = await req("/cycle");
+  Date.now = real;
   const b = await r.json();
   check("day 1 is the Monday Michael named", b.start === ANCHOR,
         b.start + " vs " + ANCHOR);
@@ -714,7 +724,18 @@ await test("the cycle is where Michael says it is", async () => {
 });
 
 await test("week and day are read from the cycle, not from the calendar", async () => {
-  await req("/cycle");                              // create cycle 1
+  /* Cycle 1 is created with the clock already in it (v0.72). It used to be
+     created with the REAL clock, which from 28 September rolled the table
+     forward to a cycle starting AFTER every row below, and `currentCycle`
+     returns only the latest row, so every frozen past moment was placed
+     against a future cycle and came back with no week and no day. The six
+     assertions below are about the timetable; they were failing on a fixture. */
+  {
+    const real = Date.now;
+    Date.now = () => Date.UTC(2026, 8, 14, 5);
+    await req("/cycle");                            // create cycle 1
+    Date.now = real;
+  }
   const rows = [
     [Date.UTC(2026, 8, 14, 5), "A", 1],             // Mon, week A
     [Date.UTC(2026, 8, 18, 5), "A", 5],             // Fri, week A
