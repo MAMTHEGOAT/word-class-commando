@@ -148,6 +148,7 @@ body.dx .learnlink,
 body.dx .ref,
 body.dx .lvl,
 body.dx .chips:not(.opts),
+body.dx .lbl.pick,
 body.dx .sub,
 body.dx h2{display:none !important}
 
@@ -731,9 +732,9 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
 <!-- ============================= PLAY ============================= -->
 <section id="play" class="screen">
   <div class="topbar"><button class="back"></button><button class="tomenu" onclick="go('splash')">Menu</button><img alt="" class="tb-logo"></div>
-  <p class="lbl">Word class</p>
+  <p class="lbl pick">Word class</p>
   <div class="chips" id="classChips"></div>
-  <p class="lbl">Level</p>
+  <p class="lbl pick">Level</p>
   <div class="chips" id="levelChips"></div>
 
   <div id="poolWarn"></div>
@@ -764,7 +765,7 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
 <!-- ========================= WHERE DOES IT FIT ===================== -->
 <section id="frames" class="screen">
   <div class="topbar"><button class="back"></button><button class="tomenu" onclick="go('splash')">Menu</button><img alt="" class="tb-logo"></div>
-  <p class="lbl">Level</p>
+  <p class="lbl pick">Level</p>
   <div class="chips" id="frLevels"></div>
   <p class="prompt">Which gap does this word fit?</p>
   <div class="bigword" id="frWord"></div>
@@ -783,7 +784,7 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
 <!-- ============================ YES OR NO ========================== -->
 <section id="yesno" class="screen">
   <div class="topbar"><button class="back"></button><button class="tomenu" onclick="go('splash')">Menu</button><img alt="" class="tb-logo"></div>
-  <p class="lbl">Word class</p>
+  <p class="lbl pick">Word class</p>
   <div class="chips" id="ynClass"></div>
   <div class="ynbar">
     <span>Streak <b id="ynStreak">0</b></span>
@@ -807,7 +808,7 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
 <!-- ========================== INSERT THE WORD ====================== -->
 <section id="cloze" class="screen">
   <div class="topbar"><button class="back"></button><button class="tomenu" onclick="go('splash')">Menu</button><img alt="" class="tb-logo"></div>
-  <p class="lbl">Level</p>
+  <p class="lbl pick">Level</p>
   <div class="chips" id="czLevels"></div>
   <p class="prompt">Which word fills the gap?</p>
   <div class="sent" id="czSent"></div>
@@ -844,7 +845,7 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
      teacher has approved it.</p>
   <div class="chips bd-scope" id="boardScope"></div>
   <div class="chips bd-tabs" id="boardTabs"></div>
-  <p class="lbl" id="bdYearLbl" style="display:none">Year group</p>
+  <p class="lbl pick" id="bdYearLbl" style="display:none">Year group</p>
   <div class="chips bd-years" id="boardYears"></div>
   <div id="boardBody"></div>
   <div class="bar" style="margin-top:18px">
@@ -1002,7 +1003,7 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
 <!-- =================== WHICH CLASS FILLS THE GAP? =================== -->
 <section id="klass" class="screen">
   <div class="topbar"><button class="back"></button><button class="tomenu" onclick="go('splash')">Menu</button><img alt="" class="tb-logo"></div>
-  <p class="lbl">Level</p>
+  <p class="lbl pick">Level</p>
   <div class="chips" id="kLevels"></div>
   <p class="prompt">Which word class fills the gap?</p>
   <div class="sent" id="kSent"></div>
@@ -1021,7 +1022,7 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
 <!-- ========================== CHANGE THE WORD ====================== -->
 <section id="trans" class="screen">
   <div class="topbar"><button class="back"></button><button class="tomenu" onclick="go('splash')">Menu</button><img alt="" class="tb-logo"></div>
-  <p class="lbl">Level</p>
+  <p class="lbl pick">Level</p>
   <div class="chips" id="trLevels"></div>
   <p class="prompt" id="trPrompt"></p>
   <div class="bigword" id="trWord"></div>
@@ -1040,7 +1041,7 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
 <!-- ===================== SAME WORD DIFFERENT JOB =================== -->
 <section id="shift" class="screen">
   <div class="topbar"><button class="back"></button><button class="tomenu" onclick="go('splash')">Menu</button><img alt="" class="tb-logo"></div>
-  <p class="lbl">Level</p>
+  <p class="lbl pick">Level</p>
   <div class="chips" id="shLevels"></div>
   <p class="prompt" id="shPrompt"></p>
   <div class="pair">
@@ -1069,9 +1070,9 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
 <!-- =========================== TECHNIQUES ========================= -->
 <section id="tech" class="screen">
   <div class="topbar"><button class="back"></button><button class="tomenu" onclick="go('splash')">Menu</button><img alt="" class="tb-logo"></div>
-  <p class="lbl" id="tqTitle">SOAPMAPS</p>
+  <p class="lbl pick" id="tqTitle">SOAPMAPS</p>
   <div class="chips" id="tqTechs"></div>
-  <p class="lbl">Level</p>
+  <p class="lbl pick">Level</p>
   <div class="chips" id="tqLevels"></div>
   <p class="step" id="tqStep" style="display:none"></p>
   <p class="prompt" id="tqPrompt"></p>
@@ -1099,9 +1100,9 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
 <!-- ===================== VERB TENSES (SPEC 44) ===================== -->
 <section id="vt" class="screen">
   <div class="topbar"><button class="back"></button><button class="tomenu" onclick="go('splash')">Menu</button><img alt="" class="tb-logo"></div>
-  <p class="lbl">What kind</p>
+  <p class="lbl pick">What kind</p>
   <div class="chips" id="vtTypes"></div>
-  <p class="lbl">Level</p>
+  <p class="lbl pick">Level</p>
   <div class="chips" id="vtLevels"></div>
   <p class="prompt" id="vtPrompt"></p>
   <div class="sent" id="vtSent"></div>
@@ -1118,7 +1119,7 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
 
 <section id="pp" class="screen">
   <div class="topbar"><button class="back"></button><button class="tomenu" onclick="go('splash')">Menu</button><img alt="" class="tb-logo"></div>
-  <p class="lbl">Level</p>
+  <p class="lbl pick">Level</p>
   <div class="chips" id="ppLevels"></div>
   <p class="prompt" id="ppPrompt"></p>
   <div class="sent vpara" id="ppSent"></div>
@@ -1135,7 +1136,7 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
 
 <section id="vp" class="screen">
   <div class="topbar"><button class="back"></button><button class="tomenu" onclick="go('splash')">Menu</button><img alt="" class="tb-logo"></div>
-  <p class="lbl">Level</p>
+  <p class="lbl pick">Level</p>
   <div class="chips" id="vpLevels"></div>
   <p class="prompt" id="vpPrompt"></p>
   <div class="sent vpara" id="vpSent"></div>
@@ -1159,9 +1160,9 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
 
 <section id="vf" class="screen">
   <div class="topbar"><button class="back"></button><button class="tomenu" onclick="go('splash')">Menu</button><img alt="" class="tb-logo"></div>
-  <p class="lbl">What kind</p>
+  <p class="lbl pick">What kind</p>
   <div class="chips" id="vfTypes"></div>
-  <p class="lbl">Level</p>
+  <p class="lbl pick">Level</p>
   <div class="chips" id="vfLevels"></div>
   <p class="prompt" id="vfPrompt"></p>
   <div class="sent" id="vfSent"></div>
@@ -1177,9 +1178,9 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
 <!-- ================= WHAT TRANSFERS (SPEC 41) ====================== -->
 <section id="xf" class="screen">
   <div class="topbar"><button class="back"></button><button class="tomenu" onclick="go('splash')">Menu</button><img alt="" class="tb-logo"></div>
-  <p class="lbl">What kind</p>
+  <p class="lbl pick">What kind</p>
   <div class="chips" id="xfTypes"></div>
-  <p class="lbl">Level</p>
+  <p class="lbl pick">Level</p>
   <div class="chips" id="xfLevels"></div>
   <p class="prompt" id="xfPrompt"></p>
   <div class="sent" id="xfSent"></div>
@@ -1277,7 +1278,7 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
 
 <section id="kt" class="screen">
   <div class="topbar"><button class="back"></button><button class="tomenu" onclick="go('splash')">Menu</button><img alt="" class="tb-logo"></div>
-  <p class="lbl">What to practise</p>
+  <p class="lbl pick">What to practise</p>
   <div class="chips" id="ktModes"></div>
   <p class="small dim">New to these? <button class="linkbtn" onclick="go('aalearn')">The techniques explained</button></p>
   <p class="prompt" id="ktPrompt"></p>
@@ -1295,7 +1296,7 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
 
 <section id="ei" class="screen">
   <div class="topbar"><button class="back"></button><button class="tomenu" onclick="go('splash')">Menu</button><img alt="" class="tb-logo"></div>
-  <p class="lbl">What to practise</p>
+  <p class="lbl pick">What to practise</p>
   <div class="chips" id="eiModes"></div>
   <details class="aa-theory">
     <summary>Said or suggested: the difference (tap to read)</summary>
@@ -1334,9 +1335,9 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
 
 <section id="al" class="screen">
   <div class="topbar"><button class="back"></button><button class="tomenu" onclick="go('splash')">Menu</button><img alt="" class="tb-logo"></div>
-  <p class="lbl">What to practise</p>
+  <p class="lbl pick">What to practise</p>
   <div class="chips" id="alModes"></div>
-  <p class="lbl">Level</p>
+  <p class="lbl pick">Level</p>
   <div class="chips" id="alLevels"></div>
   <p class="small dim">New to these? <button class="linkbtn" onclick="showALLearn()">Better than shows</button></p>
   <div class="aa-stmt" id="alExtract" style="display:none"></div>
@@ -1368,7 +1369,7 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
 
 <section id="sf" class="screen">
   <div class="topbar"><button class="back"></button><button class="tomenu" onclick="go('splash')">Menu</button><img alt="" class="tb-logo"></div>
-  <p class="lbl">Level</p>
+  <p class="lbl pick">Level</p>
   <div class="chips" id="sfLevels"></div>
   <p class="prompt" id="sfPrompt"></p>
   <div class="sent" id="sfSent"></div>
@@ -1386,7 +1387,7 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
 <!-- ============ ZOOMORPHISM OR ANTHROPOMORPHISM (SPEC 40) ========== -->
 <section id="za" class="screen">
   <div class="topbar"><button class="back"></button><button class="tomenu" onclick="go('splash')">Menu</button><img alt="" class="tb-logo"></div>
-  <p class="lbl">Level</p>
+  <p class="lbl pick">Level</p>
   <div class="chips" id="zaLevels"></div>
   <p class="prompt" id="zaPrompt"></p>
   <div class="sent" id="zaSent"></div>
@@ -1402,10 +1403,10 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
 <!-- ========================== PUNCTUATION ========================= -->
 <section id="punc" class="screen">
   <div class="topbar"><button class="back"></button><button class="tomenu" onclick="go('splash')">Menu</button><img alt="" class="tb-logo"></div>
-  <p class="lbl">Mistake type</p>
+  <p class="lbl pick">Mistake type</p>
   <div class="chips" id="pnTypes"></div>
   <p class="small dim" id="pnAsks"></p>
-  <p class="lbl">Level</p>
+  <p class="lbl pick">Level</p>
   <div class="chips" id="pnLevels"></div>
   <p class="prompt" id="pnPrompt"></p>
   <div class="sent" id="pnSent"></div>
@@ -1423,10 +1424,10 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
 <!-- ===================== PUNCTUATION: find it, fix it ================ -->
 <section id="pf" class="screen">
   <div class="topbar"><button class="back"></button><button class="tomenu" onclick="go('splash')">Menu</button><img alt="" class="tb-logo"></div>
-  <p class="lbl">Mistake type</p>
+  <p class="lbl pick">Mistake type</p>
   <div class="chips" id="pfTypes"></div>
   <p class="small dim" id="pfAsks"></p>
-  <p class="lbl">Level</p>
+  <p class="lbl pick">Level</p>
   <div class="chips" id="pfLevels"></div>
   <p class="prompt" id="pfPrompt"></p>
   <div class="sent" id="pfSent"></div>
@@ -1448,9 +1449,9 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
 <section id="commas" class="screen">
   <div class="topbar"><button class="back" id="cmBack"></button><button class="tomenu" onclick="go('splash')">Menu</button><img alt="" class="tb-logo"></div>
   <div class="rulecard" id="cmRule" style="display:none"></div>
-  <p class="lbl" id="cmTypesLbl">Comma job</p>
+  <p class="lbl pick" id="cmTypesLbl">Comma job</p>
   <div class="chips" id="cmTypes"></div>
-  <p class="lbl">Level</p>
+  <p class="lbl pick">Level</p>
   <div class="chips" id="cmLevels"></div>
   <p class="prompt" id="cmPrompt"></p>
   <div class="sent cgapline" id="cmSent"></div>
@@ -1477,7 +1478,7 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
 <section id="cs" class="screen">
   <div class="topbar"><button class="back"></button><button class="tomenu" onclick="go('splash')">Menu</button><img alt="" class="tb-logo"></div>
   <div class="rulecard" id="csRule"></div>
-  <p class="lbl">Level</p>
+  <p class="lbl pick">Level</p>
   <div class="chips" id="csLevels"></div>
   <p class="prompt">What goes in the gap: a <b>comma</b> or a <b>full stop</b>?</p>
   <div class="sent" id="csSent"></div>
@@ -3152,14 +3153,14 @@ var PUNCT = [
 {"id":"wc-pn002","level":"foundation","type":"cap","words":["My","friend","sarah","lives","next","door."],"err":2,"fixed":"My friend Sarah lives next door.","why":"A person's name is a proper noun, so it takes a capital letter.","fix":["friend Sarah lives","Friend Sarah lives","Friend sarah lives"],"sub":"cap","fams":["cap"]},
 {"id":"wc-pn003","level":"foundation","type":"cap","words":["We","visited","london","in","the","summer."],"err":2,"fixed":"We visited London in the summer.","why":"The name of a place is a proper noun, so it takes a capital letter.","fix":["London in the summer","London in the Summer","london in the Summer"],"sub":"cap","fams":["cap"]},
 {"id":"wc-pn004","level":"foundation","type":"cap","words":["The","shop","closed","early.","we","walked","home","instead."],"err":4,"fixed":"The shop closed early. We walked home instead.","why":"A new sentence starts with a capital letter, even a short one.","fix":["early. We walked","early, we walked","early. We Walked"],"sub":"cap","fams":["cap"]},
-{"id":"wc-pn005","level":"developing","type":"cap","words":["On","monday","the","whole","class","went","swimming."],"err":1,"fixed":"On Monday the whole class went swimming.","why":"Days of the week are proper nouns and take a capital letter.","fix":["On Monday the whole class","On monday, the whole class","On Monday the Whole Class"],"sub":"cap","fams":["cap"]},
+{"id":"wc-pn005","level":"developing","type":"cap","words":["On","monday","the","whole","class","went","swimming."],"err":1,"fixed":"On Monday the whole class went swimming.","why":"Days of the week are proper nouns and take a capital letter.","fix":["On Monday the whole class","on monday the whole class","On Monday the Whole Class"],"sub":"cap","fams":["cap"]},
 {"id":"wc-pn006","level":"developing","type":"cap","words":["She","reads","books","by","charles","Dickens","every","winter."],"err":4,"fixed":"She reads books by Charles Dickens every winter.","why":"Both parts of a person's name take a capital letter.","fix":["by Charles Dickens every winter","by Charles Dickens every Winter","By Charles Dickens every winter"],"sub":"cap","fams":["cap"]},
-{"id":"wc-pn007","level":"developing","type":"cap","words":["Our","teacher","asked","whether","i","had","finished","the","work."],"err":4,"fixed":"Our teacher asked whether I had finished the work.","why":"The word I is always a capital letter, wherever it sits in the sentence.","fix":["whether I had finished","Whether I had finished","whether I Had Finished"],"sub":"cap","fams":["cap"]},
-{"id":"wc-pn008","level":"developing","type":"cap","words":["In","Egypt","the","nile","is","longer","than","most","people","expect."],"err":3,"fixed":"In Egypt the Nile is longer than most people expect.","why":"The name of a particular river is a proper noun and takes a capital.","fix":["the Nile is longer","The Nile is longer","the Nile Is Longer"],"sub":"cap","fams":["cap"]},
+{"id":"wc-pn007","level":"developing","type":"cap","words":["Our","teacher","asked","whether","i","had","finished","the","work."],"err":4,"fixed":"Our teacher asked whether I had finished the work.","why":"The word I is always a capital letter, wherever it sits in the sentence.","fix":["whether I had finished","Whether i had finished","whether I Had Finished"],"sub":"cap","fams":["cap"]},
+{"id":"wc-pn008","level":"developing","type":"cap","words":["In","Egypt","the","nile","is","longer","than","most","people","expect."],"err":3,"fixed":"In Egypt the Nile is longer than most people expect.","why":"The name of a particular river is a proper noun and takes a capital.","fix":["the Nile is longer","The nile is longer","the Nile Is Longer"],"sub":"cap","fams":["cap"]},
 {"id":"wc-pn009","level":"secure","type":"cap","words":["The","team","flew","to","japan","for","the","championship."],"err":4,"fixed":"The team flew to Japan for the championship.","why":"Countries are proper nouns and take a capital letter.","fix":["to Japan for the championship","to japan for the Championship","To Japan for the championship"],"sub":"cap","fams":["cap"]},
 {"id":"wc-pn010","level":"secure","type":"cap","words":["He","speaks","french","at","home","and","English","at","school."],"err":2,"fixed":"He speaks French at home and English at school.","why":"Languages take a capital letter, which is why English already has one here.","fix":["speaks French at home","Speaks French at home","speaks french At home"],"sub":"cap","fams":["cap"]},
 {"id":"wc-pn011","level":"secure","type":"cap","words":["The","festival","happens","every","april","in","the","old","square."],"err":4,"fixed":"The festival happens every April in the old square.","why":"Months take a capital letter. Seasons like summer do not.","fix":["every April in the old square","Every april in the old square","every April In the old square"],"sub":"cap","fams":["cap"]},
-{"id":"wc-pn012","level":"secure","type":"cap","words":["She","joined","the","royal","Thai","Navy","after","leaving","school."],"err":3,"fixed":"She joined the Royal Thai Navy after leaving school.","why":"Every important word in the name of an organisation takes a capital.","fix":["joined the Royal Thai Navy after","joined The Royal Thai Navy after","Joined the Royal Thai Navy after"],"sub":"cap","fams":["cap"]},
+{"id":"wc-pn012","level":"secure","type":"cap","words":["She","joined","the","royal","Thai","Navy","after","leaving","school."],"err":3,"fixed":"She joined the Royal Thai Navy after leaving school.","why":"Every important word in the name of an organisation takes a capital.","fix":["joined the Royal Thai Navy after","joined the royal thai Navy after","Joined the Royal Thai Navy after"],"sub":"cap","fams":["cap"]},
 {"id":"wc-pn013","level":"challenge","type":"cap","words":["We","studied","the","second","World","War","for","a","whole","term."],"err":3,"fixed":"We studied the Second World War for a whole term.","why":"The whole name of a historical event takes capitals, not just part of it.","fix":["studied the Second World War","studied The Second World War","Studied the second World War"],"sub":"cap","fams":["cap"]},
 {"id":"wc-pn014","level":"challenge","type":"cap","words":["The","book","was","published","by","oxford","University","Press."],"err":5,"fixed":"The book was published by Oxford University Press.","why":"Every important word in the name of a company takes a capital.","fix":["by Oxford University Press","By Oxford University Press","by oxford university Press"],"sub":"cap","fams":["cap"]},
 {"id":"wc-pn015","level":"challenge","type":"cap","words":["Many","people","celebrate","diwali","with","lights","and","sweets."],"err":3,"fixed":"Many people celebrate Diwali with lights and sweets.","why":"The names of festivals are proper nouns and take a capital letter.","fix":["celebrate Diwali with lights","Celebrate diwali with lights","celebrate Diwali With Lights"],"sub":"cap","fams":["cap"]},
@@ -3229,16 +3230,16 @@ var PUNCT = [
 {"id":"wc-pn079","level":"challenge","type":"comma","words":["The","building,","once","a","school","is","now","a","library."],"err":4,"fixed":"The building, once a school, is now a library.","why":"The dropped-in description needs closing off with a second comma.","fix":["once a school, is now a library","once, a school is now a library","once a school is now, a library"],"sub":"comma","fams":["comma"]},
 {"id":"wc-pn080","level":"challenge","type":"comma","words":["The","passengers,","tired","and","hungry","after","a","long","night","were","finally","let","through."],"err":8,"fixed":"The passengers, tired and hungry after a long night, were finally let through.","why":"A dropped-in description is closed off at both ends.","fix":["a long night, were finally","a long, night were finally","a long night were, finally"],"sub":"comma","fams":["comma"]},
 {"id":"wc-pn081","level":"foundation","type":"speech","words":["\"Come","here","now\"","said","Mum."],"err":2,"fixed":"\"Come here now,\" said Mum.","why":"A comma closes the speech before the speech marks shut.","fix":["\"Come here now,\" said","\"Come here now\", said","\"Come here now.\" said"],"sub":"speech","fams":["speech"]},
-{"id":"wc-pn082","level":"foundation","type":"speech","words":["\"where","are","you","going?\"","asked","Dad."],"err":0,"fixed":"\"Where are you going?\" asked Dad.","why":"Speech starts with a capital letter, just like a sentence.","fix":["\"Where are you going?\" asked","\"Where are you going\"? asked","\"Where are you going,\" asked"],"sub":"speech","fams":["speech"]},
-{"id":"wc-pn083","level":"foundation","type":"speech","words":["Sam","shouted,","\"stop","that","noise!\""],"err":2,"fixed":"Sam shouted, \"Stop that noise!\"","why":"The first word inside the speech marks takes a capital letter.","fix":["shouted, \"Stop that noise!\"","shouted, \"Stop that noise\"!","shouted, \"Stop, that noise!\""],"sub":"speech","fams":["speech"]},
-{"id":"wc-pn084","level":"foundation","type":"speech","words":["Mum","called,","\"dinner","is","ready.\""],"err":2,"fixed":"Mum called, \"Dinner is ready.\"","why":"Speech begins with a capital letter.","fix":["called, \"Dinner is ready.\"","called, \"Dinner is ready\".","called, \"Dinner, is ready.\""],"sub":"speech","fams":["speech"]},
+{"id":"wc-pn082","level":"foundation","type":"speech","words":["\"where","are","you","going?\"","asked","Dad."],"err":0,"fixed":"\"Where are you going?\" asked Dad.","why":"Speech starts with a capital letter, just like a sentence.","fix":["\"Where are you going?\" asked","\"where are you going?\" Asked","\"Where are you going,\" asked"],"sub":"speech","fams":["speech"]},
+{"id":"wc-pn083","level":"foundation","type":"speech","words":["Sam","shouted,","\"stop","that","noise!\""],"err":2,"fixed":"Sam shouted, \"Stop that noise!\"","why":"The first word inside the speech marks takes a capital letter.","fix":["shouted, \"Stop that noise!\"","Shouted, \"stop that noise!\"","shouted, \"Stop, that noise!\""],"sub":"speech","fams":["speech"]},
+{"id":"wc-pn084","level":"foundation","type":"speech","words":["Mum","called,","\"dinner","is","ready.\""],"err":2,"fixed":"Mum called, \"Dinner is ready.\"","why":"Speech begins with a capital letter.","fix":["called, \"Dinner is ready.\"","Called, \"dinner is ready.\"","called, \"Dinner, is ready.\""],"sub":"speech","fams":["speech"]},
 {"id":"wc-pn085","level":"developing","type":"speech","words":["\"I","have","finished","my","work.\"","said","Ravi."],"err":4,"fixed":"\"I have finished my work,\" said Ravi.","why":"When said follows, the speech closes with a comma rather than a full stop.","fix":["\"I have finished my work,\" said","\"I have finished my work\", said","\"I have finished my work,\" Said"],"sub":"speech","fams":["speech"]},
 {"id":"wc-pn086","level":"developing","type":"speech","words":["The","coach","said","\"We","will","train","on","Saturday.\""],"err":2,"fixed":"The coach said, \"We will train on Saturday.\"","why":"A comma goes after the reporting words, before the speech marks open.","fix":["said, \"We will","said, \"we will","said. \"We will"],"sub":"speech","fams":["speech"]},
 {"id":"wc-pn087","level":"developing","type":"speech","words":["\"Be","careful","on","the","steps\"","warned","the","lifeguard."],"err":4,"fixed":"\"Be careful on the steps,\" warned the lifeguard.","why":"A comma closes the speech before the speech marks shut.","fix":["\"Be careful on the steps,\" warned","\"Be careful on the steps\", warned","\"Be careful on the steps.\" warned"],"sub":"speech","fams":["speech"]},
 {"id":"wc-pn088","level":"developing","type":"speech","words":["\"Is","anyone","there.\"","she","whispered."],"err":2,"fixed":"\"Is anyone there?\" she whispered.","why":"The speech is a question, so it closes with a question mark.","fix":["\"Is anyone there?\" she","\"Is anyone there\"? she","\"Is anyone there,\" she"],"sub":"speech","fams":["speech"]},
 {"id":"wc-pn089","level":"secure","type":"speech","words":["\"If","the","bus","is","late,","we","will","wait\"","said","the","guide."],"err":7,"fixed":"\"If the bus is late, we will wait,\" said the guide.","why":"When the speech comes first, a comma goes inside the speech marks before the reporting words.","fix":["we will wait,\" said","we will wait\", said","we will wait.\" said"],"sub":"speech","fams":["speech"]},
 {"id":"wc-pn090","level":"secure","type":"speech","words":["\"I","told","you\"","he","said,","\"that","it","would","rain.\""],"err":2,"fixed":"\"I told you,\" he said, \"that it would rain.\"","why":"The first half of the speech closes with a comma before the speech marks shut.","fix":["\"I told you,\" he said","\"I told you\", he said","\"I told you.\" he said"],"sub":"speech","fams":["speech"]},
-{"id":"wc-pn091","level":"secure","type":"speech","words":["The","notice","said,","\"no","dogs","on","the","beach.\""],"err":3,"fixed":"The notice said, \"No dogs on the beach.\"","why":"The first word inside the speech marks takes a capital letter.","fix":["said, \"No dogs","said. \"No dogs","said \"no dogs"],"sub":"speech","fams":["speech"]},
+{"id":"wc-pn091","level":"secure","type":"speech","words":["The","notice","said,","\"no","dogs","on","the","beach.\""],"err":3,"fixed":"The notice said, \"No dogs on the beach.\"","why":"The first word inside the speech marks takes a capital letter.","fix":["said, \"No dogs","Said, \"no dogs","said \"no dogs"],"sub":"speech","fams":["speech"]},
 {"id":"wc-pn092","level":"secure","type":"speech","words":["\"Did","you","hear","that,\"","asked","Nina."],"err":3,"fixed":"\"Did you hear that?\" asked Nina.","why":"The speech is a question, so it closes with a question mark and not a comma.","fix":["\"Did you hear that?\" asked","\"Did you hear that\"? asked","\"Did you hear that.\" asked"],"sub":"speech","fams":["speech"]},
 {"id":"wc-pn093","level":"challenge","type":"speech","words":["\"The","train,\"","announced","the","guard.","\"will","be","delayed.\""],"err":4,"fixed":"\"The train,\" announced the guard, \"will be delayed.\"","why":"The speech is one sentence split in two, so a comma follows the reporting words.","fix":["announced the guard, \"will","announced the guard, \"Will","announced the guard \"will"],"sub":"speech","fams":["speech"]},
 {"id":"wc-pn094","level":"challenge","type":"speech","words":["\"Stop","right","there\"","shouted","the","officer."],"err":2,"fixed":"\"Stop right there,\" shouted the officer.","why":"A comma closes the speech before the speech marks shut.","fix":["\"Stop right there,\" shouted","\"Stop right there\", shouted","\"Stop right there.\" shouted"],"sub":"speech","fams":["speech"]},
@@ -3251,7 +3252,7 @@ var PUNCT = [
 {"id":"wc-pn101","level":"secure","type":"cap","words":["We","study","french","and","geography","on","Tuesdays."],"err":2,"fixed":"We study French and geography on Tuesdays.","why":"A language takes a capital letter, even though a subject like geography does not.","fix":["study French and geography","study French and Geography","Study french and geography"],"sub":"cap","fams":["cap"]},
 {"id":"wc-pn102","level":"secure","type":"cap","words":["We","walked","along","the","thames","after","school."],"err":4,"fixed":"We walked along the Thames after school.","why":"The name of a river is a proper noun, so it takes a capital letter.","fix":["along the Thames after school","along the thames after School","Along the Thames after school"],"sub":"cap","fams":["cap"]},
 {"id":"wc-pn103","level":"challenge","type":"cap","words":["Our","teacher,","mrs","Patel,","marked","all","the","books."],"err":2,"fixed":"Our teacher, Mrs Patel, marked all the books.","why":"A title used with a name is part of that name, so it takes a capital letter.","fix":["teacher, Mrs Patel, marked","Teacher, Mrs Patel, marked","teacher, mrs Patel, Marked"],"sub":"cap","fams":["cap"]},
-{"id":"wc-pn104","level":"challenge","type":"cap","words":["He","has","supported","manchester","United","since","he","was","six."],"err":3,"fixed":"He has supported Manchester United since he was six.","why":"The name of a team is a proper noun, and both of its words take capitals.","fix":["supported Manchester United since","Supported Manchester United since","supported Manchester United Since"],"sub":"cap","fams":["cap"]},
+{"id":"wc-pn104","level":"challenge","type":"cap","words":["He","has","supported","manchester","United","since","he","was","six."],"err":3,"fixed":"He has supported Manchester United since he was six.","why":"The name of a team is a proper noun, and both of its words take capitals.","fix":["supported Manchester United since","supported manchester united since","supported Manchester United Since"],"sub":"cap","fams":["cap"]},
 {"id":"wc-pn105","level":"foundation","type":"end","words":["How","many","people","came","to","the","show."],"err":6,"fixed":"How many people came to the show?","why":"This asks something, so it ends with a question mark rather than a full stop.","fix":["came to the show?","came, to the show?","came to the show,"],"sub":"end.which","fams":["question"]},
 {"id":"wc-pn106","level":"foundation","type":"end","words":["She","picked","up","her","coat.","and","left","the","room."],"err":4,"fixed":"She picked up her coat and left the room.","why":"What comes after the full stop is not a sentence, so the stop arrives too early.","fix":["coat and left","coat. And left","coat And left"],"sub":"end.where","fams":["fullstop"]},
 {"id":"wc-pn107","level":"developing","type":"end","words":["We","waited","at","the","gate.","until","the","rain","stopped."],"err":4,"fixed":"We waited at the gate until the rain stopped.","why":"Until the rain stopped cannot stand on its own, so the full stop does not belong there.","fix":["gate until the rain","gate. Until the rain","gate; until the rain"],"sub":"end.where","fams":["fullstop"]},
@@ -3285,18 +3286,18 @@ var PUNCT = [
 {"id":"wc-pn135","level":"challenge","type":"splice","words":["The","evidence","against","the","company","was","thin","and","full","of","gaps,","the","committee","published","it","anyway."],"err":10,"fixed":"The evidence against the company was thin and full of gaps. The committee published it anyway.","why":"Two complete sentences sit either side of that comma, so it should be a full stop.","fix":["gaps. The committee","gaps the committee","gaps, The committee"],"sub":"splice","fams":["fullstop","comma"]},
 {"id":"wc-pn136","level":"challenge","type":"splice","words":["Nobody","had","asked","the","students","about","the","new","playground,","the","teachers","had","made","every","decision."],"err":8,"fixed":"Nobody had asked the students about the new playground. The teachers had made every decision.","why":"Each half could stand alone however long it is, which is exactly what makes the comma wrong.","fix":["playground. The teachers","playground the teachers","playground, The teachers"],"sub":"splice","fams":["fullstop","comma"]},
 {"id":"wc-pn137","level":"foundation","type":"speech","words":["\"Wait","for","me","here\"","said","Ben."],"err":3,"fixed":"\"Wait for me here,\" said Ben.","why":"A comma closes the speech before the speech marks shut.","fix":["\"Wait for me here,\" said","\"Wait for me here\", said","\"Wait for me here.\" said"],"sub":"speech","fams":["speech"]},
-{"id":"wc-pn138","level":"foundation","type":"speech","words":["Mum","called,","\"dinner","is","ready!\""],"err":2,"fixed":"Mum called, \"Dinner is ready!\"","why":"The first word inside the speech marks takes a capital letter.","fix":["called, \"Dinner is ready!\"","called, \"Dinner is ready\"!","called, \"Dinner, is ready!\""],"sub":"speech","fams":["speech"]},
+{"id":"wc-pn138","level":"foundation","type":"speech","words":["Mum","called,","\"dinner","is","ready!\""],"err":2,"fixed":"Mum called, \"Dinner is ready!\"","why":"The first word inside the speech marks takes a capital letter.","fix":["called, \"Dinner is ready!\"","Called, \"dinner is ready!\"","called, \"Dinner, is ready!\""],"sub":"speech","fams":["speech"]},
 {"id":"wc-pn139","level":"developing","type":"speech","words":["\"Have","you","seen","my","bag\"","asked","Priya."],"err":4,"fixed":"\"Have you seen my bag?\" asked Priya.","why":"A spoken question keeps its question mark inside the speech marks.","fix":["\"Have you seen my bag?\" asked","\"Have you seen my bag\"? asked","\"Have you seen my bag,\" asked"],"sub":"speech","fams":["speech"]},
 {"id":"wc-pn140","level":"developing","type":"speech","words":["The","driver","said","\"We","leave","in","five","minutes.\""],"err":2,"fixed":"The driver said, \"We leave in five minutes.\"","why":"A comma goes after the reporting verb, before the speech marks open.","fix":["said, \"We leave","said, \"we leave","said. \"We leave"],"sub":"speech","fams":["speech"]},
 {"id":"wc-pn141","level":"secure","type":"speech","words":["\"I","am","not","going\",","he","said","quietly."],"err":3,"fixed":"\"I am not going,\" he said quietly.","why":"The comma belongs inside the speech marks, not after them.","fix":["\"I am not going,\" he said","\"I am not going.\" he said","\"I am not going,\" He said"],"sub":"speech","fams":["speech"]},
-{"id":"wc-pn142","level":"secure","type":"speech","words":["\"Put","those","down!\"","Shouted","the","caretaker."],"err":3,"fixed":"\"Put those down!\" shouted the caretaker.","why":"Shouted carries on the same sentence, so it does not take a capital letter.","fix":["\"Put those down!\" shouted","\"Put those down\"! shouted","\"Put those down!\", shouted"],"sub":"speech","fams":["speech"]},
+{"id":"wc-pn142","level":"secure","type":"speech","words":["\"Put","those","down!\"","Shouted","the","caretaker."],"err":3,"fixed":"\"Put those down!\" shouted the caretaker.","why":"Shouted carries on the same sentence, so it does not take a capital letter.","fix":["\"Put those down!\" shouted","\"put those down!\" Shouted","\"Put those down!\", shouted"],"sub":"speech","fams":["speech"]},
 {"id":"wc-pn143","level":"challenge","type":"speech","words":["\"We","could","wait\",","she","said,","\"or","we","could","walk.\""],"err":2,"fixed":"\"We could wait,\" she said, \"or we could walk.\"","why":"The comma closing the first half of the speech sits inside the speech marks.","fix":["\"We could wait,\" she said","\"We could wait.\" she said","\"We could wait,\" She said"],"sub":"speech","fams":["speech"]},
 {"id":"wc-pn144","level":"challenge","type":"speech","words":["\"Nobody","told","me\"","the","caretaker","said,","folding","his","arms."],"err":2,"fixed":"\"Nobody told me,\" the caretaker said, folding his arms.","why":"Speech that carries on into he said or she said is closed with a comma inside the marks.","fix":["\"Nobody told me,\" the caretaker","\"Nobody told me\", the caretaker","\"Nobody told me.\" the caretaker"],"sub":"speech","fams":["speech"]},
 {"id":"wc-pn145","level":"foundation","type":"cap","words":["We","went","to","the","market","on","friday","afternoon."],"err":6,"fixed":"We went to the market on Friday afternoon.","why":"Days of the week are proper nouns, so they take a capital letter.","fix":["on Friday afternoon","on friday Afternoon","On friday afternoon"],"sub":"cap","fams":["cap"],"dx":true},
 {"id":"wc-pn146","level":"developing","type":"apos","words":["One","teachers","car","would","not","start","again."],"err":1,"fixed":"One teacher's car would not start again.","why":"The car belongs to one teacher, so teacher takes an apostrophe and then an s.","fix":["One teacher's car","One teachers' car","One teacher's Car"],"sub":"apos","fams":["apos"],"dx":true},
 {"id":"wc-pn147","level":"developing","type":"apos","words":["Somebody","had","taken","the","boys","football","at","lunchtime."],"err":4,"fixed":"Somebody had taken the boys' football at lunchtime.","why":"The football belongs to more than one boy, so the apostrophe goes after the s.","fix":["the boys' football","the boy's football","the boys football'"],"sub":"apos","fams":["apos"],"dx":true},
 {"id":"wc-pn148","level":"foundation","type":"cap","words":["My","cousin","is","learning","to","speak","japanese","at","school."],"err":6,"fixed":"My cousin is learning to speak Japanese at school.","why":"The name of a language is a proper noun, so it takes a capital letter.","fix":["speak Japanese at","speak japanese At","Speak japanese at"],"sub":"cap","fams":["cap"],"dx":true},
-{"id":"wc-pn149","level":"secure","type":"speech","words":["The","guard","shouted,","\"stand","back","from","the","doors!\""],"err":3,"fixed":"The guard shouted, \"Stand back from the doors!\"","why":"The first word inside the speech marks starts with a capital letter.","fix":["\"Stand back","\"STAND back","shouted \"Stand back"],"sub":"speech","fams":["speech"],"dx":true},
+{"id":"wc-pn149","level":"secure","type":"speech","words":["The","guard","shouted,","\"stand","back","from","the","doors!\""],"err":3,"fixed":"The guard shouted, \"Stand back from the doors!\"","why":"The first word inside the speech marks starts with a capital letter.","fix":["\"Stand back","\"stand Back","shouted \"Stand back"],"sub":"speech","fams":["speech"],"dx":true},
 {"id":"wc-pn150","level":"challenge","type":"speech","words":["The","steward","said,","\"the","gate","closes","in","ten","minutes.\""],"err":3,"fixed":"The steward said, \"The gate closes in ten minutes.\"","why":"The first word inside the speech marks starts with a capital letter.","fix":["\"The gate closes","\"the Gate closes","said \"The gate closes"],"sub":"speech","fams":["speech"],"dx":true},
 {"id":"wc-pn151","level":"foundation","type":"cap","words":["The","lights","went","out.","nobody","moved","for","a","moment."],"err":4,"fixed":"The lights went out. Nobody moved for a moment.","why":"A new sentence starts with a capital letter.","fix":["out. Nobody moved","out. nobody Moved","Out. nobody moved"],"sub":"cap","fams":["cap"],"dx":true},
 {"id":"wc-pn152","level":"foundation","type":"cap","words":["My","best","friend","is","called","ravi."],"err":5,"fixed":"My best friend is called Ravi.","why":"A person's name is a proper noun, so it takes a capital letter.","fix":["is called Ravi","Is called Ravi","is Called Ravi"],"sub":"cap","fams":["cap"],"dx":true},
@@ -3354,10 +3355,38 @@ var PUNCT = [
 {"id":"wc-pn204","level":"secure","type":"end","words":["Has","anybody","worked","out","where","the","noise","was","coming","from"],"err":9,"fixed":"Has anybody worked out where the noise was coming from?","why":"Has anybody asks something, so the sentence is a question even though where sits inside it.","fix":["coming from?","coming from.","coming, from?"],"sub":"end.which","fams":["question"]},
 {"id":"wc-pn205","level":"challenge","type":"end","words":["Did","the","inspector","ever","say","why","the","alarm","had","failed"],"err":9,"fixed":"Did the inspector ever say why the alarm had failed?","why":"Did the inspector say asks something, so this is a question even though it carries a reporting verb and why.","fix":["alarm had failed?","alarm had failed.","alarm, had failed?"],"sub":"end.which","fams":["question"]},
 {"id":"wc-pn206","level":"challenge","type":"end","words":["Is","there","any","way","of","telling","which","of","the","two","keys","fits"],"err":11,"fixed":"Is there any way of telling which of the two keys fits?","why":"Is there asks something, so the sentence is a question even though which sits inside it.","fix":["two keys fits?","two keys fits.","two keys, fits?"],"sub":"end.which","fams":["question"]},
-{"id":"wc-pn207","level":"challenge","type":"end","words":["How","the","fire","started","was","never","explained"],"err":6,"fixed":"How the fire started was never explained.","why":"How the fire started is the subject of this sentence rather than a question being asked, so it takes a full stop.","fix":["never explained.","never explained?","never, explained."],"sub":"end.which","fams":["fullstop"]}
+{"id":"wc-pn207","level":"challenge","type":"end","words":["How","the","fire","started","was","never","explained"],"err":6,"fixed":"How the fire started was never explained.","why":"How the fire started is the subject of this sentence rather than a question being asked, so it takes a full stop.","fix":["never explained.","never explained?","never, explained."],"sub":"end.which","fams":["fullstop"]},
+{"id":"wc-pn208","level":"challenge","type":"cap","words":["The","library","is","named","after","Nelson","mandela","and","opened","last","year."],"err":6,"fixed":"The library is named after Nelson Mandela and opened last year.","why":"Each part of a person's name takes a capital, so a family name needs one as much as a first name does.","fix":["after Nelson Mandela and opened","after nelson Mandela and opened","after nelson mandela and opened"],"sub":"cap","fams":["cap"]},
+{"id":"wc-pn209","level":"challenge","type":"cap","words":["We","sailed","out","across","the","South","China","sea","before","dawn."],"err":7,"fixed":"We sailed out across the South China Sea before dawn.","why":"Sea is part of the name here, so it takes a capital. A sea with no name does not.","fix":["the South China Sea before","the south China Sea before","The South China Sea Before"],"sub":"cap","fams":["cap"]},
+{"id":"wc-pn210","level":"challenge","type":"cap","words":["The","letter","was","signed","by","Professor","adebayo","himself."],"err":6,"fixed":"The letter was signed by Professor Adebayo himself.","why":"A title and the name after it make one name, so Professor Adebayo takes two capitals. On its own, the professor takes none.","fix":["by Professor Adebayo himself","by professor Adebayo himself","by professor adebayo himself"],"sub":"cap","fams":["cap"]},
+{"id":"wc-pn211","level":"challenge","type":"cap","words":["The","whole","school","celebrates","songkran","in","April."],"err":4,"fixed":"The whole school celebrates Songkran in April.","why":"Songkran names one particular festival rather than a kind of event, so it takes a capital in the way April does.","fix":["celebrates Songkran in April","celebrates Songkran in april","Celebrates Songkran In April"],"sub":"cap","fams":["cap"]},
+{"id":"wc-pn212","level":"challenge","type":"cap","words":["The","restaurant","serves","thai","food","and","Italian","pizza."],"err":3,"fixed":"The restaurant serves Thai food and Italian pizza.","why":"A word made from a country's name keeps its capital, which is why Italian has one here.","fix":["serves Thai food and Italian","serves thai food and italian","Serves Thai Food And Italian"],"sub":"cap","fams":["cap"]},
+{"id":"wc-pn213","level":"challenge","type":"cap","words":["We","waited","outside","the","Hospital","in","Patong","for","nearly","an","hour."],"err":4,"fixed":"We waited outside the hospital in Patong for nearly an hour.","why":"Hospital is the ordinary word for a kind of building rather than the name of one, so it takes no capital. Patong is a name, so it keeps one.","fix":["the hospital in Patong","the Hospital in patong","The Hospital In Patong"],"sub":"cap","fams":["cap"]},
+{"id":"wc-pn214","level":"challenge","type":"cap","words":["The","garden","looks","best","in","Spring,","just","before","Songkran."],"err":5,"fixed":"The garden looks best in spring, just before Songkran.","why":"Seasons take no capital letter, although months and days of the week do.","fix":["best in spring, just","best in Spring, Just","Best In Spring, just"],"sub":"cap","fams":["cap"]},
+{"id":"wc-pn215","level":"challenge","type":"cap","words":["She","volunteers","for","the","red","Cross","at","weekends."],"err":4,"fixed":"She volunteers for the Red Cross at weekends.","why":"Red is part of the organisation's name, so it takes a capital. The word the in front of it is not part of the name.","fix":["the Red Cross at weekends","the red cross at weekends","The Red Cross At Weekends"],"sub":"cap","fams":["cap"]},
+{"id":"wc-pn216","level":"challenge","type":"cap","words":["He","left","his","Bicycle","outside","the","library","in","Phuket."],"err":3,"fixed":"He left his bicycle outside the library in Phuket.","why":"Bicycle is an ordinary noun, so it takes no capital in the middle of a sentence. Phuket is a name, so it keeps one.","fix":["his bicycle outside the","his Bicycle Outside the","His Bicycle Outside The"],"sub":"cap","fams":["cap"]},
+{"id":"wc-pn217","level":"challenge","type":"cap","words":["The","Doctor","examined","her","knee","before","Mrs","Chen","arrived."],"err":1,"fixed":"The doctor examined her knee before Mrs Chen arrived.","why":"Doctor takes a capital when it is part of a name, as Mrs Chen shows. Here it is simply the word for a job.","fix":["The doctor examined her","the Doctor examined her","The Doctor Examined Her"],"sub":"cap","fams":["cap"]},
+{"id":"wc-pn218","level":"secure","type":"cap","words":["Was","the","gate","still","locked?","everyone","had","gone","home."],"err":5,"fixed":"Was the gate still locked? Everyone had gone home.","why":"The question mark ends the sentence here, so the next word starts a new one and takes a capital.","fix":["locked? Everyone had gone","Locked? everyone had gone","Locked? Everyone Had Gone"],"sub":"cap","fams":["cap"]},
+{"id":"wc-pn219","level":"challenge","type":"cap","words":["The","museum","is","closed","until","the","end","of","ramadan."],"err":8,"fixed":"The museum is closed until the end of Ramadan.","why":"Ramadan names one particular month rather than a kind of month, so it takes a capital in the way March does.","fix":["the end of Ramadan","the End of ramadan","The End Of Ramadan"],"sub":"cap","fams":["cap"]},
+{"id":"wc-pn220","level":"challenge","type":"cap","words":["It","was","a","very","Important","meeting","about","the","trip","to","Krabi."],"err":4,"fixed":"It was a very important meeting about the trip to Krabi.","why":"A capital letter does not make a word louder or more serious. Important is an ordinary adjective here.","fix":["a very important meeting","a Very Important meeting","A Very Important Meeting"],"sub":"cap","fams":["cap"]},
+{"id":"wc-pn221","level":"challenge","type":"cap","words":["They","walked","along","the","River","until","they","reached","Ban","Don."],"err":4,"fixed":"They walked along the river until they reached Ban Don.","why":"River is the ordinary word for a kind of waterway rather than the name of one. The Mekong is a name, so that would take a capital.","fix":["along the river until","along The River until","Along The River Until"],"sub":"cap","fams":["cap"]},
+{"id":"wc-pn222","level":"challenge","type":"cap","words":["The","bus","was","late,","Because","the","road","to","Kata","was","flooded."],"err":4,"fixed":"The bus was late, because the road to Kata was flooded.","why":"A comma does not end a sentence, and because cannot begin one on its own, so it carries on with a small letter.","fix":["late, because the road","Late, Because the road","late, Because The Road"],"sub":"cap","fams":["cap"]},
+{"id":"wc-pn223","level":"challenge","type":"cap","words":["My","Uncle","drove","us","to","the","airport","in","Phuket."],"err":1,"fixed":"My uncle drove us to the airport in Phuket.","why":"Uncle takes a capital when it is used as a name, as in Uncle Somchai. Here it is simply the word for a relative.","fix":["My uncle drove us","my Uncle drove us","My Uncle Drove Us"],"sub":"cap","fams":["cap"]},
+{"id":"wc-pn224","level":"challenge","type":"cap","words":["We","studied","the","Poem","by","Wordsworth","for","a","whole","week."],"err":3,"fixed":"We studied the poem by Wordsworth for a whole week.","why":"Poem is an ordinary noun. The title of the poem would take capitals, but the word poem does not.","fix":["the poem by Wordsworth","the Poem by wordsworth","The Poem By Wordsworth"],"sub":"cap","fams":["cap"]},
+{"id":"wc-pn225","level":"challenge","type":"cap","words":["We","drove","North","for","two","hours","before","reaching","Surat","Thani."],"err":2,"fixed":"We drove north for two hours before reaching Surat Thani.","why":"North takes a capital when it names a region, as in North America. Used as a direction it is an ordinary word.","fix":["drove north for two","Drove North for two","Drove North For Two"],"sub":"cap","fams":["cap"]},
+{"id":"wc-pn226","level":"foundation","type":"cap","words":["We","bought","some","Apples","at","the","market","in","Phuket."],"err":3,"fixed":"We bought some apples at the market in Phuket.","why":"Apples is an ordinary noun, so it takes no capital in the middle of a sentence. Phuket is a place name, so it keeps one.","fix":["some apples at the","some Apples At the","Some Apples At The"],"sub":"cap","fams":["cap"]},
+{"id":"wc-pn227","level":"foundation","type":"cap","words":["My","sister","plays","Football","every","Saturday."],"err":3,"fixed":"My sister plays football every Saturday.","why":"Football is an ordinary noun. Saturday is the name of a day, which is why that one keeps its capital.","fix":["plays football every Saturday","plays Football every saturday","Plays Football Every Saturday"],"sub":"cap","fams":["cap"]},
+{"id":"wc-pn228","level":"foundation","type":"cap","words":["The","Teacher","gave","Nina","a","new","book."],"err":1,"fixed":"The teacher gave Nina a new book.","why":"Teacher is an ordinary noun here. Nina is a name, so that one keeps its capital.","fix":["The teacher gave Nina","the Teacher gave Nina","The Teacher Gave Nina"],"sub":"cap","fams":["cap"]},
+{"id":"wc-pn229","level":"foundation","type":"cap","words":["I","saw","a","big","Dog","outside","the","shop","in","Kata."],"err":4,"fixed":"I saw a big dog outside the shop in Kata.","why":"Dog is an ordinary noun, so it takes no capital in the middle of a sentence. Kata is a name, so that one does.","fix":["a big dog outside","a Big Dog outside","A Big Dog Outside"],"sub":"cap","fams":["cap"]},
+{"id":"wc-pn230","level":"developing","type":"cap","words":["We","walked","past","the","Market","on","our","way","to","Patong."],"err":4,"fixed":"We walked past the market on our way to Patong.","why":"Market is an ordinary noun, so it takes no capital. Patong is a name, so that one does.","fix":["past the market on","past The Market on","Past The Market On"],"sub":"cap","fams":["cap"]},
+{"id":"wc-pn231","level":"developing","type":"cap","words":["She","wore","a","red","Hat","to","the","party","on","Sunday."],"err":4,"fixed":"She wore a red hat to the party on Sunday.","why":"Hat is an ordinary noun. Sunday is the name of a day, so that one keeps its capital.","fix":["a red hat to","a Red Hat to","A Red Hat To"],"sub":"cap","fams":["cap"]},
+{"id":"wc-pn232","level":"developing","type":"cap","words":["The","Train","to","Bangkok","was","full","that","morning."],"err":1,"fixed":"The train to Bangkok was full that morning.","why":"Train is an ordinary noun. Bangkok is a name, so that one keeps its capital.","fix":["The train to Bangkok","the Train to Bangkok","The Train To Bangkok"],"sub":"cap","fams":["cap"]},
+{"id":"wc-pn233","level":"secure","type":"cap","words":["He","is","learning","to","play","the","Piano","with","Mr","Lim."],"err":6,"fixed":"He is learning to play the piano with Mr Lim.","why":"Piano is an ordinary noun. Mr Lim is a name, so that keeps its capitals.","fix":["the piano with Mr","the Piano with mr","The Piano With Mr"],"sub":"cap","fams":["cap"]},
+{"id":"wc-pn234","level":"secure","type":"cap","words":["The","letter","arrived","on","the","last","Day","of","term."],"err":6,"fixed":"The letter arrived on the last day of term.","why":"Day is an ordinary noun. Only the name of a particular day, such as Monday, takes a capital.","fix":["the last day of","the Last Day of","The Last Day Of"],"sub":"cap","fams":["cap"]},
+{"id":"wc-pn235","level":"secure","type":"cap","words":["My","Mother","works","at","the","hospital","in","Phuket","Town."],"err":1,"fixed":"My mother works at the hospital in Phuket Town.","why":"Mother takes a capital when it is used as a name, as in Ask Mother to come. Here it is simply the word for a relative.","fix":["My mother works at","my Mother works at","My Mother Works At"],"sub":"cap","fams":["cap"]}
 /* >>> APPEND NEW PUNCTUATION ABOVE THIS LINE >>> */
 ];
-var PUNCMETA = {"types":{"cap":"Capital letters","end":"Full stops and question marks","apos":"Apostrophes","splice":"Joining two sentences","comma":"Commas","speech":"Speech punctuation"},"order":["cap","end","apos","comma","splice","speech"],"asks":{"cap":"Which words in this sentence need a capital letter?","end":"Does this sentence ask something or tell you something, and is this really where it ends? A group of words that cannot stand alone is not a sentence, however it is punctuated.","apos":"Does this word need an apostrophe, and where does it go?","splice":"Is a comma strong enough to hold these two halves together?","comma":"Does this sentence need a comma, and is it in the right place?","speech":"Where do the marks go around what somebody said?"},"tells":{"cap":["One word here needs a capital letter, or has one it should not have.","Tap that word."],"end":["One sentence here ends in the wrong place, or with the wrong mark.","Tap the word carrying the mistake."],"apos":["One word here needs an apostrophe, has one it does not need, or has one in the wrong place.","Tap that word."],"splice":["Two sentences here have been joined with a mark too weak to hold them.","Tap the word where they join."],"comma":["One place in this sentence has a comma missing, or a comma it does not need.","Tap the word carrying the mistake."],"speech":["The punctuation around what somebody said has gone wrong in one place.","Tap the word carrying the mistake."]},"fams":[{"id":"fullstop","name":"Full stops","sel":["end.where","end.stop","splice"],"why":null},{"id":"comma","name":"Commas","sel":["comma","splice"],"why":null},{"id":"semi","name":"Semicolons","sel":[],"why":"Not written yet, and wanted: Michael ruled on 2026-10-02 that the various uses of the semicolon are to be taught, because the exam boards count it as complex punctuation and it lifts a writing mark. What SPEC 35 refuses is one ROUND SHAPE, asking which mark fills a gap between two independent clauses, where a comma, a semicolon, a colon and a full stop are frequently all correct. Four other shapes were drafted and blind-read; three survive, with three gates derived from what the readers counted. The design, the evidence and the order to build it in are SPEC 87."},{"id":"question","name":"Question marks","sel":["end.ask"],"why":null},{"id":"cap","name":"Capital letters","sel":["cap"],"why":null},{"id":"apos","name":"Apostrophes","sel":["apos"],"why":null},{"id":"speech","name":"Speech punctuation","sel":["speech"],"why":null},{"id":"combined","name":"Everything at once","sel":["para.mixed"],"why":null}]};
+var PUNCMETA = {"types":{"cap":"Capital letters","end":"Full stops and question marks","apos":"Apostrophes","splice":"Joining two sentences","comma":"Commas","speech":"Speech punctuation"},"order":["cap","end","apos","comma","splice","speech"],"asks":{"cap":"Which words in this sentence need a capital letter?","end":"Does this sentence ask something or tell you something, and is this really where it ends? A group of words that cannot stand alone is not a sentence, however it is punctuated.","apos":"Does this word need an apostrophe, and where does it go?","splice":"Is a comma strong enough to hold these two halves together?","comma":"Does this sentence need a comma, and is it in the right place?","speech":"Where do the marks go around what somebody said?"},"tells":{"cap":["One word here needs a capital letter, or has one it should not have.","Tap that word."],"end":["One sentence here ends in the wrong place, or with the wrong mark.","Tap the word carrying the mistake."],"apos":["One word here needs an apostrophe, has one it does not need, or has one in the wrong place.","Tap that word."],"splice":["Two sentences here have been joined with a mark too weak to hold them.","Tap the word where they join."],"comma":["One place in this sentence has a comma missing, or a comma it does not need.","Tap the word carrying the mistake."],"speech":["The punctuation around what somebody said has gone wrong in one place.","Tap the word carrying the mistake."]},"fams":[{"id":"fullstop","name":"Full stops","sel":["end.where","end.stop","splice"],"why":null},{"id":"comma","name":"Commas","sel":["comma","splice"],"why":null},{"id":"semi","name":"Semicolons","sel":[],"why":"Not written yet, wanted, and PARKED. Michael ruled on 2026-10-02 that the various uses of the semicolon are to be taught, because the exam boards count it as complex punctuation and it lifts a writing mark. A first design was drafted and blind-read, and he parked it as too narrow: it tested the semicolon against the round shapes this app already has, which is the wrong question, when a new activity is allowed and the platform is not fixed. The readers' findings on the twenty-eight drafted items stand as evidence; the verdicts do not. SPEC 87 carries both, with the brief for whoever picks it up."},{"id":"question","name":"Question marks","sel":["end.ask"],"why":null},{"id":"cap","name":"Capital letters","sel":["cap"],"why":null},{"id":"apos","name":"Apostrophes","sel":["apos"],"why":null},{"id":"speech","name":"Speech punctuation","sel":["speech"],"why":null},{"id":"combined","name":"Everything at once","sel":["para.mixed"],"why":null}]};
 var YNMETA = {"buckets":{"noun:f":786,"noun:y":524,"noun:c":872,"verb:f":823,"verb:c":995,"verb:y":466,"adv:f":356,"adv:c":440,"adv:y":179,"adj:f":371,"adj:y":243,"adj:c":531},"total":6586};
 /* >>> BANK:PUNCTUATION END >>> */
 
@@ -6126,7 +6155,7 @@ var STAMPMETA = {"fmt":1,"skip":["id","dx"],"strict":["secure","challenge"]};
 /* BANK_REV stays at 37: v0.61 adds no items and retires none. It bumps when the
    banks change, and bumping it for a code change makes every pupil's record run
    the pruner for nothing. */
-var APP = "wcc", VER = "v0.75.1", BANK_REV = 41;
+var APP = "wcc", VER = "v0.75.2", BANK_REV = 41;
 var BUG_FORM_URL = "";   /* paste the Office 365 form link to switch the report button on */
 
 /* ================= HELD OUT (v0.61, SPEC 72) ================================
