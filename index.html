@@ -3317,6 +3317,7 @@ var PUNCT = [
 /* >>> APPEND NEW PUNCTUATION ABOVE THIS LINE >>> */
 ];
 var PUNCMETA = {"types":{"cap":"Capital letters","end":"Full stops and question marks","apos":"Apostrophes","splice":"Joining two sentences","comma":"Commas","speech":"Speech punctuation"},"order":["cap","end","apos","comma","splice","speech"],"asks":{"cap":"Which words in this sentence need a capital letter?","end":"Does this sentence ask something or tell you something, and is this really where it ends? A group of words that cannot stand alone is not a sentence, however it is punctuated.","apos":"Does this word need an apostrophe, and where does it go?","splice":"Is a comma strong enough to hold these two halves together?","comma":"Does this sentence need a comma, and is it in the right place?","speech":"Where do the marks go around what somebody said?"}};
+var YNMETA = {"buckets":{"noun:f":786,"noun:y":524,"noun:c":872,"verb:f":823,"verb:c":995,"verb:y":466,"adv:f":356,"adv:c":440,"adv:y":179,"adj:f":371,"adj:y":243,"adj:c":531},"total":6586};
 /* >>> BANK:PUNCTUATION END >>> */
 
 /* >>> BANK:COMMAS START >>> */
@@ -4396,6 +4397,92 @@ var EI = [
 {"phrase":"the teacher's pen hovered over the name","explicit":"the pen stopped above the name on the list","reworded":"the nib waited just over one written name","implied":"a decision is being made about that pupil","wrong":"the teacher crossed the name out at once","why":"Explicit is the pen stopping above the name. Implied, from 'hovered', is a decision in the middle of being taken. 'The nib waited over one written name' is the same literal point.","id":"wc-ei114","dx":true},
 {"phrase":"the gates locked behind them","explicit":"the gates shut and could not be opened again","reworded":"the entrance closed and stayed fastened","implied":"there is no way back to the life they had before","wrong":"the gates stood open for anyone to walk through","why":"Explicit is the gates shutting and staying shut. Implied is that what they left cannot be returned to. 'The entrance closed and stayed fastened' repeats the literal.","id":"wc-ei115","dx":true}
 ];
+/* SORT THE PAIR, enumerated in the build (v0.74, SPEC 84). A question is a
+   pair plus the six examples on screen, which is what carries the id; `ex`
+   holds NAMEEX ids, so the examples themselves are never duplicated here. */
+var KTSORT = [
+{"id":"wc-ks001","pair":["Simile","Metaphor"],"ex":["wc-nx001","wc-nx002","wc-nx003","wc-nx005","wc-nx006","wc-nx007"]},
+{"id":"wc-ks002","pair":["Simile","Metaphor"],"ex":["wc-nx002","wc-nx003","wc-nx004","wc-nx006","wc-nx007","wc-nx008"]},
+{"id":"wc-ks003","pair":["Simile","Metaphor"],"ex":["wc-nx003","wc-nx004","wc-nx033","wc-nx007","wc-nx008","wc-nx037"]},
+{"id":"wc-ks004","pair":["Simile","Metaphor"],"ex":["wc-nx004","wc-nx033","wc-nx034","wc-nx008","wc-nx037","wc-nx038"]},
+{"id":"wc-ks005","pair":["Simile","Metaphor"],"ex":["wc-nx033","wc-nx034","wc-nx035","wc-nx037","wc-nx038","wc-nx039"]},
+{"id":"wc-ks006","pair":["Simile","Metaphor"],"ex":["wc-nx034","wc-nx035","wc-nx036","wc-nx038","wc-nx039","wc-nx040"]},
+{"id":"wc-ks007","pair":["Simile","Metaphor"],"ex":["wc-nx035","wc-nx036","wc-nx065","wc-nx039","wc-nx040","wc-nx071"]},
+{"id":"wc-ks008","pair":["Simile","Metaphor"],"ex":["wc-nx036","wc-nx065","wc-nx066","wc-nx040","wc-nx071","wc-nx072"]},
+{"id":"wc-ks009","pair":["Simile","Metaphor"],"ex":["wc-nx065","wc-nx066","wc-nx067","wc-nx071","wc-nx072","wc-nx073"]},
+{"id":"wc-ks010","pair":["Simile","Metaphor"],"ex":["wc-nx066","wc-nx067","wc-nx068","wc-nx072","wc-nx073","wc-nx074"]},
+{"id":"wc-ks011","pair":["Simile","Metaphor"],"ex":["wc-nx067","wc-nx068","wc-nx069","wc-nx073","wc-nx074","wc-nx075"]},
+{"id":"wc-ks012","pair":["Simile","Metaphor"],"ex":["wc-nx068","wc-nx069","wc-nx070","wc-nx074","wc-nx075","wc-nx076"]},
+{"id":"wc-ks013","pair":["Simile","Metaphor"],"ex":["wc-nx069","wc-nx070","wc-nx113","wc-nx075","wc-nx076","wc-nx119"]},
+{"id":"wc-ks014","pair":["Simile","Metaphor"],"ex":["wc-nx070","wc-nx113","wc-nx114","wc-nx076","wc-nx119","wc-nx120"]},
+{"id":"wc-ks015","pair":["Simile","Metaphor"],"ex":["wc-nx113","wc-nx114","wc-nx115","wc-nx119","wc-nx120","wc-nx121"]},
+{"id":"wc-ks016","pair":["Simile","Metaphor"],"ex":["wc-nx114","wc-nx115","wc-nx116","wc-nx120","wc-nx121","wc-nx122"]},
+{"id":"wc-ks017","pair":["Simile","Metaphor"],"ex":["wc-nx115","wc-nx116","wc-nx117","wc-nx121","wc-nx122","wc-nx123"]},
+{"id":"wc-ks018","pair":["Simile","Metaphor"],"ex":["wc-nx116","wc-nx117","wc-nx118","wc-nx122","wc-nx123","wc-nx124"]},
+{"id":"wc-ks019","pair":["Simile","Metaphor"],"ex":["wc-nx117","wc-nx118","wc-nx001","wc-nx123","wc-nx124","wc-nx005"]},
+{"id":"wc-ks020","pair":["Simile","Metaphor"],"ex":["wc-nx118","wc-nx001","wc-nx002","wc-nx124","wc-nx005","wc-nx006"]},
+{"id":"wc-ks021","pair":["Personification","Powerful verb"],"ex":["wc-nx078","wc-nx081","wc-nx126","wc-nx013","wc-nx014","wc-nx015"]},
+{"id":"wc-ks022","pair":["Personification","Powerful verb"],"ex":["wc-nx081","wc-nx126","wc-nx128","wc-nx014","wc-nx015","wc-nx016"]},
+{"id":"wc-ks023","pair":["Personification","Powerful verb"],"ex":["wc-nx126","wc-nx128","wc-nx078","wc-nx015","wc-nx016","wc-nx045"]},
+{"id":"wc-ks024","pair":["Personification","Powerful verb"],"ex":["wc-nx128","wc-nx078","wc-nx081","wc-nx016","wc-nx045","wc-nx046"]},
+{"id":"wc-ks025","pair":["Personification","Powerful verb"],"ex":["wc-nx078","wc-nx081","wc-nx126","wc-nx045","wc-nx046","wc-nx047"]},
+{"id":"wc-ks026","pair":["Personification","Powerful verb"],"ex":["wc-nx081","wc-nx126","wc-nx128","wc-nx046","wc-nx047","wc-nx048"]},
+{"id":"wc-ks027","pair":["Personification","Powerful verb"],"ex":["wc-nx126","wc-nx128","wc-nx078","wc-nx047","wc-nx048","wc-nx083"]},
+{"id":"wc-ks028","pair":["Personification","Powerful verb"],"ex":["wc-nx128","wc-nx078","wc-nx081","wc-nx048","wc-nx083","wc-nx084"]},
+{"id":"wc-ks029","pair":["Personification","Powerful verb"],"ex":["wc-nx078","wc-nx081","wc-nx126","wc-nx083","wc-nx084","wc-nx085"]},
+{"id":"wc-ks030","pair":["Personification","Powerful verb"],"ex":["wc-nx081","wc-nx126","wc-nx128","wc-nx084","wc-nx085","wc-nx086"]},
+{"id":"wc-ks031","pair":["Personification","Powerful verb"],"ex":["wc-nx126","wc-nx128","wc-nx078","wc-nx085","wc-nx086","wc-nx087"]},
+{"id":"wc-ks032","pair":["Personification","Powerful verb"],"ex":["wc-nx128","wc-nx078","wc-nx081","wc-nx086","wc-nx087","wc-nx088"]},
+{"id":"wc-ks033","pair":["Personification","Powerful verb"],"ex":["wc-nx078","wc-nx081","wc-nx126","wc-nx087","wc-nx088","wc-nx131"]},
+{"id":"wc-ks034","pair":["Personification","Powerful verb"],"ex":["wc-nx081","wc-nx126","wc-nx128","wc-nx088","wc-nx131","wc-nx132"]},
+{"id":"wc-ks035","pair":["Personification","Powerful verb"],"ex":["wc-nx126","wc-nx128","wc-nx078","wc-nx131","wc-nx132","wc-nx133"]},
+{"id":"wc-ks036","pair":["Personification","Powerful verb"],"ex":["wc-nx128","wc-nx078","wc-nx081","wc-nx132","wc-nx133","wc-nx134"]},
+{"id":"wc-ks037","pair":["Personification","Powerful verb"],"ex":["wc-nx078","wc-nx081","wc-nx126","wc-nx133","wc-nx134","wc-nx135"]},
+{"id":"wc-ks038","pair":["Personification","Powerful verb"],"ex":["wc-nx081","wc-nx126","wc-nx128","wc-nx134","wc-nx135","wc-nx136"]},
+{"id":"wc-ks039","pair":["Personification","Powerful verb"],"ex":["wc-nx126","wc-nx128","wc-nx078","wc-nx135","wc-nx136","wc-nx165"]},
+{"id":"wc-ks040","pair":["Personification","Powerful verb"],"ex":["wc-nx128","wc-nx078","wc-nx081","wc-nx136","wc-nx165","wc-nx013"]},
+{"id":"wc-ks041","pair":["Personification","Powerful verb"],"ex":["wc-nx078","wc-nx081","wc-nx126","wc-nx165","wc-nx013","wc-nx014"]},
+{"id":"wc-ks042","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx021","wc-nx022","wc-nx023","wc-nx025","wc-nx026","wc-nx027"]},
+{"id":"wc-ks043","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx022","wc-nx023","wc-nx024","wc-nx026","wc-nx027","wc-nx057"]},
+{"id":"wc-ks044","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx023","wc-nx024","wc-nx053","wc-nx027","wc-nx057","wc-nx058"]},
+{"id":"wc-ks045","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx024","wc-nx053","wc-nx054","wc-nx057","wc-nx058","wc-nx059"]},
+{"id":"wc-ks046","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx053","wc-nx054","wc-nx055","wc-nx058","wc-nx059","wc-nx060"]},
+{"id":"wc-ks047","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx054","wc-nx055","wc-nx056","wc-nx059","wc-nx060","wc-nx101"]},
+{"id":"wc-ks048","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx055","wc-nx056","wc-nx095","wc-nx060","wc-nx101","wc-nx102"]},
+{"id":"wc-ks049","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx056","wc-nx095","wc-nx096","wc-nx101","wc-nx102","wc-nx103"]},
+{"id":"wc-ks050","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx095","wc-nx096","wc-nx097","wc-nx102","wc-nx103","wc-nx104"]},
+{"id":"wc-ks051","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx096","wc-nx097","wc-nx098","wc-nx103","wc-nx104","wc-nx105"]},
+{"id":"wc-ks052","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx097","wc-nx098","wc-nx099","wc-nx104","wc-nx105","wc-nx106"]},
+{"id":"wc-ks053","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx098","wc-nx099","wc-nx100","wc-nx105","wc-nx106","wc-nx149"]},
+{"id":"wc-ks054","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx099","wc-nx100","wc-nx143","wc-nx106","wc-nx149","wc-nx150"]},
+{"id":"wc-ks055","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx100","wc-nx143","wc-nx144","wc-nx149","wc-nx150","wc-nx151"]},
+{"id":"wc-ks056","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx143","wc-nx144","wc-nx145","wc-nx150","wc-nx151","wc-nx152"]},
+{"id":"wc-ks057","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx144","wc-nx145","wc-nx146","wc-nx151","wc-nx152","wc-nx153"]},
+{"id":"wc-ks058","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx145","wc-nx146","wc-nx147","wc-nx152","wc-nx153","wc-nx154"]},
+{"id":"wc-ks059","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx146","wc-nx147","wc-nx148","wc-nx153","wc-nx154","wc-nx025"]},
+{"id":"wc-ks060","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx147","wc-nx148","wc-nx021","wc-nx154","wc-nx025","wc-nx026"]},
+{"id":"wc-ks061","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx148","wc-nx021","wc-nx022","wc-nx025","wc-nx026","wc-nx027"]},
+{"id":"wc-ks062","pair":["Metaphor","Hyperbole"],"ex":["wc-nx006","wc-nx007","wc-nx008","wc-nx029","wc-nx030","wc-nx031"]},
+{"id":"wc-ks063","pair":["Metaphor","Hyperbole"],"ex":["wc-nx007","wc-nx008","wc-nx037","wc-nx030","wc-nx031","wc-nx032"]},
+{"id":"wc-ks064","pair":["Metaphor","Hyperbole"],"ex":["wc-nx008","wc-nx037","wc-nx039","wc-nx031","wc-nx032","wc-nx061"]},
+{"id":"wc-ks065","pair":["Metaphor","Hyperbole"],"ex":["wc-nx037","wc-nx039","wc-nx040","wc-nx032","wc-nx061","wc-nx062"]},
+{"id":"wc-ks066","pair":["Metaphor","Hyperbole"],"ex":["wc-nx039","wc-nx040","wc-nx071","wc-nx061","wc-nx062","wc-nx063"]},
+{"id":"wc-ks067","pair":["Metaphor","Hyperbole"],"ex":["wc-nx040","wc-nx071","wc-nx072","wc-nx062","wc-nx063","wc-nx064"]},
+{"id":"wc-ks068","pair":["Metaphor","Hyperbole"],"ex":["wc-nx071","wc-nx072","wc-nx073","wc-nx063","wc-nx064","wc-nx107"]},
+{"id":"wc-ks069","pair":["Metaphor","Hyperbole"],"ex":["wc-nx072","wc-nx073","wc-nx074","wc-nx064","wc-nx107","wc-nx108"]},
+{"id":"wc-ks070","pair":["Metaphor","Hyperbole"],"ex":["wc-nx073","wc-nx074","wc-nx075","wc-nx107","wc-nx108","wc-nx109"]},
+{"id":"wc-ks071","pair":["Metaphor","Hyperbole"],"ex":["wc-nx074","wc-nx075","wc-nx076","wc-nx108","wc-nx109","wc-nx110"]},
+{"id":"wc-ks072","pair":["Metaphor","Hyperbole"],"ex":["wc-nx075","wc-nx076","wc-nx119","wc-nx109","wc-nx110","wc-nx111"]},
+{"id":"wc-ks073","pair":["Metaphor","Hyperbole"],"ex":["wc-nx076","wc-nx119","wc-nx120","wc-nx110","wc-nx111","wc-nx112"]},
+{"id":"wc-ks074","pair":["Metaphor","Hyperbole"],"ex":["wc-nx119","wc-nx120","wc-nx121","wc-nx111","wc-nx112","wc-nx155"]},
+{"id":"wc-ks075","pair":["Metaphor","Hyperbole"],"ex":["wc-nx120","wc-nx121","wc-nx123","wc-nx112","wc-nx155","wc-nx156"]},
+{"id":"wc-ks076","pair":["Metaphor","Hyperbole"],"ex":["wc-nx121","wc-nx123","wc-nx124","wc-nx155","wc-nx156","wc-nx157"]},
+{"id":"wc-ks077","pair":["Metaphor","Hyperbole"],"ex":["wc-nx123","wc-nx124","wc-nx006","wc-nx156","wc-nx157","wc-nx158"]},
+{"id":"wc-ks078","pair":["Metaphor","Hyperbole"],"ex":["wc-nx124","wc-nx006","wc-nx007","wc-nx157","wc-nx158","wc-nx159"]},
+{"id":"wc-ks079","pair":["Metaphor","Hyperbole"],"ex":["wc-nx006","wc-nx007","wc-nx008","wc-nx158","wc-nx159","wc-nx160"]},
+{"id":"wc-ks080","pair":["Metaphor","Hyperbole"],"ex":["wc-nx007","wc-nx008","wc-nx037","wc-nx159","wc-nx160","wc-nx029"]},
+{"id":"wc-ks081","pair":["Metaphor","Hyperbole"],"ex":["wc-nx008","wc-nx037","wc-nx039","wc-nx160","wc-nx029","wc-nx030"]}
+];
 var AAMETA = {"pairs":[["Simile","Metaphor"],["Personification","Powerful verb"],["Onomatopoeia","Alliteration"],["Metaphor","Hyperbole"]]};
 /* >>> BANK:ANALYSIS ACROBAT END >>> */
 
@@ -4629,6 +4716,888 @@ var ALUPG = [
 {"id":"wc-au062","level":"challenge","frame":"The ending *does* the opening the other way round.","right":"inverts","wrong":["elicits","qualifies","hints at"],"why":"The same pattern returns reversed, which is more than a resemblance.","weak":"does"},
 {"id":"wc-au063","level":"challenge","frame":"That one image *stays with* the reader long after the book is closed.","right":"haunts","wrong":["dismisses","symbolises","epitomises"],"why":"It remains in the mind when everything else has gone.","weak":"stays with"},
 {"id":"wc-au064","level":"challenge","frame":"The narrator's joke *spoils* the seriousness of the funeral, one line after it.","right":"undercuts","wrong":["idealises","encapsulates","insinuates"],"why":"The force of what came before is suddenly taken away.","weak":"spoils"}
+];
+/* ODD ONE OUT, enumerated in the build (v0.74, SPEC 84). A question is three
+   words that share a job plus one that does not, and `level` is the highest of
+   the four, which makes the round's two level rules true by construction. */
+var ALODD = [
+{"id":"wc-ao0001","level":"secure","group":"approve","three":["celebrates","glorifies","idealises"],"odd":"demonstrates","oddgroup":"convey"},
+{"id":"wc-ao0002","level":"secure","group":"approve","three":["glorifies","idealises","romanticises"],"odd":"conveys","oddgroup":"convey"},
+{"id":"wc-ao0003","level":"secure","group":"approve","three":["idealises","romanticises","defends"],"odd":"creates","oddgroup":"effect"},
+{"id":"wc-ao0004","level":"secure","group":"approve","three":["romanticises","defends","honours"],"odd":"generates","oddgroup":"effect"},
+{"id":"wc-ao0005","level":"secure","group":"approve","three":["defends","honours","celebrates"],"odd":"produces","oddgroup":"effect"},
+{"id":"wc-ao0006","level":"secure","group":"approve","three":["honours","celebrates","glorifies"],"odd":"employs","oddgroup":"employ"},
+{"id":"wc-ao0007","level":"secure","group":"approve","three":["celebrates","glorifies","idealises"],"odd":"highlights","oddgroup":"strengthen"},
+{"id":"wc-ao0008","level":"secure","group":"approve","three":["glorifies","idealises","romanticises"],"odd":"emphasises","oddgroup":"strengthen"},
+{"id":"wc-ao0009","level":"secure","group":"approve","three":["idealises","romanticises","defends"],"odd":"reinforces","oddgroup":"strengthen"},
+{"id":"wc-ao0010","level":"secure","group":"approve","three":["romanticises","defends","honours"],"odd":"evokes","oddgroup":"reader"},
+{"id":"wc-ao0011","level":"secure","group":"approve","three":["defends","honours","celebrates"],"odd":"conjures","oddgroup":"reader"},
+{"id":"wc-ao0012","level":"secure","group":"approve","three":["honours","celebrates","glorifies"],"odd":"suggests","oddgroup":"hint"},
+{"id":"wc-ao0013","level":"secure","group":"approve","three":["celebrates","glorifies","idealises"],"odd":"implies","oddgroup":"hint"},
+{"id":"wc-ao0014","level":"secure","group":"approve","three":["glorifies","idealises","romanticises"],"odd":"alludes to","oddgroup":"hint"},
+{"id":"wc-ao0015","level":"secure","group":"approve","three":["idealises","romanticises","defends"],"odd":"echoes","oddgroup":"side"},
+{"id":"wc-ao0016","level":"secure","group":"approve","three":["romanticises","defends","honours"],"odd":"deploys","oddgroup":"employ"},
+{"id":"wc-ao0017","level":"secure","group":"approve","three":["defends","honours","celebrates"],"odd":"reveals","oddgroup":"reveal"},
+{"id":"wc-ao0018","level":"secure","group":"approve","three":["honours","celebrates","glorifies"],"odd":"exposes","oddgroup":"reveal"},
+{"id":"wc-ao0019","level":"secure","group":"approve","three":["celebrates","glorifies","idealises"],"odd":"unmasks","oddgroup":"reveal"},
+{"id":"wc-ao0020","level":"secure","group":"approve","three":["glorifies","idealises","romanticises"],"odd":"lays bare","oddgroup":"reveal"},
+{"id":"wc-ao0021","level":"secure","group":"approve","three":["idealises","romanticises","defends"],"odd":"accentuates","oddgroup":"strengthen"},
+{"id":"wc-ao0022","level":"secure","group":"approve","three":["romanticises","defends","honours"],"odd":"underscores","oddgroup":"strengthen"},
+{"id":"wc-ao0023","level":"secure","group":"approve","three":["defends","honours","celebrates"],"odd":"heightens","oddgroup":"strengthen"},
+{"id":"wc-ao0024","level":"secure","group":"approve","three":["honours","celebrates","glorifies"],"odd":"intensifies","oddgroup":"strengthen"},
+{"id":"wc-ao0025","level":"secure","group":"approve","three":["celebrates","glorifies","idealises"],"odd":"amplifies","oddgroup":"strengthen"},
+{"id":"wc-ao0026","level":"secure","group":"approve","three":["glorifies","idealises","romanticises"],"odd":"foregrounds","oddgroup":"strengthen"},
+{"id":"wc-ao0027","level":"secure","group":"approve","three":["idealises","romanticises","defends"],"odd":"criticises","oddgroup":"critic"},
+{"id":"wc-ao0028","level":"secure","group":"approve","three":["romanticises","defends","honours"],"odd":"condemns","oddgroup":"critic"},
+{"id":"wc-ao0029","level":"secure","group":"approve","three":["defends","honours","celebrates"],"odd":"satirises","oddgroup":"critic"},
+{"id":"wc-ao0030","level":"secure","group":"approve","three":["honours","celebrates","glorifies"],"odd":"mocks","oddgroup":"critic"},
+{"id":"wc-ao0031","level":"secure","group":"approve","three":["celebrates","glorifies","idealises"],"odd":"challenges","oddgroup":"critic"},
+{"id":"wc-ao0032","level":"secure","group":"approve","three":["glorifies","idealises","romanticises"],"odd":"questions","oddgroup":"critic"},
+{"id":"wc-ao0033","level":"secure","group":"approve","three":["idealises","romanticises","defends"],"odd":"symbolises","oddgroup":"standfor"},
+{"id":"wc-ao0034","level":"secure","group":"approve","three":["romanticises","defends","honours"],"odd":"embodies","oddgroup":"standfor"},
+{"id":"wc-ao0035","level":"secure","group":"approve","three":["defends","honours","celebrates"],"odd":"epitomises","oddgroup":"standfor"},
+{"id":"wc-ao0036","level":"secure","group":"approve","three":["honours","celebrates","glorifies"],"odd":"encapsulates","oddgroup":"standfor"},
+{"id":"wc-ao0037","level":"secure","group":"approve","three":["celebrates","glorifies","idealises"],"odd":"represents","oddgroup":"standfor"},
+{"id":"wc-ao0038","level":"secure","group":"approve","three":["glorifies","idealises","romanticises"],"odd":"elicits","oddgroup":"reader"},
+{"id":"wc-ao0039","level":"secure","group":"approve","three":["idealises","romanticises","defends"],"odd":"provokes","oddgroup":"reader"},
+{"id":"wc-ao0040","level":"secure","group":"approve","three":["romanticises","defends","honours"],"odd":"unsettles","oddgroup":"reader"},
+{"id":"wc-ao0041","level":"secure","group":"approve","three":["defends","honours","celebrates"],"odd":"alienates","oddgroup":"reader"},
+{"id":"wc-ao0042","level":"secure","group":"approve","three":["honours","celebrates","glorifies"],"odd":"invites","oddgroup":"reader"},
+{"id":"wc-ao0043","level":"challenge","group":"approve","three":["celebrates","glorifies","idealises"],"odd":"undermines","oddgroup":"weaken"},
+{"id":"wc-ao0044","level":"challenge","group":"approve","three":["glorifies","idealises","romanticises"],"odd":"undercuts","oddgroup":"weaken"},
+{"id":"wc-ao0045","level":"challenge","group":"approve","three":["idealises","romanticises","defends"],"odd":"subverts","oddgroup":"weaken"},
+{"id":"wc-ao0046","level":"challenge","group":"approve","three":["romanticises","defends","honours"],"odd":"complicates","oddgroup":"weaken"},
+{"id":"wc-ao0047","level":"challenge","group":"approve","three":["defends","honours","celebrates"],"odd":"destabilises","oddgroup":"weaken"},
+{"id":"wc-ao0048","level":"challenge","group":"approve","three":["honours","celebrates","glorifies"],"odd":"hints at","oddgroup":"hint"},
+{"id":"wc-ao0049","level":"challenge","group":"approve","three":["celebrates","glorifies","idealises"],"odd":"insinuates","oddgroup":"hint"},
+{"id":"wc-ao0050","level":"challenge","group":"approve","three":["glorifies","idealises","romanticises"],"odd":"connotes","oddgroup":"hint"},
+{"id":"wc-ao0051","level":"challenge","group":"approve","three":["idealises","romanticises","defends"],"odd":"foreshadows","oddgroup":"hint"},
+{"id":"wc-ao0052","level":"challenge","group":"approve","three":["romanticises","defends","honours"],"odd":"juxtaposes","oddgroup":"side"},
+{"id":"wc-ao0053","level":"challenge","group":"approve","three":["defends","honours","celebrates"],"odd":"contrasts","oddgroup":"side"},
+{"id":"wc-ao0054","level":"challenge","group":"approve","three":["honours","celebrates","glorifies"],"odd":"mirrors","oddgroup":"side"},
+{"id":"wc-ao0055","level":"challenge","group":"approve","three":["celebrates","glorifies","idealises"],"odd":"parallels","oddgroup":"side"},
+{"id":"wc-ao0056","level":"secure","group":"approve","three":["glorifies","idealises","romanticises"],"odd":"illustrates","oddgroup":"convey"},
+{"id":"wc-ao0057","level":"secure","group":"approve","three":["idealises","romanticises","defends"],"odd":"expresses","oddgroup":"convey"},
+{"id":"wc-ao0058","level":"secure","group":"approve","three":["romanticises","defends","honours"],"odd":"selects","oddgroup":"employ"},
+{"id":"wc-ao0059","level":"secure","group":"approve","three":["defends","honours","celebrates"],"odd":"repeats","oddgroup":"employ"},
+{"id":"wc-ao0060","level":"secure","group":"approve","three":["honours","celebrates","glorifies"],"odd":"exaggerates","oddgroup":"employ"},
+{"id":"wc-ao0061","level":"secure","group":"approve","three":["celebrates","glorifies","idealises"],"odd":"sustains","oddgroup":"effect"},
+{"id":"wc-ao0062","level":"secure","group":"approve","three":["glorifies","idealises","romanticises"],"odd":"shifts","oddgroup":"effect"},
+{"id":"wc-ao0063","level":"secure","group":"approve","three":["idealises","romanticises","defends"],"odd":"dwells on","oddgroup":"strengthen"},
+{"id":"wc-ao0064","level":"secure","group":"approve","three":["romanticises","defends","honours"],"odd":"blames","oddgroup":"critic"},
+{"id":"wc-ao0065","level":"secure","group":"approve","three":["defends","honours","celebrates"],"odd":"dismisses","oddgroup":"critic"},
+{"id":"wc-ao0066","level":"challenge","group":"approve","three":["honours","celebrates","glorifies"],"odd":"qualifies","oddgroup":"weaken"},
+{"id":"wc-ao0067","level":"challenge","group":"approve","three":["celebrates","glorifies","idealises"],"odd":"contradicts","oddgroup":"weaken"},
+{"id":"wc-ao0068","level":"challenge","group":"approve","three":["glorifies","idealises","romanticises"],"odd":"withholds","oddgroup":"hint"},
+{"id":"wc-ao0069","level":"challenge","group":"approve","three":["idealises","romanticises","defends"],"odd":"gestures towards","oddgroup":"hint"},
+{"id":"wc-ao0070","level":"challenge","group":"approve","three":["romanticises","defends","honours"],"odd":"interweaves","oddgroup":"side"},
+{"id":"wc-ao0071","level":"challenge","group":"approve","three":["defends","honours","celebrates"],"odd":"inverts","oddgroup":"side"},
+{"id":"wc-ao0072","level":"challenge","group":"approve","three":["honours","celebrates","glorifies"],"odd":"haunts","oddgroup":"reader"},
+{"id":"wc-ao0073","level":"foundation","group":"convey","three":["demonstrates","conveys","illustrates"],"odd":"employs","oddgroup":"employ"},
+{"id":"wc-ao0074","level":"foundation","group":"convey","three":["conveys","illustrates","expresses"],"odd":"evokes","oddgroup":"reader"},
+{"id":"wc-ao0075","level":"foundation","group":"convey","three":["illustrates","expresses","demonstrates"],"odd":"conjures","oddgroup":"reader"},
+{"id":"wc-ao0076","level":"foundation","group":"convey","three":["expresses","demonstrates","conveys"],"odd":"echoes","oddgroup":"side"},
+{"id":"wc-ao0077","level":"developing","group":"convey","three":["demonstrates","conveys","illustrates"],"odd":"deploys","oddgroup":"employ"},
+{"id":"wc-ao0078","level":"secure","group":"convey","three":["conveys","illustrates","expresses"],"odd":"criticises","oddgroup":"critic"},
+{"id":"wc-ao0079","level":"secure","group":"convey","three":["illustrates","expresses","demonstrates"],"odd":"condemns","oddgroup":"critic"},
+{"id":"wc-ao0080","level":"secure","group":"convey","three":["expresses","demonstrates","conveys"],"odd":"satirises","oddgroup":"critic"},
+{"id":"wc-ao0081","level":"secure","group":"convey","three":["demonstrates","conveys","illustrates"],"odd":"mocks","oddgroup":"critic"},
+{"id":"wc-ao0082","level":"secure","group":"convey","three":["conveys","illustrates","expresses"],"odd":"challenges","oddgroup":"critic"},
+{"id":"wc-ao0083","level":"secure","group":"convey","three":["illustrates","expresses","demonstrates"],"odd":"questions","oddgroup":"critic"},
+{"id":"wc-ao0084","level":"secure","group":"convey","three":["expresses","demonstrates","conveys"],"odd":"celebrates","oddgroup":"approve"},
+{"id":"wc-ao0085","level":"secure","group":"convey","three":["demonstrates","conveys","illustrates"],"odd":"glorifies","oddgroup":"approve"},
+{"id":"wc-ao0086","level":"secure","group":"convey","three":["conveys","illustrates","expresses"],"odd":"idealises","oddgroup":"approve"},
+{"id":"wc-ao0087","level":"secure","group":"convey","three":["illustrates","expresses","demonstrates"],"odd":"romanticises","oddgroup":"approve"},
+{"id":"wc-ao0088","level":"secure","group":"convey","three":["expresses","demonstrates","conveys"],"odd":"symbolises","oddgroup":"standfor"},
+{"id":"wc-ao0089","level":"secure","group":"convey","three":["demonstrates","conveys","illustrates"],"odd":"embodies","oddgroup":"standfor"},
+{"id":"wc-ao0090","level":"secure","group":"convey","three":["conveys","illustrates","expresses"],"odd":"epitomises","oddgroup":"standfor"},
+{"id":"wc-ao0091","level":"secure","group":"convey","three":["illustrates","expresses","demonstrates"],"odd":"encapsulates","oddgroup":"standfor"},
+{"id":"wc-ao0092","level":"secure","group":"convey","three":["expresses","demonstrates","conveys"],"odd":"represents","oddgroup":"standfor"},
+{"id":"wc-ao0093","level":"secure","group":"convey","three":["demonstrates","conveys","illustrates"],"odd":"elicits","oddgroup":"reader"},
+{"id":"wc-ao0094","level":"secure","group":"convey","three":["conveys","illustrates","expresses"],"odd":"provokes","oddgroup":"reader"},
+{"id":"wc-ao0095","level":"secure","group":"convey","three":["illustrates","expresses","demonstrates"],"odd":"unsettles","oddgroup":"reader"},
+{"id":"wc-ao0096","level":"secure","group":"convey","three":["expresses","demonstrates","conveys"],"odd":"alienates","oddgroup":"reader"},
+{"id":"wc-ao0097","level":"secure","group":"convey","three":["demonstrates","conveys","illustrates"],"odd":"invites","oddgroup":"reader"},
+{"id":"wc-ao0098","level":"challenge","group":"convey","three":["conveys","illustrates","expresses"],"odd":"undermines","oddgroup":"weaken"},
+{"id":"wc-ao0099","level":"challenge","group":"convey","three":["illustrates","expresses","demonstrates"],"odd":"undercuts","oddgroup":"weaken"},
+{"id":"wc-ao0100","level":"challenge","group":"convey","three":["expresses","demonstrates","conveys"],"odd":"subverts","oddgroup":"weaken"},
+{"id":"wc-ao0101","level":"challenge","group":"convey","three":["demonstrates","conveys","illustrates"],"odd":"complicates","oddgroup":"weaken"},
+{"id":"wc-ao0102","level":"challenge","group":"convey","three":["conveys","illustrates","expresses"],"odd":"destabilises","oddgroup":"weaken"},
+{"id":"wc-ao0103","level":"challenge","group":"convey","three":["illustrates","expresses","demonstrates"],"odd":"juxtaposes","oddgroup":"side"},
+{"id":"wc-ao0104","level":"challenge","group":"convey","three":["expresses","demonstrates","conveys"],"odd":"contrasts","oddgroup":"side"},
+{"id":"wc-ao0105","level":"challenge","group":"convey","three":["demonstrates","conveys","illustrates"],"odd":"mirrors","oddgroup":"side"},
+{"id":"wc-ao0106","level":"challenge","group":"convey","three":["conveys","illustrates","expresses"],"odd":"parallels","oddgroup":"side"},
+{"id":"wc-ao0107","level":"foundation","group":"convey","three":["illustrates","expresses","demonstrates"],"odd":"selects","oddgroup":"employ"},
+{"id":"wc-ao0108","level":"foundation","group":"convey","three":["expresses","demonstrates","conveys"],"odd":"repeats","oddgroup":"employ"},
+{"id":"wc-ao0109","level":"foundation","group":"convey","three":["demonstrates","conveys","illustrates"],"odd":"exaggerates","oddgroup":"employ"},
+{"id":"wc-ao0110","level":"secure","group":"convey","three":["conveys","illustrates","expresses"],"odd":"blames","oddgroup":"critic"},
+{"id":"wc-ao0111","level":"secure","group":"convey","three":["illustrates","expresses","demonstrates"],"odd":"dismisses","oddgroup":"critic"},
+{"id":"wc-ao0112","level":"secure","group":"convey","three":["expresses","demonstrates","conveys"],"odd":"defends","oddgroup":"approve"},
+{"id":"wc-ao0113","level":"secure","group":"convey","three":["demonstrates","conveys","illustrates"],"odd":"honours","oddgroup":"approve"},
+{"id":"wc-ao0114","level":"challenge","group":"convey","three":["conveys","illustrates","expresses"],"odd":"qualifies","oddgroup":"weaken"},
+{"id":"wc-ao0115","level":"challenge","group":"convey","three":["illustrates","expresses","demonstrates"],"odd":"contradicts","oddgroup":"weaken"},
+{"id":"wc-ao0116","level":"challenge","group":"convey","three":["expresses","demonstrates","conveys"],"odd":"interweaves","oddgroup":"side"},
+{"id":"wc-ao0117","level":"challenge","group":"convey","three":["demonstrates","conveys","illustrates"],"odd":"inverts","oddgroup":"side"},
+{"id":"wc-ao0118","level":"challenge","group":"convey","three":["conveys","illustrates","expresses"],"odd":"haunts","oddgroup":"reader"},
+{"id":"wc-ao0119","level":"secure","group":"critic","three":["criticises","condemns","satirises"],"odd":"demonstrates","oddgroup":"convey"},
+{"id":"wc-ao0120","level":"secure","group":"critic","three":["condemns","satirises","mocks"],"odd":"conveys","oddgroup":"convey"},
+{"id":"wc-ao0121","level":"secure","group":"critic","three":["satirises","mocks","challenges"],"odd":"creates","oddgroup":"effect"},
+{"id":"wc-ao0122","level":"secure","group":"critic","three":["mocks","challenges","questions"],"odd":"generates","oddgroup":"effect"},
+{"id":"wc-ao0123","level":"secure","group":"critic","three":["challenges","questions","blames"],"odd":"produces","oddgroup":"effect"},
+{"id":"wc-ao0124","level":"secure","group":"critic","three":["questions","blames","dismisses"],"odd":"employs","oddgroup":"employ"},
+{"id":"wc-ao0125","level":"secure","group":"critic","three":["blames","dismisses","criticises"],"odd":"highlights","oddgroup":"strengthen"},
+{"id":"wc-ao0126","level":"secure","group":"critic","three":["dismisses","criticises","condemns"],"odd":"emphasises","oddgroup":"strengthen"},
+{"id":"wc-ao0127","level":"secure","group":"critic","three":["criticises","condemns","satirises"],"odd":"reinforces","oddgroup":"strengthen"},
+{"id":"wc-ao0128","level":"secure","group":"critic","three":["condemns","satirises","mocks"],"odd":"evokes","oddgroup":"reader"},
+{"id":"wc-ao0129","level":"secure","group":"critic","three":["satirises","mocks","challenges"],"odd":"conjures","oddgroup":"reader"},
+{"id":"wc-ao0130","level":"secure","group":"critic","three":["mocks","challenges","questions"],"odd":"suggests","oddgroup":"hint"},
+{"id":"wc-ao0131","level":"secure","group":"critic","three":["challenges","questions","blames"],"odd":"implies","oddgroup":"hint"},
+{"id":"wc-ao0132","level":"secure","group":"critic","three":["questions","blames","dismisses"],"odd":"alludes to","oddgroup":"hint"},
+{"id":"wc-ao0133","level":"secure","group":"critic","three":["blames","dismisses","criticises"],"odd":"echoes","oddgroup":"side"},
+{"id":"wc-ao0134","level":"secure","group":"critic","three":["dismisses","criticises","condemns"],"odd":"deploys","oddgroup":"employ"},
+{"id":"wc-ao0135","level":"secure","group":"critic","three":["criticises","condemns","satirises"],"odd":"accentuates","oddgroup":"strengthen"},
+{"id":"wc-ao0136","level":"secure","group":"critic","three":["condemns","satirises","mocks"],"odd":"underscores","oddgroup":"strengthen"},
+{"id":"wc-ao0137","level":"secure","group":"critic","three":["satirises","mocks","challenges"],"odd":"heightens","oddgroup":"strengthen"},
+{"id":"wc-ao0138","level":"secure","group":"critic","three":["mocks","challenges","questions"],"odd":"intensifies","oddgroup":"strengthen"},
+{"id":"wc-ao0139","level":"secure","group":"critic","three":["challenges","questions","blames"],"odd":"amplifies","oddgroup":"strengthen"},
+{"id":"wc-ao0140","level":"secure","group":"critic","three":["questions","blames","dismisses"],"odd":"foregrounds","oddgroup":"strengthen"},
+{"id":"wc-ao0141","level":"secure","group":"critic","three":["blames","dismisses","criticises"],"odd":"portrays","oddgroup":"represent"},
+{"id":"wc-ao0142","level":"secure","group":"critic","three":["dismisses","criticises","condemns"],"odd":"depicts","oddgroup":"represent"},
+{"id":"wc-ao0143","level":"secure","group":"critic","three":["criticises","condemns","satirises"],"odd":"presents","oddgroup":"represent"},
+{"id":"wc-ao0144","level":"secure","group":"critic","three":["condemns","satirises","mocks"],"odd":"characterises","oddgroup":"represent"},
+{"id":"wc-ao0145","level":"secure","group":"critic","three":["satirises","mocks","challenges"],"odd":"frames","oddgroup":"represent"},
+{"id":"wc-ao0146","level":"secure","group":"critic","three":["mocks","challenges","questions"],"odd":"constructs","oddgroup":"represent"},
+{"id":"wc-ao0147","level":"secure","group":"critic","three":["challenges","questions","blames"],"odd":"celebrates","oddgroup":"approve"},
+{"id":"wc-ao0148","level":"secure","group":"critic","three":["questions","blames","dismisses"],"odd":"glorifies","oddgroup":"approve"},
+{"id":"wc-ao0149","level":"secure","group":"critic","three":["blames","dismisses","criticises"],"odd":"idealises","oddgroup":"approve"},
+{"id":"wc-ao0150","level":"secure","group":"critic","three":["dismisses","criticises","condemns"],"odd":"romanticises","oddgroup":"approve"},
+{"id":"wc-ao0151","level":"secure","group":"critic","three":["criticises","condemns","satirises"],"odd":"symbolises","oddgroup":"standfor"},
+{"id":"wc-ao0152","level":"secure","group":"critic","three":["condemns","satirises","mocks"],"odd":"embodies","oddgroup":"standfor"},
+{"id":"wc-ao0153","level":"secure","group":"critic","three":["satirises","mocks","challenges"],"odd":"epitomises","oddgroup":"standfor"},
+{"id":"wc-ao0154","level":"secure","group":"critic","three":["mocks","challenges","questions"],"odd":"encapsulates","oddgroup":"standfor"},
+{"id":"wc-ao0155","level":"secure","group":"critic","three":["challenges","questions","blames"],"odd":"represents","oddgroup":"standfor"},
+{"id":"wc-ao0156","level":"secure","group":"critic","three":["questions","blames","dismisses"],"odd":"elicits","oddgroup":"reader"},
+{"id":"wc-ao0157","level":"secure","group":"critic","three":["blames","dismisses","criticises"],"odd":"provokes","oddgroup":"reader"},
+{"id":"wc-ao0158","level":"secure","group":"critic","three":["dismisses","criticises","condemns"],"odd":"unsettles","oddgroup":"reader"},
+{"id":"wc-ao0159","level":"secure","group":"critic","three":["criticises","condemns","satirises"],"odd":"alienates","oddgroup":"reader"},
+{"id":"wc-ao0160","level":"secure","group":"critic","three":["condemns","satirises","mocks"],"odd":"invites","oddgroup":"reader"},
+{"id":"wc-ao0161","level":"challenge","group":"critic","three":["satirises","mocks","challenges"],"odd":"hints at","oddgroup":"hint"},
+{"id":"wc-ao0162","level":"challenge","group":"critic","three":["mocks","challenges","questions"],"odd":"insinuates","oddgroup":"hint"},
+{"id":"wc-ao0163","level":"challenge","group":"critic","three":["challenges","questions","blames"],"odd":"connotes","oddgroup":"hint"},
+{"id":"wc-ao0164","level":"challenge","group":"critic","three":["questions","blames","dismisses"],"odd":"foreshadows","oddgroup":"hint"},
+{"id":"wc-ao0165","level":"challenge","group":"critic","three":["blames","dismisses","criticises"],"odd":"juxtaposes","oddgroup":"side"},
+{"id":"wc-ao0166","level":"challenge","group":"critic","three":["dismisses","criticises","condemns"],"odd":"contrasts","oddgroup":"side"},
+{"id":"wc-ao0167","level":"challenge","group":"critic","three":["criticises","condemns","satirises"],"odd":"mirrors","oddgroup":"side"},
+{"id":"wc-ao0168","level":"challenge","group":"critic","three":["condemns","satirises","mocks"],"odd":"parallels","oddgroup":"side"},
+{"id":"wc-ao0169","level":"secure","group":"critic","three":["satirises","mocks","challenges"],"odd":"illustrates","oddgroup":"convey"},
+{"id":"wc-ao0170","level":"secure","group":"critic","three":["mocks","challenges","questions"],"odd":"expresses","oddgroup":"convey"},
+{"id":"wc-ao0171","level":"secure","group":"critic","three":["challenges","questions","blames"],"odd":"selects","oddgroup":"employ"},
+{"id":"wc-ao0172","level":"secure","group":"critic","three":["questions","blames","dismisses"],"odd":"repeats","oddgroup":"employ"},
+{"id":"wc-ao0173","level":"secure","group":"critic","three":["blames","dismisses","criticises"],"odd":"exaggerates","oddgroup":"employ"},
+{"id":"wc-ao0174","level":"secure","group":"critic","three":["dismisses","criticises","condemns"],"odd":"sustains","oddgroup":"effect"},
+{"id":"wc-ao0175","level":"secure","group":"critic","three":["criticises","condemns","satirises"],"odd":"shifts","oddgroup":"effect"},
+{"id":"wc-ao0176","level":"secure","group":"critic","three":["condemns","satirises","mocks"],"odd":"establishes","oddgroup":"represent"},
+{"id":"wc-ao0177","level":"secure","group":"critic","three":["satirises","mocks","challenges"],"odd":"humanises","oddgroup":"represent"},
+{"id":"wc-ao0178","level":"secure","group":"critic","three":["mocks","challenges","questions"],"odd":"dramatises","oddgroup":"represent"},
+{"id":"wc-ao0179","level":"secure","group":"critic","three":["challenges","questions","blames"],"odd":"dwells on","oddgroup":"strengthen"},
+{"id":"wc-ao0180","level":"secure","group":"critic","three":["questions","blames","dismisses"],"odd":"defends","oddgroup":"approve"},
+{"id":"wc-ao0181","level":"secure","group":"critic","three":["blames","dismisses","criticises"],"odd":"honours","oddgroup":"approve"},
+{"id":"wc-ao0182","level":"challenge","group":"critic","three":["dismisses","criticises","condemns"],"odd":"withholds","oddgroup":"hint"},
+{"id":"wc-ao0183","level":"challenge","group":"critic","three":["criticises","condemns","satirises"],"odd":"gestures towards","oddgroup":"hint"},
+{"id":"wc-ao0184","level":"challenge","group":"critic","three":["condemns","satirises","mocks"],"odd":"interweaves","oddgroup":"side"},
+{"id":"wc-ao0185","level":"challenge","group":"critic","three":["satirises","mocks","challenges"],"odd":"inverts","oddgroup":"side"},
+{"id":"wc-ao0186","level":"challenge","group":"critic","three":["mocks","challenges","questions"],"odd":"haunts","oddgroup":"reader"},
+{"id":"wc-ao0187","level":"foundation","group":"effect","three":["creates","generates","produces"],"odd":"employs","oddgroup":"employ"},
+{"id":"wc-ao0188","level":"developing","group":"effect","three":["generates","produces","sustains"],"odd":"highlights","oddgroup":"strengthen"},
+{"id":"wc-ao0189","level":"developing","group":"effect","three":["produces","sustains","shifts"],"odd":"emphasises","oddgroup":"strengthen"},
+{"id":"wc-ao0190","level":"developing","group":"effect","three":["sustains","shifts","creates"],"odd":"reinforces","oddgroup":"strengthen"},
+{"id":"wc-ao0191","level":"developing","group":"effect","three":["shifts","creates","generates"],"odd":"suggests","oddgroup":"hint"},
+{"id":"wc-ao0192","level":"foundation","group":"effect","three":["creates","generates","produces"],"odd":"implies","oddgroup":"hint"},
+{"id":"wc-ao0193","level":"developing","group":"effect","three":["generates","produces","sustains"],"odd":"alludes to","oddgroup":"hint"},
+{"id":"wc-ao0194","level":"developing","group":"effect","three":["produces","sustains","shifts"],"odd":"echoes","oddgroup":"side"},
+{"id":"wc-ao0195","level":"developing","group":"effect","three":["sustains","shifts","creates"],"odd":"deploys","oddgroup":"employ"},
+{"id":"wc-ao0196","level":"developing","group":"effect","three":["shifts","creates","generates"],"odd":"reveals","oddgroup":"reveal"},
+{"id":"wc-ao0197","level":"developing","group":"effect","three":["creates","generates","produces"],"odd":"exposes","oddgroup":"reveal"},
+{"id":"wc-ao0198","level":"developing","group":"effect","three":["generates","produces","sustains"],"odd":"unmasks","oddgroup":"reveal"},
+{"id":"wc-ao0199","level":"developing","group":"effect","three":["produces","sustains","shifts"],"odd":"lays bare","oddgroup":"reveal"},
+{"id":"wc-ao0200","level":"developing","group":"effect","three":["sustains","shifts","creates"],"odd":"accentuates","oddgroup":"strengthen"},
+{"id":"wc-ao0201","level":"developing","group":"effect","three":["shifts","creates","generates"],"odd":"underscores","oddgroup":"strengthen"},
+{"id":"wc-ao0202","level":"developing","group":"effect","three":["creates","generates","produces"],"odd":"heightens","oddgroup":"strengthen"},
+{"id":"wc-ao0203","level":"developing","group":"effect","three":["generates","produces","sustains"],"odd":"intensifies","oddgroup":"strengthen"},
+{"id":"wc-ao0204","level":"developing","group":"effect","three":["produces","sustains","shifts"],"odd":"amplifies","oddgroup":"strengthen"},
+{"id":"wc-ao0205","level":"developing","group":"effect","three":["sustains","shifts","creates"],"odd":"foregrounds","oddgroup":"strengthen"},
+{"id":"wc-ao0206","level":"developing","group":"effect","three":["shifts","creates","generates"],"odd":"portrays","oddgroup":"represent"},
+{"id":"wc-ao0207","level":"developing","group":"effect","three":["creates","generates","produces"],"odd":"depicts","oddgroup":"represent"},
+{"id":"wc-ao0208","level":"developing","group":"effect","three":["generates","produces","sustains"],"odd":"presents","oddgroup":"represent"},
+{"id":"wc-ao0209","level":"developing","group":"effect","three":["produces","sustains","shifts"],"odd":"characterises","oddgroup":"represent"},
+{"id":"wc-ao0210","level":"developing","group":"effect","three":["sustains","shifts","creates"],"odd":"frames","oddgroup":"represent"},
+{"id":"wc-ao0211","level":"developing","group":"effect","three":["shifts","creates","generates"],"odd":"constructs","oddgroup":"represent"},
+{"id":"wc-ao0212","level":"secure","group":"effect","three":["creates","generates","produces"],"odd":"criticises","oddgroup":"critic"},
+{"id":"wc-ao0213","level":"secure","group":"effect","three":["generates","produces","sustains"],"odd":"condemns","oddgroup":"critic"},
+{"id":"wc-ao0214","level":"secure","group":"effect","three":["produces","sustains","shifts"],"odd":"satirises","oddgroup":"critic"},
+{"id":"wc-ao0215","level":"secure","group":"effect","three":["sustains","shifts","creates"],"odd":"mocks","oddgroup":"critic"},
+{"id":"wc-ao0216","level":"secure","group":"effect","three":["shifts","creates","generates"],"odd":"challenges","oddgroup":"critic"},
+{"id":"wc-ao0217","level":"secure","group":"effect","three":["creates","generates","produces"],"odd":"questions","oddgroup":"critic"},
+{"id":"wc-ao0218","level":"secure","group":"effect","three":["generates","produces","sustains"],"odd":"celebrates","oddgroup":"approve"},
+{"id":"wc-ao0219","level":"secure","group":"effect","three":["produces","sustains","shifts"],"odd":"glorifies","oddgroup":"approve"},
+{"id":"wc-ao0220","level":"secure","group":"effect","three":["sustains","shifts","creates"],"odd":"idealises","oddgroup":"approve"},
+{"id":"wc-ao0221","level":"secure","group":"effect","three":["shifts","creates","generates"],"odd":"romanticises","oddgroup":"approve"},
+{"id":"wc-ao0222","level":"secure","group":"effect","three":["creates","generates","produces"],"odd":"symbolises","oddgroup":"standfor"},
+{"id":"wc-ao0223","level":"secure","group":"effect","three":["generates","produces","sustains"],"odd":"embodies","oddgroup":"standfor"},
+{"id":"wc-ao0224","level":"secure","group":"effect","three":["produces","sustains","shifts"],"odd":"epitomises","oddgroup":"standfor"},
+{"id":"wc-ao0225","level":"secure","group":"effect","three":["sustains","shifts","creates"],"odd":"encapsulates","oddgroup":"standfor"},
+{"id":"wc-ao0226","level":"secure","group":"effect","three":["shifts","creates","generates"],"odd":"represents","oddgroup":"standfor"},
+{"id":"wc-ao0227","level":"challenge","group":"effect","three":["creates","generates","produces"],"odd":"undermines","oddgroup":"weaken"},
+{"id":"wc-ao0228","level":"challenge","group":"effect","three":["generates","produces","sustains"],"odd":"undercuts","oddgroup":"weaken"},
+{"id":"wc-ao0229","level":"challenge","group":"effect","three":["produces","sustains","shifts"],"odd":"subverts","oddgroup":"weaken"},
+{"id":"wc-ao0230","level":"challenge","group":"effect","three":["sustains","shifts","creates"],"odd":"complicates","oddgroup":"weaken"},
+{"id":"wc-ao0231","level":"challenge","group":"effect","three":["shifts","creates","generates"],"odd":"destabilises","oddgroup":"weaken"},
+{"id":"wc-ao0232","level":"challenge","group":"effect","three":["creates","generates","produces"],"odd":"hints at","oddgroup":"hint"},
+{"id":"wc-ao0233","level":"challenge","group":"effect","three":["generates","produces","sustains"],"odd":"insinuates","oddgroup":"hint"},
+{"id":"wc-ao0234","level":"challenge","group":"effect","three":["produces","sustains","shifts"],"odd":"connotes","oddgroup":"hint"},
+{"id":"wc-ao0235","level":"challenge","group":"effect","three":["sustains","shifts","creates"],"odd":"foreshadows","oddgroup":"hint"},
+{"id":"wc-ao0236","level":"challenge","group":"effect","three":["shifts","creates","generates"],"odd":"juxtaposes","oddgroup":"side"},
+{"id":"wc-ao0237","level":"challenge","group":"effect","three":["creates","generates","produces"],"odd":"contrasts","oddgroup":"side"},
+{"id":"wc-ao0238","level":"challenge","group":"effect","three":["generates","produces","sustains"],"odd":"mirrors","oddgroup":"side"},
+{"id":"wc-ao0239","level":"challenge","group":"effect","three":["produces","sustains","shifts"],"odd":"parallels","oddgroup":"side"},
+{"id":"wc-ao0240","level":"developing","group":"effect","three":["sustains","shifts","creates"],"odd":"selects","oddgroup":"employ"},
+{"id":"wc-ao0241","level":"developing","group":"effect","three":["shifts","creates","generates"],"odd":"repeats","oddgroup":"employ"},
+{"id":"wc-ao0242","level":"foundation","group":"effect","three":["creates","generates","produces"],"odd":"exaggerates","oddgroup":"employ"},
+{"id":"wc-ao0243","level":"developing","group":"effect","three":["generates","produces","sustains"],"odd":"establishes","oddgroup":"represent"},
+{"id":"wc-ao0244","level":"developing","group":"effect","three":["produces","sustains","shifts"],"odd":"humanises","oddgroup":"represent"},
+{"id":"wc-ao0245","level":"developing","group":"effect","three":["sustains","shifts","creates"],"odd":"dramatises","oddgroup":"represent"},
+{"id":"wc-ao0246","level":"developing","group":"effect","three":["shifts","creates","generates"],"odd":"dwells on","oddgroup":"strengthen"},
+{"id":"wc-ao0247","level":"secure","group":"effect","three":["creates","generates","produces"],"odd":"blames","oddgroup":"critic"},
+{"id":"wc-ao0248","level":"secure","group":"effect","three":["generates","produces","sustains"],"odd":"dismisses","oddgroup":"critic"},
+{"id":"wc-ao0249","level":"secure","group":"effect","three":["produces","sustains","shifts"],"odd":"defends","oddgroup":"approve"},
+{"id":"wc-ao0250","level":"secure","group":"effect","three":["sustains","shifts","creates"],"odd":"honours","oddgroup":"approve"},
+{"id":"wc-ao0251","level":"challenge","group":"effect","three":["shifts","creates","generates"],"odd":"qualifies","oddgroup":"weaken"},
+{"id":"wc-ao0252","level":"challenge","group":"effect","three":["creates","generates","produces"],"odd":"contradicts","oddgroup":"weaken"},
+{"id":"wc-ao0253","level":"challenge","group":"effect","three":["generates","produces","sustains"],"odd":"withholds","oddgroup":"hint"},
+{"id":"wc-ao0254","level":"challenge","group":"effect","three":["produces","sustains","shifts"],"odd":"gestures towards","oddgroup":"hint"},
+{"id":"wc-ao0255","level":"challenge","group":"effect","three":["sustains","shifts","creates"],"odd":"interweaves","oddgroup":"side"},
+{"id":"wc-ao0256","level":"challenge","group":"effect","three":["shifts","creates","generates"],"odd":"inverts","oddgroup":"side"},
+{"id":"wc-ao0257","level":"developing","group":"employ","three":["employs","deploys","selects"],"odd":"demonstrates","oddgroup":"convey"},
+{"id":"wc-ao0258","level":"developing","group":"employ","three":["deploys","selects","repeats"],"odd":"conveys","oddgroup":"convey"},
+{"id":"wc-ao0259","level":"foundation","group":"employ","three":["selects","repeats","exaggerates"],"odd":"creates","oddgroup":"effect"},
+{"id":"wc-ao0260","level":"foundation","group":"employ","three":["repeats","exaggerates","employs"],"odd":"generates","oddgroup":"effect"},
+{"id":"wc-ao0261","level":"developing","group":"employ","three":["exaggerates","employs","deploys"],"odd":"produces","oddgroup":"effect"},
+{"id":"wc-ao0262","level":"developing","group":"employ","three":["employs","deploys","selects"],"odd":"highlights","oddgroup":"strengthen"},
+{"id":"wc-ao0263","level":"developing","group":"employ","three":["deploys","selects","repeats"],"odd":"emphasises","oddgroup":"strengthen"},
+{"id":"wc-ao0264","level":"foundation","group":"employ","three":["selects","repeats","exaggerates"],"odd":"reinforces","oddgroup":"strengthen"},
+{"id":"wc-ao0265","level":"foundation","group":"employ","three":["repeats","exaggerates","employs"],"odd":"evokes","oddgroup":"reader"},
+{"id":"wc-ao0266","level":"developing","group":"employ","three":["exaggerates","employs","deploys"],"odd":"conjures","oddgroup":"reader"},
+{"id":"wc-ao0267","level":"developing","group":"employ","three":["employs","deploys","selects"],"odd":"suggests","oddgroup":"hint"},
+{"id":"wc-ao0268","level":"developing","group":"employ","three":["deploys","selects","repeats"],"odd":"implies","oddgroup":"hint"},
+{"id":"wc-ao0269","level":"foundation","group":"employ","three":["selects","repeats","exaggerates"],"odd":"alludes to","oddgroup":"hint"},
+{"id":"wc-ao0270","level":"foundation","group":"employ","three":["repeats","exaggerates","employs"],"odd":"echoes","oddgroup":"side"},
+{"id":"wc-ao0271","level":"developing","group":"employ","three":["exaggerates","employs","deploys"],"odd":"reveals","oddgroup":"reveal"},
+{"id":"wc-ao0272","level":"developing","group":"employ","three":["employs","deploys","selects"],"odd":"exposes","oddgroup":"reveal"},
+{"id":"wc-ao0273","level":"developing","group":"employ","three":["deploys","selects","repeats"],"odd":"unmasks","oddgroup":"reveal"},
+{"id":"wc-ao0274","level":"developing","group":"employ","three":["selects","repeats","exaggerates"],"odd":"lays bare","oddgroup":"reveal"},
+{"id":"wc-ao0275","level":"developing","group":"employ","three":["repeats","exaggerates","employs"],"odd":"accentuates","oddgroup":"strengthen"},
+{"id":"wc-ao0276","level":"developing","group":"employ","three":["exaggerates","employs","deploys"],"odd":"underscores","oddgroup":"strengthen"},
+{"id":"wc-ao0277","level":"developing","group":"employ","three":["employs","deploys","selects"],"odd":"heightens","oddgroup":"strengthen"},
+{"id":"wc-ao0278","level":"developing","group":"employ","three":["deploys","selects","repeats"],"odd":"intensifies","oddgroup":"strengthen"},
+{"id":"wc-ao0279","level":"developing","group":"employ","three":["selects","repeats","exaggerates"],"odd":"amplifies","oddgroup":"strengthen"},
+{"id":"wc-ao0280","level":"developing","group":"employ","three":["repeats","exaggerates","employs"],"odd":"foregrounds","oddgroup":"strengthen"},
+{"id":"wc-ao0281","level":"developing","group":"employ","three":["exaggerates","employs","deploys"],"odd":"portrays","oddgroup":"represent"},
+{"id":"wc-ao0282","level":"developing","group":"employ","three":["employs","deploys","selects"],"odd":"depicts","oddgroup":"represent"},
+{"id":"wc-ao0283","level":"developing","group":"employ","three":["deploys","selects","repeats"],"odd":"presents","oddgroup":"represent"},
+{"id":"wc-ao0284","level":"developing","group":"employ","three":["selects","repeats","exaggerates"],"odd":"characterises","oddgroup":"represent"},
+{"id":"wc-ao0285","level":"developing","group":"employ","three":["repeats","exaggerates","employs"],"odd":"frames","oddgroup":"represent"},
+{"id":"wc-ao0286","level":"developing","group":"employ","three":["exaggerates","employs","deploys"],"odd":"constructs","oddgroup":"represent"},
+{"id":"wc-ao0287","level":"secure","group":"employ","three":["employs","deploys","selects"],"odd":"criticises","oddgroup":"critic"},
+{"id":"wc-ao0288","level":"secure","group":"employ","three":["deploys","selects","repeats"],"odd":"condemns","oddgroup":"critic"},
+{"id":"wc-ao0289","level":"secure","group":"employ","three":["selects","repeats","exaggerates"],"odd":"satirises","oddgroup":"critic"},
+{"id":"wc-ao0290","level":"secure","group":"employ","three":["repeats","exaggerates","employs"],"odd":"mocks","oddgroup":"critic"},
+{"id":"wc-ao0291","level":"secure","group":"employ","three":["exaggerates","employs","deploys"],"odd":"challenges","oddgroup":"critic"},
+{"id":"wc-ao0292","level":"secure","group":"employ","three":["employs","deploys","selects"],"odd":"questions","oddgroup":"critic"},
+{"id":"wc-ao0293","level":"secure","group":"employ","three":["deploys","selects","repeats"],"odd":"celebrates","oddgroup":"approve"},
+{"id":"wc-ao0294","level":"secure","group":"employ","three":["selects","repeats","exaggerates"],"odd":"glorifies","oddgroup":"approve"},
+{"id":"wc-ao0295","level":"secure","group":"employ","three":["repeats","exaggerates","employs"],"odd":"idealises","oddgroup":"approve"},
+{"id":"wc-ao0296","level":"secure","group":"employ","three":["exaggerates","employs","deploys"],"odd":"romanticises","oddgroup":"approve"},
+{"id":"wc-ao0297","level":"secure","group":"employ","three":["employs","deploys","selects"],"odd":"symbolises","oddgroup":"standfor"},
+{"id":"wc-ao0298","level":"secure","group":"employ","three":["deploys","selects","repeats"],"odd":"embodies","oddgroup":"standfor"},
+{"id":"wc-ao0299","level":"secure","group":"employ","three":["selects","repeats","exaggerates"],"odd":"epitomises","oddgroup":"standfor"},
+{"id":"wc-ao0300","level":"secure","group":"employ","three":["repeats","exaggerates","employs"],"odd":"encapsulates","oddgroup":"standfor"},
+{"id":"wc-ao0301","level":"secure","group":"employ","three":["exaggerates","employs","deploys"],"odd":"represents","oddgroup":"standfor"},
+{"id":"wc-ao0302","level":"secure","group":"employ","three":["employs","deploys","selects"],"odd":"elicits","oddgroup":"reader"},
+{"id":"wc-ao0303","level":"secure","group":"employ","three":["deploys","selects","repeats"],"odd":"provokes","oddgroup":"reader"},
+{"id":"wc-ao0304","level":"secure","group":"employ","three":["selects","repeats","exaggerates"],"odd":"unsettles","oddgroup":"reader"},
+{"id":"wc-ao0305","level":"secure","group":"employ","three":["repeats","exaggerates","employs"],"odd":"alienates","oddgroup":"reader"},
+{"id":"wc-ao0306","level":"secure","group":"employ","three":["exaggerates","employs","deploys"],"odd":"invites","oddgroup":"reader"},
+{"id":"wc-ao0307","level":"challenge","group":"employ","three":["employs","deploys","selects"],"odd":"undermines","oddgroup":"weaken"},
+{"id":"wc-ao0308","level":"challenge","group":"employ","three":["deploys","selects","repeats"],"odd":"undercuts","oddgroup":"weaken"},
+{"id":"wc-ao0309","level":"challenge","group":"employ","three":["selects","repeats","exaggerates"],"odd":"subverts","oddgroup":"weaken"},
+{"id":"wc-ao0310","level":"challenge","group":"employ","three":["repeats","exaggerates","employs"],"odd":"complicates","oddgroup":"weaken"},
+{"id":"wc-ao0311","level":"challenge","group":"employ","three":["exaggerates","employs","deploys"],"odd":"destabilises","oddgroup":"weaken"},
+{"id":"wc-ao0312","level":"challenge","group":"employ","three":["employs","deploys","selects"],"odd":"hints at","oddgroup":"hint"},
+{"id":"wc-ao0313","level":"challenge","group":"employ","three":["deploys","selects","repeats"],"odd":"insinuates","oddgroup":"hint"},
+{"id":"wc-ao0314","level":"challenge","group":"employ","three":["selects","repeats","exaggerates"],"odd":"connotes","oddgroup":"hint"},
+{"id":"wc-ao0315","level":"challenge","group":"employ","three":["repeats","exaggerates","employs"],"odd":"foreshadows","oddgroup":"hint"},
+{"id":"wc-ao0316","level":"challenge","group":"employ","three":["exaggerates","employs","deploys"],"odd":"juxtaposes","oddgroup":"side"},
+{"id":"wc-ao0317","level":"challenge","group":"employ","three":["employs","deploys","selects"],"odd":"contrasts","oddgroup":"side"},
+{"id":"wc-ao0318","level":"challenge","group":"employ","three":["deploys","selects","repeats"],"odd":"mirrors","oddgroup":"side"},
+{"id":"wc-ao0319","level":"challenge","group":"employ","three":["selects","repeats","exaggerates"],"odd":"parallels","oddgroup":"side"},
+{"id":"wc-ao0320","level":"foundation","group":"employ","three":["repeats","exaggerates","employs"],"odd":"illustrates","oddgroup":"convey"},
+{"id":"wc-ao0321","level":"developing","group":"employ","three":["exaggerates","employs","deploys"],"odd":"expresses","oddgroup":"convey"},
+{"id":"wc-ao0322","level":"developing","group":"employ","three":["employs","deploys","selects"],"odd":"sustains","oddgroup":"effect"},
+{"id":"wc-ao0323","level":"developing","group":"employ","three":["deploys","selects","repeats"],"odd":"shifts","oddgroup":"effect"},
+{"id":"wc-ao0324","level":"developing","group":"employ","three":["selects","repeats","exaggerates"],"odd":"establishes","oddgroup":"represent"},
+{"id":"wc-ao0325","level":"developing","group":"employ","three":["repeats","exaggerates","employs"],"odd":"humanises","oddgroup":"represent"},
+{"id":"wc-ao0326","level":"developing","group":"employ","three":["exaggerates","employs","deploys"],"odd":"dramatises","oddgroup":"represent"},
+{"id":"wc-ao0327","level":"developing","group":"employ","three":["employs","deploys","selects"],"odd":"dwells on","oddgroup":"strengthen"},
+{"id":"wc-ao0328","level":"secure","group":"employ","three":["deploys","selects","repeats"],"odd":"blames","oddgroup":"critic"},
+{"id":"wc-ao0329","level":"secure","group":"employ","three":["selects","repeats","exaggerates"],"odd":"dismisses","oddgroup":"critic"},
+{"id":"wc-ao0330","level":"secure","group":"employ","three":["repeats","exaggerates","employs"],"odd":"defends","oddgroup":"approve"},
+{"id":"wc-ao0331","level":"secure","group":"employ","three":["exaggerates","employs","deploys"],"odd":"honours","oddgroup":"approve"},
+{"id":"wc-ao0332","level":"challenge","group":"employ","three":["employs","deploys","selects"],"odd":"qualifies","oddgroup":"weaken"},
+{"id":"wc-ao0333","level":"challenge","group":"employ","three":["deploys","selects","repeats"],"odd":"contradicts","oddgroup":"weaken"},
+{"id":"wc-ao0334","level":"challenge","group":"employ","three":["selects","repeats","exaggerates"],"odd":"withholds","oddgroup":"hint"},
+{"id":"wc-ao0335","level":"challenge","group":"employ","three":["repeats","exaggerates","employs"],"odd":"gestures towards","oddgroup":"hint"},
+{"id":"wc-ao0336","level":"challenge","group":"employ","three":["exaggerates","employs","deploys"],"odd":"interweaves","oddgroup":"side"},
+{"id":"wc-ao0337","level":"challenge","group":"employ","three":["employs","deploys","selects"],"odd":"inverts","oddgroup":"side"},
+{"id":"wc-ao0338","level":"challenge","group":"employ","three":["deploys","selects","repeats"],"odd":"haunts","oddgroup":"reader"},
+{"id":"wc-ao0339","level":"foundation","group":"hint","three":["suggests","implies","alludes to"],"odd":"creates","oddgroup":"effect"},
+{"id":"wc-ao0340","level":"challenge","group":"hint","three":["implies","alludes to","hints at"],"odd":"generates","oddgroup":"effect"},
+{"id":"wc-ao0341","level":"challenge","group":"hint","three":["alludes to","hints at","insinuates"],"odd":"produces","oddgroup":"effect"},
+{"id":"wc-ao0342","level":"challenge","group":"hint","three":["hints at","insinuates","connotes"],"odd":"employs","oddgroup":"employ"},
+{"id":"wc-ao0343","level":"challenge","group":"hint","three":["insinuates","connotes","foreshadows"],"odd":"highlights","oddgroup":"strengthen"},
+{"id":"wc-ao0344","level":"challenge","group":"hint","three":["connotes","foreshadows","withholds"],"odd":"emphasises","oddgroup":"strengthen"},
+{"id":"wc-ao0345","level":"challenge","group":"hint","three":["foreshadows","withholds","gestures towards"],"odd":"reinforces","oddgroup":"strengthen"},
+{"id":"wc-ao0346","level":"challenge","group":"hint","three":["withholds","gestures towards","suggests"],"odd":"evokes","oddgroup":"reader"},
+{"id":"wc-ao0347","level":"challenge","group":"hint","three":["gestures towards","suggests","implies"],"odd":"conjures","oddgroup":"reader"},
+{"id":"wc-ao0348","level":"foundation","group":"hint","three":["suggests","implies","alludes to"],"odd":"echoes","oddgroup":"side"},
+{"id":"wc-ao0349","level":"challenge","group":"hint","three":["implies","alludes to","hints at"],"odd":"deploys","oddgroup":"employ"},
+{"id":"wc-ao0350","level":"challenge","group":"hint","three":["alludes to","hints at","insinuates"],"odd":"accentuates","oddgroup":"strengthen"},
+{"id":"wc-ao0351","level":"challenge","group":"hint","three":["hints at","insinuates","connotes"],"odd":"underscores","oddgroup":"strengthen"},
+{"id":"wc-ao0352","level":"challenge","group":"hint","three":["insinuates","connotes","foreshadows"],"odd":"heightens","oddgroup":"strengthen"},
+{"id":"wc-ao0353","level":"challenge","group":"hint","three":["connotes","foreshadows","withholds"],"odd":"intensifies","oddgroup":"strengthen"},
+{"id":"wc-ao0354","level":"challenge","group":"hint","three":["foreshadows","withholds","gestures towards"],"odd":"amplifies","oddgroup":"strengthen"},
+{"id":"wc-ao0355","level":"challenge","group":"hint","three":["withholds","gestures towards","suggests"],"odd":"foregrounds","oddgroup":"strengthen"},
+{"id":"wc-ao0356","level":"challenge","group":"hint","three":["gestures towards","suggests","implies"],"odd":"portrays","oddgroup":"represent"},
+{"id":"wc-ao0357","level":"developing","group":"hint","three":["suggests","implies","alludes to"],"odd":"depicts","oddgroup":"represent"},
+{"id":"wc-ao0358","level":"challenge","group":"hint","three":["implies","alludes to","hints at"],"odd":"presents","oddgroup":"represent"},
+{"id":"wc-ao0359","level":"challenge","group":"hint","three":["alludes to","hints at","insinuates"],"odd":"characterises","oddgroup":"represent"},
+{"id":"wc-ao0360","level":"challenge","group":"hint","three":["hints at","insinuates","connotes"],"odd":"frames","oddgroup":"represent"},
+{"id":"wc-ao0361","level":"challenge","group":"hint","three":["insinuates","connotes","foreshadows"],"odd":"constructs","oddgroup":"represent"},
+{"id":"wc-ao0362","level":"challenge","group":"hint","three":["connotes","foreshadows","withholds"],"odd":"criticises","oddgroup":"critic"},
+{"id":"wc-ao0363","level":"challenge","group":"hint","three":["foreshadows","withholds","gestures towards"],"odd":"condemns","oddgroup":"critic"},
+{"id":"wc-ao0364","level":"challenge","group":"hint","three":["withholds","gestures towards","suggests"],"odd":"satirises","oddgroup":"critic"},
+{"id":"wc-ao0365","level":"challenge","group":"hint","three":["gestures towards","suggests","implies"],"odd":"mocks","oddgroup":"critic"},
+{"id":"wc-ao0366","level":"secure","group":"hint","three":["suggests","implies","alludes to"],"odd":"challenges","oddgroup":"critic"},
+{"id":"wc-ao0367","level":"challenge","group":"hint","three":["implies","alludes to","hints at"],"odd":"questions","oddgroup":"critic"},
+{"id":"wc-ao0368","level":"challenge","group":"hint","three":["alludes to","hints at","insinuates"],"odd":"celebrates","oddgroup":"approve"},
+{"id":"wc-ao0369","level":"challenge","group":"hint","three":["hints at","insinuates","connotes"],"odd":"glorifies","oddgroup":"approve"},
+{"id":"wc-ao0370","level":"challenge","group":"hint","three":["insinuates","connotes","foreshadows"],"odd":"idealises","oddgroup":"approve"},
+{"id":"wc-ao0371","level":"challenge","group":"hint","three":["connotes","foreshadows","withholds"],"odd":"romanticises","oddgroup":"approve"},
+{"id":"wc-ao0372","level":"challenge","group":"hint","three":["foreshadows","withholds","gestures towards"],"odd":"elicits","oddgroup":"reader"},
+{"id":"wc-ao0373","level":"challenge","group":"hint","three":["withholds","gestures towards","suggests"],"odd":"provokes","oddgroup":"reader"},
+{"id":"wc-ao0374","level":"challenge","group":"hint","three":["gestures towards","suggests","implies"],"odd":"unsettles","oddgroup":"reader"},
+{"id":"wc-ao0375","level":"secure","group":"hint","three":["suggests","implies","alludes to"],"odd":"alienates","oddgroup":"reader"},
+{"id":"wc-ao0376","level":"challenge","group":"hint","three":["implies","alludes to","hints at"],"odd":"invites","oddgroup":"reader"},
+{"id":"wc-ao0377","level":"challenge","group":"hint","three":["alludes to","hints at","insinuates"],"odd":"undermines","oddgroup":"weaken"},
+{"id":"wc-ao0378","level":"challenge","group":"hint","three":["hints at","insinuates","connotes"],"odd":"undercuts","oddgroup":"weaken"},
+{"id":"wc-ao0379","level":"challenge","group":"hint","three":["insinuates","connotes","foreshadows"],"odd":"subverts","oddgroup":"weaken"},
+{"id":"wc-ao0380","level":"challenge","group":"hint","three":["connotes","foreshadows","withholds"],"odd":"complicates","oddgroup":"weaken"},
+{"id":"wc-ao0381","level":"challenge","group":"hint","three":["foreshadows","withholds","gestures towards"],"odd":"destabilises","oddgroup":"weaken"},
+{"id":"wc-ao0382","level":"challenge","group":"hint","three":["withholds","gestures towards","suggests"],"odd":"juxtaposes","oddgroup":"side"},
+{"id":"wc-ao0383","level":"challenge","group":"hint","three":["gestures towards","suggests","implies"],"odd":"contrasts","oddgroup":"side"},
+{"id":"wc-ao0384","level":"challenge","group":"hint","three":["suggests","implies","alludes to"],"odd":"mirrors","oddgroup":"side"},
+{"id":"wc-ao0385","level":"challenge","group":"hint","three":["implies","alludes to","hints at"],"odd":"parallels","oddgroup":"side"},
+{"id":"wc-ao0386","level":"challenge","group":"hint","three":["alludes to","hints at","insinuates"],"odd":"selects","oddgroup":"employ"},
+{"id":"wc-ao0387","level":"challenge","group":"hint","three":["hints at","insinuates","connotes"],"odd":"repeats","oddgroup":"employ"},
+{"id":"wc-ao0388","level":"challenge","group":"hint","three":["insinuates","connotes","foreshadows"],"odd":"exaggerates","oddgroup":"employ"},
+{"id":"wc-ao0389","level":"challenge","group":"hint","three":["connotes","foreshadows","withholds"],"odd":"sustains","oddgroup":"effect"},
+{"id":"wc-ao0390","level":"challenge","group":"hint","three":["foreshadows","withholds","gestures towards"],"odd":"shifts","oddgroup":"effect"},
+{"id":"wc-ao0391","level":"challenge","group":"hint","three":["withholds","gestures towards","suggests"],"odd":"establishes","oddgroup":"represent"},
+{"id":"wc-ao0392","level":"challenge","group":"hint","three":["gestures towards","suggests","implies"],"odd":"humanises","oddgroup":"represent"},
+{"id":"wc-ao0393","level":"developing","group":"hint","three":["suggests","implies","alludes to"],"odd":"dramatises","oddgroup":"represent"},
+{"id":"wc-ao0394","level":"challenge","group":"hint","three":["implies","alludes to","hints at"],"odd":"dwells on","oddgroup":"strengthen"},
+{"id":"wc-ao0395","level":"challenge","group":"hint","three":["alludes to","hints at","insinuates"],"odd":"blames","oddgroup":"critic"},
+{"id":"wc-ao0396","level":"challenge","group":"hint","three":["hints at","insinuates","connotes"],"odd":"dismisses","oddgroup":"critic"},
+{"id":"wc-ao0397","level":"challenge","group":"hint","three":["insinuates","connotes","foreshadows"],"odd":"defends","oddgroup":"approve"},
+{"id":"wc-ao0398","level":"challenge","group":"hint","three":["connotes","foreshadows","withholds"],"odd":"honours","oddgroup":"approve"},
+{"id":"wc-ao0399","level":"challenge","group":"hint","three":["foreshadows","withholds","gestures towards"],"odd":"qualifies","oddgroup":"weaken"},
+{"id":"wc-ao0400","level":"challenge","group":"hint","three":["withholds","gestures towards","suggests"],"odd":"contradicts","oddgroup":"weaken"},
+{"id":"wc-ao0401","level":"challenge","group":"hint","three":["gestures towards","suggests","implies"],"odd":"interweaves","oddgroup":"side"},
+{"id":"wc-ao0402","level":"challenge","group":"hint","three":["suggests","implies","alludes to"],"odd":"inverts","oddgroup":"side"},
+{"id":"wc-ao0403","level":"challenge","group":"hint","three":["implies","alludes to","hints at"],"odd":"haunts","oddgroup":"reader"},
+{"id":"wc-ao0404","level":"secure","group":"reader","three":["evokes","conjures","elicits"],"odd":"demonstrates","oddgroup":"convey"},
+{"id":"wc-ao0405","level":"secure","group":"reader","three":["conjures","elicits","provokes"],"odd":"conveys","oddgroup":"convey"},
+{"id":"wc-ao0406","level":"secure","group":"reader","three":["elicits","provokes","unsettles"],"odd":"employs","oddgroup":"employ"},
+{"id":"wc-ao0407","level":"secure","group":"reader","three":["provokes","unsettles","alienates"],"odd":"highlights","oddgroup":"strengthen"},
+{"id":"wc-ao0408","level":"secure","group":"reader","three":["unsettles","alienates","invites"],"odd":"emphasises","oddgroup":"strengthen"},
+{"id":"wc-ao0409","level":"challenge","group":"reader","three":["alienates","invites","haunts"],"odd":"reinforces","oddgroup":"strengthen"},
+{"id":"wc-ao0410","level":"challenge","group":"reader","three":["invites","haunts","evokes"],"odd":"suggests","oddgroup":"hint"},
+{"id":"wc-ao0411","level":"challenge","group":"reader","three":["haunts","evokes","conjures"],"odd":"implies","oddgroup":"hint"},
+{"id":"wc-ao0412","level":"secure","group":"reader","three":["evokes","conjures","elicits"],"odd":"alludes to","oddgroup":"hint"},
+{"id":"wc-ao0413","level":"secure","group":"reader","three":["conjures","elicits","provokes"],"odd":"echoes","oddgroup":"side"},
+{"id":"wc-ao0414","level":"secure","group":"reader","three":["elicits","provokes","unsettles"],"odd":"deploys","oddgroup":"employ"},
+{"id":"wc-ao0415","level":"secure","group":"reader","three":["provokes","unsettles","alienates"],"odd":"reveals","oddgroup":"reveal"},
+{"id":"wc-ao0416","level":"secure","group":"reader","three":["unsettles","alienates","invites"],"odd":"exposes","oddgroup":"reveal"},
+{"id":"wc-ao0417","level":"challenge","group":"reader","three":["alienates","invites","haunts"],"odd":"unmasks","oddgroup":"reveal"},
+{"id":"wc-ao0418","level":"challenge","group":"reader","three":["invites","haunts","evokes"],"odd":"lays bare","oddgroup":"reveal"},
+{"id":"wc-ao0419","level":"challenge","group":"reader","three":["haunts","evokes","conjures"],"odd":"accentuates","oddgroup":"strengthen"},
+{"id":"wc-ao0420","level":"secure","group":"reader","three":["evokes","conjures","elicits"],"odd":"underscores","oddgroup":"strengthen"},
+{"id":"wc-ao0421","level":"secure","group":"reader","three":["conjures","elicits","provokes"],"odd":"heightens","oddgroup":"strengthen"},
+{"id":"wc-ao0422","level":"secure","group":"reader","three":["elicits","provokes","unsettles"],"odd":"intensifies","oddgroup":"strengthen"},
+{"id":"wc-ao0423","level":"secure","group":"reader","three":["provokes","unsettles","alienates"],"odd":"amplifies","oddgroup":"strengthen"},
+{"id":"wc-ao0424","level":"secure","group":"reader","three":["unsettles","alienates","invites"],"odd":"foregrounds","oddgroup":"strengthen"},
+{"id":"wc-ao0425","level":"challenge","group":"reader","three":["alienates","invites","haunts"],"odd":"portrays","oddgroup":"represent"},
+{"id":"wc-ao0426","level":"challenge","group":"reader","three":["invites","haunts","evokes"],"odd":"depicts","oddgroup":"represent"},
+{"id":"wc-ao0427","level":"challenge","group":"reader","three":["haunts","evokes","conjures"],"odd":"presents","oddgroup":"represent"},
+{"id":"wc-ao0428","level":"secure","group":"reader","three":["evokes","conjures","elicits"],"odd":"characterises","oddgroup":"represent"},
+{"id":"wc-ao0429","level":"secure","group":"reader","three":["conjures","elicits","provokes"],"odd":"frames","oddgroup":"represent"},
+{"id":"wc-ao0430","level":"secure","group":"reader","three":["elicits","provokes","unsettles"],"odd":"constructs","oddgroup":"represent"},
+{"id":"wc-ao0431","level":"secure","group":"reader","three":["provokes","unsettles","alienates"],"odd":"criticises","oddgroup":"critic"},
+{"id":"wc-ao0432","level":"secure","group":"reader","three":["unsettles","alienates","invites"],"odd":"condemns","oddgroup":"critic"},
+{"id":"wc-ao0433","level":"challenge","group":"reader","three":["alienates","invites","haunts"],"odd":"satirises","oddgroup":"critic"},
+{"id":"wc-ao0434","level":"challenge","group":"reader","three":["invites","haunts","evokes"],"odd":"mocks","oddgroup":"critic"},
+{"id":"wc-ao0435","level":"challenge","group":"reader","three":["haunts","evokes","conjures"],"odd":"challenges","oddgroup":"critic"},
+{"id":"wc-ao0436","level":"secure","group":"reader","three":["evokes","conjures","elicits"],"odd":"questions","oddgroup":"critic"},
+{"id":"wc-ao0437","level":"secure","group":"reader","three":["conjures","elicits","provokes"],"odd":"celebrates","oddgroup":"approve"},
+{"id":"wc-ao0438","level":"secure","group":"reader","three":["elicits","provokes","unsettles"],"odd":"glorifies","oddgroup":"approve"},
+{"id":"wc-ao0439","level":"secure","group":"reader","three":["provokes","unsettles","alienates"],"odd":"idealises","oddgroup":"approve"},
+{"id":"wc-ao0440","level":"secure","group":"reader","three":["unsettles","alienates","invites"],"odd":"romanticises","oddgroup":"approve"},
+{"id":"wc-ao0441","level":"challenge","group":"reader","three":["alienates","invites","haunts"],"odd":"symbolises","oddgroup":"standfor"},
+{"id":"wc-ao0442","level":"challenge","group":"reader","three":["invites","haunts","evokes"],"odd":"embodies","oddgroup":"standfor"},
+{"id":"wc-ao0443","level":"challenge","group":"reader","three":["haunts","evokes","conjures"],"odd":"epitomises","oddgroup":"standfor"},
+{"id":"wc-ao0444","level":"secure","group":"reader","three":["evokes","conjures","elicits"],"odd":"encapsulates","oddgroup":"standfor"},
+{"id":"wc-ao0445","level":"secure","group":"reader","three":["conjures","elicits","provokes"],"odd":"represents","oddgroup":"standfor"},
+{"id":"wc-ao0446","level":"challenge","group":"reader","three":["elicits","provokes","unsettles"],"odd":"undermines","oddgroup":"weaken"},
+{"id":"wc-ao0447","level":"challenge","group":"reader","three":["provokes","unsettles","alienates"],"odd":"undercuts","oddgroup":"weaken"},
+{"id":"wc-ao0448","level":"challenge","group":"reader","three":["unsettles","alienates","invites"],"odd":"subverts","oddgroup":"weaken"},
+{"id":"wc-ao0449","level":"challenge","group":"reader","three":["alienates","invites","haunts"],"odd":"complicates","oddgroup":"weaken"},
+{"id":"wc-ao0450","level":"challenge","group":"reader","three":["invites","haunts","evokes"],"odd":"destabilises","oddgroup":"weaken"},
+{"id":"wc-ao0451","level":"challenge","group":"reader","three":["haunts","evokes","conjures"],"odd":"hints at","oddgroup":"hint"},
+{"id":"wc-ao0452","level":"challenge","group":"reader","three":["evokes","conjures","elicits"],"odd":"insinuates","oddgroup":"hint"},
+{"id":"wc-ao0453","level":"challenge","group":"reader","three":["conjures","elicits","provokes"],"odd":"connotes","oddgroup":"hint"},
+{"id":"wc-ao0454","level":"challenge","group":"reader","three":["elicits","provokes","unsettles"],"odd":"foreshadows","oddgroup":"hint"},
+{"id":"wc-ao0455","level":"challenge","group":"reader","three":["provokes","unsettles","alienates"],"odd":"juxtaposes","oddgroup":"side"},
+{"id":"wc-ao0456","level":"challenge","group":"reader","three":["unsettles","alienates","invites"],"odd":"contrasts","oddgroup":"side"},
+{"id":"wc-ao0457","level":"challenge","group":"reader","three":["alienates","invites","haunts"],"odd":"mirrors","oddgroup":"side"},
+{"id":"wc-ao0458","level":"challenge","group":"reader","three":["invites","haunts","evokes"],"odd":"parallels","oddgroup":"side"},
+{"id":"wc-ao0459","level":"challenge","group":"reader","three":["haunts","evokes","conjures"],"odd":"illustrates","oddgroup":"convey"},
+{"id":"wc-ao0460","level":"secure","group":"reader","three":["evokes","conjures","elicits"],"odd":"expresses","oddgroup":"convey"},
+{"id":"wc-ao0461","level":"secure","group":"reader","three":["conjures","elicits","provokes"],"odd":"selects","oddgroup":"employ"},
+{"id":"wc-ao0462","level":"secure","group":"reader","three":["elicits","provokes","unsettles"],"odd":"repeats","oddgroup":"employ"},
+{"id":"wc-ao0463","level":"secure","group":"reader","three":["provokes","unsettles","alienates"],"odd":"exaggerates","oddgroup":"employ"},
+{"id":"wc-ao0464","level":"secure","group":"reader","three":["unsettles","alienates","invites"],"odd":"establishes","oddgroup":"represent"},
+{"id":"wc-ao0465","level":"challenge","group":"reader","three":["alienates","invites","haunts"],"odd":"humanises","oddgroup":"represent"},
+{"id":"wc-ao0466","level":"challenge","group":"reader","three":["invites","haunts","evokes"],"odd":"dramatises","oddgroup":"represent"},
+{"id":"wc-ao0467","level":"challenge","group":"reader","three":["haunts","evokes","conjures"],"odd":"dwells on","oddgroup":"strengthen"},
+{"id":"wc-ao0468","level":"secure","group":"reader","three":["evokes","conjures","elicits"],"odd":"blames","oddgroup":"critic"},
+{"id":"wc-ao0469","level":"secure","group":"reader","three":["conjures","elicits","provokes"],"odd":"dismisses","oddgroup":"critic"},
+{"id":"wc-ao0470","level":"secure","group":"reader","three":["elicits","provokes","unsettles"],"odd":"defends","oddgroup":"approve"},
+{"id":"wc-ao0471","level":"secure","group":"reader","three":["provokes","unsettles","alienates"],"odd":"honours","oddgroup":"approve"},
+{"id":"wc-ao0472","level":"challenge","group":"reader","three":["unsettles","alienates","invites"],"odd":"qualifies","oddgroup":"weaken"},
+{"id":"wc-ao0473","level":"challenge","group":"reader","three":["alienates","invites","haunts"],"odd":"contradicts","oddgroup":"weaken"},
+{"id":"wc-ao0474","level":"challenge","group":"reader","three":["invites","haunts","evokes"],"odd":"withholds","oddgroup":"hint"},
+{"id":"wc-ao0475","level":"challenge","group":"reader","three":["haunts","evokes","conjures"],"odd":"gestures towards","oddgroup":"hint"},
+{"id":"wc-ao0476","level":"challenge","group":"reader","three":["evokes","conjures","elicits"],"odd":"interweaves","oddgroup":"side"},
+{"id":"wc-ao0477","level":"challenge","group":"reader","three":["conjures","elicits","provokes"],"odd":"inverts","oddgroup":"side"},
+{"id":"wc-ao0478","level":"developing","group":"represent","three":["portrays","depicts","presents"],"odd":"creates","oddgroup":"effect"},
+{"id":"wc-ao0479","level":"developing","group":"represent","three":["depicts","presents","characterises"],"odd":"generates","oddgroup":"effect"},
+{"id":"wc-ao0480","level":"developing","group":"represent","three":["presents","characterises","frames"],"odd":"produces","oddgroup":"effect"},
+{"id":"wc-ao0481","level":"developing","group":"represent","three":["characterises","frames","constructs"],"odd":"employs","oddgroup":"employ"},
+{"id":"wc-ao0482","level":"developing","group":"represent","three":["frames","constructs","establishes"],"odd":"highlights","oddgroup":"strengthen"},
+{"id":"wc-ao0483","level":"developing","group":"represent","three":["constructs","establishes","humanises"],"odd":"emphasises","oddgroup":"strengthen"},
+{"id":"wc-ao0484","level":"developing","group":"represent","three":["establishes","humanises","dramatises"],"odd":"reinforces","oddgroup":"strengthen"},
+{"id":"wc-ao0485","level":"developing","group":"represent","three":["humanises","dramatises","portrays"],"odd":"evokes","oddgroup":"reader"},
+{"id":"wc-ao0486","level":"developing","group":"represent","three":["dramatises","portrays","depicts"],"odd":"conjures","oddgroup":"reader"},
+{"id":"wc-ao0487","level":"developing","group":"represent","three":["portrays","depicts","presents"],"odd":"suggests","oddgroup":"hint"},
+{"id":"wc-ao0488","level":"developing","group":"represent","three":["depicts","presents","characterises"],"odd":"implies","oddgroup":"hint"},
+{"id":"wc-ao0489","level":"developing","group":"represent","three":["presents","characterises","frames"],"odd":"alludes to","oddgroup":"hint"},
+{"id":"wc-ao0490","level":"developing","group":"represent","three":["characterises","frames","constructs"],"odd":"echoes","oddgroup":"side"},
+{"id":"wc-ao0491","level":"developing","group":"represent","three":["frames","constructs","establishes"],"odd":"deploys","oddgroup":"employ"},
+{"id":"wc-ao0492","level":"developing","group":"represent","three":["constructs","establishes","humanises"],"odd":"reveals","oddgroup":"reveal"},
+{"id":"wc-ao0493","level":"developing","group":"represent","three":["establishes","humanises","dramatises"],"odd":"exposes","oddgroup":"reveal"},
+{"id":"wc-ao0494","level":"developing","group":"represent","three":["humanises","dramatises","portrays"],"odd":"unmasks","oddgroup":"reveal"},
+{"id":"wc-ao0495","level":"developing","group":"represent","three":["dramatises","portrays","depicts"],"odd":"lays bare","oddgroup":"reveal"},
+{"id":"wc-ao0496","level":"developing","group":"represent","three":["portrays","depicts","presents"],"odd":"accentuates","oddgroup":"strengthen"},
+{"id":"wc-ao0497","level":"developing","group":"represent","three":["depicts","presents","characterises"],"odd":"underscores","oddgroup":"strengthen"},
+{"id":"wc-ao0498","level":"developing","group":"represent","three":["presents","characterises","frames"],"odd":"heightens","oddgroup":"strengthen"},
+{"id":"wc-ao0499","level":"developing","group":"represent","three":["characterises","frames","constructs"],"odd":"intensifies","oddgroup":"strengthen"},
+{"id":"wc-ao0500","level":"developing","group":"represent","three":["frames","constructs","establishes"],"odd":"amplifies","oddgroup":"strengthen"},
+{"id":"wc-ao0501","level":"developing","group":"represent","three":["constructs","establishes","humanises"],"odd":"foregrounds","oddgroup":"strengthen"},
+{"id":"wc-ao0502","level":"secure","group":"represent","three":["establishes","humanises","dramatises"],"odd":"criticises","oddgroup":"critic"},
+{"id":"wc-ao0503","level":"secure","group":"represent","three":["humanises","dramatises","portrays"],"odd":"condemns","oddgroup":"critic"},
+{"id":"wc-ao0504","level":"secure","group":"represent","three":["dramatises","portrays","depicts"],"odd":"satirises","oddgroup":"critic"},
+{"id":"wc-ao0505","level":"secure","group":"represent","three":["portrays","depicts","presents"],"odd":"mocks","oddgroup":"critic"},
+{"id":"wc-ao0506","level":"secure","group":"represent","three":["depicts","presents","characterises"],"odd":"challenges","oddgroup":"critic"},
+{"id":"wc-ao0507","level":"secure","group":"represent","three":["presents","characterises","frames"],"odd":"questions","oddgroup":"critic"},
+{"id":"wc-ao0508","level":"secure","group":"represent","three":["characterises","frames","constructs"],"odd":"elicits","oddgroup":"reader"},
+{"id":"wc-ao0509","level":"secure","group":"represent","three":["frames","constructs","establishes"],"odd":"provokes","oddgroup":"reader"},
+{"id":"wc-ao0510","level":"secure","group":"represent","three":["constructs","establishes","humanises"],"odd":"unsettles","oddgroup":"reader"},
+{"id":"wc-ao0511","level":"secure","group":"represent","three":["establishes","humanises","dramatises"],"odd":"alienates","oddgroup":"reader"},
+{"id":"wc-ao0512","level":"secure","group":"represent","three":["humanises","dramatises","portrays"],"odd":"invites","oddgroup":"reader"},
+{"id":"wc-ao0513","level":"challenge","group":"represent","three":["dramatises","portrays","depicts"],"odd":"undermines","oddgroup":"weaken"},
+{"id":"wc-ao0514","level":"challenge","group":"represent","three":["portrays","depicts","presents"],"odd":"undercuts","oddgroup":"weaken"},
+{"id":"wc-ao0515","level":"challenge","group":"represent","three":["depicts","presents","characterises"],"odd":"subverts","oddgroup":"weaken"},
+{"id":"wc-ao0516","level":"challenge","group":"represent","three":["presents","characterises","frames"],"odd":"complicates","oddgroup":"weaken"},
+{"id":"wc-ao0517","level":"challenge","group":"represent","three":["characterises","frames","constructs"],"odd":"destabilises","oddgroup":"weaken"},
+{"id":"wc-ao0518","level":"challenge","group":"represent","three":["frames","constructs","establishes"],"odd":"hints at","oddgroup":"hint"},
+{"id":"wc-ao0519","level":"challenge","group":"represent","three":["constructs","establishes","humanises"],"odd":"insinuates","oddgroup":"hint"},
+{"id":"wc-ao0520","level":"challenge","group":"represent","three":["establishes","humanises","dramatises"],"odd":"connotes","oddgroup":"hint"},
+{"id":"wc-ao0521","level":"challenge","group":"represent","three":["humanises","dramatises","portrays"],"odd":"foreshadows","oddgroup":"hint"},
+{"id":"wc-ao0522","level":"challenge","group":"represent","three":["dramatises","portrays","depicts"],"odd":"juxtaposes","oddgroup":"side"},
+{"id":"wc-ao0523","level":"challenge","group":"represent","three":["portrays","depicts","presents"],"odd":"contrasts","oddgroup":"side"},
+{"id":"wc-ao0524","level":"challenge","group":"represent","three":["depicts","presents","characterises"],"odd":"mirrors","oddgroup":"side"},
+{"id":"wc-ao0525","level":"challenge","group":"represent","three":["presents","characterises","frames"],"odd":"parallels","oddgroup":"side"},
+{"id":"wc-ao0526","level":"developing","group":"represent","three":["characterises","frames","constructs"],"odd":"selects","oddgroup":"employ"},
+{"id":"wc-ao0527","level":"developing","group":"represent","three":["frames","constructs","establishes"],"odd":"repeats","oddgroup":"employ"},
+{"id":"wc-ao0528","level":"developing","group":"represent","three":["constructs","establishes","humanises"],"odd":"exaggerates","oddgroup":"employ"},
+{"id":"wc-ao0529","level":"developing","group":"represent","three":["establishes","humanises","dramatises"],"odd":"sustains","oddgroup":"effect"},
+{"id":"wc-ao0530","level":"developing","group":"represent","three":["humanises","dramatises","portrays"],"odd":"shifts","oddgroup":"effect"},
+{"id":"wc-ao0531","level":"developing","group":"represent","three":["dramatises","portrays","depicts"],"odd":"dwells on","oddgroup":"strengthen"},
+{"id":"wc-ao0532","level":"secure","group":"represent","three":["portrays","depicts","presents"],"odd":"blames","oddgroup":"critic"},
+{"id":"wc-ao0533","level":"secure","group":"represent","three":["depicts","presents","characterises"],"odd":"dismisses","oddgroup":"critic"},
+{"id":"wc-ao0534","level":"challenge","group":"represent","three":["presents","characterises","frames"],"odd":"qualifies","oddgroup":"weaken"},
+{"id":"wc-ao0535","level":"challenge","group":"represent","three":["characterises","frames","constructs"],"odd":"contradicts","oddgroup":"weaken"},
+{"id":"wc-ao0536","level":"challenge","group":"represent","three":["frames","constructs","establishes"],"odd":"withholds","oddgroup":"hint"},
+{"id":"wc-ao0537","level":"challenge","group":"represent","three":["constructs","establishes","humanises"],"odd":"gestures towards","oddgroup":"hint"},
+{"id":"wc-ao0538","level":"challenge","group":"represent","three":["establishes","humanises","dramatises"],"odd":"interweaves","oddgroup":"side"},
+{"id":"wc-ao0539","level":"challenge","group":"represent","three":["humanises","dramatises","portrays"],"odd":"inverts","oddgroup":"side"},
+{"id":"wc-ao0540","level":"challenge","group":"represent","three":["dramatises","portrays","depicts"],"odd":"haunts","oddgroup":"reader"},
+{"id":"wc-ao0541","level":"developing","group":"reveal","three":["reveals","exposes","unmasks"],"odd":"creates","oddgroup":"effect"},
+{"id":"wc-ao0542","level":"developing","group":"reveal","three":["exposes","unmasks","lays bare"],"odd":"generates","oddgroup":"effect"},
+{"id":"wc-ao0543","level":"developing","group":"reveal","three":["unmasks","lays bare","reveals"],"odd":"produces","oddgroup":"effect"},
+{"id":"wc-ao0544","level":"developing","group":"reveal","three":["lays bare","reveals","exposes"],"odd":"employs","oddgroup":"employ"},
+{"id":"wc-ao0545","level":"developing","group":"reveal","three":["reveals","exposes","unmasks"],"odd":"evokes","oddgroup":"reader"},
+{"id":"wc-ao0546","level":"developing","group":"reveal","three":["exposes","unmasks","lays bare"],"odd":"conjures","oddgroup":"reader"},
+{"id":"wc-ao0547","level":"developing","group":"reveal","three":["unmasks","lays bare","reveals"],"odd":"echoes","oddgroup":"side"},
+{"id":"wc-ao0548","level":"developing","group":"reveal","three":["lays bare","reveals","exposes"],"odd":"deploys","oddgroup":"employ"},
+{"id":"wc-ao0549","level":"developing","group":"reveal","three":["reveals","exposes","unmasks"],"odd":"portrays","oddgroup":"represent"},
+{"id":"wc-ao0550","level":"developing","group":"reveal","three":["exposes","unmasks","lays bare"],"odd":"depicts","oddgroup":"represent"},
+{"id":"wc-ao0551","level":"developing","group":"reveal","three":["unmasks","lays bare","reveals"],"odd":"presents","oddgroup":"represent"},
+{"id":"wc-ao0552","level":"developing","group":"reveal","three":["lays bare","reveals","exposes"],"odd":"characterises","oddgroup":"represent"},
+{"id":"wc-ao0553","level":"developing","group":"reveal","three":["reveals","exposes","unmasks"],"odd":"frames","oddgroup":"represent"},
+{"id":"wc-ao0554","level":"developing","group":"reveal","three":["exposes","unmasks","lays bare"],"odd":"constructs","oddgroup":"represent"},
+{"id":"wc-ao0555","level":"secure","group":"reveal","three":["unmasks","lays bare","reveals"],"odd":"celebrates","oddgroup":"approve"},
+{"id":"wc-ao0556","level":"secure","group":"reveal","three":["lays bare","reveals","exposes"],"odd":"glorifies","oddgroup":"approve"},
+{"id":"wc-ao0557","level":"secure","group":"reveal","three":["reveals","exposes","unmasks"],"odd":"idealises","oddgroup":"approve"},
+{"id":"wc-ao0558","level":"secure","group":"reveal","three":["exposes","unmasks","lays bare"],"odd":"romanticises","oddgroup":"approve"},
+{"id":"wc-ao0559","level":"secure","group":"reveal","three":["unmasks","lays bare","reveals"],"odd":"symbolises","oddgroup":"standfor"},
+{"id":"wc-ao0560","level":"secure","group":"reveal","three":["lays bare","reveals","exposes"],"odd":"embodies","oddgroup":"standfor"},
+{"id":"wc-ao0561","level":"secure","group":"reveal","three":["reveals","exposes","unmasks"],"odd":"epitomises","oddgroup":"standfor"},
+{"id":"wc-ao0562","level":"secure","group":"reveal","three":["exposes","unmasks","lays bare"],"odd":"encapsulates","oddgroup":"standfor"},
+{"id":"wc-ao0563","level":"secure","group":"reveal","three":["unmasks","lays bare","reveals"],"odd":"represents","oddgroup":"standfor"},
+{"id":"wc-ao0564","level":"secure","group":"reveal","three":["lays bare","reveals","exposes"],"odd":"elicits","oddgroup":"reader"},
+{"id":"wc-ao0565","level":"secure","group":"reveal","three":["reveals","exposes","unmasks"],"odd":"provokes","oddgroup":"reader"},
+{"id":"wc-ao0566","level":"secure","group":"reveal","three":["exposes","unmasks","lays bare"],"odd":"unsettles","oddgroup":"reader"},
+{"id":"wc-ao0567","level":"secure","group":"reveal","three":["unmasks","lays bare","reveals"],"odd":"alienates","oddgroup":"reader"},
+{"id":"wc-ao0568","level":"secure","group":"reveal","three":["lays bare","reveals","exposes"],"odd":"invites","oddgroup":"reader"},
+{"id":"wc-ao0569","level":"challenge","group":"reveal","three":["reveals","exposes","unmasks"],"odd":"undermines","oddgroup":"weaken"},
+{"id":"wc-ao0570","level":"challenge","group":"reveal","three":["exposes","unmasks","lays bare"],"odd":"undercuts","oddgroup":"weaken"},
+{"id":"wc-ao0571","level":"challenge","group":"reveal","three":["unmasks","lays bare","reveals"],"odd":"subverts","oddgroup":"weaken"},
+{"id":"wc-ao0572","level":"challenge","group":"reveal","three":["lays bare","reveals","exposes"],"odd":"complicates","oddgroup":"weaken"},
+{"id":"wc-ao0573","level":"challenge","group":"reveal","three":["reveals","exposes","unmasks"],"odd":"destabilises","oddgroup":"weaken"},
+{"id":"wc-ao0574","level":"challenge","group":"reveal","three":["exposes","unmasks","lays bare"],"odd":"juxtaposes","oddgroup":"side"},
+{"id":"wc-ao0575","level":"challenge","group":"reveal","three":["unmasks","lays bare","reveals"],"odd":"contrasts","oddgroup":"side"},
+{"id":"wc-ao0576","level":"challenge","group":"reveal","three":["lays bare","reveals","exposes"],"odd":"mirrors","oddgroup":"side"},
+{"id":"wc-ao0577","level":"challenge","group":"reveal","three":["reveals","exposes","unmasks"],"odd":"parallels","oddgroup":"side"},
+{"id":"wc-ao0578","level":"developing","group":"reveal","three":["exposes","unmasks","lays bare"],"odd":"selects","oddgroup":"employ"},
+{"id":"wc-ao0579","level":"developing","group":"reveal","three":["unmasks","lays bare","reveals"],"odd":"repeats","oddgroup":"employ"},
+{"id":"wc-ao0580","level":"developing","group":"reveal","three":["lays bare","reveals","exposes"],"odd":"exaggerates","oddgroup":"employ"},
+{"id":"wc-ao0581","level":"developing","group":"reveal","three":["reveals","exposes","unmasks"],"odd":"sustains","oddgroup":"effect"},
+{"id":"wc-ao0582","level":"developing","group":"reveal","three":["exposes","unmasks","lays bare"],"odd":"shifts","oddgroup":"effect"},
+{"id":"wc-ao0583","level":"developing","group":"reveal","three":["unmasks","lays bare","reveals"],"odd":"establishes","oddgroup":"represent"},
+{"id":"wc-ao0584","level":"developing","group":"reveal","three":["lays bare","reveals","exposes"],"odd":"humanises","oddgroup":"represent"},
+{"id":"wc-ao0585","level":"developing","group":"reveal","three":["reveals","exposes","unmasks"],"odd":"dramatises","oddgroup":"represent"},
+{"id":"wc-ao0586","level":"secure","group":"reveal","three":["exposes","unmasks","lays bare"],"odd":"defends","oddgroup":"approve"},
+{"id":"wc-ao0587","level":"secure","group":"reveal","three":["unmasks","lays bare","reveals"],"odd":"honours","oddgroup":"approve"},
+{"id":"wc-ao0588","level":"challenge","group":"reveal","three":["lays bare","reveals","exposes"],"odd":"qualifies","oddgroup":"weaken"},
+{"id":"wc-ao0589","level":"challenge","group":"reveal","three":["reveals","exposes","unmasks"],"odd":"contradicts","oddgroup":"weaken"},
+{"id":"wc-ao0590","level":"challenge","group":"reveal","three":["exposes","unmasks","lays bare"],"odd":"interweaves","oddgroup":"side"},
+{"id":"wc-ao0591","level":"challenge","group":"reveal","three":["unmasks","lays bare","reveals"],"odd":"inverts","oddgroup":"side"},
+{"id":"wc-ao0592","level":"challenge","group":"reveal","three":["lays bare","reveals","exposes"],"odd":"haunts","oddgroup":"reader"},
+{"id":"wc-ao0593","level":"challenge","group":"side","three":["echoes","juxtaposes","contrasts"],"odd":"demonstrates","oddgroup":"convey"},
+{"id":"wc-ao0594","level":"challenge","group":"side","three":["juxtaposes","contrasts","mirrors"],"odd":"conveys","oddgroup":"convey"},
+{"id":"wc-ao0595","level":"challenge","group":"side","three":["contrasts","mirrors","parallels"],"odd":"creates","oddgroup":"effect"},
+{"id":"wc-ao0596","level":"challenge","group":"side","three":["mirrors","parallels","interweaves"],"odd":"generates","oddgroup":"effect"},
+{"id":"wc-ao0597","level":"challenge","group":"side","three":["parallels","interweaves","inverts"],"odd":"produces","oddgroup":"effect"},
+{"id":"wc-ao0598","level":"challenge","group":"side","three":["interweaves","inverts","echoes"],"odd":"employs","oddgroup":"employ"},
+{"id":"wc-ao0599","level":"challenge","group":"side","three":["inverts","echoes","juxtaposes"],"odd":"highlights","oddgroup":"strengthen"},
+{"id":"wc-ao0600","level":"challenge","group":"side","three":["echoes","juxtaposes","contrasts"],"odd":"emphasises","oddgroup":"strengthen"},
+{"id":"wc-ao0601","level":"challenge","group":"side","three":["juxtaposes","contrasts","mirrors"],"odd":"reinforces","oddgroup":"strengthen"},
+{"id":"wc-ao0602","level":"challenge","group":"side","three":["contrasts","mirrors","parallels"],"odd":"evokes","oddgroup":"reader"},
+{"id":"wc-ao0603","level":"challenge","group":"side","three":["mirrors","parallels","interweaves"],"odd":"conjures","oddgroup":"reader"},
+{"id":"wc-ao0604","level":"challenge","group":"side","three":["parallels","interweaves","inverts"],"odd":"suggests","oddgroup":"hint"},
+{"id":"wc-ao0605","level":"challenge","group":"side","three":["interweaves","inverts","echoes"],"odd":"implies","oddgroup":"hint"},
+{"id":"wc-ao0606","level":"challenge","group":"side","three":["inverts","echoes","juxtaposes"],"odd":"alludes to","oddgroup":"hint"},
+{"id":"wc-ao0607","level":"challenge","group":"side","three":["echoes","juxtaposes","contrasts"],"odd":"deploys","oddgroup":"employ"},
+{"id":"wc-ao0608","level":"challenge","group":"side","three":["juxtaposes","contrasts","mirrors"],"odd":"reveals","oddgroup":"reveal"},
+{"id":"wc-ao0609","level":"challenge","group":"side","three":["contrasts","mirrors","parallels"],"odd":"exposes","oddgroup":"reveal"},
+{"id":"wc-ao0610","level":"challenge","group":"side","three":["mirrors","parallels","interweaves"],"odd":"unmasks","oddgroup":"reveal"},
+{"id":"wc-ao0611","level":"challenge","group":"side","three":["parallels","interweaves","inverts"],"odd":"lays bare","oddgroup":"reveal"},
+{"id":"wc-ao0612","level":"challenge","group":"side","three":["interweaves","inverts","echoes"],"odd":"accentuates","oddgroup":"strengthen"},
+{"id":"wc-ao0613","level":"challenge","group":"side","three":["inverts","echoes","juxtaposes"],"odd":"underscores","oddgroup":"strengthen"},
+{"id":"wc-ao0614","level":"challenge","group":"side","three":["echoes","juxtaposes","contrasts"],"odd":"heightens","oddgroup":"strengthen"},
+{"id":"wc-ao0615","level":"challenge","group":"side","three":["juxtaposes","contrasts","mirrors"],"odd":"intensifies","oddgroup":"strengthen"},
+{"id":"wc-ao0616","level":"challenge","group":"side","three":["contrasts","mirrors","parallels"],"odd":"amplifies","oddgroup":"strengthen"},
+{"id":"wc-ao0617","level":"challenge","group":"side","three":["mirrors","parallels","interweaves"],"odd":"foregrounds","oddgroup":"strengthen"},
+{"id":"wc-ao0618","level":"challenge","group":"side","three":["parallels","interweaves","inverts"],"odd":"portrays","oddgroup":"represent"},
+{"id":"wc-ao0619","level":"challenge","group":"side","three":["interweaves","inverts","echoes"],"odd":"depicts","oddgroup":"represent"},
+{"id":"wc-ao0620","level":"challenge","group":"side","three":["inverts","echoes","juxtaposes"],"odd":"presents","oddgroup":"represent"},
+{"id":"wc-ao0621","level":"challenge","group":"side","three":["echoes","juxtaposes","contrasts"],"odd":"characterises","oddgroup":"represent"},
+{"id":"wc-ao0622","level":"challenge","group":"side","three":["juxtaposes","contrasts","mirrors"],"odd":"frames","oddgroup":"represent"},
+{"id":"wc-ao0623","level":"challenge","group":"side","three":["contrasts","mirrors","parallels"],"odd":"constructs","oddgroup":"represent"},
+{"id":"wc-ao0624","level":"challenge","group":"side","three":["mirrors","parallels","interweaves"],"odd":"criticises","oddgroup":"critic"},
+{"id":"wc-ao0625","level":"challenge","group":"side","three":["parallels","interweaves","inverts"],"odd":"condemns","oddgroup":"critic"},
+{"id":"wc-ao0626","level":"challenge","group":"side","three":["interweaves","inverts","echoes"],"odd":"satirises","oddgroup":"critic"},
+{"id":"wc-ao0627","level":"challenge","group":"side","three":["inverts","echoes","juxtaposes"],"odd":"mocks","oddgroup":"critic"},
+{"id":"wc-ao0628","level":"challenge","group":"side","three":["echoes","juxtaposes","contrasts"],"odd":"challenges","oddgroup":"critic"},
+{"id":"wc-ao0629","level":"challenge","group":"side","three":["juxtaposes","contrasts","mirrors"],"odd":"questions","oddgroup":"critic"},
+{"id":"wc-ao0630","level":"challenge","group":"side","three":["contrasts","mirrors","parallels"],"odd":"celebrates","oddgroup":"approve"},
+{"id":"wc-ao0631","level":"challenge","group":"side","three":["mirrors","parallels","interweaves"],"odd":"glorifies","oddgroup":"approve"},
+{"id":"wc-ao0632","level":"challenge","group":"side","three":["parallels","interweaves","inverts"],"odd":"idealises","oddgroup":"approve"},
+{"id":"wc-ao0633","level":"challenge","group":"side","three":["interweaves","inverts","echoes"],"odd":"romanticises","oddgroup":"approve"},
+{"id":"wc-ao0634","level":"challenge","group":"side","three":["inverts","echoes","juxtaposes"],"odd":"symbolises","oddgroup":"standfor"},
+{"id":"wc-ao0635","level":"challenge","group":"side","three":["echoes","juxtaposes","contrasts"],"odd":"embodies","oddgroup":"standfor"},
+{"id":"wc-ao0636","level":"challenge","group":"side","three":["juxtaposes","contrasts","mirrors"],"odd":"epitomises","oddgroup":"standfor"},
+{"id":"wc-ao0637","level":"challenge","group":"side","three":["contrasts","mirrors","parallels"],"odd":"encapsulates","oddgroup":"standfor"},
+{"id":"wc-ao0638","level":"challenge","group":"side","three":["mirrors","parallels","interweaves"],"odd":"represents","oddgroup":"standfor"},
+{"id":"wc-ao0639","level":"challenge","group":"side","three":["parallels","interweaves","inverts"],"odd":"elicits","oddgroup":"reader"},
+{"id":"wc-ao0640","level":"challenge","group":"side","three":["interweaves","inverts","echoes"],"odd":"provokes","oddgroup":"reader"},
+{"id":"wc-ao0641","level":"challenge","group":"side","three":["inverts","echoes","juxtaposes"],"odd":"unsettles","oddgroup":"reader"},
+{"id":"wc-ao0642","level":"challenge","group":"side","three":["echoes","juxtaposes","contrasts"],"odd":"alienates","oddgroup":"reader"},
+{"id":"wc-ao0643","level":"challenge","group":"side","three":["juxtaposes","contrasts","mirrors"],"odd":"invites","oddgroup":"reader"},
+{"id":"wc-ao0644","level":"challenge","group":"side","three":["contrasts","mirrors","parallels"],"odd":"undermines","oddgroup":"weaken"},
+{"id":"wc-ao0645","level":"challenge","group":"side","three":["mirrors","parallels","interweaves"],"odd":"undercuts","oddgroup":"weaken"},
+{"id":"wc-ao0646","level":"challenge","group":"side","three":["parallels","interweaves","inverts"],"odd":"subverts","oddgroup":"weaken"},
+{"id":"wc-ao0647","level":"challenge","group":"side","three":["interweaves","inverts","echoes"],"odd":"complicates","oddgroup":"weaken"},
+{"id":"wc-ao0648","level":"challenge","group":"side","three":["inverts","echoes","juxtaposes"],"odd":"destabilises","oddgroup":"weaken"},
+{"id":"wc-ao0649","level":"challenge","group":"side","three":["echoes","juxtaposes","contrasts"],"odd":"hints at","oddgroup":"hint"},
+{"id":"wc-ao0650","level":"challenge","group":"side","three":["juxtaposes","contrasts","mirrors"],"odd":"insinuates","oddgroup":"hint"},
+{"id":"wc-ao0651","level":"challenge","group":"side","three":["contrasts","mirrors","parallels"],"odd":"connotes","oddgroup":"hint"},
+{"id":"wc-ao0652","level":"challenge","group":"side","three":["mirrors","parallels","interweaves"],"odd":"foreshadows","oddgroup":"hint"},
+{"id":"wc-ao0653","level":"challenge","group":"side","three":["parallels","interweaves","inverts"],"odd":"illustrates","oddgroup":"convey"},
+{"id":"wc-ao0654","level":"challenge","group":"side","three":["interweaves","inverts","echoes"],"odd":"expresses","oddgroup":"convey"},
+{"id":"wc-ao0655","level":"challenge","group":"side","three":["inverts","echoes","juxtaposes"],"odd":"selects","oddgroup":"employ"},
+{"id":"wc-ao0656","level":"challenge","group":"side","three":["echoes","juxtaposes","contrasts"],"odd":"repeats","oddgroup":"employ"},
+{"id":"wc-ao0657","level":"challenge","group":"side","three":["juxtaposes","contrasts","mirrors"],"odd":"exaggerates","oddgroup":"employ"},
+{"id":"wc-ao0658","level":"challenge","group":"side","three":["contrasts","mirrors","parallels"],"odd":"sustains","oddgroup":"effect"},
+{"id":"wc-ao0659","level":"challenge","group":"side","three":["mirrors","parallels","interweaves"],"odd":"shifts","oddgroup":"effect"},
+{"id":"wc-ao0660","level":"challenge","group":"side","three":["parallels","interweaves","inverts"],"odd":"establishes","oddgroup":"represent"},
+{"id":"wc-ao0661","level":"challenge","group":"side","three":["interweaves","inverts","echoes"],"odd":"humanises","oddgroup":"represent"},
+{"id":"wc-ao0662","level":"challenge","group":"side","three":["inverts","echoes","juxtaposes"],"odd":"dramatises","oddgroup":"represent"},
+{"id":"wc-ao0663","level":"challenge","group":"side","three":["echoes","juxtaposes","contrasts"],"odd":"dwells on","oddgroup":"strengthen"},
+{"id":"wc-ao0664","level":"challenge","group":"side","three":["juxtaposes","contrasts","mirrors"],"odd":"blames","oddgroup":"critic"},
+{"id":"wc-ao0665","level":"challenge","group":"side","three":["contrasts","mirrors","parallels"],"odd":"dismisses","oddgroup":"critic"},
+{"id":"wc-ao0666","level":"challenge","group":"side","three":["mirrors","parallels","interweaves"],"odd":"defends","oddgroup":"approve"},
+{"id":"wc-ao0667","level":"challenge","group":"side","three":["parallels","interweaves","inverts"],"odd":"honours","oddgroup":"approve"},
+{"id":"wc-ao0668","level":"challenge","group":"side","three":["interweaves","inverts","echoes"],"odd":"qualifies","oddgroup":"weaken"},
+{"id":"wc-ao0669","level":"challenge","group":"side","three":["inverts","echoes","juxtaposes"],"odd":"contradicts","oddgroup":"weaken"},
+{"id":"wc-ao0670","level":"challenge","group":"side","three":["echoes","juxtaposes","contrasts"],"odd":"withholds","oddgroup":"hint"},
+{"id":"wc-ao0671","level":"challenge","group":"side","three":["juxtaposes","contrasts","mirrors"],"odd":"gestures towards","oddgroup":"hint"},
+{"id":"wc-ao0672","level":"challenge","group":"side","three":["contrasts","mirrors","parallels"],"odd":"haunts","oddgroup":"reader"},
+{"id":"wc-ao0673","level":"secure","group":"standfor","three":["symbolises","embodies","epitomises"],"odd":"demonstrates","oddgroup":"convey"},
+{"id":"wc-ao0674","level":"secure","group":"standfor","three":["embodies","epitomises","encapsulates"],"odd":"conveys","oddgroup":"convey"},
+{"id":"wc-ao0675","level":"secure","group":"standfor","three":["epitomises","encapsulates","represents"],"odd":"creates","oddgroup":"effect"},
+{"id":"wc-ao0676","level":"secure","group":"standfor","three":["encapsulates","represents","symbolises"],"odd":"generates","oddgroup":"effect"},
+{"id":"wc-ao0677","level":"secure","group":"standfor","three":["represents","symbolises","embodies"],"odd":"produces","oddgroup":"effect"},
+{"id":"wc-ao0678","level":"secure","group":"standfor","three":["symbolises","embodies","epitomises"],"odd":"employs","oddgroup":"employ"},
+{"id":"wc-ao0679","level":"secure","group":"standfor","three":["embodies","epitomises","encapsulates"],"odd":"highlights","oddgroup":"strengthen"},
+{"id":"wc-ao0680","level":"secure","group":"standfor","three":["epitomises","encapsulates","represents"],"odd":"emphasises","oddgroup":"strengthen"},
+{"id":"wc-ao0681","level":"secure","group":"standfor","three":["encapsulates","represents","symbolises"],"odd":"reinforces","oddgroup":"strengthen"},
+{"id":"wc-ao0682","level":"secure","group":"standfor","three":["represents","symbolises","embodies"],"odd":"evokes","oddgroup":"reader"},
+{"id":"wc-ao0683","level":"secure","group":"standfor","three":["symbolises","embodies","epitomises"],"odd":"conjures","oddgroup":"reader"},
+{"id":"wc-ao0684","level":"secure","group":"standfor","three":["embodies","epitomises","encapsulates"],"odd":"echoes","oddgroup":"side"},
+{"id":"wc-ao0685","level":"secure","group":"standfor","three":["epitomises","encapsulates","represents"],"odd":"deploys","oddgroup":"employ"},
+{"id":"wc-ao0686","level":"secure","group":"standfor","three":["encapsulates","represents","symbolises"],"odd":"reveals","oddgroup":"reveal"},
+{"id":"wc-ao0687","level":"secure","group":"standfor","three":["represents","symbolises","embodies"],"odd":"exposes","oddgroup":"reveal"},
+{"id":"wc-ao0688","level":"secure","group":"standfor","three":["symbolises","embodies","epitomises"],"odd":"unmasks","oddgroup":"reveal"},
+{"id":"wc-ao0689","level":"secure","group":"standfor","three":["embodies","epitomises","encapsulates"],"odd":"lays bare","oddgroup":"reveal"},
+{"id":"wc-ao0690","level":"secure","group":"standfor","three":["epitomises","encapsulates","represents"],"odd":"accentuates","oddgroup":"strengthen"},
+{"id":"wc-ao0691","level":"secure","group":"standfor","three":["encapsulates","represents","symbolises"],"odd":"underscores","oddgroup":"strengthen"},
+{"id":"wc-ao0692","level":"secure","group":"standfor","three":["represents","symbolises","embodies"],"odd":"heightens","oddgroup":"strengthen"},
+{"id":"wc-ao0693","level":"secure","group":"standfor","three":["symbolises","embodies","epitomises"],"odd":"intensifies","oddgroup":"strengthen"},
+{"id":"wc-ao0694","level":"secure","group":"standfor","three":["embodies","epitomises","encapsulates"],"odd":"amplifies","oddgroup":"strengthen"},
+{"id":"wc-ao0695","level":"secure","group":"standfor","three":["epitomises","encapsulates","represents"],"odd":"foregrounds","oddgroup":"strengthen"},
+{"id":"wc-ao0696","level":"secure","group":"standfor","three":["encapsulates","represents","symbolises"],"odd":"criticises","oddgroup":"critic"},
+{"id":"wc-ao0697","level":"secure","group":"standfor","three":["represents","symbolises","embodies"],"odd":"condemns","oddgroup":"critic"},
+{"id":"wc-ao0698","level":"secure","group":"standfor","three":["symbolises","embodies","epitomises"],"odd":"satirises","oddgroup":"critic"},
+{"id":"wc-ao0699","level":"secure","group":"standfor","three":["embodies","epitomises","encapsulates"],"odd":"mocks","oddgroup":"critic"},
+{"id":"wc-ao0700","level":"secure","group":"standfor","three":["epitomises","encapsulates","represents"],"odd":"challenges","oddgroup":"critic"},
+{"id":"wc-ao0701","level":"secure","group":"standfor","three":["encapsulates","represents","symbolises"],"odd":"questions","oddgroup":"critic"},
+{"id":"wc-ao0702","level":"secure","group":"standfor","three":["represents","symbolises","embodies"],"odd":"celebrates","oddgroup":"approve"},
+{"id":"wc-ao0703","level":"secure","group":"standfor","three":["symbolises","embodies","epitomises"],"odd":"glorifies","oddgroup":"approve"},
+{"id":"wc-ao0704","level":"secure","group":"standfor","three":["embodies","epitomises","encapsulates"],"odd":"idealises","oddgroup":"approve"},
+{"id":"wc-ao0705","level":"secure","group":"standfor","three":["epitomises","encapsulates","represents"],"odd":"romanticises","oddgroup":"approve"},
+{"id":"wc-ao0706","level":"secure","group":"standfor","three":["encapsulates","represents","symbolises"],"odd":"elicits","oddgroup":"reader"},
+{"id":"wc-ao0707","level":"secure","group":"standfor","three":["represents","symbolises","embodies"],"odd":"provokes","oddgroup":"reader"},
+{"id":"wc-ao0708","level":"secure","group":"standfor","three":["symbolises","embodies","epitomises"],"odd":"unsettles","oddgroup":"reader"},
+{"id":"wc-ao0709","level":"secure","group":"standfor","three":["embodies","epitomises","encapsulates"],"odd":"alienates","oddgroup":"reader"},
+{"id":"wc-ao0710","level":"secure","group":"standfor","three":["epitomises","encapsulates","represents"],"odd":"invites","oddgroup":"reader"},
+{"id":"wc-ao0711","level":"challenge","group":"standfor","three":["encapsulates","represents","symbolises"],"odd":"undermines","oddgroup":"weaken"},
+{"id":"wc-ao0712","level":"challenge","group":"standfor","three":["represents","symbolises","embodies"],"odd":"undercuts","oddgroup":"weaken"},
+{"id":"wc-ao0713","level":"challenge","group":"standfor","three":["symbolises","embodies","epitomises"],"odd":"subverts","oddgroup":"weaken"},
+{"id":"wc-ao0714","level":"challenge","group":"standfor","three":["embodies","epitomises","encapsulates"],"odd":"complicates","oddgroup":"weaken"},
+{"id":"wc-ao0715","level":"challenge","group":"standfor","three":["epitomises","encapsulates","represents"],"odd":"destabilises","oddgroup":"weaken"},
+{"id":"wc-ao0716","level":"challenge","group":"standfor","three":["encapsulates","represents","symbolises"],"odd":"juxtaposes","oddgroup":"side"},
+{"id":"wc-ao0717","level":"challenge","group":"standfor","three":["represents","symbolises","embodies"],"odd":"contrasts","oddgroup":"side"},
+{"id":"wc-ao0718","level":"challenge","group":"standfor","three":["symbolises","embodies","epitomises"],"odd":"mirrors","oddgroup":"side"},
+{"id":"wc-ao0719","level":"challenge","group":"standfor","three":["embodies","epitomises","encapsulates"],"odd":"parallels","oddgroup":"side"},
+{"id":"wc-ao0720","level":"secure","group":"standfor","three":["epitomises","encapsulates","represents"],"odd":"illustrates","oddgroup":"convey"},
+{"id":"wc-ao0721","level":"secure","group":"standfor","three":["encapsulates","represents","symbolises"],"odd":"expresses","oddgroup":"convey"},
+{"id":"wc-ao0722","level":"secure","group":"standfor","three":["represents","symbolises","embodies"],"odd":"selects","oddgroup":"employ"},
+{"id":"wc-ao0723","level":"secure","group":"standfor","three":["symbolises","embodies","epitomises"],"odd":"repeats","oddgroup":"employ"},
+{"id":"wc-ao0724","level":"secure","group":"standfor","three":["embodies","epitomises","encapsulates"],"odd":"exaggerates","oddgroup":"employ"},
+{"id":"wc-ao0725","level":"secure","group":"standfor","three":["epitomises","encapsulates","represents"],"odd":"sustains","oddgroup":"effect"},
+{"id":"wc-ao0726","level":"secure","group":"standfor","three":["encapsulates","represents","symbolises"],"odd":"shifts","oddgroup":"effect"},
+{"id":"wc-ao0727","level":"secure","group":"standfor","three":["represents","symbolises","embodies"],"odd":"dwells on","oddgroup":"strengthen"},
+{"id":"wc-ao0728","level":"secure","group":"standfor","three":["symbolises","embodies","epitomises"],"odd":"blames","oddgroup":"critic"},
+{"id":"wc-ao0729","level":"secure","group":"standfor","three":["embodies","epitomises","encapsulates"],"odd":"dismisses","oddgroup":"critic"},
+{"id":"wc-ao0730","level":"secure","group":"standfor","three":["epitomises","encapsulates","represents"],"odd":"defends","oddgroup":"approve"},
+{"id":"wc-ao0731","level":"secure","group":"standfor","three":["encapsulates","represents","symbolises"],"odd":"honours","oddgroup":"approve"},
+{"id":"wc-ao0732","level":"challenge","group":"standfor","three":["represents","symbolises","embodies"],"odd":"qualifies","oddgroup":"weaken"},
+{"id":"wc-ao0733","level":"challenge","group":"standfor","three":["symbolises","embodies","epitomises"],"odd":"contradicts","oddgroup":"weaken"},
+{"id":"wc-ao0734","level":"challenge","group":"standfor","three":["embodies","epitomises","encapsulates"],"odd":"interweaves","oddgroup":"side"},
+{"id":"wc-ao0735","level":"challenge","group":"standfor","three":["epitomises","encapsulates","represents"],"odd":"inverts","oddgroup":"side"},
+{"id":"wc-ao0736","level":"challenge","group":"standfor","three":["encapsulates","represents","symbolises"],"odd":"haunts","oddgroup":"reader"},
+{"id":"wc-ao0737","level":"foundation","group":"strengthen","three":["highlights","emphasises","reinforces"],"odd":"creates","oddgroup":"effect"},
+{"id":"wc-ao0738","level":"developing","group":"strengthen","three":["emphasises","reinforces","accentuates"],"odd":"generates","oddgroup":"effect"},
+{"id":"wc-ao0739","level":"developing","group":"strengthen","three":["reinforces","accentuates","underscores"],"odd":"produces","oddgroup":"effect"},
+{"id":"wc-ao0740","level":"developing","group":"strengthen","three":["accentuates","underscores","heightens"],"odd":"employs","oddgroup":"employ"},
+{"id":"wc-ao0741","level":"developing","group":"strengthen","three":["underscores","heightens","intensifies"],"odd":"evokes","oddgroup":"reader"},
+{"id":"wc-ao0742","level":"developing","group":"strengthen","three":["heightens","intensifies","amplifies"],"odd":"conjures","oddgroup":"reader"},
+{"id":"wc-ao0743","level":"developing","group":"strengthen","three":["intensifies","amplifies","foregrounds"],"odd":"suggests","oddgroup":"hint"},
+{"id":"wc-ao0744","level":"developing","group":"strengthen","three":["amplifies","foregrounds","dwells on"],"odd":"implies","oddgroup":"hint"},
+{"id":"wc-ao0745","level":"developing","group":"strengthen","three":["foregrounds","dwells on","highlights"],"odd":"alludes to","oddgroup":"hint"},
+{"id":"wc-ao0746","level":"developing","group":"strengthen","three":["dwells on","highlights","emphasises"],"odd":"echoes","oddgroup":"side"},
+{"id":"wc-ao0747","level":"developing","group":"strengthen","three":["highlights","emphasises","reinforces"],"odd":"deploys","oddgroup":"employ"},
+{"id":"wc-ao0748","level":"developing","group":"strengthen","three":["emphasises","reinforces","accentuates"],"odd":"portrays","oddgroup":"represent"},
+{"id":"wc-ao0749","level":"developing","group":"strengthen","three":["reinforces","accentuates","underscores"],"odd":"depicts","oddgroup":"represent"},
+{"id":"wc-ao0750","level":"developing","group":"strengthen","three":["accentuates","underscores","heightens"],"odd":"presents","oddgroup":"represent"},
+{"id":"wc-ao0751","level":"developing","group":"strengthen","three":["underscores","heightens","intensifies"],"odd":"characterises","oddgroup":"represent"},
+{"id":"wc-ao0752","level":"developing","group":"strengthen","three":["heightens","intensifies","amplifies"],"odd":"frames","oddgroup":"represent"},
+{"id":"wc-ao0753","level":"developing","group":"strengthen","three":["intensifies","amplifies","foregrounds"],"odd":"constructs","oddgroup":"represent"},
+{"id":"wc-ao0754","level":"secure","group":"strengthen","three":["amplifies","foregrounds","dwells on"],"odd":"criticises","oddgroup":"critic"},
+{"id":"wc-ao0755","level":"secure","group":"strengthen","three":["foregrounds","dwells on","highlights"],"odd":"condemns","oddgroup":"critic"},
+{"id":"wc-ao0756","level":"secure","group":"strengthen","three":["dwells on","highlights","emphasises"],"odd":"satirises","oddgroup":"critic"},
+{"id":"wc-ao0757","level":"secure","group":"strengthen","three":["highlights","emphasises","reinforces"],"odd":"mocks","oddgroup":"critic"},
+{"id":"wc-ao0758","level":"secure","group":"strengthen","three":["emphasises","reinforces","accentuates"],"odd":"challenges","oddgroup":"critic"},
+{"id":"wc-ao0759","level":"secure","group":"strengthen","three":["reinforces","accentuates","underscores"],"odd":"questions","oddgroup":"critic"},
+{"id":"wc-ao0760","level":"secure","group":"strengthen","three":["accentuates","underscores","heightens"],"odd":"celebrates","oddgroup":"approve"},
+{"id":"wc-ao0761","level":"secure","group":"strengthen","three":["underscores","heightens","intensifies"],"odd":"glorifies","oddgroup":"approve"},
+{"id":"wc-ao0762","level":"secure","group":"strengthen","three":["heightens","intensifies","amplifies"],"odd":"idealises","oddgroup":"approve"},
+{"id":"wc-ao0763","level":"secure","group":"strengthen","three":["intensifies","amplifies","foregrounds"],"odd":"romanticises","oddgroup":"approve"},
+{"id":"wc-ao0764","level":"secure","group":"strengthen","three":["amplifies","foregrounds","dwells on"],"odd":"symbolises","oddgroup":"standfor"},
+{"id":"wc-ao0765","level":"secure","group":"strengthen","three":["foregrounds","dwells on","highlights"],"odd":"embodies","oddgroup":"standfor"},
+{"id":"wc-ao0766","level":"secure","group":"strengthen","three":["dwells on","highlights","emphasises"],"odd":"epitomises","oddgroup":"standfor"},
+{"id":"wc-ao0767","level":"secure","group":"strengthen","three":["highlights","emphasises","reinforces"],"odd":"encapsulates","oddgroup":"standfor"},
+{"id":"wc-ao0768","level":"secure","group":"strengthen","three":["emphasises","reinforces","accentuates"],"odd":"represents","oddgroup":"standfor"},
+{"id":"wc-ao0769","level":"secure","group":"strengthen","three":["reinforces","accentuates","underscores"],"odd":"elicits","oddgroup":"reader"},
+{"id":"wc-ao0770","level":"secure","group":"strengthen","three":["accentuates","underscores","heightens"],"odd":"provokes","oddgroup":"reader"},
+{"id":"wc-ao0771","level":"secure","group":"strengthen","three":["underscores","heightens","intensifies"],"odd":"unsettles","oddgroup":"reader"},
+{"id":"wc-ao0772","level":"secure","group":"strengthen","three":["heightens","intensifies","amplifies"],"odd":"alienates","oddgroup":"reader"},
+{"id":"wc-ao0773","level":"secure","group":"strengthen","three":["intensifies","amplifies","foregrounds"],"odd":"invites","oddgroup":"reader"},
+{"id":"wc-ao0774","level":"challenge","group":"strengthen","three":["amplifies","foregrounds","dwells on"],"odd":"undermines","oddgroup":"weaken"},
+{"id":"wc-ao0775","level":"challenge","group":"strengthen","three":["foregrounds","dwells on","highlights"],"odd":"undercuts","oddgroup":"weaken"},
+{"id":"wc-ao0776","level":"challenge","group":"strengthen","three":["dwells on","highlights","emphasises"],"odd":"subverts","oddgroup":"weaken"},
+{"id":"wc-ao0777","level":"challenge","group":"strengthen","three":["highlights","emphasises","reinforces"],"odd":"complicates","oddgroup":"weaken"},
+{"id":"wc-ao0778","level":"challenge","group":"strengthen","three":["emphasises","reinforces","accentuates"],"odd":"destabilises","oddgroup":"weaken"},
+{"id":"wc-ao0779","level":"challenge","group":"strengthen","three":["reinforces","accentuates","underscores"],"odd":"hints at","oddgroup":"hint"},
+{"id":"wc-ao0780","level":"challenge","group":"strengthen","three":["accentuates","underscores","heightens"],"odd":"insinuates","oddgroup":"hint"},
+{"id":"wc-ao0781","level":"challenge","group":"strengthen","three":["underscores","heightens","intensifies"],"odd":"connotes","oddgroup":"hint"},
+{"id":"wc-ao0782","level":"challenge","group":"strengthen","three":["heightens","intensifies","amplifies"],"odd":"foreshadows","oddgroup":"hint"},
+{"id":"wc-ao0783","level":"challenge","group":"strengthen","three":["intensifies","amplifies","foregrounds"],"odd":"juxtaposes","oddgroup":"side"},
+{"id":"wc-ao0784","level":"challenge","group":"strengthen","three":["amplifies","foregrounds","dwells on"],"odd":"contrasts","oddgroup":"side"},
+{"id":"wc-ao0785","level":"challenge","group":"strengthen","three":["foregrounds","dwells on","highlights"],"odd":"mirrors","oddgroup":"side"},
+{"id":"wc-ao0786","level":"challenge","group":"strengthen","three":["dwells on","highlights","emphasises"],"odd":"parallels","oddgroup":"side"},
+{"id":"wc-ao0787","level":"foundation","group":"strengthen","three":["highlights","emphasises","reinforces"],"odd":"selects","oddgroup":"employ"},
+{"id":"wc-ao0788","level":"developing","group":"strengthen","three":["emphasises","reinforces","accentuates"],"odd":"repeats","oddgroup":"employ"},
+{"id":"wc-ao0789","level":"developing","group":"strengthen","three":["reinforces","accentuates","underscores"],"odd":"exaggerates","oddgroup":"employ"},
+{"id":"wc-ao0790","level":"developing","group":"strengthen","three":["accentuates","underscores","heightens"],"odd":"sustains","oddgroup":"effect"},
+{"id":"wc-ao0791","level":"developing","group":"strengthen","three":["underscores","heightens","intensifies"],"odd":"shifts","oddgroup":"effect"},
+{"id":"wc-ao0792","level":"developing","group":"strengthen","three":["heightens","intensifies","amplifies"],"odd":"establishes","oddgroup":"represent"},
+{"id":"wc-ao0793","level":"developing","group":"strengthen","three":["intensifies","amplifies","foregrounds"],"odd":"humanises","oddgroup":"represent"},
+{"id":"wc-ao0794","level":"developing","group":"strengthen","three":["amplifies","foregrounds","dwells on"],"odd":"dramatises","oddgroup":"represent"},
+{"id":"wc-ao0795","level":"secure","group":"strengthen","three":["foregrounds","dwells on","highlights"],"odd":"blames","oddgroup":"critic"},
+{"id":"wc-ao0796","level":"secure","group":"strengthen","three":["dwells on","highlights","emphasises"],"odd":"dismisses","oddgroup":"critic"},
+{"id":"wc-ao0797","level":"secure","group":"strengthen","three":["highlights","emphasises","reinforces"],"odd":"defends","oddgroup":"approve"},
+{"id":"wc-ao0798","level":"secure","group":"strengthen","three":["emphasises","reinforces","accentuates"],"odd":"honours","oddgroup":"approve"},
+{"id":"wc-ao0799","level":"challenge","group":"strengthen","three":["reinforces","accentuates","underscores"],"odd":"qualifies","oddgroup":"weaken"},
+{"id":"wc-ao0800","level":"challenge","group":"strengthen","three":["accentuates","underscores","heightens"],"odd":"contradicts","oddgroup":"weaken"},
+{"id":"wc-ao0801","level":"challenge","group":"strengthen","three":["underscores","heightens","intensifies"],"odd":"withholds","oddgroup":"hint"},
+{"id":"wc-ao0802","level":"challenge","group":"strengthen","three":["heightens","intensifies","amplifies"],"odd":"gestures towards","oddgroup":"hint"},
+{"id":"wc-ao0803","level":"challenge","group":"strengthen","three":["intensifies","amplifies","foregrounds"],"odd":"interweaves","oddgroup":"side"},
+{"id":"wc-ao0804","level":"challenge","group":"strengthen","three":["amplifies","foregrounds","dwells on"],"odd":"inverts","oddgroup":"side"},
+{"id":"wc-ao0805","level":"challenge","group":"strengthen","three":["foregrounds","dwells on","highlights"],"odd":"haunts","oddgroup":"reader"},
+{"id":"wc-ao0806","level":"challenge","group":"weaken","three":["undermines","undercuts","subverts"],"odd":"demonstrates","oddgroup":"convey"},
+{"id":"wc-ao0807","level":"challenge","group":"weaken","three":["undercuts","subverts","complicates"],"odd":"conveys","oddgroup":"convey"},
+{"id":"wc-ao0808","level":"challenge","group":"weaken","three":["subverts","complicates","destabilises"],"odd":"creates","oddgroup":"effect"},
+{"id":"wc-ao0809","level":"challenge","group":"weaken","three":["complicates","destabilises","qualifies"],"odd":"generates","oddgroup":"effect"},
+{"id":"wc-ao0810","level":"challenge","group":"weaken","three":["destabilises","qualifies","contradicts"],"odd":"produces","oddgroup":"effect"},
+{"id":"wc-ao0811","level":"challenge","group":"weaken","three":["qualifies","contradicts","undermines"],"odd":"employs","oddgroup":"employ"},
+{"id":"wc-ao0812","level":"challenge","group":"weaken","three":["contradicts","undermines","undercuts"],"odd":"highlights","oddgroup":"strengthen"},
+{"id":"wc-ao0813","level":"challenge","group":"weaken","three":["undermines","undercuts","subverts"],"odd":"emphasises","oddgroup":"strengthen"},
+{"id":"wc-ao0814","level":"challenge","group":"weaken","three":["undercuts","subverts","complicates"],"odd":"reinforces","oddgroup":"strengthen"},
+{"id":"wc-ao0815","level":"challenge","group":"weaken","three":["subverts","complicates","destabilises"],"odd":"evokes","oddgroup":"reader"},
+{"id":"wc-ao0816","level":"challenge","group":"weaken","three":["complicates","destabilises","qualifies"],"odd":"conjures","oddgroup":"reader"},
+{"id":"wc-ao0817","level":"challenge","group":"weaken","three":["destabilises","qualifies","contradicts"],"odd":"suggests","oddgroup":"hint"},
+{"id":"wc-ao0818","level":"challenge","group":"weaken","three":["qualifies","contradicts","undermines"],"odd":"implies","oddgroup":"hint"},
+{"id":"wc-ao0819","level":"challenge","group":"weaken","three":["contradicts","undermines","undercuts"],"odd":"alludes to","oddgroup":"hint"},
+{"id":"wc-ao0820","level":"challenge","group":"weaken","three":["undermines","undercuts","subverts"],"odd":"echoes","oddgroup":"side"},
+{"id":"wc-ao0821","level":"challenge","group":"weaken","three":["undercuts","subverts","complicates"],"odd":"deploys","oddgroup":"employ"},
+{"id":"wc-ao0822","level":"challenge","group":"weaken","three":["subverts","complicates","destabilises"],"odd":"reveals","oddgroup":"reveal"},
+{"id":"wc-ao0823","level":"challenge","group":"weaken","three":["complicates","destabilises","qualifies"],"odd":"exposes","oddgroup":"reveal"},
+{"id":"wc-ao0824","level":"challenge","group":"weaken","three":["destabilises","qualifies","contradicts"],"odd":"unmasks","oddgroup":"reveal"},
+{"id":"wc-ao0825","level":"challenge","group":"weaken","three":["qualifies","contradicts","undermines"],"odd":"lays bare","oddgroup":"reveal"},
+{"id":"wc-ao0826","level":"challenge","group":"weaken","three":["contradicts","undermines","undercuts"],"odd":"accentuates","oddgroup":"strengthen"},
+{"id":"wc-ao0827","level":"challenge","group":"weaken","three":["undermines","undercuts","subverts"],"odd":"underscores","oddgroup":"strengthen"},
+{"id":"wc-ao0828","level":"challenge","group":"weaken","three":["undercuts","subverts","complicates"],"odd":"heightens","oddgroup":"strengthen"},
+{"id":"wc-ao0829","level":"challenge","group":"weaken","three":["subverts","complicates","destabilises"],"odd":"intensifies","oddgroup":"strengthen"},
+{"id":"wc-ao0830","level":"challenge","group":"weaken","three":["complicates","destabilises","qualifies"],"odd":"amplifies","oddgroup":"strengthen"},
+{"id":"wc-ao0831","level":"challenge","group":"weaken","three":["destabilises","qualifies","contradicts"],"odd":"foregrounds","oddgroup":"strengthen"},
+{"id":"wc-ao0832","level":"challenge","group":"weaken","three":["qualifies","contradicts","undermines"],"odd":"portrays","oddgroup":"represent"},
+{"id":"wc-ao0833","level":"challenge","group":"weaken","three":["contradicts","undermines","undercuts"],"odd":"depicts","oddgroup":"represent"},
+{"id":"wc-ao0834","level":"challenge","group":"weaken","three":["undermines","undercuts","subverts"],"odd":"presents","oddgroup":"represent"},
+{"id":"wc-ao0835","level":"challenge","group":"weaken","three":["undercuts","subverts","complicates"],"odd":"characterises","oddgroup":"represent"},
+{"id":"wc-ao0836","level":"challenge","group":"weaken","three":["subverts","complicates","destabilises"],"odd":"frames","oddgroup":"represent"},
+{"id":"wc-ao0837","level":"challenge","group":"weaken","three":["complicates","destabilises","qualifies"],"odd":"constructs","oddgroup":"represent"},
+{"id":"wc-ao0838","level":"challenge","group":"weaken","three":["destabilises","qualifies","contradicts"],"odd":"celebrates","oddgroup":"approve"},
+{"id":"wc-ao0839","level":"challenge","group":"weaken","three":["qualifies","contradicts","undermines"],"odd":"glorifies","oddgroup":"approve"},
+{"id":"wc-ao0840","level":"challenge","group":"weaken","three":["contradicts","undermines","undercuts"],"odd":"idealises","oddgroup":"approve"},
+{"id":"wc-ao0841","level":"challenge","group":"weaken","three":["undermines","undercuts","subverts"],"odd":"romanticises","oddgroup":"approve"},
+{"id":"wc-ao0842","level":"challenge","group":"weaken","three":["undercuts","subverts","complicates"],"odd":"symbolises","oddgroup":"standfor"},
+{"id":"wc-ao0843","level":"challenge","group":"weaken","three":["subverts","complicates","destabilises"],"odd":"embodies","oddgroup":"standfor"},
+{"id":"wc-ao0844","level":"challenge","group":"weaken","three":["complicates","destabilises","qualifies"],"odd":"epitomises","oddgroup":"standfor"},
+{"id":"wc-ao0845","level":"challenge","group":"weaken","three":["destabilises","qualifies","contradicts"],"odd":"encapsulates","oddgroup":"standfor"},
+{"id":"wc-ao0846","level":"challenge","group":"weaken","three":["qualifies","contradicts","undermines"],"odd":"represents","oddgroup":"standfor"},
+{"id":"wc-ao0847","level":"challenge","group":"weaken","three":["contradicts","undermines","undercuts"],"odd":"elicits","oddgroup":"reader"},
+{"id":"wc-ao0848","level":"challenge","group":"weaken","three":["undermines","undercuts","subverts"],"odd":"provokes","oddgroup":"reader"},
+{"id":"wc-ao0849","level":"challenge","group":"weaken","three":["undercuts","subverts","complicates"],"odd":"unsettles","oddgroup":"reader"},
+{"id":"wc-ao0850","level":"challenge","group":"weaken","three":["subverts","complicates","destabilises"],"odd":"alienates","oddgroup":"reader"},
+{"id":"wc-ao0851","level":"challenge","group":"weaken","three":["complicates","destabilises","qualifies"],"odd":"invites","oddgroup":"reader"},
+{"id":"wc-ao0852","level":"challenge","group":"weaken","three":["destabilises","qualifies","contradicts"],"odd":"hints at","oddgroup":"hint"},
+{"id":"wc-ao0853","level":"challenge","group":"weaken","three":["qualifies","contradicts","undermines"],"odd":"insinuates","oddgroup":"hint"},
+{"id":"wc-ao0854","level":"challenge","group":"weaken","three":["contradicts","undermines","undercuts"],"odd":"connotes","oddgroup":"hint"},
+{"id":"wc-ao0855","level":"challenge","group":"weaken","three":["undermines","undercuts","subverts"],"odd":"foreshadows","oddgroup":"hint"},
+{"id":"wc-ao0856","level":"challenge","group":"weaken","three":["undercuts","subverts","complicates"],"odd":"juxtaposes","oddgroup":"side"},
+{"id":"wc-ao0857","level":"challenge","group":"weaken","three":["subverts","complicates","destabilises"],"odd":"contrasts","oddgroup":"side"},
+{"id":"wc-ao0858","level":"challenge","group":"weaken","three":["complicates","destabilises","qualifies"],"odd":"mirrors","oddgroup":"side"},
+{"id":"wc-ao0859","level":"challenge","group":"weaken","three":["destabilises","qualifies","contradicts"],"odd":"parallels","oddgroup":"side"},
+{"id":"wc-ao0860","level":"challenge","group":"weaken","three":["qualifies","contradicts","undermines"],"odd":"illustrates","oddgroup":"convey"},
+{"id":"wc-ao0861","level":"challenge","group":"weaken","three":["contradicts","undermines","undercuts"],"odd":"expresses","oddgroup":"convey"},
+{"id":"wc-ao0862","level":"challenge","group":"weaken","three":["undermines","undercuts","subverts"],"odd":"selects","oddgroup":"employ"},
+{"id":"wc-ao0863","level":"challenge","group":"weaken","three":["undercuts","subverts","complicates"],"odd":"repeats","oddgroup":"employ"},
+{"id":"wc-ao0864","level":"challenge","group":"weaken","three":["subverts","complicates","destabilises"],"odd":"exaggerates","oddgroup":"employ"},
+{"id":"wc-ao0865","level":"challenge","group":"weaken","three":["complicates","destabilises","qualifies"],"odd":"sustains","oddgroup":"effect"},
+{"id":"wc-ao0866","level":"challenge","group":"weaken","three":["destabilises","qualifies","contradicts"],"odd":"shifts","oddgroup":"effect"},
+{"id":"wc-ao0867","level":"challenge","group":"weaken","three":["qualifies","contradicts","undermines"],"odd":"establishes","oddgroup":"represent"},
+{"id":"wc-ao0868","level":"challenge","group":"weaken","three":["contradicts","undermines","undercuts"],"odd":"humanises","oddgroup":"represent"},
+{"id":"wc-ao0869","level":"challenge","group":"weaken","three":["undermines","undercuts","subverts"],"odd":"dramatises","oddgroup":"represent"},
+{"id":"wc-ao0870","level":"challenge","group":"weaken","three":["undercuts","subverts","complicates"],"odd":"dwells on","oddgroup":"strengthen"},
+{"id":"wc-ao0871","level":"challenge","group":"weaken","three":["subverts","complicates","destabilises"],"odd":"defends","oddgroup":"approve"},
+{"id":"wc-ao0872","level":"challenge","group":"weaken","three":["complicates","destabilises","qualifies"],"odd":"honours","oddgroup":"approve"},
+{"id":"wc-ao0873","level":"challenge","group":"weaken","three":["destabilises","qualifies","contradicts"],"odd":"withholds","oddgroup":"hint"},
+{"id":"wc-ao0874","level":"challenge","group":"weaken","three":["qualifies","contradicts","undermines"],"odd":"gestures towards","oddgroup":"hint"},
+{"id":"wc-ao0875","level":"challenge","group":"weaken","three":["contradicts","undermines","undercuts"],"odd":"interweaves","oddgroup":"side"},
+{"id":"wc-ao0876","level":"challenge","group":"weaken","three":["undermines","undercuts","subverts"],"odd":"inverts","oddgroup":"side"},
+{"id":"wc-ao0877","level":"challenge","group":"weaken","three":["undercuts","subverts","complicates"],"odd":"haunts","oddgroup":"reader"}
 ];
 var ALMETA = {"groups":[{"id":"convey","job":"puts a meaning across to the reader"},{"id":"effect","job":"brings an effect or impression into being"},{"id":"deduce","job":"works out a meaning from clues (the reader does this, not the writer)"},{"id":"employ","job":"names a tool the writer uses on purpose"},{"id":"reveal","job":"brings something hidden into view"},{"id":"strengthen","job":"makes something stronger or more noticeable"},{"id":"represent","job":"shows a person, place or idea in a chosen way"},{"id":"critic","job":"takes a stand against something"},{"id":"approve","job":"takes an approving stance towards something"},{"id":"standfor","job":"stands for a bigger idea"},{"id":"hint","job":"puts an idea in the reader's mind indirectly"},{"id":"side","job":"links or sets things side by side"},{"id":"reader","job":"acts on the reader's feelings or thoughts"},{"id":"weaken","job":"takes the strength out of something, or makes it less simple"}],"conflicts":[["convey","reveal"],["convey","represent"],["convey","hint"],["convey","effect"],["convey","strengthen"],["effect","reader"],["critic","weaken"],["critic","reveal"],["approve","represent"],["standfor","represent"],["standfor","hint"],["strengthen","reveal"],["deduce","hint"],["hint","reveal"]]};
 /* Techniques (Expanded), second wave (SPEC 53): the semantic field round, and
@@ -5116,7 +6085,7 @@ var STAMPMETA = {"fmt":1,"skip":["id","dx"],"strict":["secure","challenge"]};
 /* BANK_REV stays at 37: v0.61 adds no items and retires none. It bumps when the
    banks change, and bumping it for a code change makes every pupil's record run
    the pruner for nothing. */
-var APP = "wcc", VER = "v0.73", BANK_REV = 41;
+var APP = "wcc", VER = "v0.74", BANK_REV = 41;
 var BUG_FORM_URL = "";   /* paste the Office 365 form link to switch the report button on */
 
 /* ================= HELD OUT (v0.61, SPEC 72) ================================
@@ -5138,7 +6107,10 @@ var DXHOME = {};    /* id -> the bank array it was lifted out of */
 var DX_BANKS = ["SENTENCES", "FRAMES", "CLOZE", "KLASS", "SHIFTERS", "TECHNIQUES", "PUNCT",
                 "COMMAS", "SPLICE", "TENSES", "PUNCPARAS", "TENSEPARAS", "IMAGERY", "TECHDEFS",
                 "NAMEEX", "SPOT", "EI", "ALW", "ALCTX", "ALUPG", "SEMF", "XTERMS", "TRANSFORM",
-                "FAMILIES"];
+                "FAMILIES", "KTSORT", "ALODD",
+                /* v0.74: enumerated at load from SENTENCES, not spliced, but its
+                   ids are in a pupil's history and must survive _pruneToBank. */
+                "YESNO"];
 function dxBank(name){
   return (typeof window !== "undefined" && window[name] && window[name].length !== undefined)
     ? window[name] : null;
@@ -5199,7 +6171,62 @@ function dxLeak(){
   }
   return out;
 }
+
+/* A DERIVED POOL IS INVALIDATED BY WHATEVER CHANGES ITS SOURCE (v0.74).
+   `YESNO` is enumerated from SENTENCES, so a split that moves sentences leaves
+   it holding questions whose sentence the page no longer has. At LOAD the order
+   saves it, because `dxSplit()` is called above and `ynBuild()` below. Nothing
+   saved a LATER call: `holdtest.py` rigs a bank and splits again mid-session,
+   and the round then handed `ynRender` a null sentence and threw.
+
+   Clearing it here rather than asking every caller of `dxSplit` to remember is
+   the v0.61 rule about doors: a promise each caller keeps is a promise that
+   holds in one place. The next `ynNext` rebuilds from the bank as it now
+   stands. */
+function dxSplitAndDerive(){
+  var moved = dxSplit();
+  if(typeof YESNO !== "undefined") YESNO.length = 0;
+  dxPruneDerived();
+  return moved;
+}
+
+/* THE SAME RULE FOR THE BANKS THAT ARE DERIVED IN THE BUILD (v0.74).
+   `ALODD` names analytical words and `KTSORT` names NAMEEX ids, so both are
+   snapshots of a bank the split can change. The build already excludes
+   held-out records from both, so the shipped banks are clean; this is for the
+   case the build cannot see, which is a split that runs again after load.
+
+   It REMOVES rather than filters at the draw, because a filter is a promise
+   every future caller has to keep and there are two rounds here already
+   (v0.61). A question that names a record the page no longer holds is not a
+   question. */
+function dxPruneDerived(){
+  var i, j, keep;
+  if(typeof ALODD !== "undefined" && typeof ALW !== "undefined"){
+    var haveW = {};
+    for(i=0;i<ALW.length;i++) haveW[ALW[i].w] = 1;
+    keep = [];
+    for(i=0;i<ALODD.length;i++){
+      var r = ALODD[i], ok = !!haveW[r.odd];
+      for(j=0;j<r.three.length;j++) if(!haveW[r.three[j]]) ok = false;
+      if(ok) keep.push(r);
+    }
+    if(keep.length !== ALODD.length){ ALODD.length = 0; for(i=0;i<keep.length;i++) ALODD.push(keep[i]); }
+  }
+  if(typeof KTSORT !== "undefined" && typeof NAMEEX !== "undefined"){
+    var haveE = {};
+    for(i=0;i<NAMEEX.length;i++) haveE[NAMEEX[i].id] = 1;
+    keep = [];
+    for(i=0;i<KTSORT.length;i++){
+      var k = KTSORT[i], good = true;
+      for(j=0;j<k.ex.length;j++) if(!haveE[k.ex[j]]) good = false;
+      if(good) keep.push(k);
+    }
+    if(keep.length !== KTSORT.length){ KTSORT.length = 0; for(i=0;i<keep.length;i++) KTSORT.push(keep[i]); }
+  }
+}
 dxSplit();
+dxPruneDerived();
 
 /* ---------- the four tests: one source for the Learn screen AND every
      feedback string, so the two cannot drift (SPEC section 8). ---------- */
@@ -7546,7 +8573,7 @@ function frCheck(){
    round. The timer is display only: a cutoff would punish a slower
    reader for their reading speed rather than their grammar.
    ================================================================== */
-var Y = { cls:"noun", item:null, idx:-1, want:false, done:false,
+var Y = { cls:"noun", item:null, rec:null, idx:-1, want:false, done:false,
           streak:0, best:0, t0:0 };
 
 function startYN(){ if(!LIVE[Y.cls]) Y.cls="noun"; go("yesno"); ynChips(); ynNext(); }
@@ -7581,31 +8608,109 @@ function ynCandidates(s, cls){
   return {yes:yes, no:no};
 }
 
-function ynNext(){
-  var pool=[], i;
-  for(i=0;i<SENTENCES.length;i++){
-    var s=SENTENCES[i];
-    if(!s.eligible || !s.eligible[Y.cls]) continue;
-    var c = ynCandidates(s, Y.cls);
-    if(c.yes.length && c.no.length) pool.push([s, c]);
-  }
-  if(!pool.length){ el("ynPrompt").textContent="Nothing here yet."; el("ynSent").innerHTML=""; return; }
-  var picked = pool[Math.floor(Math.random()*pool.length)];
-  var s2 = picked[0], cand = picked[1];
-  var wantYes = Math.random() < 0.5;
-  var list = wantYes ? cand.yes : cand.no;
-  if(!wantYes){
-    var content=[], fn=[];
-    for(i=0;i<list.length;i++){
-      var wc = s2.words[list[i]].c;
-      (SCORED.indexOf(wc)>=0 ? content : fn).push(list[i]);
+/* ================== YES OR NO DRAWS FROM AN ENUMERATED POOL ==================
+   (v0.74, SPEC 84). Until this version the round built a list of eligible
+   sentences and took `pool[Math.floor(Math.random()*pool.length)]`, then a
+   random word inside it. It never called `pickUnseen` and never called
+   `recordSeen`, so it had NO no-repeat logic at all: by the birthday problem a
+   pupil met a repeat inside their first session, and the round had no item
+   count, so nothing could be said about how long it lasts.
+
+   That is the v0.51 fault in the one place it was never fixed. Every other
+   round goes through `pickUnseen`, which holds the three piles (never served,
+   answered wrong, answered right) that stop the noodle shop coming back.
+
+   A ROUND THAT GENERATES ITS QUESTION AT RENDER CANNOT HAVE A NO-REPEAT
+   GUARANTEE, because there is nothing to count and nothing to remember. So the
+   questions are ENUMERATED instead: every (sentence, class, word) the round
+   could legitimately ask about, with an id, built at load.
+
+   Built at load rather than written into the page, because the enumeration IS
+   `ynCandidates`, which is the round's existing content rule, and a second copy
+   of that rule in a bank file is the fault this project has shipped five times.
+   The build counts the same thing and the validator checks the two agree, which
+   is the SPEC 61 shape: one rule, two readers, gated.
+
+   THE FOUR BUCKETS ARE KEPT. 1,491 of the 7,008 questions have the answer YES,
+   so serving the pool uniformly would make "always say no" pay 79%. The round
+   already defeated that with a coin, and within the no-answers it already drew
+   a content word three times in four rather than asking whether `the` is a
+   noun. Both of those are preserved by drawing from four pools rather than one,
+   so the balance stays a property of the DRAW and the no-repeat becomes a
+   property of the POOL, and neither has to remember the other. */
+var YESNO = [];
+function ynKind(w){ return SCORED.indexOf(w.c) >= 0 ? "c" : "f"; }
+function ynBuild(){
+  YESNO.length = 0;
+  for(var i=0;i<SENTENCES.length;i++){
+    var s = SENTENCES[i];
+    if(!s.eligible) continue;
+    for(var k=0;k<SCORED.length;k++){
+      var cls = SCORED[k];
+      if(!s.eligible[cls]) continue;
+      var c = ynCandidates(s, cls), j;
+      for(j=0;j<c.yes.length;j++)
+        YESNO.push({ id: s.id+":"+cls+":"+c.yes[j], s: s.id, cls: cls,
+                     idx: c.yes[j], want: true, kind: "y" });
+      for(j=0;j<c.no.length;j++)
+        YESNO.push({ id: s.id+":"+cls+":"+c.no[j], s: s.id, cls: cls,
+                     idx: c.no[j], want: false, kind: ynKind(s.words[c.no[j]]) });
     }
-    if(content.length && (!fn.length || Math.random() < 0.75)) list = content;
-    else if(fn.length) list = fn;
   }
-  Y.item = s2;
-  Y.idx = list[Math.floor(Math.random()*list.length)];
-  Y.want = wantYes;
+  return YESNO.length;
+}
+/* The id is DERIVED from the sentence's id and the word's position, which is
+   stable because a sentence is never edited in place: RETIRED() replaces it
+   with a fresh id (SPEC 33.3). So a pupil's history stays valid by
+   construction, and a retired sentence takes its questions with it, which
+   `_pruneToBank` then clears because YESNO is in DX_BANKS. */
+function ynPool(cls, kind){
+  var out = [], i;
+  for(i=0;i<YESNO.length;i++)
+    if(YESNO[i].cls === cls && YESNO[i].kind === kind) out.push(YESNO[i]);
+  return out;
+}
+function ynSentById(id){
+  for(var i=0;i<SENTENCES.length;i++) if(SENTENCES[i].id === id) return SENTENCES[i];
+  return null;
+}
+/* Built at module level, after `ynCandidates` exists and before anything reads
+   the stored profile. ORDER MATTERS: `_pruneToBank` deletes stored ids no bank
+   contains, so if it ran with YESNO empty it would delete this round's history
+   on the next content release, which is exactly the v0.16-to-v0.20 data loss.
+   `storetest.py` asserts a yesno id SURVIVES a forced bank revision, because
+   that is the assertion that would have caught the original. */
+ynBuild();
+function ynNext(){
+  if(!YESNO.length) ynBuild();            /* a reloaded bank, or a test */
+  /* The draw, unchanged: a coin for yes-or-no, then a content word three times
+     in four when the answer is no. Only WHICH item comes out of the chosen
+     bucket is new, and that is now pickUnseen's job. */
+  var kind = Math.random() < 0.5 ? "y"
+           : (Math.random() < 0.75 ? "c" : "f");
+  var pool = ynPool(Y.cls, kind);
+  if(!pool.length) pool = ynPool(Y.cls, kind === "y" ? "c" : "y");
+  if(!pool.length){ el("ynPrompt").textContent="Nothing here yet."; el("ynSent").innerHTML=""; return; }
+  var rec = pickUnseen(pool, "yesno:"+Y.cls+":"+kind);
+  if(!rec){ el("ynPrompt").textContent="Nothing here yet."; el("ynSent").innerHTML=""; return; }
+  Y.rec = rec;
+  Y.item = ynSentById(rec.s);
+  /* The enumerated question names a sentence by id, and a sentence can leave
+     the bank between the enumeration and the draw. Rebuild once, and if it is
+     still gone, say so: a round that throws takes the whole screen with it
+     (v0.74). */
+  if(!Y.item){
+    ynBuild();
+    pool = ynPool(Y.cls, kind);
+    rec = pool.length ? pickUnseen(pool, "yesno:"+Y.cls+":"+kind) : null;
+    Y.rec = rec;
+    Y.item = rec ? ynSentById(rec.s) : null;
+    if(!Y.item){
+      el("ynPrompt").textContent = "Nothing here yet."; el("ynSent").innerHTML = ""; return;
+    }
+  }
+  Y.idx = rec.idx;
+  Y.want = rec.want;
   Y.done = false;
   Y.t0 = new Date().getTime();
   ynRender();
@@ -7655,6 +8760,7 @@ function ynAnswer(said){
   el("ynTime").textContent = secs.toFixed(1) + "s";
   el("ynYes").style.display="none"; el("ynNo").style.display="none";
   el("ynNextBar").style.display="";
+  if(Y.rec) recordSeen("yesno:"+Y.cls+":"+Y.rec.kind, Y.rec.id, ok);
   chRecord(ok);
 }
 function aOrAn(w){ return ("aeiou".indexOf(w.charAt(0))>=0 ? "an " : "a ") + w; }
@@ -11478,11 +12584,31 @@ function ktNext(){
     el("ktCheck").style.display = "";
     el("ktRef").textContent = it.id;
   } else {
-    var pairs = AAMETA.pairs, pr = pairs[Math.floor(Math.random()*pairs.length)], A = pr[0], B = pr[1];
-    var side = function(x, y){ return shuffled(NAMEEX.filter(function(e){
-      return e.tech === x && e.also.indexOf(y) < 0; })).slice(0,3); };
+    /* ENUMERATED, AND REMEMBERED (v0.74, SPEC 84). This round used to pick its
+       pair and its six examples here at render and set only `KT.pair`, so the
+       `recordSeen` call guarded by `KT.item` could never fire, and `ktFinish`
+       was passed a null key as well. Nothing about it was remembered: no
+       no-repeat, no item count, nothing to pool in the statistics.
+
+       The questions are built in `build_aa.build_ktsort`, three examples from
+       each side so one column never scores half, and `ex` holds NAMEEX ids so
+       an example is stored once. The shuffle stays here, because which row is
+       which is the only thing that should vary between sittings. */
+    it = KT.item = pickUnseen(KTSORT, "kt:sort");
+    var A = it.pair[0], B = it.pair[1];
+    var byId = {}; for(var q=0;q<NAMEEX.length;q++) byId[NAMEEX[q].id] = NAMEEX[q];
     KT.pair = [A, B];
-    KT.opts = shuffled(side(A,B).concat(side(B,A)));
+    KT.opts = shuffled(it.ex.map(function(x){ return byId[x]; }).filter(Boolean));
+    /* A missing example means the build enumerated one the page does not hold,
+       which `dxSplit()` does to the held-out items. Five rows is a quieter
+       failure than an error and it is exactly what the first build of this
+       shipped, so it says so rather than dealing a short hand (v0.74). */
+    if(KT.opts.length !== it.ex.length){
+      el("ktPrompt").innerHTML = "This question is not available. Tell your teacher the code " +
+        esc(it.id) + ".";
+      el("ktArea").innerHTML = ""; el("ktCheck").style.display = "none";
+      return;
+    }
     el("ktPrompt").innerHTML = "Sort each example: <b>"+esc(A)+"</b> or <b>"+esc(B)+"</b>?";
     h = "";
     for(var j=0;j<KT.opts.length;j++)
@@ -11491,7 +12617,7 @@ function ktNext(){
            '<button class="chip" id="kts'+j+'b" aria-pressed="false" onclick="ktSort('+j+',1)">'+esc(B)+'</button></span></div>';
     el("ktArea").innerHTML = h;
     el("ktCheck").style.display = "";
-    el("ktRef").textContent = "Sort: "+A+" / "+B;
+    el("ktRef").textContent = it.id;
   }
 }
 function ktToggle(i){
@@ -11584,7 +12710,7 @@ function ktCheck(){
       if(KT.assign[i] === want){ ok++; row.className = "sortrow rowok"; }
       else { right = false; row.className = "sortrow rowno"; }
     }
-    ktFinish(right, null, '<li>'+(right ? 'All '+KT.opts.length+' sorted correctly.' :
+    ktFinish(right, "kt:sort", '<li>'+(right ? 'All '+KT.opts.length+' sorted correctly.' :
       ok+' of '+KT.opts.length+' sorted correctly. The red ones are in the wrong group.')+'</li>'+
       '<li class="dim"><b>'+esc(KT.pair[0])+':</b> '+esc(ktDef(KT.pair[0]))+'</li>'+
       '<li class="dim"><b>'+esc(KT.pair[1])+':</b> '+esc(ktDef(KT.pair[1]))+'</li>');
@@ -12129,21 +13255,16 @@ function alNext(){
     el("alPrompt").textContent = "What job does this word do? It...";
     alTarget(esc(it.w));
   } else if(AL.mode === "odd"){
-    /* three from one group, at or below the level; one from a group that does not overlap it */
-    var cap = AL.lvl === "all" ? 3 : alLvlRank(AL.lvl);
-    var ok = ALW.filter(function(w){ return alLvlRank(w.level) <= cap; });
-    var byG = {}; ok.forEach(function(w){ (byG[w.group] = byG[w.group] || []).push(w); });
-    var gids = Object.keys(byG).filter(function(g){ return g !== "deduce" && byG[g].length >= 3 &&
-      (AL.lvl === "all" || byG[g].some(function(w){ return w.level === AL.lvl; })); });
-    var G = gids[Math.floor(Math.random()*gids.length)];
-    /* one of the three is always AT the level, so a harder level never serves
-       three foundation words */
-    var atL = shuffled(byG[G].filter(function(w){ return AL.lvl === "all" || w.level === AL.lvl; }))[0];
-    var three = shuffled([atL].concat(shuffled(byG[G].filter(function(w){ return w !== atL; })).slice(0,2)));
-    var odd = shuffled(ok.filter(function(w){ return !alClash(w.group, G) && w.group !== "deduce"; }))[0];
-    it = AL.item = { id: "odd:"+G, group: G, three: three, odd: odd };
-    opts = shuffled(three.map(function(w){ return w.w; }).concat([odd.w]));
-    AL.ans = opts.indexOf(odd.w);
+    /* ENUMERATED, AND REMEMBERED (v0.74, SPEC 84). This round used to assemble
+       four words here at render and record seen under `"odd:" + group`, so one
+       answer marked a whole group seen and thirteen questions exhausted the
+       unseen pile. It never called `pickUnseen` either, so the three piles did
+       not apply to it. The questions are built in `build_anal.build_odd` with
+       an id each, and the only thing left to do at render is the shuffle, which
+       is what stops the answer sitting in one place. */
+    it = AL.item = pickUnseen(lvlPool(ALODD, AL.lvl), "al:odd:"+AL.lvl);
+    opts = shuffled(it.three.concat([it.odd]));
+    AL.ans = opts.indexOf(it.odd);
     el("alPrompt").innerHTML = "Three of these do the same job. <b>Which one does not?</b>";
   } else {
     var bank = AL.mode === "true" ? ALCTX : ALUPG;
@@ -12187,9 +13308,12 @@ function alPick(i){
       if(ww) fb += '<li class="dim"><b>' + esc(ww.w) + '</b> ' + esc(ww.mean) + '.</li>';
     }
   } else if(AL.mode === "odd"){
-    fb = '<li><b>' + it.three.map(function(w){ return esc(w.w); }).join(', ') + '</b> all ' +
-         esc(alJob(it.group)) + '.</li><li><b>' + esc(it.odd.w) + '</b> ' + esc(alJob(it.odd.group)) +
-         ': it ' + esc(it.odd.mean) + '.</li>';
+    /* The enumerated item carries words, not records, so the meaning is looked
+       up from ALW rather than carried twice (v0.74). */
+    var oddW = alWord(it.odd);
+    fb = '<li><b>' + it.three.map(function(w){ return esc(w); }).join(', ') + '</b> all ' +
+         esc(alJob(it.group)) + '.</li><li><b>' + esc(it.odd) + '</b> ' + esc(alJob(it.oddgroup)) +
+         ': it ' + esc(oddW ? oddW.mean : "") + '.</li>';
   } else {
     var R = alWord(it.right);
     fb = '<li>' + esc(it.why) + '</li>';
@@ -13682,6 +14806,49 @@ function validate(){
       if(m>0 && m<4) floorFails.push(acts[i]+" / "+SCORED[j]+" / "+LEVELS[k]+" = "+m);
       if(m===0) floorFails.push(acts[i]+" / "+SCORED[j]+" / "+LEVELS[k]+" = 0 (chip greyed out)");
     }
+  }
+
+  /* ---- SORT THE PAIR: every enumerated example is in the bank the page holds ----
+     (v0.74, SPEC 84). The build enumerates six NAMEEX ids per question, and
+     `dxSplit()` lifts the held-out items out of NAMEEX at load, so an id that
+     was fine in the file can be absent on the page. The first build of this did
+     exactly that and the round showed five rows. */
+  if(typeof KTSORT !== "undefined" && KTSORT.length){
+    var ksHave = {}, ksI;
+    for(ksI=0;ksI<NAMEEX.length;ksI++) ksHave[NAMEEX[ksI].id] = 1;
+    for(ksI=0;ksI<KTSORT.length;ksI++){
+      var ksR = KTSORT[ksI], ksM = [];
+      for(var ksJ=0;ksJ<ksR.ex.length;ksJ++)
+        if(!ksHave[ksR.ex[ksJ]]) ksM.push(ksR.ex[ksJ]);
+      if(ksM.length)
+        E.push("sort the pair: " + ksR.id + " names " + ksM.join(", ") +
+               ", which the page does not hold, so the round would show " +
+               (ksR.ex.length - ksM.length) + " rows instead of " + ksR.ex.length);
+    }
+  }
+
+  /* ---- YES OR NO: the page's enumeration against the build's count ----
+     (v0.74, SPEC 84). The round enumerates its own questions from
+     `ynCandidates`, which is the one copy of its content rule, and the build
+     counts the same thing into `ynmeta.json`. This is the SPEC 61 shape: one
+     rule, two readers, gated. If they disagree, either the enumeration has
+     drifted from the rule the round marks by, or the held-out split has moved,
+     and both of those are silent faults: the round would still look normal and
+     would be serving a different set of questions from the one anybody counted. */
+  if(typeof YNMETA === "object" && YNMETA && YNMETA.buckets){
+    if(!YESNO.length) ynBuild();
+    var ynHave = {}, ynI;
+    for(ynI=0;ynI<YESNO.length;ynI++){
+      var ynK = YESNO[ynI].cls + ":" + YESNO[ynI].kind;
+      ynHave[ynK] = (ynHave[ynK] || 0) + 1;
+    }
+    for(var ynB in YNMETA.buckets)
+      if((ynHave[ynB]||0) !== YNMETA.buckets[ynB])
+        E.push("yes or no: the page enumerates " + (ynHave[ynB]||0) + " questions in bucket '" +
+               ynB + "' and the build counted " + YNMETA.buckets[ynB]);
+    for(var ynC in ynHave)
+      if(!(ynC in YNMETA.buckets))
+        E.push("yes or no: the page enumerates a bucket '" + ynC + "' the build did not count");
   }
 
   /* ---- the cycle, checked against itself (v0.58, SPEC 68) ----
