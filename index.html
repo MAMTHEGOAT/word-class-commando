@@ -19,6 +19,22 @@ html,body{margin:0;padding:0;background:var(--bg);color:var(--txt);
   -webkit-text-size-adjust:100%}
 body{padding:0 0 96px}
 .wrap{max-width:760px;margin:0 auto;padding:20px 16px}
+/* DESKTOP IS NOT A WIDE PHONE (v0.76). Michael, on a laptop: "the app now looks
+   very unattractive on Desktop. It needs to be equally attractive on both." The
+   app was drawn at 430px and the only thing that happened above that was more
+   black either side of a 760px column, so a sentence a pupil is meant to read
+   sat small and narrow in the middle of a large dark field.
+   Prose line length is NOT widened with it: `.pl` stays capped at 34em, because
+   a blurb running the full width of a laptop is harder to read, not easier.
+   What widens is the furniture that benefits, which is the menu grids and the
+   panel holding the language. */
+@media(min-width:1024px){
+  .wrap{max-width:980px;padding:26px 24px}
+  .bz-row,.tb-track{max-width:980px}
+  .sent{font-size:1.4rem;padding:26px 22px}
+  .paper{padding:22px 24px;font-size:1.04rem}
+  .screen h2{font-size:1.9rem}
+}
 h1,h2,h3{font-weight:650;line-height:1.2;margin:0 0 12px}
 h1{font-size:1.9rem;letter-spacing:.02em}
 h2{font-size:1.3rem}
@@ -314,6 +330,13 @@ body.testing .score{visibility:hidden}
    whole point of it. It is NOT shown inside a diagnostic sitting or a timed
    run: both have their own exit (Stop) and both are measurements a pupil
    should not be able to walk out of by reflex. */
+/* the line on a domain screen saying which mark is filtering the list (v0.76) */
+.domfilter{color:var(--dim);font-size:.9rem;margin:0 0 14px}
+.domfilter b{color:var(--txt)}
+.linkish{background:none;border:0;color:var(--brass);text-decoration:underline;
+  font-size:.9rem;padding:4px 2px;min-height:34px}
+.linkish:hover{color:var(--txt)}
+
 .tomenu{background:none;border:1px solid var(--line);border-radius:8px;
   color:var(--dim);padding:7px 12px;min-height:44px;font-size:.85rem;
   margin-left:auto;margin-right:12px}
@@ -706,10 +729,39 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
     opposite and borrows from an <b>animal</b>, so a car that growls is zoomorphism.</div>
 </section>
 
+<!-- ===================== WHICH MARK? (v0.76) =====================
+     Michael, 2026-10-02, looking at the domain screen on a laptop: "the app now
+     looks very unattractive on Desktop. It needs to be equally attractive on
+     both. Could it be a two-screen thing where they are first asked what type
+     of punctuation do you want to practice, before they move on to the
+     exercises?"
+
+     He is right and the screenshot showed something worse than plain. The chip
+     row was prepended INTO `#domGroups`, which is a three-column grid, so the
+     label became one cell, the chips another (wrapping nine deep inside a third
+     of the width) and the activity groups scattered around them. That was a
+     fault of mine from v0.75, and it is the v0.29 lesson again: adding to a
+     single-file app is a global edit, and a container with a layout of its own
+     will apply it to whatever you put inside it.
+
+     The design answer is his. One screen, one job (v0.57). And the card is the
+     one the splash already uses, which is the only layout in this app proven to
+     read well at both widths: a grid that is three across on a laptop and one
+     column on a phone.
+     ============================================================= -->
+<section id="marks" class="screen">
+  <div class="topbar"><button class="back" id="mkBack"></button><button class="tomenu" onclick="go('splash')">Menu</button><img alt="" class="tb-logo"></div>
+  <h2 id="mkTitle"></h2>
+  <p class="pl" style="margin-top:-4px" id="mkBlurb"></p>
+  <div class="modes" id="mkList"></div>
+  <p class="note" id="mkWhy" style="display:none"></p>
+</section>
+
 <section id="domain" class="screen">
   <div class="topbar"><button class="back" id="domBack"></button><button class="tomenu" onclick="go('splash')">Menu</button><img alt="" class="tb-logo"></div>
   <h2 id="domTitle"></h2>
   <p class="pl" style="margin-top:-4px" id="domBlurb"></p>
+  <p class="domfilter" id="domFilter" style="display:none"></p>
   <div id="domGroups" class="groups"></div>
 </section>
 
@@ -3386,7 +3438,7 @@ var PUNCT = [
 {"id":"wc-pn235","level":"secure","type":"cap","words":["My","Mother","works","at","the","hospital","in","Phuket","Town."],"err":1,"fixed":"My mother works at the hospital in Phuket Town.","why":"Mother takes a capital when it is used as a name, as in Ask Mother to come. Here it is simply the word for a relative.","fix":["My mother works at","my Mother works at","My Mother Works At"],"sub":"cap","fams":["cap"]}
 /* >>> APPEND NEW PUNCTUATION ABOVE THIS LINE >>> */
 ];
-var PUNCMETA = {"types":{"cap":"Capital letters","end":"Full stops and question marks","apos":"Apostrophes","splice":"Joining two sentences","comma":"Commas","speech":"Speech punctuation"},"order":["cap","end","apos","comma","splice","speech"],"asks":{"cap":"Which words in this sentence need a capital letter?","end":"Does this sentence ask something or tell you something, and is this really where it ends? A group of words that cannot stand alone is not a sentence, however it is punctuated.","apos":"Does this word need an apostrophe, and where does it go?","splice":"Is a comma strong enough to hold these two halves together?","comma":"Does this sentence need a comma, and is it in the right place?","speech":"Where do the marks go around what somebody said?"},"tells":{"cap":["One word here needs a capital letter, or has one it should not have.","Tap that word."],"end":["One sentence here ends in the wrong place, or with the wrong mark.","Tap the word carrying the mistake."],"apos":["One word here needs an apostrophe, has one it does not need, or has one in the wrong place.","Tap that word."],"splice":["Two sentences here have been joined with a mark too weak to hold them.","Tap the word where they join."],"comma":["One place in this sentence has a comma missing, or a comma it does not need.","Tap the word carrying the mistake."],"speech":["The punctuation around what somebody said has gone wrong in one place.","Tap the word carrying the mistake."]},"fams":[{"id":"fullstop","name":"Full stops","sel":["end.where","end.stop","splice"],"why":null},{"id":"comma","name":"Commas","sel":["comma","splice"],"why":null},{"id":"semi","name":"Semicolons","sel":[],"why":"Not written yet, wanted, and PARKED. Michael ruled on 2026-10-02 that the various uses of the semicolon are to be taught, because the exam boards count it as complex punctuation and it lifts a writing mark. A first design was drafted and blind-read, and he parked it as too narrow: it tested the semicolon against the round shapes this app already has, which is the wrong question, when a new activity is allowed and the platform is not fixed. The readers' findings on the twenty-eight drafted items stand as evidence; the verdicts do not. SPEC 87 carries both, with the brief for whoever picks it up."},{"id":"question","name":"Question marks","sel":["end.ask"],"why":null},{"id":"cap","name":"Capital letters","sel":["cap"],"why":null},{"id":"apos","name":"Apostrophes","sel":["apos"],"why":null},{"id":"speech","name":"Speech punctuation","sel":["speech"],"why":null},{"id":"combined","name":"Everything at once","sel":["para.mixed"],"why":null}]};
+var PUNCMETA = {"types":{"cap":"Capital letters","end":"Full stops and question marks","apos":"Apostrophes","splice":"Joining two sentences","comma":"Commas","speech":"Speech punctuation"},"order":["cap","end","apos","comma","splice","speech"],"asks":{"cap":"Which words in this sentence need a capital letter?","end":"Does this sentence ask something or tell you something, and is this really where it ends? A group of words that cannot stand alone is not a sentence, however it is punctuated.","apos":"Does this word need an apostrophe, and where does it go?","splice":"Is a comma strong enough to hold these two halves together?","comma":"Does this sentence need a comma, and is it in the right place?","speech":"Where do the marks go around what somebody said?"},"tells":{"cap":["One word here needs a capital letter, or has one it should not have.","Tap that word."],"end":["One sentence here ends in the wrong place, or with the wrong mark.","Tap the word carrying the mistake."],"apos":["One word here needs an apostrophe, has one it does not need, or has one in the wrong place.","Tap that word."],"splice":["Two sentences here have been joined with a mark too weak to hold them.","Tap the word where they join."],"comma":["One place in this sentence has a comma missing, or a comma it does not need.","Tap the word carrying the mistake."],"speech":["The punctuation around what somebody said has gone wrong in one place.","Tap the word carrying the mistake."]},"fams":[{"id":"fullstop","name":"Full stops","sel":["end.where","end.stop","splice"],"why":null,"blurb":"Where one sentence ends and the next begins, including a comma trying to do a full stop's job."},{"id":"comma","name":"Commas","sel":["comma","splice"],"why":null,"blurb":"Lists, dropped-in information, opening clauses, speaking to someone, and the comma that joins two sentences when it should not."},{"id":"semi","name":"Semicolons","sel":[],"why":"Not written yet, wanted, and PARKED. Michael ruled on 2026-10-02 that the various uses of the semicolon are to be taught, because the exam boards count it as complex punctuation and it lifts a writing mark. A first design was drafted and blind-read, and he parked it as too narrow: it tested the semicolon against the round shapes this app already has, which is the wrong question, when a new activity is allowed and the platform is not fixed. The readers' findings on the twenty-eight drafted items stand as evidence; the verdicts do not. SPEC 87 carries both, with the brief for whoever picks it up.","blurb":"Joining two sentences with a mark stronger than a comma."},{"id":"question","name":"Question marks","sel":["end.ask"],"why":null,"blurb":"Does this sentence ask something, or does it tell you something?"},{"id":"cap","name":"Capital letters","sel":["cap"],"why":null,"blurb":"Names and sentence starts, and the capitals that should not be there at all."},{"id":"apos","name":"Apostrophes","sel":["apos"],"why":null,"blurb":"Who owns what, and where the apostrophe goes when they do."},{"id":"speech","name":"Speech punctuation","sel":["speech"],"why":null,"blurb":"The marks that go around what somebody said, and the capital that starts it."},{"id":"combined","name":"Mixed punctuation","sel":["para.mixed"],"why":null,"blurb":"Whole paragraphs with more than one kind of mistake in them, the way your own writing arrives."}]};
 var YNMETA = {"buckets":{"noun:f":786,"noun:y":524,"noun:c":872,"verb:f":823,"verb:c":995,"verb:y":466,"adv:f":356,"adv:c":440,"adv:y":179,"adj:f":371,"adj:y":243,"adj:c":531},"total":6586};
 /* >>> BANK:PUNCTUATION END >>> */
 
@@ -6155,7 +6207,7 @@ var STAMPMETA = {"fmt":1,"skip":["id","dx"],"strict":["secure","challenge"]};
 /* BANK_REV stays at 37: v0.61 adds no items and retires none. It bumps when the
    banks change, and bumping it for a code change makes every pupil's record run
    the pruner for nothing. */
-var APP = "wcc", VER = "v0.75.2", BANK_REV = 41;
+var APP = "wcc", VER = "v0.76", BANK_REV = 41;
 var BUG_FORM_URL = "";   /* paste the Office 365 form link to switch the report button on */
 
 /* ================= HELD OUT (v0.61, SPEC 72) ================================
@@ -10937,6 +10989,14 @@ function domainById(id){
   for(var i=0;i<DOMAINS.length;i++) if(DOMAINS[i].id === id) return DOMAINS[i];
   return null;
 }
+/** The domain a screen is showing, from the title it printed. Needed because
+ *  `#domain` serves every domain and holds no id of its own; the alternative
+ *  was a global saying which domain is open, which is a second copy of what the
+ *  screen already displays. */
+function domainByName(name){
+  for(var i=0;i<DOMAINS.length;i++) if(DOMAINS[i].name === name) return DOMAINS[i];
+  return null;
+}
 
 /* Both counts on the splash are READ FROM THE APP, never typed. */
 function menuCounts(){
@@ -10951,7 +11011,7 @@ function renderDomains(){
   for(i=0;i<DOMAINS.length;i++){
     d = DOMAINS[i]; n = domActs(d.id).length;
     if(n){
-      h += '<button class="mode' + (i === 0 ? ' mode-main' : '') + '" onclick="openDomain(\'' + d.id + '\')">' +
+      h += '<button class="mode' + (i === 0 ? ' mode-main' : '') + '" onclick="openDomainOrMarks(\'' + d.id + '\')">' +
            '<span class="mode-n">' + esc(d.name) + '</span>' +
            '<span class="mode-d">' + esc(d.sub) + '</span>' +
            '<span class="mode-k">' + n + (n === 1 ? ' activity' : ' activities') + '</span></button>';
@@ -11001,10 +11061,29 @@ function openDomain(id){
         '</button>' + (d.learn2 ? '<button class="menu-btn" onclick="' + d.learn2[1] + '">' +
         esc(d.learn2[0]) + '<span class="sub">' + esc(d.learn2[2]) + '</span></button>' : '') +
         '</div>' + h;
-  /* The row goes ABOVE the Learn card as well as the groups: it is the subject
-     of the screen rather than one more thing on it. */
-  h = famChips(id) + h;
   el("domGroups").innerHTML = h;
+  /* WHICH MARK IS ON, AND HOW TO CHANGE IT (v0.76). This used to be a chip row
+     prepended into `#domGroups`, which is a three-column grid, so each piece of
+     it became a grid cell and the screen fell apart on a laptop. The choice
+     lives on its own screen now; what stays here is a line saying what is
+     filtering the list, because a filtered menu that does not say it is
+     filtered is a menu with items missing. */
+  var fl = el("domFilter");
+  if(fam !== "all" && domFams(id).length){
+    var fd = null, ff = domFams(id), fi;
+    for(fi=0;fi<ff.length;fi++) if(ff[fi].id === fam) fd = ff[fi];
+    fl.innerHTML = 'Showing <b>' + esc(fd ? fd.name : fam) + '</b> only. ' +
+                   '<button class="linkish" onclick="openMarks(\'' + id + '\')">' +
+                   'Change mark</button>';
+    fl.style.display = "";
+  } else if(domFams(id).length){
+    fl.innerHTML = 'Showing <b>every mark</b>. ' +
+                   '<button class="linkish" onclick="openMarks(\'' + id + '\')">' +
+                   'Choose one</button>';
+    fl.style.display = "";
+  } else {
+    fl.style.display = "none";
+  }
   /* Back used to be set here. It is `paintNav` that sets it now, from the
      `"@dom"` entry in NAV_UP, for the same reason every other screen's back
      moved there: a destination written at the place a screen is OPENED is a
@@ -11205,28 +11284,62 @@ function soleTypeIn(fam){
   return live.length === 1 ? live[0] : null;
 }
 
-/** The chip row. A family with nothing in it renders disabled and says why,
- *  the way an unbuilt domain already does on the splash, because a label a
- *  pupil can see and cannot press is information and a label that is simply
- *  absent is not. */
-function famChips(dom){
-  var fams = domFams(dom);
-  if(!fams.length) return "";
-  var cur = domFam(dom), h = "", i, f, n, why = "";
-  h += '<button class="chip" aria-pressed="' + (cur === "all") + '" ' +
-       'onclick="setDomFam(\'' + dom + '\',\'all\')">All</button>';
+/** The mark screen (v0.76). One job: choose which mark to practise. The card
+ *  is the splash's, because that is the only layout in this app proven to read
+ *  at both widths, and a family with nothing in it is shown disabled with its
+ *  reason rather than hidden, so a pupil can see the app knows the gap is there.
+ */
+function openMarks(dom){
+  var d = domainById(dom), fams = domFams(dom);
+  if(!d || !fams.length){ openDomain(dom); return; }
+  el("mkTitle").textContent = d.name;
+  el("mkBlurb").textContent = "Which mark do you want to practise?";
+  var h = "", i, f, n;
+  /* The no-filter card first and emphasised, the way Practise leads the splash:
+     it is the common case and the one a pupil who has not been set a target
+     wants. It is NOT called "Everything at once", which is the name of a
+     family of paragraph questions; two things called everything on one screen
+     is one too many. */
+  n = famActs(dom, "all").length;
+  h += '<button class="mode mode-main" onclick="setDomFam(\'' + dom + '\',\'all\')">' +
+       '<span class="mode-n">Everything</span>' +
+       '<span class="mode-d">Every kind of punctuation this domain teaches, mixed together.</span>' +
+       '<span class="mode-k">' + n + (n === 1 ? ' activity' : ' activities') + '</span></button>';
   for(i=0;i<fams.length;i++){
     f = fams[i];
     n = famActs(dom, f.id).length;
-    h += '<button class="chip" ' + (n < 1 ? 'disabled aria-disabled="true" ' : '') +
-         'aria-pressed="' + (cur === f.id) + '" ' +
-         'onclick="setDomFam(\'' + dom + '\',\'' + f.id + '\')">' + esc(f.name) +
-         (n < 1 ? ' (not built yet)' : '') + '</button>';
-    if(cur === f.id && f.why) why = f.why;
+    if(n){
+      h += '<button class="mode" onclick="setDomFam(\'' + dom + '\',\'' + f.id + '\')">' +
+           '<span class="mode-n">' + esc(f.name) + '</span>' +
+           '<span class="mode-d">' + esc(f.blurb || "") + '</span>' +
+           '<span class="mode-k">' + n + (n === 1 ? ' activity' : ' activities') +
+           '</span></button>';
+    } else {
+      h += '<button class="mode" disabled aria-disabled="true">' +
+           '<span class="mode-n">' + esc(f.name) + '</span>' +
+           '<span class="mode-d">' + esc(f.blurb || "") + '</span>' +
+           '<span class="mode-k">Not built yet</span></button>';
+    }
   }
-  return '<p class="lbl" id="domFamLbl">Which mark?</p>' +
-         '<div class="chips" id="domFams">' + h + '</div>' +
-         (why ? '<p class="note" id="domFamWhy">' + esc(why) + '</p>' : '');
+  el("mkList").innerHTML = h;
+  /* THE `why` FIELD IS NOT PUPIL TEXT (v0.76). The first draft of this screen
+     printed it under the cards and a laptop screenshot showed a pupil being
+     told that "Michael ruled on 2026-10-02... SPEC 87 carries both, with the
+     brief for whoever picks it up". That field is the build's declaration of
+     why a family is empty, written for whoever reads the build next, and it is
+     the v0.52 distinction in a new place: the thing a pupil reads and the thing
+     a developer reads are two objects, not one object in two sizes. What a
+     pupil needs here is already on the card, in the blurb and in "Not built
+     yet". */
+  el("mkWhy").style.display = "none";
+  go("marks");
+}
+
+/** Where Practise sends a pupil for one domain: the mark screen when the domain
+ *  has marks, the activity list when it does not. One place, so the two menus
+ *  cannot disagree about which comes first. */
+function openDomainOrMarks(dom){
+  if(domFams(dom).length) openMarks(dom); else openDomain(dom);
 }
 
 /** The domain id an activity is registered under. Read, never typed. */
@@ -11249,7 +11362,15 @@ var NAV_UP = {
 
   /* the menu itself */
   practice: "go('splash')",
-  domain:   "@dom",
+  marks:    "@dom",
+  /* A domain that has marks is reached THROUGH its mark screen, so that is the
+     step back from its activity list. A domain without marks is reached from
+     the picker as before. Read from the declaration rather than written down,
+     so a second domain growing marks needs no edit here (v0.76). */
+  domain:   function(){
+    var d = el("domTitle") ? domainByName(el("domTitle").textContent) : null;
+    return (d && domFams(d.id).length) ? "openMarks('" + d.id + "')" : "@dom";
+  },
 
   /* not activities: their parent really is the front page */
   board:       "go('splash')",
@@ -11318,6 +11439,8 @@ function navLabelOf(expr){
   if(expr === "go('splash')")   return "Menu";
   if(expr === "go('practice')") return "Practise";
   if(expr === "startRules()")   return "Comma rules";
+  m = /^openMarks\('([a-z]+)'\)$/.exec(expr);
+  if(m){ var md = domainById(m[1]); if(md) return md.name; }
   return "Back";
 }
 
