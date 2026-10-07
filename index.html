@@ -3309,7 +3309,7 @@ var PUNCT = [
 {"id":"wc-pn115","level":"foundation","type":"apos","words":["My","younger","sisters","bike","has","a","flat","tyre."],"err":2,"fixed":"My younger sister's bike has a flat tyre.","why":"The bike belongs to one sister, so the apostrophe goes before the s.","sub":"apos","fix":["sister's","sister'"],"fams":["apos"]},
 {"id":"wc-pn116","level":"foundation","type":"apos","words":["We","sell","apple's","and","pears","at","the","gate."],"err":2,"fixed":"We sell apples and pears at the gate.","why":"This is simply more than one apple, so there is no apostrophe at all.","sub":"apos","fix":["apples","apples'"],"fams":["apos"]},
 {"id":"wc-pn117","level":"challenge","type":"apos","words":["The","childrens","coats","are","still","in","the","hall."],"err":1,"fixed":"The children's coats are still in the hall.","why":"Children is already plural without an s, so the apostrophe goes before the s.","sub":"apos","fix":["children's","childrens'"],"fams":["apos"]},
-{"id":"wc-pn118","level":"secure","type":"apos","words":["Whose","coming","to","the","match","on","Saturday?"],"err":0,"fixed":"Who's coming to the match on Saturday?","why":"Who's is short for who is. Whose means belonging to somebody.","sub":"apos","fix":["Who's","Whos","Whos'"],"fams":["apos"]},
+{"id":"wc-pn118","level":"secure","type":"apos","words":["Whose","coming","to","the","match","on","Saturday?"],"err":0,"fixed":"Who's coming to the match on Saturday?","why":"Who's is short for who is. Whose means belonging to somebody.","sub":"apos","fams":["apos"]},
 {"id":"wc-pn119","level":"secure","type":"apos","words":["The","two","teams","kits","were","almost","identical."],"err":2,"fixed":"The two teams' kits were almost identical.","why":"The kits belong to two teams, so the apostrophe goes after the s.","sub":"apos","fix":["teams'","team's"],"fams":["apos"]},
 {"id":"wc-pn120","level":"developing","type":"apos","words":["The","old","house","lost","it's","roof","in","the","storm."],"err":4,"fixed":"The old house lost its roof in the storm.","why":"Its without an apostrophe means belonging to it. With one it would mean it is.","sub":"apos","fix":["its","its'"],"fams":["apos"],"dx":true},
 {"id":"wc-pn121","level":"foundation","type":"comma","words":["Yes","we","are","going","swimming","later."],"err":0,"fixed":"Yes, we are going swimming later.","why":"A comma follows Yes when the sentence carries on after it.","sub":"comma","fams":["comma"]},
@@ -6400,7 +6400,7 @@ var STAMPMETA = {"fmt":1,"skip":["id","dx"],"strict":["secure","challenge"]};
 /* BANK_REV bumps when the banks change, and bumping it for a code change makes
    every pupil's record run the pruner for nothing. 44 at v0.78: twenty-eight items
    move from the end-mark chip to the boundary chip. */
-var APP = "wcc", VER = "v0.90", BANK_REV = 54;
+var APP = "wcc", VER = "v0.91", BANK_REV = 54;
 var BUG_FORM_URL = "";   /* paste the Office 365 form link to switch the report button on */
 
 /* ================= HELD OUT (v0.61, SPEC 72) ================================
