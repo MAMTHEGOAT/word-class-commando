@@ -1419,6 +1419,23 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
   <div class="ref"><span>Reference: <code id="xtRef"></code></span></div>
 </section>
 
+<section id="vb" class="screen">
+  <div class="topbar"><button class="back"></button><button class="tomenu" onclick="go('splash')">Menu</button><img alt="" class="tb-logo"></div>
+  <p class="lbl pick">Level</p>
+  <div class="chips" id="vbLevels"></div>
+  <p class="prompt" id="vbPrompt"></p>
+  <div class="sent" id="vbSent"></div>
+  <div class="bar">
+    <button class="go checkbtn keep" id="vbCheck" onclick="vbCheck()" disabled>Check</button>
+    <span class="score" id="vbScore"></span>
+  </div>
+  <ul class="fb" id="vbFb"></ul>
+  <div class="bar nextbar" id="vbNextBar" style="display:none">
+    <button class="go" onclick="vbNext()">Next sentence</button>
+  </div>
+  <div class="ref"><span>Reference: <code id="vbRef"></code></span></div>
+</section>
+
 <section id="sf" class="screen">
   <div class="topbar"><button class="back"></button><button class="tomenu" onclick="go('splash')">Menu</button><img alt="" class="tb-logo"></div>
   <p class="lbl pick">Level</p>
@@ -4185,6 +4202,135 @@ var TENSEPARAS = [
 {"id":"wc-vp049","level":"challenge","words":["My","neighbour,","Mr","Anan,","is","a","retired","postman.","Thirty","years","ago","his","round","covered","every","house","in","our","street.","These","days","he","sat","on","his","balcony","every","morning","with","a","pair","of","binoculars.","He","quietly","watches","the","birds","in","the","tall","trees","along","the","road.","He","know","the","names","of","more","than","fifty","kinds.","Two","swifts","are","nesting","under","his","roof.","Last","week","he","lent","me","an","old","bird","book","with","beautiful","drawings.","Now","I","had","my","own","bird","notebook","too."],"errors":[{"i":22,"wrong":"sat","right":"sits","why":"These days and every morning tell you this is his life now, so the verb is present: sits. Thirty years ago he delivered is correct, because thirty years ago tells you it is past.","opts":["sit","sits","sat","sitting"]},{"i":46,"wrong":"know","right":"knows","why":"He is one person, so the present verb takes an s: knows.","opts":["know","knows","knew","knowing"]},{"i":75,"wrong":"had","right":"have","why":"Now tells you this is true today, so the verb is present: have. Last week he lent is correct, because last week tells you it is past.","opts":["have","has","had","having"]}],"verbs":[4,13,22,35,46,56,57,64,75]},
 {"id":"wc-vp050","level":"challenge","words":["Last","April","my","family","spent","a","night","on","the","beach","at","Koh","Yao","Noi.","The","five","of","us","took","the","early","ferry","from","Phuket","with","all","our","things.","My","father","carries","the","heavy","tent","along","the","sand.","The","tide","was","creeping","up","the","beach.","After","dinner","we","all","lay","on","our","backs","and","looked","at","the","stars.","My","sister","spots","a","shooting","star","just","before","midnight.","Nobody","slept","much","because","of","the","noisy","crabs.","These","days","she","keeps","a","star","map","on","her","bedroom","wall."],"errors":[{"i":30,"wrong":"carries","right":"carried","why":"The trip was last April, and took in the sentence before is past: carried.","opts":["carry","carries","carried","carrying"]},{"i":59,"wrong":"spots","right":"spotted","why":"Just before midnight is still that night in April, so the verb is past: spotted. These days she keeps is correct, because these days tells you it is true now.","opts":["spot","spots","spotted","spotting"]}],"verbs":[4,18,30,39,40,48,53,59,67,77]}
 ];
+/* Find every verb (v0.94, SPEC 111): one SENTENCE from the paragraphs above,
+   carrying two or more verbs, marked all or nothing. Derived rather than
+   authored, and its ids are pinned in verbfind_ids.py because a derived bank
+   numbered in emission order renumbers itself the moment a paragraph gains a
+   sentence. The single-verb sentences are deliberately not served: that is
+   where the no-grammar cue lives, and Spot the tense mistake already asks for
+   them. SPEC 111 has the measurement. */
+var VERBFIND = [
+{"id":"wc-vb001","level":"foundation","src":"wc-vp001","words":["My","parents","left","home","early","and","drove","for","an","hour."],"verbs":[2,6]},
+{"id":"wc-vb002","level":"foundation","src":"wc-vp001","words":["In","the","evening","we","were","all","singing","in","the","car."],"verbs":[4,6]},
+{"id":"wc-vb003","level":"foundation","src":"wc-vp002","words":["Now","that","I","am","in","Year","7,","I","wake","up","at","six","o'clock","every","morning."],"verbs":[3,8]},
+{"id":"wc-vb004","level":"foundation","src":"wc-vp002","words":["I","always","have","a","shower","and","put","on","my","uniform."],"verbs":[2,6]},
+{"id":"wc-vb005","level":"foundation","src":"wc-vp002","words":["We","usually","arrive","at","half","past","seven,","and","the","corridors","are","already","filling","with","students."],"verbs":[2,10,12]},
+{"id":"wc-vb006","level":"foundation","src":"wc-vp003","words":["My","sister","had","already","made","a","card,","and","I","bought","some","flowers."],"verbs":[2,4,9]},
+{"id":"wc-vb007","level":"foundation","src":"wc-vp003","words":["Grandma","smiled","when","she","saw","them."],"verbs":[1,4]},
+{"id":"wc-vb008","level":"foundation","src":"wc-vp003","words":["The","whole","family","ate","cake","and","played","cards","until","dinner."],"verbs":[3,6]},
+{"id":"wc-vb009","level":"foundation","src":"wc-vp004","words":["My","cat","is","called","Mango."],"verbs":[2,3]},
+{"id":"wc-vb010","level":"foundation","src":"wc-vp004","words":["She","eats","very","fast","and","then","goes","outside."],"verbs":[1,6]},
+{"id":"wc-vb011","level":"foundation","src":"wc-vp004","words":["My","little","brother","loves","her","and","will","never","share","his","chicken."],"verbs":[3,6,8]},
+{"id":"wc-vb012","level":"foundation","src":"wc-vp005","words":["My","friend","Nok","was","taking","photos","the","whole","time."],"verbs":[3,4]},
+{"id":"wc-vb013","level":"foundation","src":"wc-vp006","words":["Students","go","there","at","lunchtime","to","read","and","study."],"verbs":[1,6,8]},
+{"id":"wc-vb014","level":"developing","src":"wc-vp007","words":["At","first","I","did","not","know","anyone","at","my","new","school."],"verbs":[3,5]},
+{"id":"wc-vb015","level":"developing","src":"wc-vp007","words":["After","a","few","weeks","we","were","best","friends,","and","we","still","are","today."],"verbs":[5,11]},
+{"id":"wc-vb016","level":"developing","src":"wc-vp008","words":["First","he","checks","the","rooms,","and","then","he","talks","to","the","guests."],"verbs":[2,8]},
+{"id":"wc-vb017","level":"developing","src":"wc-vp008","words":["Tourists","often","ask","him","about","places","to","visit."],"verbs":[2,7]},
+{"id":"wc-vb018","level":"developing","src":"wc-vp008","words":["He","can","name","all","the","best","restaurants","in","town."],"verbs":[1,2]},
+{"id":"wc-vb019","level":"developing","src":"wc-vp009","words":["The","wind","was","howling","outside,","and","the","rain","did","not","stop","for","hours."],"verbs":[2,3,8,10]},
+{"id":"wc-vb020","level":"developing","src":"wc-vp009","words":["Our","lights","went","out","at","nine","o'clock,","so","we","lit","some","candles."],"verbs":[2,9]},
+{"id":"wc-vb021","level":"developing","src":"wc-vp009","words":["My","little","sister","was","afraid,","but","my","mother","told","her","a","story."],"verbs":[3,8]},
+{"id":"wc-vb022","level":"developing","src":"wc-vp010","words":["My","mother","buys","fruit","and","vegetables,","and","my","father","looks","for","fresh","fish."],"verbs":[2,9]},
+{"id":"wc-vb023","level":"developing","src":"wc-vp010","words":["By","nine","the","best","stalls","are","already","selling","out."],"verbs":[5,7]},
+{"id":"wc-vb024","level":"developing","src":"wc-vp010","words":["The","market","is","always","busy","and","noisy,","but","we","love","it."],"verbs":[2,9]},
+{"id":"wc-vb025","level":"developing","src":"wc-vp011","words":["My","team","had","practised","for","weeks,","and","on","the","day","we","won","the","gold","medal."],"verbs":[2,3,11]},
+{"id":"wc-vb026","level":"developing","src":"wc-vp012","words":["She","likes","maths,","but","I","prefer","art."],"verbs":[1,5]},
+{"id":"wc-vb027","level":"developing","src":"wc-vp012","words":["Her","mother","always","gives","us","a","snack","and","will","not","let","us","leave","hungry."],"verbs":[3,8,10,12]},
+{"id":"wc-vb028","level":"secure","src":"wc-vp013","words":["When","I","was","eight,","my","family","lived","in","a","small","village","in","the","north."],"verbs":[2,6]},
+{"id":"wc-vb029","level":"secure","src":"wc-vp013","words":["Every","morning","I","walked","to","school","along","a","dusty","road,","and","the","buffalo","were","standing","in","the","wet","fields."],"verbs":[3,13,14]},
+{"id":"wc-vb030","level":"secure","src":"wc-vp013","words":["My","teacher","was","strict,","but","she","was","kind","too."],"verbs":[2,6]},
+{"id":"wc-vb031","level":"secure","src":"wc-vp013","words":["We","grew","rice","there","until","I","was","ten."],"verbs":[1,6]},
+{"id":"wc-vb032","level":"secure","src":"wc-vp013","words":["Now","my","family","lives","in","the","city,","but","I","still","miss","the","village."],"verbs":[3,10]},
+{"id":"wc-vb033","level":"secure","src":"wc-vp014","words":["Every","time","I","visit,","he","shows","me","the","ripest","chillies."],"verbs":[3,5]},
+{"id":"wc-vb034","level":"secure","src":"wc-vp014","words":["Last","week","he","carefully","wrapped","a","small","pot","of","mint","for","me","to","take","home."],"verbs":[4,13]},
+{"id":"wc-vb035","level":"secure","src":"wc-vp014","words":["He","always","says","that","mint","grows","quickly","in","the","rain."],"verbs":[2,5]},
+{"id":"wc-vb036","level":"secure","src":"wc-vp015","words":["Ploy","played","the","main","character,","and","I","held","the","camera."],"verbs":[1,7]},
+{"id":"wc-vb037","level":"secure","src":"wc-vp015","words":["The","filming","took","three","weeks","because","it","rained","almost","every","afternoon","that","month."],"verbs":[2,7]},
+{"id":"wc-vb038","level":"secure","src":"wc-vp015","words":["On","the","last","day","we","finally","watched","the","film","in","the","hall,","and","everyone","was","clapping."],"verbs":[6,14,15]},
+{"id":"wc-vb039","level":"secure","src":"wc-vp016","words":["Hundreds","of","people","come","to","eat","and","shop."],"verbs":[3,5,7]},
+{"id":"wc-vb040","level":"secure","src":"wc-vp016","words":["The","stalls","always","open","at","five","o'clock,","and","the","smell","of","grilled","food","fills","the","street."],"verbs":[3,13]},
+{"id":"wc-vb041","level":"secure","src":"wc-vp016","words":["Families","are","queueing","at","the","busiest","stalls","before","sunset."],"verbs":[1,2]},
+{"id":"wc-vb042","level":"secure","src":"wc-vp016","words":["I","always","buy","some","before","I","go","home."],"verbs":[2,6]},
+{"id":"wc-vb043","level":"secure","src":"wc-vp017","words":["Yesterday","the","bus","left","without","me,","so","I","walked","slowly","to","school."],"verbs":[3,8]},
+{"id":"wc-vb044","level":"secure","src":"wc-vp017","words":["The","dog","looked","hungry","and","thin,","and","its","ribs","were","showing","through","its","fur."],"verbs":[2,9,10]},
+{"id":"wc-vb045","level":"secure","src":"wc-vp017","words":["I","quickly","gave","it","some","of","my","sandwich,","and","it","followed","me","all","the","way","to","the","gate."],"verbs":[2,10]},
+{"id":"wc-vb046","level":"secure","src":"wc-vp017","words":["My","teacher","laughed","when","she","saw","it."],"verbs":[2,5]},
+{"id":"wc-vb047","level":"secure","src":"wc-vp018","words":["Children","fill","buckets","and","water","guns,","and","nobody","stays","dry."],"verbs":[1,8]},
+{"id":"wc-vb048","level":"secure","src":"wc-vp018","words":["Older","people","will","often","pour","the","water","gently","over","an","elder's","hands."],"verbs":[2,4]},
+{"id":"wc-vb049","level":"secure","src":"wc-vp018","words":["April","is","the","hottest","month","of","the","year,","so","the","cold","water","feels","wonderful."],"verbs":[1,12]},
+{"id":"wc-vb050","level":"challenge","src":"wc-vp019","words":["When","my","father","was","young,","he","worked","on","a","fishing","boat."],"verbs":[3,6]},
+{"id":"wc-vb051","level":"challenge","src":"wc-vp019","words":["The","boat","left","the","pier","before","sunrise","and","came","back","after","dark."],"verbs":[2,8]},
+{"id":"wc-vb052","level":"challenge","src":"wc-vp019","words":["The","work","was","hard,","and","the","sea","was","often","dangerous."],"verbs":[2,7]},
+{"id":"wc-vb053","level":"challenge","src":"wc-vp019","words":["One","night","a","storm","broke","the","boat's","mast,","and","the","crew","had","to","row","back","to","shore."],"verbs":[4,11,13]},
+{"id":"wc-vb054","level":"challenge","src":"wc-vp019","words":["Today","he","still","runs","a","small","shop,","and","he","tells","that","story","to","every","customer","who","wants","to","listen."],"verbs":[3,9,16,18]},
+{"id":"wc-vb055","level":"challenge","src":"wc-vp020","words":["These","days","he","often","brings","strange","objects","into","class","for","us","to","guess","at."],"verbs":[4,12]},
+{"id":"wc-vb056","level":"challenge","src":"wc-vp020","words":["The","radio","had","been","sitting","in","his","cupboard","for","years."],"verbs":[2,3,4]},
+{"id":"wc-vb057","level":"challenge","src":"wc-vp020","words":["He","explained","its","parts","to","us,","and","then","we","took","it","apart","in","groups."],"verbs":[1,9]},
+{"id":"wc-vb058","level":"challenge","src":"wc-vp021","words":["The","air","was","cooler","in","the","north,","so","we","always","wore","jackets","in","the","evenings."],"verbs":[2,10]},
+{"id":"wc-vb059","level":"challenge","src":"wc-vp021","words":["The","monks","were","already","sweeping","the","steps","at","that","hour."],"verbs":[2,4]},
+{"id":"wc-vb060","level":"challenge","src":"wc-vp021","words":["My","aunt","knew","the","history","of","every","temple,","and","she","told","us","stories","about","each","one."],"verbs":[2,10]},
+{"id":"wc-vb061","level":"challenge","src":"wc-vp022","words":["My","sister","is","sixteen","and","wants","to","be","a","doctor."],"verbs":[2,5,7]},
+{"id":"wc-vb062","level":"challenge","src":"wc-vp022","words":["Everybody","says","she","will","be","a","good","doctor."],"verbs":[1,3,4]},
+{"id":"wc-vb063","level":"challenge","src":"wc-vp023","words":["Two","hundred","years","ago,","a","family","lived","there","and","looked","after","the","lamp."],"verbs":[6,9]},
+{"id":"wc-vb064","level":"challenge","src":"wc-vp023","words":["Every","night","the","father","climbed","the","stairs","to","light","it."],"verbs":[4,8]},
+{"id":"wc-vb065","level":"challenge","src":"wc-vp023","words":["One","stormy","night","a","ship","struck","the","rocks,","but","the","family","saved","every","sailor."],"verbs":[5,11]},
+{"id":"wc-vb066","level":"challenge","src":"wc-vp023","words":["The","lamp","had","been","burning","for","ninety","years","by","then."],"verbs":[2,3,4]},
+{"id":"wc-vb067","level":"challenge","src":"wc-vp024","words":["We","mostly","use","them","to","check","homework","and","message","our","friends."],"verbs":[2,5,8]},
+{"id":"wc-vb068","level":"challenge","src":"wc-vp024","words":["When","they","were","young,","they","wrote","letters","to","their","friends","and","waited","weeks","for","a","reply."],"verbs":[2,5,11]},
+{"id":"wc-vb069","level":"foundation","src":"wc-vp025","words":["Last","Sunday","my","father","taught","me","to","ride","a","bike."],"verbs":[4,7]},
+{"id":"wc-vb070","level":"foundation","src":"wc-vp025","words":["My","father","was","holding","the","back","of","the","seat","and","running","beside","me."],"verbs":[2,3,10]},
+{"id":"wc-vb071","level":"foundation","src":"wc-vp026","words":["My","coach","is","called","Ben."],"verbs":[2,3]},
+{"id":"wc-vb072","level":"foundation","src":"wc-vp026","words":["My","arms","are","aching","before","the","end."],"verbs":[2,3]},
+{"id":"wc-vb073","level":"foundation","src":"wc-vp027","words":["The","ground","was","baking","in","the","afternoon","sun."],"verbs":[2,3]},
+{"id":"wc-vb074","level":"foundation","src":"wc-vp027","words":["Then","we","carefully","put","the","tree","in","the","hole","and","added","soil."],"verbs":[3,10]},
+{"id":"wc-vb075","level":"foundation","src":"wc-vp028","words":["Workers","are","already","waiting","on","the","pavement","when","the","first","pot","boils."],"verbs":[1,3,11]},
+{"id":"wc-vb076","level":"foundation","src":"wc-vp030","words":["The","blue","one","can","eat","twice","as","much","as","the","others."],"verbs":[3,4]},
+{"id":"wc-vb077","level":"foundation","src":"wc-vp030","words":["I","often","sit","and","watch","the","fish","before","bed."],"verbs":[2,4]},
+{"id":"wc-vb078","level":"developing","src":"wc-vp031","words":["Below","us","we","could","see","bright","yellow","fish","and","a","sea","turtle."],"verbs":[3,4]},
+{"id":"wc-vb079","level":"developing","src":"wc-vp032","words":["By","six","the","roads","are","filling","with","scooters."],"verbs":[4,5]},
+{"id":"wc-vb080","level":"developing","src":"wc-vp032","words":["In","the","evening","he","comes","home","late,","but","he","enjoys","his","job."],"verbs":[4,9]},
+{"id":"wc-vb081","level":"developing","src":"wc-vp033","words":["My","fingers","are","still","learning."],"verbs":[2,4]},
+{"id":"wc-vb082","level":"developing","src":"wc-vp034","words":["The","band","had","already","set","up","in","the","garden."],"verbs":[2,4]},
+{"id":"wc-vb083","level":"developing","src":"wc-vp034","words":["At","night","we","danced","and","ate","until","very","late."],"verbs":[3,5]},
+{"id":"wc-vb084","level":"developing","src":"wc-vp035","words":["His","kites","can","reach","the","top","of","the","palm","trees."],"verbs":[2,3]},
+{"id":"wc-vb085","level":"developing","src":"wc-vp036","words":["I","looked","everywhere","in","my","bag,","but","it","was","not","there."],"verbs":[1,8]},
+{"id":"wc-vb086","level":"developing","src":"wc-vp036","words":["She","had","seen","it","fall","from","the","side","pocket."],"verbs":[1,2,4]},
+{"id":"wc-vb087","level":"developing","src":"wc-vp037","words":["The","sun","was","beating","down","on","the","dry","red","soil."],"verbs":[2,3]},
+{"id":"wc-vb088","level":"developing","src":"wc-vp037","words":["Everyone","picked","one","pineapple","to","take","home."],"verbs":[1,5]},
+{"id":"wc-vb089","level":"secure","src":"wc-vp038","words":["She","showed","me","how","to","fold","the","leaves","into","small","points."],"verbs":[1,5]},
+{"id":"wc-vb090","level":"secure","src":"wc-vp038","words":["The","whole","lake","was","glowing","with","little","candles."],"verbs":[3,4]},
+{"id":"wc-vb091","level":"secure","src":"wc-vp038","words":["These","days","my","grandmother","lives","with","us,","so","we","still","make","one","together","every","year."],"verbs":[4,10]},
+{"id":"wc-vb092","level":"secure","src":"wc-vp039","words":["In","the","evenings","the","three","friends","cook","dinner","together","and","talk","about","their","day."],"verbs":[6,10]},
+{"id":"wc-vb093","level":"secure","src":"wc-vp039","words":["His","course","will","finish","next","year."],"verbs":[2,3]},
+{"id":"wc-vb094","level":"secure","src":"wc-vp039","words":["Last","month","he","came","home","for","a","few","days,","and","we","went","to","the","beach","together."],"verbs":[3,11]},
+{"id":"wc-vb095","level":"secure","src":"wc-vp040","words":["When","I","was","six,","my","father","taught","me","to","ride","a","bike."],"verbs":[2,6,9]},
+{"id":"wc-vb096","level":"secure","src":"wc-vp040","words":["At","first","I","could","not","balance","at","all."],"verbs":[3,5]},
+{"id":"wc-vb097","level":"secure","src":"wc-vp040","words":["The","neighbours","were","watching","from","their","gate."],"verbs":[2,3]},
+{"id":"wc-vb098","level":"secure","src":"wc-vp040","words":["One","evening","my","father","let","go","of","the","seat,","and","I","rode","all","the","way","to","the","corner","on","my","own."],"verbs":[4,5,11]},
+{"id":"wc-vb099","level":"secure","src":"wc-vp041","words":["We","quickly","change","into","our","swimsuits","after","lunch","and","walk","to","the","school","pool."],"verbs":[2,9]},
+{"id":"wc-vb100","level":"secure","src":"wc-vp041","words":["First","we","swim","four","lengths","to","warm","up."],"verbs":[2,6]},
+{"id":"wc-vb101","level":"secure","src":"wc-vp041","words":["Last","week","we","learned","to","dive","from","the","side,","and","I","swallowed","a","lot","of","water!"],"verbs":[3,5,11]},
+{"id":"wc-vb102","level":"secure","src":"wc-vp041","words":["My","hair","is","still","dripping","when","the","next","bell","rings."],"verbs":[2,4,9]},
+{"id":"wc-vb103","level":"secure","src":"wc-vp042","words":["The","tide","was","already","turning."],"verbs":[2,4]},
+{"id":"wc-vb104","level":"secure","src":"wc-vp042","words":["Today","I","still","think","about","my","turtle","every","time","I","visit","the","beach."],"verbs":[3,10]},
+{"id":"wc-vb105","level":"secure","src":"wc-vp043","words":["He","makes","us","skip","for","ten","minutes","before","every","class."],"verbs":[1,3]},
+{"id":"wc-vb106","level":"secure","src":"wc-vp043","words":["Heavy","bags","are","hanging","from","the","ceiling","in","a","long","line."],"verbs":[2,3]},
+{"id":"wc-vb107","level":"secure","src":"wc-vp043","words":["Then","we","always","practise","kicks","on","them","until","our","legs","shake."],"verbs":[3,10]},
+{"id":"wc-vb108","level":"secure","src":"wc-vp043","words":["My","first","class","was","last","January,","and","at","first","my","legs","ached","every","night."],"verbs":[3,11]},
+{"id":"wc-vb109","level":"secure","src":"wc-vp044","words":["The","tide","had","gone","out","an","hour","before."],"verbs":[2,3]},
+{"id":"wc-vb110","level":"secure","src":"wc-vp044","words":["Today","the","young","trees","are","still","small,","but","crabs","already","live","between","their","roots."],"verbs":[4,10]},
+{"id":"wc-vb111","level":"challenge","src":"wc-vp045","words":["She","still","keeps","all","her","recipes","in","her","head,","and","her","sister","can","cook","only","two","of","them."],"verbs":[2,12,13]},
+{"id":"wc-vb112","level":"challenge","src":"wc-vp045","words":["On","Saturdays","my","cousin","and","I","help","her","in","the","kitchen,","and","she","pays","us","in","noodles."],"verbs":[6,13]},
+{"id":"wc-vb113","level":"challenge","src":"wc-vp046","words":["We","lost","ten","minutes,","and","the","other","teams","were","already","pouring","their","batter."],"verbs":[1,8,10]},
+{"id":"wc-vb114","level":"challenge","src":"wc-vp047","words":["Two","years","ago","the","water","reached","our","front","step,","so","we","carried","the","sofa","upstairs."],"verbs":[5,11]},
+{"id":"wc-vb115","level":"challenge","src":"wc-vp048","words":["When","my","mother","was","a","girl,","her","family","lived","on","a","small","island","with","no","cars."],"verbs":[3,8]},
+{"id":"wc-vb116","level":"challenge","src":"wc-vp048","words":["Nobody","could","leave","without","the","boat."],"verbs":[1,2]},
+{"id":"wc-vb117","level":"challenge","src":"wc-vp048","words":["Now","the","island","has","a","hotel","and","a","road,","and","my","mother","hardly","recognises","it."],"verbs":[3,13]},
+{"id":"wc-vb118","level":"challenge","src":"wc-vp049","words":["Two","swifts","are","nesting","under","his","roof."],"verbs":[2,3]},
+{"id":"wc-vb119","level":"challenge","src":"wc-vp050","words":["The","tide","was","creeping","up","the","beach."],"verbs":[2,3]},
+{"id":"wc-vb120","level":"challenge","src":"wc-vp050","words":["After","dinner","we","all","lay","on","our","backs","and","looked","at","the","stars."],"verbs":[4,9]}
+];
 /* >>> BANK:COMMAS END >>> */
 
 /* >>> BANK:ANALYSIS ACROBAT START >>> */
@@ -6400,7 +6546,7 @@ var STAMPMETA = {"fmt":1,"skip":["id","dx"],"strict":["secure","challenge"]};
 /* BANK_REV bumps when the banks change, and bumping it for a code change makes
    every pupil's record run the pruner for nothing. 44 at v0.78: twenty-eight items
    move from the end-mark chip to the boundary chip. */
-var APP = "wcc", VER = "v0.93", BANK_REV = 56;
+var APP = "wcc", VER = "v0.94", BANK_REV = 57;
 var BUG_FORM_URL = "";   /* paste the Office 365 form link to switch the report button on */
 
 /* ================= HELD OUT (v0.61, SPEC 72) ================================
@@ -6422,7 +6568,7 @@ var DXHOME = {};    /* id -> the bank array it was lifted out of */
 var DX_BANKS = ["SENTENCES", "FRAMES", "CLOZE", "KLASS", "SHIFTERS", "TECHNIQUES", "PUNCT",
                 "COMMAS", "SPLICE", "TENSES", "PUNCPARAS", "TENSEPARAS", "IMAGERY", "TECHDEFS",
                 "NAMEEX", "SPOT", "EI", "ALW", "ALCTX", "ALUPG", "SEMF", "XTERMS", "TRANSFORM",
-                "FAMILIES", "KTSORT", "ALODD",
+                "FAMILIES", "KTSORT", "ALODD", "VERBFIND",
                 /* v0.74: enumerated at load from SENTENCES, not spliced, but its
                    ids are in a pupil's history and must survive _pruneToBank. */
                 "YESNO"];
@@ -10344,8 +10490,8 @@ var CHALLENGES = {
            cycle:["pn", "cs", "cm", "pn", "pf", "cs", "pp"],
            desc:"Spot the mistake, comma or full stop, put the commas in, find it then fix it, and a paragraph to proofread." },
   tense: { name:"Verb tenses", secs:120,
-           cycle:["vt", "vf", "vt", "vf", "vp"],
-           desc:"Spot the wrong tense, put the right one in, and a paragraph to proofread." },
+           cycle:["vt", "vf", "vb", "vt", "vf", "vp"],
+           desc:"Spot the wrong tense, put the right one in, find every verb in a sentence, and a paragraph to proofread." },
   tech:  { name:"Techniques (SOAPMAPS)", secs:120,
            cycle:["ktname", "eiclass", "ktdef", "xf", "eipick", "ktname", "ktspot"],
            desc:"Name the technique, match the definition, said or suggested, what the image carries, and spot them all." },
@@ -10921,6 +11067,7 @@ var ACTIVITY_LIST = [
   ["semf",   "Semantic field",             "startSF()",     "techx", "find", "Tap every word that belongs to one topic"],
   ["vt",     "Spot the tense mistake",     "startTense()",     "tense", "find", "One verb is in the wrong form: find it"],
   ["vp",     "Spot the mistakes in a paragraph", "startTensePara()", "tense", "find", "A whole paragraph, with one to three verbs in the wrong tense"],
+  ["vb",     "Find every verb",            "startVB()",        "tense", "find", "Tap every verb in the sentence, including the helper words"],
   ["vf",     "Put the right tense in",     "startTenseFill()", "tense", "use",  "The verb is missing: choose the form the sentence needs"],
   ["punc",   "Spot the mistake",           "startPunc()",   "punc", "find", "One sentence, one punctuation error: find it"],
   ["pp",     "Proofread a paragraph",      "startPuncPara()", "punc", "find", "A whole paragraph, with one to three punctuation mistakes to find"],
@@ -10965,6 +11112,7 @@ var ACT_CODES = {
   pf:"P2A",
   commas:"P3A", crules:"P3B",
   vt:"V1A", vp:"V1B",
+  vb:"V1C",
   vf:"V2A",
   almean:"A1A", aljob:"A1B", alodd:"A1C",
   altrue:"A2A", alupg:"A2B"
@@ -11005,7 +11153,7 @@ function screenAct(scr){
   if(scr === "cs")     return "crules";
   var m = { yesno:"yesno", klass:"klass", frames:"frames", cloze:"cloze", trans:"trans",
             shift:"shift", ei:"ei", xf:"xf", xt:"xterm", sf:"semf", za:"za",
-            vt:"vt", vf:"vf", vp:"vp", punc:"punc", pp:"pp", pf:"pf",
+            vt:"vt", vf:"vf", vp:"vp", vb:"vb", punc:"punc", pp:"pp", pf:"pf",
             commas:"commas", crules:"crules" };
   return m[scr] || null;
 }
@@ -11153,7 +11301,7 @@ var DOMAINS = [
   { id:"tense", name:"Verb tenses",
     sub:"Simple past and simple present. Find the verb that is in the wrong form, then choose the right form yourself. Built for Year 7 and for anyone learning English alongside their other subjects.",
     groups:[
-      ["find", "1. Find it", "Every sentence here has one verb in the wrong form, and every paragraph has one to three. Sometimes the tense is wrong and the sentence says when it happens; sometimes the verb simply does not match its subject. The question tells you which one you are looking for."],
+      ["find", "1. Find it", "Two kinds of question. In most of them one verb is in the wrong form and you find it: sometimes the tense is wrong and the sentence says when it happens, sometimes the verb simply does not match its subject, and the question tells you which. In Find every verb nothing is wrong at all, and the job is to tap every verb in the sentence, helper words included."],
       ["use",  "2. Use it",  "Now the other way round. The verb has been taken out and you choose which form the sentence needs."]
     ]},
   { id:"anal", name:"Analytical language",
@@ -11594,6 +11742,7 @@ var NAV_UP = {
   play:"@act",  frames:"@act", yesno:"@act", cloze:"@act", klass:"@act",
   trans:"@act", shift:"@act",  tech:"@act",  punc:"@act",  pp:"@act",
   pf:"@act",    crules:"@act", vt:"@act",    vp:"@act",    vf:"@act",
+  vb:"@act",
   xf:"@act",    ei:"@act",     kt:"@act",    al:"@act",    xt:"@act",
   sf:"@act",    za:"@act"
 };
@@ -13889,6 +14038,83 @@ function xtPick(i){
 }
 
 var SF = { lvl:"all", item:null, sel:{}, done:false };
+/* ================= FIND EVERY VERB (v0.94, SPEC 111) =======================
+   The Year 7 marking round of 1 October gave two pupils the same instruction in
+   as many words: read through your diary with a red pen, underline every verb,
+   then check each one. The app had both halves and nothing joined them.
+
+   The interaction is the semantic-field round's, because it is the same act:
+   tap every word of a kind. The MARKING is not. A semantic field ends Right,
+   Close or Not that one, and this round is all or nothing, because partial
+   credit per tap is exactly what made a no-grammar rule worth +26% of the
+   paragraph (SPEC 110). All or nothing over a sentence takes the same rule to
+   +5%, which is what English pays, and it needed no authoring to do it.
+
+   A miss and a wrong tap are shown differently even so. The pupil is told what
+   they missed and why it is a verb, because the point of the round is the words
+   a pupil does not think of as verbs: the helper in `was standing`, the `had`
+   in `had already made`, the copula in `the air was cooler`. */
+var VB = { lvl:"all", item:null, sel:{}, done:false };
+function vbPool(lvl){ return VERBFIND.filter(function(r){ return lvl === "all" || r.level === lvl; }); }
+function startVB(){ go("vb"); lvlChips("vbLevels", VERBFIND, VB.lvl, "vbLvl"); vbNext(); }
+function vbLvl(l){ VB.lvl = l; lvlChips("vbLevels", VERBFIND, VB.lvl, "vbLvl"); vbNext(); }
+function vbNext(){
+  var it = VB.item = pickUnseen(vbPool(VB.lvl), "vb:"+VB.lvl), h = "", i;
+  VB.sel = {}; VB.done = false;
+  for(i=0;i<it.words.length;i++)
+    h += '<button class="wbtn" id="vbw'+i+'" aria-pressed="false" onclick="vbTap('+i+')">'+
+         '<span class="tw">'+esc(it.words[i])+'</span></button> ';
+  el("vbSent").innerHTML = h;
+  el("vbPrompt").innerHTML = "Tap <b>every verb</b> in this sentence, then check. " +
+    "Some verbs are two words: tap <b>both</b> of them. Helper words like " +
+    "<b>is</b>, <b>was</b>, <b>had</b>, <b>could</b> and <b>will</b> are verbs too.";
+  el("vbScore").textContent = ""; el("vbFb").innerHTML = "";
+  el("vbCheck").disabled = true; el("vbNextBar").style.display = "none";
+  el("vbRef").textContent = it.id;
+}
+function vbTap(i){
+  if(VB.done) return;
+  VB.sel[i] = !VB.sel[i];
+  el("vbw"+i).setAttribute("aria-pressed", VB.sel[i] ? "true" : "false");
+  var any = false, k; for(k in VB.sel) if(VB.sel[k]) any = true;
+  el("vbCheck").disabled = !any;
+}
+function vbCheck(){
+  if(VB.done) return;
+  VB.done = true;
+  var it = VB.item, found = 0, missed = [], extra = [], i, b;
+  for(i=0;i<it.words.length;i++){
+    b = el("vbw"+i); b.disabled = true; b.setAttribute("aria-pressed","false");
+    var isV = it.verbs.indexOf(i) >= 0, sel = !!VB.sel[i];
+    if(isV && sel){ b.className = "wbtn res-ok"; found++; }
+    else if(isV){ b.className = "wbtn res-part"; missed.push(vbBare(it.words[i])); }
+    else if(sel){ b.className = "wbtn res-bad"; extra.push(vbBare(it.words[i])); }
+  }
+  var n = it.verbs.length, right = (found === n && !extra.length);
+  el("vbScore").textContent = right ? "Right" : "Not yet";
+  var fb = '<li>This sentence has <b>' + n + '</b> verb' + (n === 1 ? '' : 's') +
+           ', and you found <b>' + found + '</b>' +
+           (extra.length ? ', with <b>' + extra.length + '</b> tap' +
+            (extra.length === 1 ? '' : 's') + ' on a word that is not one' : '') + '.</li>';
+  if(missed.length) fb += '<li>The dashed one' + (missed.length === 1 ? ' is the verb' : 's are the verbs') +
+                          ' you missed: <b>' + missed.map(esc).join('</b>, <b>') + '</b>.</li>';
+  if(extra.length) fb += '<li class="dim"><b>' + extra.map(esc).join('</b>, <b>') + '</b> ' +
+                         (extra.length === 1 ? 'is not a verb' : 'are not verbs') + ' here.</li>';
+  /* The whole list only when they did not get it, because a pupil who tapped
+     every one has just been shown them in green and does not need telling
+     (v0.52: a right answer that repeats the question teaches nothing). */
+  if(!right) fb += '<li>Every verb in it: <b>' +
+        it.verbs.map(function(k){ return esc(vbBare(it.words[k])); }).join('</b>, <b>') + '</b>.</li>';
+  el("vbFb").innerHTML = fb;
+  var st = store();
+  if(!right) st.err.vb = (st.err.vb||0) + 1;
+  recordSeen("vb:"+VB.lvl, it.id, right);
+  save(st);
+  el("vbNextBar").style.display = "";
+  chRecord(right, null);
+}
+function vbBare(w){ return String(w).replace(/[.,;:!?"]+$/, ""); }
+
 function sfPool(lvl){ return SEMF.filter(function(r){ return lvl === "all" || r.level === lvl; }); }
 function startSF(){ go("sf"); lvlChips("sfLevels", SEMF, SF.lvl, "sfLvl"); sfNext(); }
 function sfLvl(l){ SF.lvl = l; lvlChips("sfLevels", SEMF, SF.lvl, "sfLvl"); sfNext(); }
