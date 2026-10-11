@@ -7916,7 +7916,7 @@ function batNextStage(dom){
 
 function batStagePassed(dom, n){ return !!batStageSit(dom, n); }
 
-/* The sitting a part's pass RESTS ON, which is the latest one that carried
+/* The sitting a part's pass RESTS ON, which is the latest one that mastered
    it. The certificate names it, so the claim on the certificate has a date
    and a score behind it and is not a bare assertion. */
 function batStageSit(dom, n){
@@ -7927,10 +7927,12 @@ function batStageSit(dom, n){
   return best;
 }
 
-/* Did this sitting carry its part? Every sub-skill in it at BAT_PASS or
-   better. A cell with too few questions to band (SPEC 113.3) cannot
-   carry a pass either, because a pass is a claim and that cell does not
-   support one. */
+/* Did this sitting MASTER its part? Every sub-skill in it at BAT_PASS or
+   better. A cell with too few questions to band (SPEC 113.3) cannot support
+   a claim of mastery either, because mastery is a claim and that cell does
+   not support one.
+   The word a pupil reads is "mastered" (Michael, 2026-10-11); the field is
+   `pass`, because it is also what the next part is gated on. */
 /* The fewest questions in a cell that support any claim at all. Three, for
    the reason SPEC 113.3 gives: three questions support three bands and nothing
    finer. The report's DX_THIN is this number and reads it from here, and the
@@ -7990,9 +7992,10 @@ function batOpen(dom, stage){
       esc(dxList(names)) + ".</li>" +
     "<li>" + plan.length + " questions. No timer and no score while you work.</li>" +
     "<li>You will <b>not be told</b> whether an answer was right until the end.</li>" +
-    "<li>Do well enough and the next part opens. You can sit any part again.</li>";
+    "<li>Master every activity in this part and the next part opens. " +
+      "You can sit any part again.</li>";
   el("batPrev").textContent = batStagePassed(dom, stage)
-    ? "You have already passed this part. Sitting it again replaces what it says."
+    ? "You have already mastered this part. Sitting it again replaces what it says."
     : "";
   go("batStartS");
 }
@@ -8092,10 +8095,10 @@ function dxLeanest(pool, subs){
    "not necessary", and that the teacher half was "redundant and shows
    basically the same info". All three are gone. In their place the page
    has ONE verdict line and ONE row of buttons, and the buttons differ by
-   the verdict: carried the part, go on to the next part; carried the last
-   part, take the certificate; did not carry it, print the report and
-   practise. The page no longer explains itself, because a page that
-   explains itself is a page a pupil stops reading.
+   the verdict: mastered the part, go on to the next part; mastered the last
+   part, take the certificate; not yet, print the report and practise. The
+   page no longer explains itself, because a page that explains itself is a
+   page a pupil stops reading.
 
    WHAT CHANGED AT v0.97, and the gain is larger than the loss. The retired
    report named two strengths and two weaknesses across six domains, and
@@ -8328,11 +8331,11 @@ function dxReportBody(sit){
 
   /* THE FIRST LINE IS THE VERDICT. Michael, 2026-10-11: there was too much
      description on this page. A pupil reads the first sentence and some of
-     them read nothing else, so it says whether they carried the part and what
+     them read nothing else, so it says whether they mastered the part and what
      to do, in one line each, and everything that was explaining itself has
      gone. */
   if(sit.pass)
-    h += '<p class="lead ok">You carried this part.</p>';
+    h += '<p class="lead ok">You have mastered this part.</p>';
   else if(weak.length){
     names = [];
     for(i=0;i<weak.length && i<3;i++) names.push(dxCellName(weak[i]));
@@ -8381,10 +8384,16 @@ function dxReportBody(sit){
 }
 
 /* WHAT HAPPENS NEXT, which is the page's other job and is a row of buttons
-   rather than a paragraph (Michael, 2026-10-11). A pupil who carried the part
-   is offered the next one; a pupil who did not is offered the report to take
-   away. The two are exclusive on purpose: a Next button beside a result that
-   does not justify it is the app saying one thing and meaning another. */
+   rather than a paragraph (Michael, 2026-10-11). A pupil who has mastered the
+   part is offered the next one; a pupil who has not is offered the report to
+   take away. The two are exclusive on purpose: a Next button beside a result
+   that does not justify it is the app saying one thing and meaning another.
+
+   THE WORD IS "MASTERED" (Michael, 2026-10-11). It was "carried", which is a
+   cricketing sense of the verb that a thirteen-year-old in Phuket has no
+   reason to know, and the certificate was already headed Certificate of
+   mastery, so the page and the certificate were using two words for one
+   thing. */
 function dxAfter(sit){
   var dom = sit.skill, h = "", cells, weak, i, sug,
       stages = batStages(dom), nxt = (sit.stage || 0) + 1, names = [];
@@ -8398,18 +8407,19 @@ function dxAfter(sit){
   } else {
     /* Michael, 2026-10-11: "If students do not get enough points to get the
        'Next' button, instead create a 'Print report' button so they can
-       download and send the report." It is also what a pupil who has carried
+       download and send the report." It is also what a pupil who has mastered
        the last part there is gets, because there is nothing else to offer. */
     h += '<button class="go" onclick="dxSave1()">Print report</button>';
   }
   /* Then the take-away, which every pupil gets whatever the verdict, and which
-     is second because it is not what the page is telling them to do. On a
-     failed part the lead button IS the download, so this is the paper copy. */
+     is second because it is not what the page is telling them to do. On a part
+     not yet mastered the lead button IS the download, so this is the paper
+     copy. */
   h += ' <button class="go alt" onclick="window.print()">Print or save as PDF</button>';
   if(sit.pass && (nxt < stages.length || batAllPassed(dom)))
     h += ' <button class="go alt" onclick="dxSave1()">Save a copy</button>';
-  /* And the practice, which only a pupil who did not carry the part is shown:
-     a report that sends a pupil who passed back to an easier level has told
+  /* And the practice, which only a pupil who has not yet mastered the part is
+     shown: a report that sends a pupil who has back to an easier level has told
      them their result does not mean anything. */
   if(!sit.pass){
     cells = dxCells(sit); weak = dxWeakCells(cells);
@@ -8430,7 +8440,7 @@ function dxAfterNote(sit){
       left = batUnasked(dom);
   if(sit.pass && nxt < stages.length) return "";
   if(sit.pass && batAllPassed(dom))
-    return "Every part of " + dxDomainName(dom).toLowerCase() + ", carried.";
+    return "You have mastered every part of " + dxDomainName(dom).toLowerCase() + ".";
   if(sit.pass && left.length)
     return "That is every part there is to check so far. " + left.length +
            (left.length === 1 ? " activity in " : " activities in ") +
@@ -8525,7 +8535,7 @@ function dxShowReport(sit){
   el("dxName").value = sit.who || "";
   dxPaint();
   /* Somewhere to go next, which the downloaded file cannot offer because it has
-     no app around it. One pupil, one road: a pupil who carried the part gets the
+     no app around it. One pupil, one road: a pupil who mastered the part gets the
      next part (or the certificate when there is no next part), and a pupil who
      did not gets the report to take away and the activities to practise. The
      practice buttons go through `openLink`, the same path a code written in a
@@ -8634,11 +8644,11 @@ function batCertBody(dom){
   h += '<p class="ceye">Word Class Commando</p>';
   h += '<h1>Certificate of mastery</h1>';
   h += '<p class="cwho">' + esc(who || "(no name given)") + '</p>';
-  h += '<p class="csub">has carried every part of <b>' +
+  h += '<p class="csub">has demonstrated mastery of every part of <b>' +
        esc(dxDomainName(dom)) + '</b><br>on ' + esc(dxWhen(last)) + '</p>';
   h += '<table class="cert"><thead><tr><th scope="col">Part</th>' +
        '<th scope="col">What it covered</th><th scope="col">Score</th>' +
-       '<th scope="col">Carried on</th></tr></thead><tbody>';
+       '<th scope="col">Mastered on</th></tr></thead><tbody>';
   for(i=0;i<rows.length;i++)
     h += '<tr><th scope="row">Part ' + rows[i].part + '</th>' +
          '<td>' + esc(rows[i].what) + '</td>' +
@@ -8647,7 +8657,7 @@ function batCertBody(dom){
   h += '</tbody></table>';
   h += '<p class="cfoot">' + tr + ' of ' + tn + ' questions answered correctly across ' +
        rows.length + (rows.length === 1 ? ' part' : ' parts') +
-       '. Every part was passed at ' + Math.round(BAT_PASS * 100) +
+       '. Every part was mastered at ' + Math.round(BAT_PASS * 100) +
        '% or better in every activity it covered.</p>';
   h += '</div>';
   return h;
