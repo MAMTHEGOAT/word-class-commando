@@ -237,7 +237,25 @@ body.dx .wbtn.res-miss, body.dx .wbtn.res-part{background:var(--paper);
 #batCert{background:#fffdf5;color:#1a1a1a;border:1px solid #c9b072;border-radius:4px;
   padding:34px 30px;text-align:center;
   font:16px/1.6 Georgia,"Times New Roman",serif}
-#batCert .cfr{border:2px solid #c9b072;border-radius:3px;padding:26px 22px}
+/* A DOUBLE RULE is the whole of the ornament, which is the oldest certificate
+   device there is and the only one that costs nothing: a second line inset
+   inside the first, drawn as a shadow so it needs no element. A certificate
+   that is busy stops reading as a record and starts reading as a party
+   invitation, and this one has to survive a school printer in black and white
+   and then a wall. The LOGO is the graphic; the frame holds it. */
+#batCert .cfr{border:2px solid #c9b072;border-radius:3px;padding:26px 22px;
+  box-shadow:inset 0 0 0 5px #fffdf5, inset 0 0 0 6px #e0d2a6}
+/* The app's mark is drawn light, because every other place it appears is on
+   the near-black chrome. On cream it disappears, so it is flattened to a
+   silhouette here rather than carried as a second embedded image. It also
+   prints correctly in black and white on a school printer, which is where
+   most of these will end up. */
+#batCert .cmark{width:58px;height:auto;display:block;margin:0 auto .55em;
+  filter:brightness(0);opacity:.8}
+#batCert .crank{margin:1.4em 0 0;padding-top:1em;border-top:1px solid #e7dcb8;
+  font-size:.95rem;color:#5b5637}
+#batCert .crank b{color:#8a6f2a;letter-spacing:.08em;text-transform:uppercase;
+  font-size:.8rem}
 #batCert .ceye{margin:0 0 .6em;font-size:.72rem;letter-spacing:.26em;
   text-transform:uppercase;color:#8a6f2a}
 #batCert h1{font-size:1.9rem;margin:0 0 .15em;font-weight:normal;letter-spacing:.01em}
@@ -6608,7 +6626,7 @@ var STAMPMETA = {"fmt":1,"skip":["id","dx"],"strict":["secure","challenge"]};
 /* BANK_REV bumps when the banks change, and bumping it for a code change makes
    every pupil's record run the pruner for nothing. 44 at v0.78: twenty-eight items
    move from the end-mark chip to the boundary chip. */
-var APP = "wcc", VER = "v0.98", BANK_REV = 58;
+var APP = "wcc", VER = "v0.98.2", BANK_REV = 58;
 var BUG_FORM_URL = "";   /* paste the Office 365 form link to switch the report button on */
 
 /* ================= HELD OUT (v0.61, SPEC 72) ================================
@@ -8185,6 +8203,11 @@ function dxBand(r, n){
    five of those stale (CLAUDE.md). */
 
 function dxDomainName(id){ var d = domainById(id); return d ? d.name : id; }
+/* The DOCUMENT's name for a skill, which is the menu's name in title case and
+   is declared on the domain rather than derived from it (SPEC 113.4a). Falls
+   back to the menu name, so a domain that forgets to declare one prints
+   sentence case rather than nothing; the validator makes that an error. */
+function dxDomainTitle(id){ var d = domainById(id); return (d && d.title) || dxDomainName(id); }
 /* A route's name reads inside a sentence ("went into commas") and as a row
    label in a table. Lower case is right in the first and looks like a typo in
    the second, so the table asks for the capital rather than the name carrying
@@ -8632,20 +8655,83 @@ function batCertWho(rows){
   return who;
 }
 
+/* ------------------------------------------------- the collection (113.4a) */
+/* Every skill this device has finished, oldest first by the date its last part
+   was mastered. The ORDER is what the ordinal rests on, so it is computed from
+   the sittings and not from the order DOMAINS happens to list them in. */
+function batEarned(){
+  var out = [], i, d, rows, last, j;
+  for(i=0;i<DOMAINS.length;i++){
+    d = DOMAINS[i];
+    if(!batAllPassed(d.id)) continue;
+    rows = batCertRows(d.id);
+    if(!rows) continue;
+    last = 0;
+    for(j=0;j<rows.length;j++) if((rows[j].at || 0) > last) last = rows[j].at;
+    out.push({ dom:d.id, at:last });
+  }
+  out.sort(function(a, b){ return a.at - b.at; });
+  return out;
+}
+
+/* Which certificate this one is. NOT "four of six": there are two moving
+   totals here, the number of skills and the number of activities inside one,
+   so a fraction printed today is a different claim from the same fraction
+   printed next year (Michael, 2026-10-11: "X of Y is dangerous because we will
+   increase the amount of activities"). An ordinal is a fact about THIS
+   document and cannot go stale. */
+var BAT_ORDINAL = ["", "first", "second", "third", "fourth", "fifth", "sixth",
+                   "seventh", "eighth", "ninth", "tenth"];
+
+function batCertNth(dom){
+  var earned = batEarned(), i;
+  for(i=0;i<earned.length;i++) if(earned[i].dom === dom) return i + 1;
+  return 0;
+}
+
+function batOrdinal(n){
+  if(n > 0 && n < BAT_ORDINAL.length) return BAT_ORDINAL[n];
+  /* Past the written-out words, the numeral with its suffix. 11th to 13th are
+     the exceptions every first draft of this gets wrong. */
+  var t = n % 100, u = n % 10;
+  return n + (t >= 11 && t <= 13 ? "th" :
+              u === 1 ? "st" : u === 2 ? "nd" : u === 3 ? "rd" : "th");
+}
+
+/* THE RANK, which is what makes the collection cumulative rather than a set of
+   separate branches (Michael, 2026-10-11). It is a WORD derived from a count,
+   not a drawing, so there is nothing to keep in step and nothing to redraw
+   when a seventh skill is added: the ladder simply runs out at its top and
+   every rank above the last named one is the last named one. A rank is never
+   taken away, because nothing earned is ever revoked (SPEC 113.4a). */
+var BAT_RANKS = ["Recruit", "Private", "Lance Corporal", "Corporal",
+                 "Sergeant", "Commando"];
+
+function batRank(n){
+  if(n < 1) return "";
+  return BAT_RANKS[Math.min(n, BAT_RANKS.length) - 1];
+}
+
 function batCertBody(dom){
-  var rows = batCertRows(dom), h, i, tn = 0, tr = 0, who, last = 0;
+  var rows = batCertRows(dom), h, i, tn = 0, tr = 0, who, last = 0, nth, rank;
   if(!rows) return "";
   who = batCertWho(rows);
   for(i=0;i<rows.length;i++){
     tn += rows[i].n; tr += rows[i].r;
     if((rows[i].at || 0) > last) last = rows[i].at;
   }
+  nth = batCertNth(dom);
+  rank = batRank(nth);
   h = '<div class="cfr">';
+  /* The logo, which the app already carries once as base64 and which the
+     downloaded copy therefore gets for nothing. It is the only image on the
+     page and it is the first thing on it. */
+  h += '<img class="cmark" alt="" src="' + LOGOSM + '">';
   h += '<p class="ceye">Word Class Commando</p>';
-  h += '<h1>Certificate of mastery</h1>';
+  h += '<h1>Certificate of Mastery</h1>';
   h += '<p class="cwho">' + esc(who || "(no name given)") + '</p>';
-  h += '<p class="csub">has demonstrated mastery of every part of <b>' +
-       esc(dxDomainName(dom)) + '</b><br>on ' + esc(dxWhen(last)) + '</p>';
+  h += '<p class="csub">has demonstrated mastery of every part of<br><b>' +
+       esc(dxDomainTitle(dom)) + '</b><br>on ' + esc(dxWhen(last)) + '</p>';
   h += '<table class="cert"><thead><tr><th scope="col">Part</th>' +
        '<th scope="col">What it covered</th><th scope="col">Score</th>' +
        '<th scope="col">Mastered on</th></tr></thead><tbody>';
@@ -8659,6 +8745,16 @@ function batCertBody(dom){
        rows.length + (rows.length === 1 ? ' part' : ' parts') +
        '. Every part was mastered at ' + Math.round(BAT_PASS * 100) +
        '% or better in every activity it covered.</p>';
+  /* THE COLLECTION, which is about the collection and not about this skill.
+     The certificate itself is identical in form for everybody who earns it:
+     making a fourth one grander than a first would attach the grandeur to the
+     collection while the document makes a claim about punctuation, so two
+     pupils with the same mastery would hold different-looking certificates
+     (SPEC 113.4a). No fraction here, ever. */
+  if(nth)
+    h += '<p class="crank"><b>' + esc(rank) + '</b> &middot; ' +
+         esc(who || "This pupil") + "'s " + esc(batOrdinal(nth)) +
+         ' certificate</p>';
   h += '</div>';
   return h;
 }
@@ -8670,9 +8766,16 @@ var DX_CERT_CSS =
   'background:#f3efe2;margin:0;padding:28px}' +
   '.cert-page{max-width:40em;margin:0 auto;background:#fffdf5;border:1px solid #c9b072;' +
   'border-radius:4px;padding:34px 30px;text-align:center}' +
-  '.cfr{border:2px solid #c9b072;border-radius:3px;padding:26px 22px}' +
+  '.cfr{border:2px solid #c9b072;border-radius:3px;padding:26px 22px;' +
+  'box-shadow:inset 0 0 0 5px #fffdf5, inset 0 0 0 6px #e0d2a6}' +
+  '.cmark{width:58px;height:auto;display:block;margin:0 auto .55em;' +
+  'filter:brightness(0);opacity:.8}' +
   '.ceye{margin:0 0 .6em;font-size:.72rem;letter-spacing:.26em;' +
   'text-transform:uppercase;color:#8a6f2a}' +
+  '.crank{margin:1.4em 0 0;padding-top:1em;border-top:1px solid #e7dcb8;' +
+  'font-size:.95rem;color:#5b5637}' +
+  '.crank b{color:#8a6f2a;letter-spacing:.08em;text-transform:uppercase;' +
+  'font-size:.8rem}' +
   'h1{font-size:1.9rem;margin:0 0 .15em;font-weight:normal}' +
   '.cwho{font-size:1.5rem;margin:.9em 0 .1em;font-weight:bold}' +
   '.csub{margin:.2em 0 1.2em;color:#5b5637}' +
@@ -11422,11 +11525,18 @@ function paintKeys(sec){
 
    Adding a domain's content is therefore a data change: register the activities
    in ACTIVITY_LIST against the domain id and it lights up by itself. */
+/* A DOMAIN'S TWO NAMES (v0.98). `name` is what the menu says, in the sentence
+   case a menu wants; `title` is what a DOCUMENT says, in the title case a
+   certificate wants. Michael, 2026-10-11, reading the first certificate:
+   "either Word Classes is both capitalised, or none of it is". He is right,
+   and the fix is not to upper-case the menu's name at render, because that is
+   a second description of the name and this project has found five of those
+   stale. It is declared here, beside the name, and `dxDomainTitle` reads it. */
 var DOMAINS = [
   /* The Learn page used to be the first thing on the landing screen, from when
      the app was only about word classes (v0.50, Michael): it now belongs to the
      domain it teaches, reached the same way as every other domain's Learn page. */
-  { id:"wc", name:"Word classes",
+  { id:"wc", name:"Word classes", title:"Word Classes",
     sub:"Nouns, verbs, adjectives and adverbs. Find one in a real sentence, name the job it is doing, then choose the right one yourself.",
     learn:["How to spot each class", "go('learn')",
            "What a noun, verb, adjective and adverb each are, the check that finds one, and the exceptions to it"],
@@ -11436,7 +11546,8 @@ var DOMAINS = [
       ["name", "2. Name it", "Given a word, or a gap where a word should be, can you say what job it is doing?"],
       ["use",  "3. Use it",  "Now choose or build the word the sentence actually needs. This is the one that shows up in your writing."]
     ]},
-  { id:"tech", name:"Techniques (SOAPMAPS)", learn:["What SOAPMAPS means", "showTechLearn()"],
+  { id:"tech", name:"Techniques (SOAPMAPS)", title:"Techniques (SOAPMAPS)",
+    learn:["What SOAPMAPS means", "showTechLearn()"],
     sub:"SOAPMAPS: simile, onomatopoeia, adjectives, personification, metaphor, adverbs, powerful verbs and senses. Find them in a sentence, then work out what the image is actually doing.",
     learn2:["The techniques explained", "go('aalearn')", "Eight techniques, with examples and how to write about each"],
     groups:[
@@ -11450,14 +11561,14 @@ var DOMAINS = [
      content, the same as every domain before it. The technique registry already
      carries the section each technique belongs to, so this lights up when the
      items are authored and needs no engine change to do it. */
-  { id:"techx", name:"Techniques (Expanded)", learn:["The harder techniques", "showTechXLearn()", "Every harder technique, and the words for talking about them"],
+  { id:"techx", name:"Techniques (Expanded)", title:"Techniques (Expanded)", learn:["The harder techniques", "showTechXLearn()", "Every harder technique, and the words for talking about them"],
     sub:"The harder set, once SOAPMAPS is secure: zoomorphism and anthropomorphism, alliteration with its plosive and sibilant variants, hyperbole, oxymoron, verbal irony, pathetic fallacy, tricolon, rhetorical question, antithesis, juxtaposition and semantic field.",
     groups:[
       ["know", "1. Know them", "What each one means, and the words examiners expect you to use about them: connotation, implication, tone, motif."],
       ["find", "2. Find it", "Same hunt, harder quarry. You are told which one to look for, and you select the whole phrase doing the work."],
       ["name", "3. Name it", "Two techniques that are the same move in opposite directions. Which way round is this one?"]
     ]},
-  { id:"punc", name:"Punctuation",
+  { id:"punc", name:"Punctuation", title:"Punctuation",
     sub:"Capital letters, full stops, question marks, apostrophes, commas, speech marks, and joining two sentences. Find the mistake in a sentence, the way you would proofread your own work.",
     /* THE FIRST DOMAIN TO DECLARE MARK FAMILIES (v0.75, SPEC 86). The list and
        the per-item stamp are both written by `build_bank.py`, so a chip cannot
@@ -11470,13 +11581,13 @@ var DOMAINS = [
       ["fix",  "2. Fix it", "Harder. Find the mistake, then choose how to repair it. Knowing where it is and knowing what is wrong are two different things."],
       ["use",  "3. Put it in", "Now the other way round. The marks have been taken out and you decide where they go."]
     ]},
-  { id:"tense", name:"Verb tenses",
+  { id:"tense", name:"Verb tenses", title:"Verb Tenses",
     sub:"Simple past and simple present. Find the verb that is in the wrong form, then choose the right form yourself. Built for Year 7 and for anyone learning English alongside their other subjects.",
     groups:[
       ["find", "1. Find it", "Two kinds of question. In most of them one verb is in the wrong form and you find it: sometimes the tense is wrong and the sentence says when it happens, sometimes the verb simply does not match its subject, and the question tells you which. In Find every verb nothing is wrong at all, and the job is to tap every verb in the sentence, helper words included."],
       ["use",  "2. Use it",  "Now the other way round. The verb has been taken out and you choose which form the sentence needs."]
     ]},
-  { id:"anal", name:"Analytical language",
+  { id:"anal", name:"Analytical language", title:"Analytical Language",
     sub:"Better words than shows. The verbs that do the work in an analytical paragraph, starting from your IDEA sheet, grouped by what each one claims.",
     learn:["Better than shows", "showALLearn()", "Every word, what it means and one example of it used well"],
     learnWhy:"What each word means and what it claims, with an example of each.",
@@ -16287,6 +16398,16 @@ function validate(){
      all (SPEC 113.3: three questions support three bands and nothing finer).
      And A CELL WHOSE QUESTIONS SIT AT ONE LEVEL cannot tell the report which
      level to send the pupil to, which is half of what a suggestion is for. */
+  /* A DOMAIN THAT CAN EARN A CERTIFICATE MUST DECLARE ITS DOCUMENT NAME. The
+     certificate falls back to the menu's name if `title` is missing, so the
+     fault is a quietly lower-cased certificate rather than a crash, which is
+     exactly the kind of thing nobody notices until it is printed and on a
+     wall. */
+  for(i=0;i<DOMAINS.length;i++)
+    if(!DOMAINS[i].title)
+      E.push("assessment: the "+DOMAINS[i].id+" domain declares no `title`, so a "+
+             "certificate for it would print the menu's sentence case (SPEC 113.4a).");
+
   var skills = {};
   for(i=0;i<DEEPREG.length;i++){
     var cl0 = DEEPREG[i][1], dom0 = null;
