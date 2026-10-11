@@ -541,6 +541,14 @@ button.yn{min-width:110px;font-size:1.05rem}
   margin-bottom:26px;background:rgba(190,150,80,.06)}
 .learn-group h3{margin-top:0}
 .learn-group .menu-btn{border-color:var(--brass)}
+/* The skill's own assessment (v0.97). Same bookend treatment as "Before you
+   start", and for the same reason: it is not a fourth step in the practice
+   sequence, it is the thing at the other end of it. The two bordered blocks
+   frame the three groups between them. */
+.assess-group{border:1px solid var(--brass);border-radius:14px;padding:14px 14px 4px;
+  margin-bottom:26px;background:rgba(190,150,80,.06)}
+.assess-group h3{margin-top:0}
+.assess-group .menu-btn{border-color:var(--brass)}
 .target{background:var(--paper);color:var(--ink);border-radius:10px;
   padding:14px 16px;margin:6px 0 14px;font-size:1.16rem;line-height:1.6}
 .target .hi{font-weight:700;border-bottom:2px solid var(--ink)}
@@ -627,17 +635,16 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
         Champion for all of them. Bragging rights are the point.</span>
       <span class="mode-k">For when you think you have got it.</span>
     </button>
-    <!-- The third card, promised in the comment above since v0.57 and worded the
-         same way: what the mode is FOR comes first, and the rules line says what
-         happens. What this one is for is telling a pupil which of the other two
-         to spend their time in, which is the only reason to sit it. -->
-    <button class="mode" onclick="dxOpen()">
-      <span class="mode-n">Check what you know</span>
-      <span class="mode-d">Where you find out what to practise. A set of questions across
-        everything the app covers, and a report at the end that names the two things you
-        are best at and the two worth working on next.</span>
-      <span class="mode-k">No timer, no score, and nothing marked until the end.</span>
-    </button>
+    <!-- THE THIRD CARD IS GONE (v0.97, SPEC 116). It opened one sitting across
+         everything the app covers, and Michael retired that on 2026-10-10: it
+         tested too much and the skill level was too broad. A pupil who wanted to
+         know about punctuation answered thirty-four questions about other things
+         first, and a report naming two strengths out of sixteen groups said
+         almost nothing about any of them. The replacement is one assessment per
+         skill, reached from that skill's own screen (SPEC 113), so there is
+         nothing to put on the front page: the question "which skill?" is the one
+         the pupil has already answered by the time they are standing in front of
+         it. -->
   </div>
 
   <!-- where the timetable is (v0.58). The week and the day come from the same
@@ -1571,15 +1578,15 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
      in an ordinary round, so it inherits every gate that round has learned
      and looks to the pupil exactly like the thing they have practised.
      ================================================================== -->
-<section id="dxStartS" class="screen">
+<section id="batStartS" class="screen">
   <div class="topbar"><button class="back"></button><button class="tomenu" onclick="go('splash')">Menu</button><img alt="" class="tb-logo"></div>
-  <h2>Check what you know</h2>
-  <p class="sub" id="dxIntro"></p>
-  <ul class="fb" id="dxRules"></ul>
+  <h2 id="batTitle">Check what you know</h2>
+  <p class="sub" id="batIntro"></p>
+  <ul class="fb" id="batRules"></ul>
   <div class="bar">
-    <button class="go" id="dxGo" onclick="dxBegin()">Start</button>
+    <button class="go" id="batGo" onclick="batBegin()">Start</button>
   </div>
-  <p class="dim small" id="dxPrev"></p>
+  <p class="dim small" id="batPrev"></p>
 </section>
 
 <section id="dxEndS" class="screen">
@@ -1970,9 +1977,9 @@ var SENTENCES = [
 {"id":"wc-s363","level":"foundation","topic":"home","words":[{"w":"The","c":"det","sub":"art"},{"w":"garden","c":"noun","sub":"common"},{"w":"looked","c":"verb","sub":"cop","head":true,"lem":"look"},{"w":"green","c":"adj"},{"w":"after","c":"prep"},{"w":"the","c":"det","sub":"art"},{"w":"shower","c":"noun","sub":"common","p":"."}],"ans":{"noun":[1,6],"verb":[2],"adj":[3]},"eligible":{"noun":true,"verb":true,"adj":true,"adv":false},"tomorrow":"The garden will look green after the shower tomorrow."},
 {"id":"wc-s364","level":"foundation","topic":"people","words":[{"w":"Her","c":"det","sub":"poss"},{"w":"cousin","c":"noun","sub":"common"},{"w":"laughed","c":"verb","sub":"lex","lem":"laugh"},{"w":"and","c":"conj"},{"w":"waved","c":"verb","sub":"lex","p":".","lem":"wave"}],"ans":{"noun":[1],"verb":[2,4]},"eligible":{"noun":true,"verb":true,"adj":false,"adv":false},"tomorrow":"Her cousin will laugh and wave tomorrow."},
 {"id":"wc-s365","level":"foundation","topic":"animals","words":[{"w":"The","c":"det","sub":"art"},{"w":"birds","c":"noun","sub":"common","lem":"bird"},{"w":"sang","c":"verb","sub":"lex","lem":"sing"},{"w":"loudly","c":"adv","sub":"manner"},{"w":"and","c":"conj"},{"w":"flew","c":"verb","sub":"lex","lem":"fly"},{"w":"away","c":"adv","sub":"place","p":"."}],"ans":{"noun":[1],"verb":[2,5],"adv":[3]},"eligible":{"noun":true,"verb":true,"adj":false,"adv":true},"neutral":{"adv":[6]},"tomorrow":"The birds will sing loudly and fly away tomorrow."},
-{"id":"wc-s366","level":"foundation","topic":"food","words":[{"w":"The","c":"det","sub":"art"},{"w":"baker","c":"noun","sub":"common"},{"w":"smiled","c":"verb","sub":"lex","lem":"smile"},{"w":"politely","c":"adv","sub":"manner","p":"."}],"ans":{"noun":[1],"verb":[2],"adv":[3]},"eligible":{"noun":true,"verb":true,"adj":false,"adv":true},"tomorrow":"The baker will smile politely tomorrow.","dx":true},
-{"id":"wc-s367","level":"developing","topic":"travel","words":[{"w":"The","c":"det","sub":"art"},{"w":"path","c":"noun","sub":"common"},{"w":"crossed","c":"verb","sub":"lex","lem":"cross"},{"w":"a","c":"det","sub":"art"},{"w":"muddy","c":"adj"},{"w":"field","c":"noun","sub":"common"},{"w":"behind","c":"prep"},{"w":"the","c":"det","sub":"art"},{"w":"school","c":"noun","sub":"common","p":"."}],"ans":{"noun":[1,5,8],"verb":[2],"adj":[4]},"eligible":{"noun":true,"verb":true,"adj":true,"adv":false},"tomorrow":"The path will cross a muddy field behind the school tomorrow.","dx":true},
-{"id":"wc-s368","level":"challenge","topic":"travel","words":[{"w":"Although","c":"conj"},{"w":"the","c":"det","sub":"art"},{"w":"crowd","c":"noun","sub":"common"},{"w":"waited","c":"verb","sub":"lex"},{"w":"patiently","c":"adv","sub":"manner","p":","},{"w":"the","c":"det","sub":"art"},{"w":"platform","c":"noun","sub":"common"},{"w":"stayed","c":"verb","sub":"cop","head":true},{"w":"empty","c":"adj","p":"."}],"ans":{"noun":[2,6],"verb":[3,7],"adj":[8],"adv":[4]},"eligible":{"noun":true,"verb":true,"adj":true,"adv":true},"tomorrow":"Although the crowd waits patiently tomorrow, the platform will stay empty.","dx":true},
+{"id":"wc-s366","level":"foundation","topic":"food","words":[{"w":"The","c":"det","sub":"art"},{"w":"baker","c":"noun","sub":"common"},{"w":"smiled","c":"verb","sub":"lex","lem":"smile"},{"w":"politely","c":"adv","sub":"manner","p":"."}],"ans":{"noun":[1],"verb":[2],"adv":[3]},"eligible":{"noun":true,"verb":true,"adj":false,"adv":true},"tomorrow":"The baker will smile politely tomorrow."},
+{"id":"wc-s367","level":"developing","topic":"travel","words":[{"w":"The","c":"det","sub":"art"},{"w":"path","c":"noun","sub":"common"},{"w":"crossed","c":"verb","sub":"lex","lem":"cross"},{"w":"a","c":"det","sub":"art"},{"w":"muddy","c":"adj"},{"w":"field","c":"noun","sub":"common"},{"w":"behind","c":"prep"},{"w":"the","c":"det","sub":"art"},{"w":"school","c":"noun","sub":"common","p":"."}],"ans":{"noun":[1,5,8],"verb":[2],"adj":[4]},"eligible":{"noun":true,"verb":true,"adj":true,"adv":false},"tomorrow":"The path will cross a muddy field behind the school tomorrow."},
+{"id":"wc-s368","level":"challenge","topic":"travel","words":[{"w":"Although","c":"conj"},{"w":"the","c":"det","sub":"art"},{"w":"crowd","c":"noun","sub":"common"},{"w":"waited","c":"verb","sub":"lex"},{"w":"patiently","c":"adv","sub":"manner","p":","},{"w":"the","c":"det","sub":"art"},{"w":"platform","c":"noun","sub":"common"},{"w":"stayed","c":"verb","sub":"cop","head":true},{"w":"empty","c":"adj","p":"."}],"ans":{"noun":[2,6],"verb":[3,7],"adj":[8],"adv":[4]},"eligible":{"noun":true,"verb":true,"adj":true,"adv":true},"tomorrow":"Although the crowd waits patiently tomorrow, the platform will stay empty."},
 {"id":"wc-s369","level":"foundation","topic":"home","words":[{"w":"The","c":"det","sub":"art"},{"w":"kettle","c":"noun","sub":"common"},{"w":"boiled","c":"verb","sub":"lex","lem":"boil"},{"w":"slowly","c":"adv","sub":"manner","p":"."}],"ans":{"noun":[1],"verb":[2],"adv":[3]},"eligible":{"noun":true,"verb":true,"adj":false,"adv":true},"tomorrow":"The kettle will boil slowly tomorrow.","dx":true},
 {"id":"wc-s370","level":"developing","topic":"home","words":[{"w":"We","c":"pron"},{"w":"repaired","c":"verb","sub":"lex"},{"w":"the","c":"det","sub":"art"},{"w":"old","c":"adj"},{"w":"fence","c":"noun","sub":"common","p":"."}],"ans":{"noun":[4],"verb":[1],"adj":[3]},"eligible":{"noun":true,"verb":true,"adj":true,"adv":false},"tomorrow":"We will repair the old fence tomorrow.","dx":true},
 {"id":"wc-s371","level":"secure","topic":"weather","words":[{"w":"After","c":"prep"},{"w":"the","c":"det","sub":"art"},{"w":"sudden","c":"adj"},{"w":"storm","c":"noun","sub":"common"},{"w":"they","c":"pron"},{"w":"worked","c":"verb","sub":"lex"},{"w":"quietly","c":"adv","sub":"manner","p":"."}],"ans":{"noun":[3],"verb":[5],"adj":[2],"adv":[6]},"eligible":{"noun":true,"verb":true,"adj":true,"adv":true},"tomorrow":"After the sudden storm they will work quietly tomorrow.","dx":true},
@@ -2184,10 +2191,10 @@ var CLOZE = [
 {"id":"wc-c107","level":"challenge","family":"wc-wf072","answerClass":"adv","text":"She waited ____ for her turn.","options":[{"w":"patient"},{"w":"patiently","correct":true},{"w":"patience"}],"why":"Patiently tells you HOW she waited."},
 {"id":"wc-c108","level":"challenge","family":"wc-wf070","answerClass":"adv","text":"The bell rang ____ through the corridor.","options":[{"w":"urgently","correct":true},{"w":"urgency"},{"w":"urgent"}],"why":"Urgently tells you HOW it rang."},
 {"id":"wc-c109","level":"challenge","family":"wc-wf068","answerClass":"adv","text":"He measured the wood ____.","options":[{"w":"accuracy"},{"w":"accurate"},{"w":"accurately","correct":true}],"why":"Accurately tells you HOW he measured."},
-{"id":"wc-c110","level":"foundation","family":"wc-wf008","answerClass":"adv","text":"She spoke to the new boy ____.","options":[{"w":"kind"},{"w":"kindly","correct":true},{"w":"kindness"}],"why":"Kindly tells you HOW she spoke, so it is the adverb.","dx":true},
-{"id":"wc-c111","level":"developing","family":"wc-wf016","answerClass":"adj","text":"The crowd became ____ as the delay went on.","options":[{"w":"angry","correct":true},{"w":"anger"},{"w":"angrily"}],"why":"After 'became' the gap describes the crowd, so it is the adjective.","dx":true},
-{"id":"wc-c112","level":"secure","family":"wc-wf054","answerClass":"noun","text":"The committee reached its ____ after two hours.","options":[{"w":"decision","correct":true},{"w":"decide"},{"w":"decisive"},{"w":"decisively"}],"why":"After 'its' the gap is the thing reached, so it is the noun.","dx":true},
-{"id":"wc-c113","level":"challenge","family":"wc-wf068","answerClass":"noun","text":"The map showed the coastline with complete ____.","options":[{"w":"accurately"},{"w":"accuracy","correct":true},{"w":"accurate"}],"why":"After 'complete' the gap is the thing itself, so it is the noun.","dx":true},
+{"id":"wc-c110","level":"foundation","family":"wc-wf008","answerClass":"adv","text":"She spoke to the new boy ____.","options":[{"w":"kind"},{"w":"kindly","correct":true},{"w":"kindness"}],"why":"Kindly tells you HOW she spoke, so it is the adverb."},
+{"id":"wc-c111","level":"developing","family":"wc-wf016","answerClass":"adj","text":"The crowd became ____ as the delay went on.","options":[{"w":"angry","correct":true},{"w":"anger"},{"w":"angrily"}],"why":"After 'became' the gap describes the crowd, so it is the adjective."},
+{"id":"wc-c112","level":"secure","family":"wc-wf054","answerClass":"noun","text":"The committee reached its ____ after two hours.","options":[{"w":"decision","correct":true},{"w":"decide"},{"w":"decisive"},{"w":"decisively"}],"why":"After 'its' the gap is the thing reached, so it is the noun."},
+{"id":"wc-c113","level":"challenge","family":"wc-wf068","answerClass":"noun","text":"The map showed the coastline with complete ____.","options":[{"w":"accurately"},{"w":"accuracy","correct":true},{"w":"accurate"}],"why":"After 'complete' the gap is the thing itself, so it is the noun."},
 {"id":"wc-c114","level":"foundation","family":"wc-wf001","answerClass":"noun","text":"The room fell into complete ____.","options":[{"w":"silence","correct":true},{"w":"silent"},{"w":"silently"}],"why":"Silence is the thing itself, so it is the noun.","dx":true},
 {"id":"wc-c115","level":"developing","family":"wc-wf005","answerClass":"noun","text":"The award was given for ____.","options":[{"w":"brave"},{"w":"bravely"},{"w":"bravery","correct":true}],"why":"Bravery is the thing itself, and after 'for' only the noun can stand.","dx":true},
 {"id":"wc-c116","level":"secure","family":"wc-wf055","answerClass":"noun","text":"The whole ____ took less than an hour.","options":[{"w":"creation","correct":true},{"w":"create"},{"w":"creative"},{"w":"creatively"}],"why":"After 'the whole' the gap is the thing itself, so it is the noun.","dx":true},
@@ -2340,10 +2347,10 @@ var KLASS = [
 {"id":"wc-k128","level":"secure","answerClass":"adv","text":"The gardener had visited the greenhouse ____ that summer.","example":"often","why":"The greenhouse is already there, so the gap tells you HOW OFTEN he visited it. Often is an adverb and has no -ly ending."},
 {"id":"wc-k129","level":"secure","answerClass":"adv","text":"He knew the poem ____ by the end of the week.","example":"well","why":"The poem is already there, so the gap tells you HOW he knew it. Well is the adverb of good, and it has no -ly ending."},
 {"id":"wc-k130","level":"secure","answerClass":"adv","text":"The team had trained ____ throughout the winter.","example":"hard","why":"The gap tells you HOW they had trained, so it is an adverb. Hard has no -ly, and hardly is a different word meaning almost not."},
-{"id":"wc-k131","level":"foundation","answerClass":"noun","text":"A ____ chased the cat across the garden.","example":"terrier","why":"The gap needs the thing doing the chasing, and after 'a' only a noun can stand there.","dx":true},
-{"id":"wc-k132","level":"developing","answerClass":"adv","text":"The children had ____ finished their lunch.","example":"almost","why":"The gap sits inside the verb group, between had and finished, where only an adverb can go.","dx":true},
-{"id":"wc-k133","level":"secure","answerClass":"verb","text":"The committee ____ the proposal without discussion.","example":"rejected","why":"The gap needs the action the committee took, so it is a verb.","dx":true},
-{"id":"wc-k134","level":"challenge","answerClass":"adj","text":"She handed him a surprisingly ____ envelope.","example":"heavy","why":"The gap describes the envelope, so it is an adjective. A noun modifier such as 'bus' could not follow 'surprisingly'.","dx":true},
+{"id":"wc-k131","level":"foundation","answerClass":"noun","text":"A ____ chased the cat across the garden.","example":"terrier","why":"The gap needs the thing doing the chasing, and after 'a' only a noun can stand there."},
+{"id":"wc-k132","level":"developing","answerClass":"adv","text":"The children had ____ finished their lunch.","example":"almost","why":"The gap sits inside the verb group, between had and finished, where only an adverb can go."},
+{"id":"wc-k133","level":"secure","answerClass":"verb","text":"The committee ____ the proposal without discussion.","example":"rejected","why":"The gap needs the action the committee took, so it is a verb."},
+{"id":"wc-k134","level":"challenge","answerClass":"adj","text":"She handed him a surprisingly ____ envelope.","example":"heavy","why":"The gap describes the envelope, so it is an adjective. A noun modifier such as 'bus' could not follow 'surprisingly'."},
 {"id":"wc-k135","level":"foundation","answerClass":"noun","text":"A large ____ waited by the gate.","example":"dog","why":"After 'a large' you need the thing itself, so it is a noun.","dx":true},
 {"id":"wc-k136","level":"developing","answerClass":"noun","text":"She unpacked a heavy ____.","example":"box","why":"After 'a heavy' you need the thing itself, so it is a noun.","dx":true},
 {"id":"wc-k137","level":"secure","answerClass":"noun","text":"The fire destroyed most of the ____.","example":"harvest","why":"After 'most of the' the gap is the thing itself, so it is a noun.","dx":true},
@@ -3184,12 +3191,12 @@ var TECHNIQUES = [
 {"id":"wc-tq722","level":"foundation","tech":"hyp","text":"My little brother eats about a mountain of rice every evening.","words":["My","little","brother","eats","about","a","mountain","of","rice","every","evening."],"spans":[{"a":4,"b":8,"t":"hyp"}],"cov":0.455},
 {"id":"wc-tq723","level":"secure","tech":"tri","text":"The coach wanted effort, honesty and patience from every player.","words":["The","coach","wanted","effort,","honesty","and","patience","from","every","player."],"spans":[{"a":3,"b":6,"t":"tri"}],"cov":0.4},
 {"id":"wc-tq724","level":"challenge","tech":"anti","text":"The town remembered everything about the flood and nothing about the warning.","words":["The","town","remembered","everything","about","the","flood","and","nothing","about","the","warning."],"spans":[{"a":3,"b":11,"t":"anti"}],"cov":0.75},
-{"id":"wc-tq725","level":"foundation","tech":"anth","text":"The old kettle promised itself an early night again.","words":["The","old","kettle","promised","itself","an","early","night","again."],"spans":[{"a":3,"b":7,"t":"anth"}],"cov":0.556,"subj":"thing","dx":true},
-{"id":"wc-tq726","level":"developing","tech":"zoo","text":"The old van roosted behind the sheds for years.","words":["The","old","van","roosted","behind","the","sheds","for","years."],"spans":[{"a":3,"b":6,"t":"zoo"}],"cov":0.444,"subj":"thing","dx":true},
-{"id":"wc-tq727","level":"challenge","tech":"zoo","text":"The rumour slithered from class to class before lunch.","words":["The","rumour","slithered","from","class","to","class","before","lunch."],"spans":[{"a":2,"b":6,"t":"zoo"}],"cov":0.556,"subj":"thing","dx":true},
-{"id":"wc-tq728","level":"foundation","tech":"anth","text":"The broken lift sighed between floors.","words":["The","broken","lift","sighed","between","floors."],"spans":[{"a":3,"b":3,"t":"anth"}],"cov":0.167,"subj":"thing","dx":true},
-{"id":"wc-tq729","level":"secure","tech":"anth","text":"The timetable had lost patience with all of us by Wednesday.","words":["The","timetable","had","lost","patience","with","all","of","us","by","Wednesday."],"spans":[{"a":2,"b":8,"t":"anth"}],"cov":0.636,"subj":"thing","dx":true},
-{"id":"wc-tq730","level":"challenge","tech":"zoo","text":"The ivy had swallowed the old gatepost whole by June.","words":["The","ivy","had","swallowed","the","old","gatepost","whole","by","June."],"spans":[{"a":2,"b":7,"t":"zoo"}],"cov":0.6,"subj":"thing","dx":true},
+{"id":"wc-tq725","level":"foundation","tech":"anth","text":"The old kettle promised itself an early night again.","words":["The","old","kettle","promised","itself","an","early","night","again."],"spans":[{"a":3,"b":7,"t":"anth"}],"cov":0.556,"subj":"thing"},
+{"id":"wc-tq726","level":"developing","tech":"zoo","text":"The old van roosted behind the sheds for years.","words":["The","old","van","roosted","behind","the","sheds","for","years."],"spans":[{"a":3,"b":6,"t":"zoo"}],"cov":0.444,"subj":"thing"},
+{"id":"wc-tq727","level":"challenge","tech":"zoo","text":"The rumour slithered from class to class before lunch.","words":["The","rumour","slithered","from","class","to","class","before","lunch."],"spans":[{"a":2,"b":6,"t":"zoo"}],"cov":0.556,"subj":"thing"},
+{"id":"wc-tq728","level":"foundation","tech":"anth","text":"The broken lift sighed between floors.","words":["The","broken","lift","sighed","between","floors."],"spans":[{"a":3,"b":3,"t":"anth"}],"cov":0.167,"subj":"thing"},
+{"id":"wc-tq729","level":"secure","tech":"anth","text":"The timetable had lost patience with all of us by Wednesday.","words":["The","timetable","had","lost","patience","with","all","of","us","by","Wednesday."],"spans":[{"a":2,"b":8,"t":"anth"}],"cov":0.636,"subj":"thing"},
+{"id":"wc-tq730","level":"challenge","tech":"zoo","text":"The ivy had swallowed the old gatepost whole by June.","words":["The","ivy","had","swallowed","the","old","gatepost","whole","by","June."],"spans":[{"a":2,"b":7,"t":"zoo"}],"cov":0.6,"subj":"thing"},
 {"id":"wc-tq732","level":"secure","tech":"sim","text":"Behind the shutters the market noise faded like a tide going out.","words":["Behind","the","shutters","the","market","noise","faded","like","a","tide","going","out."],"spans":[{"a":7,"b":11,"t":"sim"}],"cov":0.417,"dx":true},
 {"id":"wc-tq734","level":"challenge","tech":"meta","text":"Her revision notes had become a jungle of arrows and boxes.","words":["Her","revision","notes","had","become","a","jungle","of","arrows","and","boxes."],"spans":[{"a":5,"b":10,"t":"meta"}],"cov":0.545,"ten":[0,2],"veh":[5,10],"tr":["overgrown and tangled","hard to find a way through","grown without any plan"],"dq":["full of animals nobody can see","hot and wet all year round","cut back with a long knife"],"dw":["a jungle has creatures in it; the notes have only ink, and the image is about the tangle.","true of a real jungle, and it tells us nothing about a page of notes.","a path through a jungle is hacked out; notes would be rewritten instead."],"mod":"Calling her notes a jungle suggests they had grown over without any plan, tangled and overgrown until there was no clear way through.","dx":true},
 {"id":"wc-tq735","level":"developing","tech":"pers","text":"The fridge rattled the shelves and then muttered to itself all night.","words":["The","fridge","rattled","the","shelves","and","then","muttered","to","itself","all","night."],"spans":[{"a":7,"b":7,"t":"pers"}],"cov":0.083,"decoy":2,"dx":true},
@@ -3353,10 +3360,10 @@ var PUNCT = [
 {"id":"wc-pn142","level":"secure","type":"speech","words":["\"Put","those","down!\"","Shouted","the","caretaker."],"err":3,"fixed":"\"Put those down!\" shouted the caretaker.","why":"The exclamation mark closes the speech, but the sentence carries on, so shouted keeps its small letter.","sub":"speech","fams":["speech"]},
 {"id":"wc-pn143","level":"secure","type":"speech","words":["\"We","could","wait\",","she","said,","\"or","we","could","walk.\""],"err":2,"fixed":"\"We could wait,\" she said, \"or we could walk.\"","why":"The comma closing the first half of the speech sits inside the speech marks.","sub":"speech","fix":["wait,\"","wait.\"","wait?\""],"fams":["speech"]},
 {"id":"wc-pn144","level":"foundation","type":"speech","words":["\"Nobody","told","me\"","the","caretaker","said,","folding","his","arms."],"err":2,"fixed":"\"Nobody told me,\" the caretaker said, folding his arms.","why":"A statement that carries on into the reporting words is closed with a comma inside the speech marks. A question would close with a question mark there instead.","sub":"speech","fix":["me,\"","me.\"","me?\""],"fams":["speech"]},
-{"id":"wc-pn145","level":"developing","type":"cap","words":["We","went","to","the","market","on","friday","afternoon."],"err":6,"fixed":"We went to the market on Friday afternoon.","why":"Days of the week are proper nouns, so they take a capital letter.","sub":"cap","fams":["cap"],"dx":true},
-{"id":"wc-pn146","level":"foundation","type":"apos","words":["One","teachers","car","would","not","start","again."],"err":1,"fixed":"One teacher's car would not start again.","why":"The car belongs to one teacher, so teacher takes an apostrophe and then an s.","sub":"apos","fix":["teacher's","teachers'","teacher'"],"fams":["apos"],"dx":true},
-{"id":"wc-pn147","level":"secure","type":"apos","words":["Somebody","had","taken","the","boys","football","at","lunchtime."],"err":4,"fixed":"Somebody had taken the boys' football at lunchtime.","why":"The football belongs to more than one boy, so the apostrophe goes after the s.","sub":"apos","fams":["apos"],"dx":true},
-{"id":"wc-pn148","level":"developing","type":"cap","words":["My","cousin","is","learning","to","speak","japanese","at","school."],"err":6,"fixed":"My cousin is learning to speak Japanese at school.","why":"The name of a language is a proper noun, so it takes a capital letter.","sub":"cap","fams":["cap"],"dx":true},
+{"id":"wc-pn145","level":"developing","type":"cap","words":["We","went","to","the","market","on","friday","afternoon."],"err":6,"fixed":"We went to the market on Friday afternoon.","why":"Days of the week are proper nouns, so they take a capital letter.","sub":"cap","fams":["cap"]},
+{"id":"wc-pn146","level":"foundation","type":"apos","words":["One","teachers","car","would","not","start","again."],"err":1,"fixed":"One teacher's car would not start again.","why":"The car belongs to one teacher, so teacher takes an apostrophe and then an s.","sub":"apos","fix":["teacher's","teachers'","teacher'"],"fams":["apos"]},
+{"id":"wc-pn147","level":"secure","type":"apos","words":["Somebody","had","taken","the","boys","football","at","lunchtime."],"err":4,"fixed":"Somebody had taken the boys' football at lunchtime.","why":"The football belongs to more than one boy, so the apostrophe goes after the s.","sub":"apos","fams":["apos"]},
+{"id":"wc-pn148","level":"developing","type":"cap","words":["My","cousin","is","learning","to","speak","japanese","at","school."],"err":6,"fixed":"My cousin is learning to speak Japanese at school.","why":"The name of a language is a proper noun, so it takes a capital letter.","sub":"cap","fams":["cap"]},
 {"id":"wc-pn149","level":"secure","type":"speech","words":["The","guard","shouted,","\"stand","back","from","the","doors!\""],"err":3,"fixed":"The guard shouted, \"Stand back from the doors!\"","why":"The reporting words come first and the speech begins a new sentence after them, so it opens with a capital letter.","sub":"speech","fams":["speech"]},
 {"id":"wc-pn150","level":"secure","type":"speech","words":["The","steward","said,","\"the","gate","closes","in","ten","minutes.\""],"err":3,"fixed":"The steward said, \"The gate closes in ten minutes.\"","why":"The comma after said is correct. What follows it is a new sentence, so the speech opens with a capital letter.","sub":"speech","fams":["speech"]},
 {"id":"wc-pn151","level":"foundation","type":"cap","words":["The","lights","went","out.","nobody","moved","for","a","moment."],"err":4,"fixed":"The lights went out. Nobody moved for a moment.","why":"A new sentence starts with a capital letter.","sub":"cap","fams":["cap"]},
@@ -3622,7 +3629,7 @@ var PUNCT = [
 {"id":"wc-pn411","level":"foundation","type":"speech","words":["Dad","looked","round","the","kitchen.","\"Who","left","the","tap","running\""],"err":9,"fixed":"Dad looked round the kitchen. \"Who left the tap running?\"","why":"There are no reporting words, and the speech is a question, so the question mark goes inside the speech marks.","sub":"speech","fix":["running?\"","running,\"","running.\""],"fams":["speech"]},
 {"id":"wc-pn412","level":"foundation","type":"speech","words":["Tom","put","down","his","book.","\"Is","it","time","to","go\""],"err":9,"fixed":"Tom put down his book. \"Is it time to go?\"","why":"The speech is a question standing on its own, so a full stop would be wrong and the question mark belongs inside the speech marks.","sub":"speech","fix":["go?\"","go,\"","go.\""],"fams":["speech"]},
 {"id":"wc-pn413","level":"developing","type":"speech","words":["Mr","Dale","announced,","\"You","can","leave","your","bags","by","the","door\""],"err":10,"fixed":"Mr Dale announced, \"You can leave your bags by the door.\"","why":"Nothing follows the speech, so there is nothing for a comma to join it to and the full stop goes inside the speech marks.","sub":"speech","fix":["door.\"","door,\"","door?\""],"fams":["speech"]},
-{"id":"wc-pn414","level":"developing","type":"speech","words":["Grandad","explained,","\"I","have","not","been","to","that","market","for","years\"","Ama","smiled","at","him."],"err":10,"fixed":"Grandad explained, \"I have not been to that market for years.\" Ama smiled at him.","why":"What follows is a new sentence rather than reporting words, so the speech closes with its own full stop inside the speech marks.","sub":"speech","fix":["years.\"","years,\"","years?\""],"fams":["speech"],"dx":true},
+{"id":"wc-pn414","level":"developing","type":"speech","words":["Grandad","explained,","\"I","have","not","been","to","that","market","for","years\"","Ama","smiled","at","him."],"err":10,"fixed":"Grandad explained, \"I have not been to that market for years.\" Ama smiled at him.","why":"What follows is a new sentence rather than reporting words, so the speech closes with its own full stop inside the speech marks.","sub":"speech","fix":["years.\"","years,\"","years?\""],"fams":["speech"]},
 {"id":"wc-pn415","level":"developing","type":"speech","words":["Miss","Carr","said,","\"I","will","mark","your","essays","this","weekend\""],"err":9,"fixed":"Miss Carr said, \"I will mark your essays this weekend.\"","why":"The reporting words are already in front of the speech, so the speech ends the sentence and its full stop goes inside the speech marks.","sub":"speech","fix":["weekend.\"","weekend,\"","weekend?\""],"fams":["speech"]},
 {"id":"wc-pn416","level":"developing","type":"speech","words":["Samir","whispered,","\"The","water","in","the","tank","is","nearly","gone\"","Dad","went","out","to","look."],"err":9,"fixed":"Samir whispered, \"The water in the tank is nearly gone.\" Dad went out to look.","why":"A comma would say that reporting words were coming. A whole sentence comes instead, so the speech takes a full stop inside the speech marks.","sub":"speech","fix":["gone.\"","gone,\"","gone?\""],"fams":["speech"]},
 {"id":"wc-pn417","level":"developing","type":"speech","words":["Ellie","checked","the","timetable","twice.","\"I","will","meet","you","by","the","gate","after","lunch\""],"err":13,"fixed":"Ellie checked the timetable twice. \"I will meet you by the gate after lunch.\"","why":"No reporting words are used at all, so the speech is a sentence on its own and keeps its full stop inside the speech marks.","sub":"speech","fix":["lunch.\"","lunch,\"","lunch?\""],"fams":["speech"]},
@@ -3631,7 +3638,7 @@ var PUNCT = [
 {"id":"wc-pn420","level":"developing","type":"speech","words":["\"Has","the","last","bus","gone","already\"","said","Niran."],"err":5,"fixed":"\"Has the last bus gone already?\" said Niran.","why":"A comma would close a statement. This closes a question, so it is a question mark, and it sits inside the speech marks.","sub":"speech","fix":["already?\"","already,\"","already.\""],"fams":["speech"]},
 {"id":"wc-pn421","level":"developing","type":"speech","words":["Samir","closed","the","door","quietly.","\"Is","everybody","ready\""],"err":7,"fixed":"Samir closed the door quietly. \"Is everybody ready?\"","why":"The question stands on its own with no reporting words, so its question mark belongs inside the speech marks.","sub":"speech","fix":["ready?\"","ready,\"","ready.\""],"fams":["speech"]},
 {"id":"wc-pn422","level":"secure","type":"speech","words":["Mum","said,","\"If","the","rain","stops,","we","can","walk","to","the","shop\""],"err":11,"fixed":"Mum said, \"If the rain stops, we can walk to the shop.\"","why":"The comma after stops is correct, because a fronted clause takes one. The speech then ends the sentence, so its last mark is a full stop inside the speech marks.","sub":"speech","fix":["shop.\"","shop,\"","shop?\""],"fams":["speech"],"dx":true},
-{"id":"wc-pn423","level":"secure","type":"speech","words":["Mr","Boon","called,","\"When","the","bell","goes,","leave","by","the","side","door\"","The","class","waited."],"err":11,"fixed":"Mr Boon called, \"When the bell goes, leave by the side door.\" The class waited.","why":"The comma after goes is already right. What follows the speech is a new sentence, so the speech closes with a full stop inside the speech marks.","sub":"speech","fix":["door.\"","door,\"","door?\""],"fams":["speech"],"dx":true},
+{"id":"wc-pn423","level":"secure","type":"speech","words":["Mr","Boon","called,","\"When","the","bell","goes,","leave","by","the","side","door\"","The","class","waited."],"err":11,"fixed":"Mr Boon called, \"When the bell goes, leave by the side door.\" The class waited.","why":"The comma after goes is already right. What follows the speech is a new sentence, so the speech closes with a full stop inside the speech marks.","sub":"speech","fix":["door.\"","door,\"","door?\""],"fams":["speech"]},
 {"id":"wc-pn424","level":"secure","type":"speech","words":["Leah","said,","\"My","aunt,","a","teacher","in","Bangkok,","has","sent","us","a","parcel\""],"err":12,"fixed":"Leah said, \"My aunt, a teacher in Bangkok, has sent us a parcel.\"","why":"The two commas round the dropped-in description are correct. Nothing follows the speech, so its own mark is a full stop inside the speech marks.","sub":"speech","fix":["parcel.\"","parcel,\"","parcel?\""],"fams":["speech"]},
 {"id":"wc-pn425","level":"secure","type":"speech","words":["Ravi","folded","the","letter","away.","\"Until","the","office","answers,","nobody","can","book","the","minibus\""],"err":13,"fixed":"Ravi folded the letter away. \"Until the office answers, nobody can book the minibus.\"","why":"The comma after answers belongs to the fronted clause. There are no reporting words, so the speech ends with a full stop inside the speech marks.","sub":"speech","fix":["minibus.\"","minibus,\"","minibus?\""],"fams":["speech"]},
 {"id":"wc-pn426","level":"secure","type":"speech","words":["Miss","Chen","replied,","\"Once","the","hall","is","free,","we","can","move","the","chairs\""],"err":12,"fixed":"Miss Chen replied, \"Once the hall is free, we can move the chairs.\"","why":"The first comma is correct and the speech is a statement that ends the sentence, so the mark that closes it is a full stop inside the speech marks.","sub":"speech","fix":["chairs.\"","chairs,\"","chairs?\""],"fams":["speech"]},
@@ -3649,7 +3656,7 @@ var PUNCT = [
 /* >>> APPEND NEW PUNCTUATION ABOVE THIS LINE >>> */
 ];
 var PUNCMETA = {"types":{"cap":"Capital letters","end":"Asking or telling","splice":"Where sentences end","apos":"Apostrophes","comma":"Commas","speech":"Speech punctuation"},"order":["cap","end","splice","apos","comma","speech"],"asks":{"cap":"Which words in this sentence need a capital letter?","end":"Does this sentence ask you something or tell you something, and so which mark belongs at the end of it?","apos":"Does this word need an apostrophe, and where does it go?","splice":"Where does one sentence end and the next one begin? A group of words that cannot stand alone is not a sentence however it is punctuated, and a comma is not strong enough to hold together two that can.","comma":"Does this sentence need a comma, and is it in the right place?","speech":"Where do the marks go around what somebody said?"},"tells":{"cap":["One word here needs a capital letter, or has one it should not have.","Tap that word."],"end":["One sentence here ends with the wrong mark, or with no mark at all.","Tap the word carrying the mistake."],"apos":["One word here needs an apostrophe, has one it does not need, or has one in the wrong place.","Tap that word."],"splice":["One place where two groups of words meet has the wrong mark, or no mark where it needs one.","Tap the word just before that place."],"comma":["One place in this sentence has a comma missing, or a comma it does not need.","Tap the word carrying the mistake."],"speech":["The punctuation around what somebody said has gone wrong in one place, or a mark is missing inside the speech.","Tap the word carrying the mistake, or the word just in front of a missing mark."]},"posok":{"ask":"the fault IS the final mark of a one-sentence item, so its position is the round's shape rather than the bank's, and no item of this skill can put it anywhere else. The boundary skill, where the position does vary and is gated, is its own chip from v0.78 and runs in both directions: a stop that has to go and a boundary that has to arrive (SPEC 92.4, SPEC 93)."},"authored":[],"fams":[{"id":"fullstop","name":"Full stops","sel":["end.where","end.stop","splice"],"why":null,"blurb":"Where one sentence ends and the next begins, including a comma trying to do a full stop's job."},{"id":"comma","name":"Commas","sel":["comma","splice"],"why":null,"blurb":"Lists, dropped-in information, opening clauses, speaking to someone, and the comma that joins two sentences when it should not."},{"id":"semi","name":"Semicolons","sel":[],"why":"Not written yet, wanted, and PARKED. Michael ruled on 2026-10-02 that the various uses of the semicolon are to be taught, because the exam boards count it as complex punctuation and it lifts a writing mark. A first design was drafted and blind-read, and he parked it as too narrow: it tested the semicolon against the round shapes this app already has, which is the wrong question, when a new activity is allowed and the platform is not fixed. The readers' findings on the twenty-eight drafted items stand as evidence; the verdicts do not. SPEC 87 carries both, with the brief for whoever picks it up.","blurb":"Joining two sentences with a mark stronger than a comma."},{"id":"question","name":"Question marks","sel":["end.ask"],"why":null,"blurb":"Does this sentence ask something, or does it tell you something?"},{"id":"cap","name":"Capital letters","sel":["cap"],"why":null,"blurb":"Names and sentence starts, and the capitals that should not be there at all."},{"id":"apos","name":"Apostrophes","sel":["apos"],"why":null,"blurb":"Who owns what, and where the apostrophe goes when they do."},{"id":"speech","name":"Speech punctuation","sel":["speech"],"why":null,"blurb":"The marks that go around what somebody said, and the capital that starts it."},{"id":"combined","name":"Mixed punctuation","sel":["para.mixed"],"why":null,"blurb":"Whole paragraphs with more than one kind of mistake in them, the way your own writing arrives."}]};
-var YNMETA = {"buckets":{"noun:f":786,"noun:y":524,"noun:c":872,"verb:f":823,"verb:c":995,"verb:y":466,"adv:f":356,"adv:c":440,"adv:y":179,"adj:f":371,"adj:y":243,"adj:c":531},"total":6586};
+var YNMETA = {"buckets":{"noun:f":794,"noun:y":530,"noun:c":880,"verb:f":831,"verb:c":1005,"verb:y":470,"adv:f":360,"adv:c":447,"adv:y":181,"adj:f":378,"adj:y":245,"adj:c":540},"total":6661};
 /* >>> BANK:PUNCTUATION END >>> */
 
 /* >>> BANK:COMMAS START >>> */
@@ -3780,9 +3787,9 @@ var COMMAS = [
 {"id":"wc-cm118","level":"challenge","type":"subj","words":["Having","waited","for","over","an","hour","the","people","at","the","front","of","the","queue","began","to","complain."],"need":[5],"ok":[],"why":"The comma ends the opening phrase after hour. The people at the front of the queue is the subject of began, so no comma after queue.","gaps":16,"fams":["comma"]},
 {"id":"wc-cm119","level":"challenge","type":"subj","words":["The","bridge","the","oldest","in","the","town","needs","repairs."],"need":[1,6],"ok":[],"why":"The oldest in the town is extra information and takes a comma on each side. It lifts out and leaves The bridge needs repairs.","gaps":8,"fams":["comma"]},
 {"id":"wc-cm120","level":"challenge","type":"subj","words":["Tired","after","the","long","walk","the","children","at","the","back","sat","down."],"need":[4],"ok":[],"why":"The comma ends the opening phrase after walk. The children at the back is the subject of sat, so no comma after back.","gaps":11,"fams":["comma"]},
-{"id":"wc-cm121","level":"foundation","type":"address","words":["I","will","see","you","on","Saturday","Grandma."],"need":[5],"ok":[],"why":"A comma comes before the name of the person being spoken to.","gaps":6,"fams":["comma"],"dx":true},
-{"id":"wc-cm122","level":"developing","type":"drop","words":["Our","neighbour","a","retired","nurse","waters","the","plants","for","us."],"need":[1,4],"ok":[],"why":"The description is dropped into the middle, so it needs a comma at BOTH ends.","gaps":9,"fams":["comma"],"dx":true},
-{"id":"wc-cm123","level":"secure","type":"subj","words":["The","man","at","the","front","of","the","queue","asked","for","help."],"need":[],"ok":[],"why":"The man at the front of the queue is the subject and asked is its verb. However long the subject is, no comma goes between them.","gaps":10,"fams":["comma"],"dx":true},
+{"id":"wc-cm121","level":"foundation","type":"address","words":["I","will","see","you","on","Saturday","Grandma."],"need":[5],"ok":[],"why":"A comma comes before the name of the person being spoken to.","gaps":6,"fams":["comma"]},
+{"id":"wc-cm122","level":"developing","type":"drop","words":["Our","neighbour","a","retired","nurse","waters","the","plants","for","us."],"need":[1,4],"ok":[],"why":"The description is dropped into the middle, so it needs a comma at BOTH ends.","gaps":9,"fams":["comma"]},
+{"id":"wc-cm123","level":"secure","type":"subj","words":["The","man","at","the","front","of","the","queue","asked","for","help."],"need":[],"ok":[],"why":"The man at the front of the queue is the subject and asked is its verb. However long the subject is, no comma goes between them.","gaps":10,"fams":["comma"]},
 {"id":"wc-cm124","level":"foundation","type":"list","words":["We","packed","sandwiches","and","water."],"need":[],"ok":[],"why":"Two things joined by and are not a list, so no comma is needed at all.","gaps":4,"fams":["comma"],"dx":true},
 {"id":"wc-cm125","level":"foundation","type":"list","words":["The","kit","holds","a","ball","a","net","and","two","bats."],"need":[4],"ok":[6],"why":"A list of three things needs a comma between them.","gaps":9,"fams":["comma"],"dx":true},
 {"id":"wc-cm126","level":"developing","type":"list","words":["She","speaks","Japanese","Thai","and","a","little","French."],"need":[2],"ok":[3],"why":"The languages are a list, so they are separated by commas.","gaps":7,"fams":["comma"],"dx":true},
@@ -4047,12 +4054,12 @@ var TENSES = [
 {"id":"wc-vt158","level":"challenge","type":"mixed","words":["These","days","the","island","got","more","tourists","than","ever."],"err":4,"wrong":"got","right":"gets","third":"get","opts":["got","gets","get"],"fixed":"These days the island gets more tourists than ever.","why":"These days points at the present, so on its own this sentence needs the present: it gets.","kind":"tense","hint":"Read the whole sentence first: something in it tells you when this happens, and look at who or what is doing it.","decoy":[],"pin":true,"skip":[]},
 {"id":"wc-vt159","level":"challenge","type":"mixed","words":["Until","last","month","my","cousin","lives","in","Chiang","Mai."],"err":5,"wrong":"lives","right":"lived","third":"live","opts":["lives","lived","live"],"fixed":"Until last month my cousin lived in Chiang Mai.","why":"Until last month is finished, so the verb must be in the past.","kind":"tense","hint":"Read the whole sentence first: something in it tells you when this happens.","decoy":[],"pin":true,"skip":[]},
 {"id":"wc-vt160","level":"challenge","type":"mixed","words":["Nowadays","the","old","market","sold","mostly","souvenirs."],"err":4,"wrong":"sold","right":"sells","third":"sell","opts":["sold","sells","sell"],"fixed":"Nowadays the old market sells mostly souvenirs.","why":"Nowadays points at the present, so on its own this sentence needs the present: it sells.","kind":"tense","hint":"Read the whole sentence first: something in it tells you when this happens, and look at who or what is doing it.","decoy":[],"pin":true,"skip":[]},
-{"id":"wc-vt161","level":"secure","type":"mixed","words":["These","days","the","shop","closed","at","nine,","leaving","the","street","dark."],"err":4,"wrong":"closed","right":"closes","third":"close","opts":["closed","closes","close"],"fixed":"These days the shop closes at nine, leaving the street dark.","why":"These days points at the present, so on its own this sentence needs the present: it closes.","kind":"tense","hint":"Read the whole sentence first: something in it tells you when this happens, and look at who or what is doing it.","decoy":[],"pin":true,"skip":[],"dx":true},
-{"id":"wc-vt162","level":"developing","type":"irrpast","words":["At","the","concert","last","week","my","cousin","bring","his","guitar."],"err":7,"wrong":"bring","right":"brought","third":"brings","opts":["bring","brought","brings"],"fixed":"At the concert last week my cousin brought his guitar.","why":"Bring is irregular. Its past is brought, and there is no such word as bringed.","kind":"tense","hint":"Read the whole sentence first: something in it tells you when this happens.","decoy":[],"pin":true,"skip":[],"dx":true},
-{"id":"wc-vt163","level":"foundation","type":"irrpast","words":["Yesterday","my","parents","buy","new","plants","to","put","on","the","balcony."],"err":3,"wrong":"buy","right":"bought","third":"buys","opts":["buy","bought","buys"],"fixed":"Yesterday my parents bought new plants to put on the balcony.","why":"Buy is irregular. Its past is bought, and there is no such word as buyed.","kind":"tense","hint":"Read the whole sentence first: something in it tells you when this happens.","decoy":[],"pin":true,"skip":[],"dx":true},
-{"id":"wc-vt164","level":"challenge","type":"mixed","words":["Nowadays","my","grandfather","walked","to","the","market","before","dawn."],"err":3,"wrong":"walked","right":"walks","third":"walk","opts":["walked","walks","walk"],"fixed":"Nowadays my grandfather walks to the market before dawn.","why":"Nowadays points at the present, so on its own this sentence needs the present: he walks.","kind":"tense","hint":"Read the whole sentence first: something in it tells you when this happens, and look at who or what is doing it.","decoy":[],"pin":true,"skip":[],"dx":true},
-{"id":"wc-vt165","level":"secure","type":"be","words":["Last","August","the","corridors","of","the","school","was","silent,","waiting","for","term."],"err":7,"wrong":"was","right":"were","third":"are","opts":["was","were","are"],"fixed":"Last August the corridors of the school were silent, waiting for term.","why":"The corridors means more than one, so the past form is were.","kind":"agreement","hint":"Read the whole sentence first: something in it tells you when this happens, and look at who or what is doing it.","decoy":[],"pin":true,"skip":[],"dx":true},
-{"id":"wc-vt166","level":"challenge","type":"mixed","words":["In","those","days","the","ferry","takes","two","hours","to","cross."],"err":5,"wrong":"takes","right":"took","third":"take","opts":["takes","took","take"],"fixed":"In those days the ferry took two hours to cross.","why":"In those days is finished, so the verb must be in the past: it took.","kind":"tense","hint":"Read the whole sentence first: something in it tells you when this happens.","decoy":[],"pin":true,"skip":[],"dx":true},
+{"id":"wc-vt161","level":"secure","type":"mixed","words":["These","days","the","shop","closed","at","nine,","leaving","the","street","dark."],"err":4,"wrong":"closed","right":"closes","third":"close","opts":["closed","closes","close"],"fixed":"These days the shop closes at nine, leaving the street dark.","why":"These days points at the present, so on its own this sentence needs the present: it closes.","kind":"tense","hint":"Read the whole sentence first: something in it tells you when this happens, and look at who or what is doing it.","decoy":[],"pin":true,"skip":[]},
+{"id":"wc-vt162","level":"developing","type":"irrpast","words":["At","the","concert","last","week","my","cousin","bring","his","guitar."],"err":7,"wrong":"bring","right":"brought","third":"brings","opts":["bring","brought","brings"],"fixed":"At the concert last week my cousin brought his guitar.","why":"Bring is irregular. Its past is brought, and there is no such word as bringed.","kind":"tense","hint":"Read the whole sentence first: something in it tells you when this happens.","decoy":[],"pin":true,"skip":[]},
+{"id":"wc-vt163","level":"foundation","type":"irrpast","words":["Yesterday","my","parents","buy","new","plants","to","put","on","the","balcony."],"err":3,"wrong":"buy","right":"bought","third":"buys","opts":["buy","bought","buys"],"fixed":"Yesterday my parents bought new plants to put on the balcony.","why":"Buy is irregular. Its past is bought, and there is no such word as buyed.","kind":"tense","hint":"Read the whole sentence first: something in it tells you when this happens.","decoy":[],"pin":true,"skip":[]},
+{"id":"wc-vt164","level":"challenge","type":"mixed","words":["Nowadays","my","grandfather","walked","to","the","market","before","dawn."],"err":3,"wrong":"walked","right":"walks","third":"walk","opts":["walked","walks","walk"],"fixed":"Nowadays my grandfather walks to the market before dawn.","why":"Nowadays points at the present, so on its own this sentence needs the present: he walks.","kind":"tense","hint":"Read the whole sentence first: something in it tells you when this happens, and look at who or what is doing it.","decoy":[],"pin":true,"skip":[]},
+{"id":"wc-vt165","level":"secure","type":"be","words":["Last","August","the","corridors","of","the","school","was","silent,","waiting","for","term."],"err":7,"wrong":"was","right":"were","third":"are","opts":["was","were","are"],"fixed":"Last August the corridors of the school were silent, waiting for term.","why":"The corridors means more than one, so the past form is were.","kind":"agreement","hint":"Read the whole sentence first: something in it tells you when this happens, and look at who or what is doing it.","decoy":[],"pin":true,"skip":[]},
+{"id":"wc-vt166","level":"challenge","type":"mixed","words":["In","those","days","the","ferry","takes","two","hours","to","cross."],"err":5,"wrong":"takes","right":"took","third":"take","opts":["takes","took","take"],"fixed":"In those days the ferry took two hours to cross.","why":"In those days is finished, so the verb must be in the past: it took.","kind":"tense","hint":"Read the whole sentence first: something in it tells you when this happens.","decoy":[],"pin":true,"skip":[]},
 {"id":"wc-vt167","level":"foundation","type":"sform","words":["These","days","my","father","sweeps","the","yard","while","my","brother","wash","the","car."],"err":10,"wrong":"wash","right":"washes","third":"washed","opts":["wash","washes","washed"],"fixed":"These days my father sweeps the yard while my brother washes the car.","why":"My brother is one person, so the present tense verb takes an s: he washes.","kind":"agreement","hint":"Read the whole sentence first: something in it tells you when this happens, and look at who or what is doing it.","decoy":[4],"pin":true,"skip":[],"dx":true},
 {"id":"wc-vt168","level":"foundation","type":"sform","words":["Nowadays","the","bus","stop","at","every","corner","near","the","market."],"err":3,"wrong":"stop","right":"stops","third":"stopped","opts":["stop","stops","stopped"],"fixed":"Nowadays the bus stops at every corner near the market.","why":"The bus is one thing, so the present tense verb takes an s: it stops.","kind":"agreement","hint":"Read the whole sentence first: something in it tells you when this happens, and look at who or what is doing it.","decoy":[],"pin":true,"skip":[],"dx":true},
 {"id":"wc-vt169","level":"developing","type":"sform","words":["These","days","my","grandmother","waits","outside","while","my","cousins","visits","the","temple."],"err":9,"wrong":"visits","right":"visit","third":"visited","opts":["visits","visit","visited"],"fixed":"These days my grandmother waits outside while my cousins visit the temple.","why":"My cousins means more than one, so the present tense verb takes no s: they visit.","kind":"agreement","hint":"Read the whole sentence first: something in it tells you when this happens, and look at who or what is doing it.","decoy":[4],"pin":true,"skip":[],"dx":true},
@@ -4659,10 +4666,10 @@ var NAMEEX = [
 {"text":"My little brother eats enough to feed an entire army.","mark":"enough to feed an entire army","tech":"Hyperbole","also":[],"why":"He cannot really eat enough for an army; it is a deliberate exaggeration.","id":"wc-nx158"},
 {"text":"Our teacher gave us enough homework to bury the entire town.","mark":"enough homework to bury the entire town","tech":"Hyperbole","also":[],"why":"Homework could never bury a whole town; it overstates how much there was.","id":"wc-nx159"},
 {"text":"My dad snores loud enough to wake the whole street.","mark":"loud enough to wake the whole street","tech":"Hyperbole","also":[],"why":"His snoring cannot really wake a street; it exaggerates the degree.","id":"wc-nx160"},
-{"text":"The old blanket was as rough as sandpaper.","mark":"as rough as sandpaper","tech":"Simile","also":["Senses"],"why":"It compares the blanket to sandpaper using 'as ... as'.","id":"wc-nx161","dx":true},
-{"text":"Five fat frogs sat at the edge of the pond.","mark":"Five fat frogs","tech":"Alliteration","also":["Senses"],"why":"Five, fat and frogs all begin with the same f sound.","id":"wc-nx162","dx":true},
-{"text":"My school bag weighs a hundred kilos on a Monday.","mark":"weighs a hundred kilos","tech":"Hyperbole","also":["Senses"],"why":"Nobody is meant to believe the bag really weighs that. The size of it is the point.","id":"wc-nx163","dx":true},
-{"text":"The examiner's questions were a series of locked doors.","mark":"a series of locked doors","tech":"Metaphor","also":["Senses"],"why":"It says the questions ARE locked doors, a direct comparison with no 'like' or 'as'.","id":"wc-nx164","dx":true},
+{"text":"The old blanket was as rough as sandpaper.","mark":"as rough as sandpaper","tech":"Simile","also":["Senses"],"why":"It compares the blanket to sandpaper using 'as ... as'.","id":"wc-nx161"},
+{"text":"Five fat frogs sat at the edge of the pond.","mark":"Five fat frogs","tech":"Alliteration","also":["Senses"],"why":"Five, fat and frogs all begin with the same f sound.","id":"wc-nx162"},
+{"text":"My school bag weighs a hundred kilos on a Monday.","mark":"weighs a hundred kilos","tech":"Hyperbole","also":["Senses"],"why":"Nobody is meant to believe the bag really weighs that. The size of it is the point.","id":"wc-nx163"},
+{"text":"The examiner's questions were a series of locked doors.","mark":"a series of locked doors","tech":"Metaphor","also":["Senses"],"why":"It says the questions ARE locked doors, a direct comparison with no 'like' or 'as'.","id":"wc-nx164"},
 {"text":"He wrenched the door open against the wind.","mark":"wrenched","tech":"Powerful verb","also":[],"why":"Wrenched is a far stronger word than opened, chosen for the effort it carries.","id":"wc-nx165"},
 {"text":"The kitchen smelled of butter and warm bread.","mark":"smelled of butter and warm bread","tech":"Senses","also":[],"why":"It appeals to smell and to touch.","id":"wc-nx166"},
 {"text":"The lorry crawled up the hill in the heat.","mark":"crawled","tech":"Powerful verb","also":["Personification"],"why":"Crawled is a much stronger word than moved, chosen for how slow it makes the lorry seem.","id":"wc-nx167"},
@@ -4842,9 +4849,9 @@ var EI = [
 {"phrase":"the houses turned their backs on the sea","explicit":"the houses faced away from the sea","reworded":"the homes were built facing inland, not the water","implied":"the village is closed-off, cold and unwelcoming","wrong":"the houses faced the sea with wide, open windows","why":"Explicit is the houses facing away. Implied, from 'turned their backs', is the closed-off, unwelcoming village. 'Built facing inland' just rewords the literal.","id":"wc-ei098"},
 {"phrase":"exhaustion weighed on his shoulders","explicit":"he was extremely tired and had no energy","reworded":"he was utterly worn out, with no strength","implied":"his tiredness is a burden he must carry","wrong":"he was fresh, energetic and full of life","why":"Explicit is his extreme tiredness. Implied, from 'weighed on his shoulders', is the heavy burden of it. 'Utterly worn out' just rewords the literal.","id":"wc-ei099"},
 {"phrase":"the last leaf clung to the branch","explicit":"one last leaf still held onto the tree","reworded":"a single leaf remained, hanging on the branch","implied":"life is holding on bravely against the end","wrong":"the tree was full of thick, fresh green leaves","why":"Explicit is the one remaining leaf. Implied, from 'clung', is the moving image of life holding on. 'A single leaf remained' just rewords the literal.","id":"wc-ei100"},
-{"phrase":"a paper smile","explicit":"she is smiling thinly","reworded":"her smile looks weak","implied":"the warmth is put on","wrong":"she is beaming with a broad and solid grin","why":"Explicit is the thin smile. Implied, from 'paper', is that the warmth is not real. 'Weak and slight' is the same literal point reworded.","id":"wc-ei101","dx":true},
-{"phrase":"the corridor swallowed their voices","explicit":"the sound of their talking died away","reworded":"their voices faded as they walked along","implied":"the building dwarfed the people in it","wrong":"their voices echoed brightly down the corridor","why":"Explicit is that the sound died away. Implied, from 'swallowed', is a building that dwarfs the people in it. 'Their voices faded' just restates the literal.","id":"wc-ei102","dx":true},
-{"phrase":"the town held its breath","explicit":"the whole town went still and quiet","reworded":"everything in the town stopped and fell silent","implied":"everyone waited for bad news","wrong":"the town carried on as noisily as it always did","why":"Explicit is the stillness. Implied is a shared dread of something nobody can stop. 'Everything stopped and fell silent' repeats the literal.","id":"wc-ei103","dx":true},
+{"phrase":"a paper smile","explicit":"she is smiling thinly","reworded":"her smile looks weak","implied":"the warmth is put on","wrong":"she is beaming with a broad and solid grin","why":"Explicit is the thin smile. Implied, from 'paper', is that the warmth is not real. 'Weak and slight' is the same literal point reworded.","id":"wc-ei101"},
+{"phrase":"the corridor swallowed their voices","explicit":"the sound of their talking died away","reworded":"their voices faded as they walked along","implied":"the building dwarfed the people in it","wrong":"their voices echoed brightly down the corridor","why":"Explicit is that the sound died away. Implied, from 'swallowed', is a building that dwarfs the people in it. 'Their voices faded' just restates the literal.","id":"wc-ei102"},
+{"phrase":"the town held its breath","explicit":"the whole town went still and quiet","reworded":"everything in the town stopped and fell silent","implied":"everyone waited for bad news","wrong":"the town carried on as noisily as it always did","why":"Explicit is the stillness. Implied is a shared dread of something nobody can stop. 'Everything stopped and fell silent' repeats the literal.","id":"wc-ei103"},
 {"phrase":"the bell cut through the heat","explicit":"the bell rang loudly across the hot playground","reworded":"a loud ring carried over the warm yard","implied":"the school day rules everything here","wrong":"the playground stayed silent all afternoon","why":"Explicit is the loud ringing across the playground. Implied, from 'cut through', is that the timetable governs everything, heat included. 'A loud ring carried over the yard' is the same literal point in other words.","id":"wc-ei104","dx":true},
 {"phrase":"her suitcase waited by the door","explicit":"the packed case had been left ready in the hallway","reworded":"a filled bag stood by the front entrance","implied":"she has already decided to leave and will not be talked out of it","wrong":"she has unpacked everything and put it away again","why":"Explicit is the packed case in the hallway. Implied, from 'waited', is a decision already taken and not open to argument. 'A filled bag stood by the entrance' only restates the literal.","id":"wc-ei105","dx":true},
 {"phrase":"the ceiling fan stirred the thick air","explicit":"the fan moved the heavy air around the room","reworded":"warm air shifted slowly under the turning blades","implied":"nothing here ever really changes","wrong":"the room was cool and the air perfectly fresh","why":"Explicit is the fan moving heavy air. Implied, from 'stirred' and 'thick', is a place that turns over without ever moving on. 'Warm air shifted under the blades' repeats the literal.","id":"wc-ei106","dx":true},
@@ -4880,69 +4887,71 @@ var KTSORT = [
 {"id":"wc-ks016","pair":["Simile","Metaphor"],"ex":["wc-nx114","wc-nx115","wc-nx116","wc-nx120","wc-nx121","wc-nx122"]},
 {"id":"wc-ks017","pair":["Simile","Metaphor"],"ex":["wc-nx115","wc-nx116","wc-nx117","wc-nx121","wc-nx122","wc-nx123"]},
 {"id":"wc-ks018","pair":["Simile","Metaphor"],"ex":["wc-nx116","wc-nx117","wc-nx118","wc-nx122","wc-nx123","wc-nx124"]},
-{"id":"wc-ks019","pair":["Simile","Metaphor"],"ex":["wc-nx117","wc-nx118","wc-nx001","wc-nx123","wc-nx124","wc-nx005"]},
-{"id":"wc-ks020","pair":["Simile","Metaphor"],"ex":["wc-nx118","wc-nx001","wc-nx002","wc-nx124","wc-nx005","wc-nx006"]},
-{"id":"wc-ks021","pair":["Personification","Powerful verb"],"ex":["wc-nx078","wc-nx081","wc-nx126","wc-nx013","wc-nx014","wc-nx015"]},
-{"id":"wc-ks022","pair":["Personification","Powerful verb"],"ex":["wc-nx081","wc-nx126","wc-nx128","wc-nx014","wc-nx015","wc-nx016"]},
-{"id":"wc-ks023","pair":["Personification","Powerful verb"],"ex":["wc-nx126","wc-nx128","wc-nx078","wc-nx015","wc-nx016","wc-nx045"]},
-{"id":"wc-ks024","pair":["Personification","Powerful verb"],"ex":["wc-nx128","wc-nx078","wc-nx081","wc-nx016","wc-nx045","wc-nx046"]},
-{"id":"wc-ks025","pair":["Personification","Powerful verb"],"ex":["wc-nx078","wc-nx081","wc-nx126","wc-nx045","wc-nx046","wc-nx047"]},
-{"id":"wc-ks026","pair":["Personification","Powerful verb"],"ex":["wc-nx081","wc-nx126","wc-nx128","wc-nx046","wc-nx047","wc-nx048"]},
-{"id":"wc-ks027","pair":["Personification","Powerful verb"],"ex":["wc-nx126","wc-nx128","wc-nx078","wc-nx047","wc-nx048","wc-nx083"]},
-{"id":"wc-ks028","pair":["Personification","Powerful verb"],"ex":["wc-nx128","wc-nx078","wc-nx081","wc-nx048","wc-nx083","wc-nx084"]},
-{"id":"wc-ks029","pair":["Personification","Powerful verb"],"ex":["wc-nx078","wc-nx081","wc-nx126","wc-nx083","wc-nx084","wc-nx085"]},
-{"id":"wc-ks030","pair":["Personification","Powerful verb"],"ex":["wc-nx081","wc-nx126","wc-nx128","wc-nx084","wc-nx085","wc-nx086"]},
-{"id":"wc-ks031","pair":["Personification","Powerful verb"],"ex":["wc-nx126","wc-nx128","wc-nx078","wc-nx085","wc-nx086","wc-nx087"]},
-{"id":"wc-ks032","pair":["Personification","Powerful verb"],"ex":["wc-nx128","wc-nx078","wc-nx081","wc-nx086","wc-nx087","wc-nx088"]},
-{"id":"wc-ks033","pair":["Personification","Powerful verb"],"ex":["wc-nx078","wc-nx081","wc-nx126","wc-nx087","wc-nx088","wc-nx131"]},
-{"id":"wc-ks034","pair":["Personification","Powerful verb"],"ex":["wc-nx081","wc-nx126","wc-nx128","wc-nx088","wc-nx131","wc-nx132"]},
-{"id":"wc-ks035","pair":["Personification","Powerful verb"],"ex":["wc-nx126","wc-nx128","wc-nx078","wc-nx131","wc-nx132","wc-nx133"]},
-{"id":"wc-ks036","pair":["Personification","Powerful verb"],"ex":["wc-nx128","wc-nx078","wc-nx081","wc-nx132","wc-nx133","wc-nx134"]},
-{"id":"wc-ks037","pair":["Personification","Powerful verb"],"ex":["wc-nx078","wc-nx081","wc-nx126","wc-nx133","wc-nx134","wc-nx135"]},
-{"id":"wc-ks038","pair":["Personification","Powerful verb"],"ex":["wc-nx081","wc-nx126","wc-nx128","wc-nx134","wc-nx135","wc-nx136"]},
-{"id":"wc-ks039","pair":["Personification","Powerful verb"],"ex":["wc-nx126","wc-nx128","wc-nx078","wc-nx135","wc-nx136","wc-nx165"]},
-{"id":"wc-ks040","pair":["Personification","Powerful verb"],"ex":["wc-nx128","wc-nx078","wc-nx081","wc-nx136","wc-nx165","wc-nx013"]},
-{"id":"wc-ks041","pair":["Personification","Powerful verb"],"ex":["wc-nx078","wc-nx081","wc-nx126","wc-nx165","wc-nx013","wc-nx014"]},
-{"id":"wc-ks042","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx021","wc-nx022","wc-nx023","wc-nx025","wc-nx026","wc-nx027"]},
-{"id":"wc-ks043","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx022","wc-nx023","wc-nx024","wc-nx026","wc-nx027","wc-nx057"]},
-{"id":"wc-ks044","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx023","wc-nx024","wc-nx053","wc-nx027","wc-nx057","wc-nx058"]},
-{"id":"wc-ks045","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx024","wc-nx053","wc-nx054","wc-nx057","wc-nx058","wc-nx059"]},
-{"id":"wc-ks046","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx053","wc-nx054","wc-nx055","wc-nx058","wc-nx059","wc-nx060"]},
-{"id":"wc-ks047","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx054","wc-nx055","wc-nx056","wc-nx059","wc-nx060","wc-nx101"]},
-{"id":"wc-ks048","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx055","wc-nx056","wc-nx095","wc-nx060","wc-nx101","wc-nx102"]},
-{"id":"wc-ks049","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx056","wc-nx095","wc-nx096","wc-nx101","wc-nx102","wc-nx103"]},
-{"id":"wc-ks050","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx095","wc-nx096","wc-nx097","wc-nx102","wc-nx103","wc-nx104"]},
-{"id":"wc-ks051","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx096","wc-nx097","wc-nx098","wc-nx103","wc-nx104","wc-nx105"]},
-{"id":"wc-ks052","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx097","wc-nx098","wc-nx099","wc-nx104","wc-nx105","wc-nx106"]},
-{"id":"wc-ks053","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx098","wc-nx099","wc-nx100","wc-nx105","wc-nx106","wc-nx149"]},
-{"id":"wc-ks054","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx099","wc-nx100","wc-nx143","wc-nx106","wc-nx149","wc-nx150"]},
-{"id":"wc-ks055","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx100","wc-nx143","wc-nx144","wc-nx149","wc-nx150","wc-nx151"]},
-{"id":"wc-ks056","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx143","wc-nx144","wc-nx145","wc-nx150","wc-nx151","wc-nx152"]},
-{"id":"wc-ks057","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx144","wc-nx145","wc-nx146","wc-nx151","wc-nx152","wc-nx153"]},
-{"id":"wc-ks058","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx145","wc-nx146","wc-nx147","wc-nx152","wc-nx153","wc-nx154"]},
-{"id":"wc-ks059","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx146","wc-nx147","wc-nx148","wc-nx153","wc-nx154","wc-nx025"]},
-{"id":"wc-ks060","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx147","wc-nx148","wc-nx021","wc-nx154","wc-nx025","wc-nx026"]},
-{"id":"wc-ks061","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx148","wc-nx021","wc-nx022","wc-nx025","wc-nx026","wc-nx027"]},
-{"id":"wc-ks062","pair":["Metaphor","Hyperbole"],"ex":["wc-nx006","wc-nx007","wc-nx008","wc-nx029","wc-nx030","wc-nx031"]},
-{"id":"wc-ks063","pair":["Metaphor","Hyperbole"],"ex":["wc-nx007","wc-nx008","wc-nx037","wc-nx030","wc-nx031","wc-nx032"]},
-{"id":"wc-ks064","pair":["Metaphor","Hyperbole"],"ex":["wc-nx008","wc-nx037","wc-nx039","wc-nx031","wc-nx032","wc-nx061"]},
-{"id":"wc-ks065","pair":["Metaphor","Hyperbole"],"ex":["wc-nx037","wc-nx039","wc-nx040","wc-nx032","wc-nx061","wc-nx062"]},
-{"id":"wc-ks066","pair":["Metaphor","Hyperbole"],"ex":["wc-nx039","wc-nx040","wc-nx071","wc-nx061","wc-nx062","wc-nx063"]},
-{"id":"wc-ks067","pair":["Metaphor","Hyperbole"],"ex":["wc-nx040","wc-nx071","wc-nx072","wc-nx062","wc-nx063","wc-nx064"]},
-{"id":"wc-ks068","pair":["Metaphor","Hyperbole"],"ex":["wc-nx071","wc-nx072","wc-nx073","wc-nx063","wc-nx064","wc-nx107"]},
-{"id":"wc-ks069","pair":["Metaphor","Hyperbole"],"ex":["wc-nx072","wc-nx073","wc-nx074","wc-nx064","wc-nx107","wc-nx108"]},
-{"id":"wc-ks070","pair":["Metaphor","Hyperbole"],"ex":["wc-nx073","wc-nx074","wc-nx075","wc-nx107","wc-nx108","wc-nx109"]},
-{"id":"wc-ks071","pair":["Metaphor","Hyperbole"],"ex":["wc-nx074","wc-nx075","wc-nx076","wc-nx108","wc-nx109","wc-nx110"]},
-{"id":"wc-ks072","pair":["Metaphor","Hyperbole"],"ex":["wc-nx075","wc-nx076","wc-nx119","wc-nx109","wc-nx110","wc-nx111"]},
-{"id":"wc-ks073","pair":["Metaphor","Hyperbole"],"ex":["wc-nx076","wc-nx119","wc-nx120","wc-nx110","wc-nx111","wc-nx112"]},
-{"id":"wc-ks074","pair":["Metaphor","Hyperbole"],"ex":["wc-nx119","wc-nx120","wc-nx121","wc-nx111","wc-nx112","wc-nx155"]},
-{"id":"wc-ks075","pair":["Metaphor","Hyperbole"],"ex":["wc-nx120","wc-nx121","wc-nx123","wc-nx112","wc-nx155","wc-nx156"]},
-{"id":"wc-ks076","pair":["Metaphor","Hyperbole"],"ex":["wc-nx121","wc-nx123","wc-nx124","wc-nx155","wc-nx156","wc-nx157"]},
-{"id":"wc-ks077","pair":["Metaphor","Hyperbole"],"ex":["wc-nx123","wc-nx124","wc-nx006","wc-nx156","wc-nx157","wc-nx158"]},
-{"id":"wc-ks078","pair":["Metaphor","Hyperbole"],"ex":["wc-nx124","wc-nx006","wc-nx007","wc-nx157","wc-nx158","wc-nx159"]},
-{"id":"wc-ks079","pair":["Metaphor","Hyperbole"],"ex":["wc-nx006","wc-nx007","wc-nx008","wc-nx158","wc-nx159","wc-nx160"]},
-{"id":"wc-ks080","pair":["Metaphor","Hyperbole"],"ex":["wc-nx007","wc-nx008","wc-nx037","wc-nx159","wc-nx160","wc-nx029"]},
-{"id":"wc-ks081","pair":["Metaphor","Hyperbole"],"ex":["wc-nx008","wc-nx037","wc-nx039","wc-nx160","wc-nx029","wc-nx030"]}
+{"id":"wc-ks019","pair":["Simile","Metaphor"],"ex":["wc-nx117","wc-nx118","wc-nx161","wc-nx123","wc-nx124","wc-nx164"]},
+{"id":"wc-ks020","pair":["Simile","Metaphor"],"ex":["wc-nx118","wc-nx161","wc-nx001","wc-nx124","wc-nx164","wc-nx005"]},
+{"id":"wc-ks021","pair":["Simile","Metaphor"],"ex":["wc-nx161","wc-nx001","wc-nx002","wc-nx164","wc-nx005","wc-nx006"]},
+{"id":"wc-ks022","pair":["Personification","Powerful verb"],"ex":["wc-nx078","wc-nx081","wc-nx126","wc-nx013","wc-nx014","wc-nx015"]},
+{"id":"wc-ks023","pair":["Personification","Powerful verb"],"ex":["wc-nx081","wc-nx126","wc-nx128","wc-nx014","wc-nx015","wc-nx016"]},
+{"id":"wc-ks024","pair":["Personification","Powerful verb"],"ex":["wc-nx126","wc-nx128","wc-nx078","wc-nx015","wc-nx016","wc-nx045"]},
+{"id":"wc-ks025","pair":["Personification","Powerful verb"],"ex":["wc-nx128","wc-nx078","wc-nx081","wc-nx016","wc-nx045","wc-nx046"]},
+{"id":"wc-ks026","pair":["Personification","Powerful verb"],"ex":["wc-nx078","wc-nx081","wc-nx126","wc-nx045","wc-nx046","wc-nx047"]},
+{"id":"wc-ks027","pair":["Personification","Powerful verb"],"ex":["wc-nx081","wc-nx126","wc-nx128","wc-nx046","wc-nx047","wc-nx048"]},
+{"id":"wc-ks028","pair":["Personification","Powerful verb"],"ex":["wc-nx126","wc-nx128","wc-nx078","wc-nx047","wc-nx048","wc-nx083"]},
+{"id":"wc-ks029","pair":["Personification","Powerful verb"],"ex":["wc-nx128","wc-nx078","wc-nx081","wc-nx048","wc-nx083","wc-nx084"]},
+{"id":"wc-ks030","pair":["Personification","Powerful verb"],"ex":["wc-nx078","wc-nx081","wc-nx126","wc-nx083","wc-nx084","wc-nx085"]},
+{"id":"wc-ks031","pair":["Personification","Powerful verb"],"ex":["wc-nx081","wc-nx126","wc-nx128","wc-nx084","wc-nx085","wc-nx086"]},
+{"id":"wc-ks032","pair":["Personification","Powerful verb"],"ex":["wc-nx126","wc-nx128","wc-nx078","wc-nx085","wc-nx086","wc-nx087"]},
+{"id":"wc-ks033","pair":["Personification","Powerful verb"],"ex":["wc-nx128","wc-nx078","wc-nx081","wc-nx086","wc-nx087","wc-nx088"]},
+{"id":"wc-ks034","pair":["Personification","Powerful verb"],"ex":["wc-nx078","wc-nx081","wc-nx126","wc-nx087","wc-nx088","wc-nx131"]},
+{"id":"wc-ks035","pair":["Personification","Powerful verb"],"ex":["wc-nx081","wc-nx126","wc-nx128","wc-nx088","wc-nx131","wc-nx132"]},
+{"id":"wc-ks036","pair":["Personification","Powerful verb"],"ex":["wc-nx126","wc-nx128","wc-nx078","wc-nx131","wc-nx132","wc-nx133"]},
+{"id":"wc-ks037","pair":["Personification","Powerful verb"],"ex":["wc-nx128","wc-nx078","wc-nx081","wc-nx132","wc-nx133","wc-nx134"]},
+{"id":"wc-ks038","pair":["Personification","Powerful verb"],"ex":["wc-nx078","wc-nx081","wc-nx126","wc-nx133","wc-nx134","wc-nx135"]},
+{"id":"wc-ks039","pair":["Personification","Powerful verb"],"ex":["wc-nx081","wc-nx126","wc-nx128","wc-nx134","wc-nx135","wc-nx136"]},
+{"id":"wc-ks040","pair":["Personification","Powerful verb"],"ex":["wc-nx126","wc-nx128","wc-nx078","wc-nx135","wc-nx136","wc-nx165"]},
+{"id":"wc-ks041","pair":["Personification","Powerful verb"],"ex":["wc-nx128","wc-nx078","wc-nx081","wc-nx136","wc-nx165","wc-nx013"]},
+{"id":"wc-ks042","pair":["Personification","Powerful verb"],"ex":["wc-nx078","wc-nx081","wc-nx126","wc-nx165","wc-nx013","wc-nx014"]},
+{"id":"wc-ks043","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx021","wc-nx022","wc-nx023","wc-nx025","wc-nx026","wc-nx027"]},
+{"id":"wc-ks044","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx022","wc-nx023","wc-nx024","wc-nx026","wc-nx027","wc-nx057"]},
+{"id":"wc-ks045","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx023","wc-nx024","wc-nx053","wc-nx027","wc-nx057","wc-nx058"]},
+{"id":"wc-ks046","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx024","wc-nx053","wc-nx054","wc-nx057","wc-nx058","wc-nx059"]},
+{"id":"wc-ks047","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx053","wc-nx054","wc-nx055","wc-nx058","wc-nx059","wc-nx060"]},
+{"id":"wc-ks048","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx054","wc-nx055","wc-nx056","wc-nx059","wc-nx060","wc-nx101"]},
+{"id":"wc-ks049","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx055","wc-nx056","wc-nx095","wc-nx060","wc-nx101","wc-nx102"]},
+{"id":"wc-ks050","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx056","wc-nx095","wc-nx096","wc-nx101","wc-nx102","wc-nx103"]},
+{"id":"wc-ks051","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx095","wc-nx096","wc-nx097","wc-nx102","wc-nx103","wc-nx104"]},
+{"id":"wc-ks052","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx096","wc-nx097","wc-nx098","wc-nx103","wc-nx104","wc-nx105"]},
+{"id":"wc-ks053","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx097","wc-nx098","wc-nx099","wc-nx104","wc-nx105","wc-nx106"]},
+{"id":"wc-ks054","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx098","wc-nx099","wc-nx100","wc-nx105","wc-nx106","wc-nx149"]},
+{"id":"wc-ks055","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx099","wc-nx100","wc-nx143","wc-nx106","wc-nx149","wc-nx150"]},
+{"id":"wc-ks056","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx100","wc-nx143","wc-nx144","wc-nx149","wc-nx150","wc-nx151"]},
+{"id":"wc-ks057","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx143","wc-nx144","wc-nx145","wc-nx150","wc-nx151","wc-nx152"]},
+{"id":"wc-ks058","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx144","wc-nx145","wc-nx146","wc-nx151","wc-nx152","wc-nx153"]},
+{"id":"wc-ks059","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx145","wc-nx146","wc-nx147","wc-nx152","wc-nx153","wc-nx154"]},
+{"id":"wc-ks060","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx146","wc-nx147","wc-nx148","wc-nx153","wc-nx154","wc-nx162"]},
+{"id":"wc-ks061","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx147","wc-nx148","wc-nx021","wc-nx154","wc-nx162","wc-nx025"]},
+{"id":"wc-ks062","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx148","wc-nx021","wc-nx022","wc-nx162","wc-nx025","wc-nx026"]},
+{"id":"wc-ks063","pair":["Metaphor","Hyperbole"],"ex":["wc-nx006","wc-nx007","wc-nx008","wc-nx029","wc-nx030","wc-nx031"]},
+{"id":"wc-ks064","pair":["Metaphor","Hyperbole"],"ex":["wc-nx007","wc-nx008","wc-nx037","wc-nx030","wc-nx031","wc-nx032"]},
+{"id":"wc-ks065","pair":["Metaphor","Hyperbole"],"ex":["wc-nx008","wc-nx037","wc-nx039","wc-nx031","wc-nx032","wc-nx061"]},
+{"id":"wc-ks066","pair":["Metaphor","Hyperbole"],"ex":["wc-nx037","wc-nx039","wc-nx040","wc-nx032","wc-nx061","wc-nx062"]},
+{"id":"wc-ks067","pair":["Metaphor","Hyperbole"],"ex":["wc-nx039","wc-nx040","wc-nx071","wc-nx061","wc-nx062","wc-nx063"]},
+{"id":"wc-ks068","pair":["Metaphor","Hyperbole"],"ex":["wc-nx040","wc-nx071","wc-nx072","wc-nx062","wc-nx063","wc-nx064"]},
+{"id":"wc-ks069","pair":["Metaphor","Hyperbole"],"ex":["wc-nx071","wc-nx072","wc-nx073","wc-nx063","wc-nx064","wc-nx107"]},
+{"id":"wc-ks070","pair":["Metaphor","Hyperbole"],"ex":["wc-nx072","wc-nx073","wc-nx074","wc-nx064","wc-nx107","wc-nx108"]},
+{"id":"wc-ks071","pair":["Metaphor","Hyperbole"],"ex":["wc-nx073","wc-nx074","wc-nx075","wc-nx107","wc-nx108","wc-nx109"]},
+{"id":"wc-ks072","pair":["Metaphor","Hyperbole"],"ex":["wc-nx074","wc-nx075","wc-nx076","wc-nx108","wc-nx109","wc-nx110"]},
+{"id":"wc-ks073","pair":["Metaphor","Hyperbole"],"ex":["wc-nx075","wc-nx076","wc-nx119","wc-nx109","wc-nx110","wc-nx111"]},
+{"id":"wc-ks074","pair":["Metaphor","Hyperbole"],"ex":["wc-nx076","wc-nx119","wc-nx120","wc-nx110","wc-nx111","wc-nx112"]},
+{"id":"wc-ks075","pair":["Metaphor","Hyperbole"],"ex":["wc-nx119","wc-nx120","wc-nx121","wc-nx111","wc-nx112","wc-nx155"]},
+{"id":"wc-ks076","pair":["Metaphor","Hyperbole"],"ex":["wc-nx120","wc-nx121","wc-nx123","wc-nx112","wc-nx155","wc-nx156"]},
+{"id":"wc-ks077","pair":["Metaphor","Hyperbole"],"ex":["wc-nx121","wc-nx123","wc-nx124","wc-nx155","wc-nx156","wc-nx157"]},
+{"id":"wc-ks078","pair":["Metaphor","Hyperbole"],"ex":["wc-nx123","wc-nx124","wc-nx164","wc-nx156","wc-nx157","wc-nx158"]},
+{"id":"wc-ks079","pair":["Metaphor","Hyperbole"],"ex":["wc-nx124","wc-nx164","wc-nx006","wc-nx157","wc-nx158","wc-nx159"]},
+{"id":"wc-ks080","pair":["Metaphor","Hyperbole"],"ex":["wc-nx164","wc-nx006","wc-nx007","wc-nx158","wc-nx159","wc-nx160"]},
+{"id":"wc-ks081","pair":["Metaphor","Hyperbole"],"ex":["wc-nx006","wc-nx007","wc-nx008","wc-nx159","wc-nx160","wc-nx163"]},
+{"id":"wc-ks082","pair":["Metaphor","Hyperbole"],"ex":["wc-nx007","wc-nx008","wc-nx037","wc-nx160","wc-nx163","wc-nx029"]},
+{"id":"wc-ks083","pair":["Metaphor","Hyperbole"],"ex":["wc-nx008","wc-nx037","wc-nx039","wc-nx163","wc-nx029","wc-nx030"]}
 ];
 var AAMETA = {"pairs":[["Simile","Metaphor"],["Personification","Powerful verb"],["Onomatopoeia","Alliteration"],["Metaphor","Hyperbole"]]};
 /* >>> BANK:ANALYSIS ACROBAT END >>> */
@@ -5108,9 +5117,9 @@ var ALCTX = [
 {"id":"wc-ac062","level":"challenge","extract":"In chapter one the father carries the boy home. In the final chapter the boy carries the father.","frame":"The ending ___ the opening.","right":"inverts","wrong":["questions","connotes","challenges"],"why":"The same pattern returns the other way round, which is more than a repetition."},
 {"id":"wc-ac063","level":"challenge","extract":"She is still standing at the bus stop when the bus pulls away without her. The rain has not stopped.","frame":"That image ___ the reader.","right":"haunts","wrong":["subverts","parallels","honours"],"why":"Nothing in the scene explains why it matters, and it refuses to leave."},
 {"id":"wc-ac064","level":"challenge","extract":"The speech is generous, the handshake is warm, and the narrator mentions that the contract was signed that morning.","frame":"The last detail ___ the generosity.","right":"undercuts","wrong":["idealises","symbolises","withholds"],"why":"The force of what came before is taken away, suddenly, by one piece of information."},
-{"id":"wc-ac065","level":"developing","extract":"The captain is never once described in the same room as his crew. He gives every order through a runner.","frame":"The distance ___ him as a man apart from the men he leads.","right":"presents","wrong":["elicits","undermines","satirises"],"why":"The separation is how the writer puts him before us, so the distance presents him a particular way.","dx":true},
-{"id":"wc-ac066","level":"challenge","extract":"The first chapter ends with a wedding. The second opens on the same road, empty, in the rain.","frame":"Setting the two scenes on one road ___ the celebration and what follows.","right":"juxtaposes","wrong":["celebrates","reveals","sustains"],"why":"The two scenes are set side by side in the same place, which is what juxtaposing is.","dx":true},
-{"id":"wc-ac067","level":"challenge","extract":"The narrator calls the mayor a man of his word. Each chapter then closes on another promise nobody kept.","frame":"The pattern of broken promises ___ the praise the narrator gives him.","right":"undermines","wrong":["portrays","embodies","deploys"],"why":"The praise is never withdrawn. The broken promises weaken it from underneath, which is what undermining is.","dx":true}
+{"id":"wc-ac065","level":"developing","extract":"The captain is never once described in the same room as his crew. He gives every order through a runner.","frame":"The distance ___ him as a man apart from the men he leads.","right":"presents","wrong":["elicits","undermines","satirises"],"why":"The separation is how the writer puts him before us, so the distance presents him a particular way."},
+{"id":"wc-ac066","level":"challenge","extract":"The first chapter ends with a wedding. The second opens on the same road, empty, in the rain.","frame":"Setting the two scenes on one road ___ the celebration and what follows.","right":"juxtaposes","wrong":["celebrates","reveals","sustains"],"why":"The two scenes are set side by side in the same place, which is what juxtaposing is."},
+{"id":"wc-ac067","level":"challenge","extract":"The narrator calls the mayor a man of his word. Each chapter then closes on another promise nobody kept.","frame":"The pattern of broken promises ___ the praise the narrator gives him.","right":"undermines","wrong":["portrays","embodies","deploys"],"why":"The praise is never withdrawn. The broken promises weaken it from underneath, which is what undermining is."}
 ];
 var ALUPG = [
 {"id":"wc-au001","level":"foundation","frame":"The writer *shows* the boy's fear through his shaking hands and stammering voice.","right":"conveys","wrong":["employs","deploys","conjures"],"why":"The details carry his fear across to the reader, so the writer conveys it.","weak":"shows"},
@@ -6515,12 +6524,13 @@ var AMBIG = ["answer","answers","back","bark","barks","book","books","brush","br
 /* >>> BANK:AMBIG END >>> */
 
 /* >>> BANK:DXREG START >>> */
-/* The screener's REGISTER: [id, group, form, activity, level, mode]. The questions
-   themselves are not here. They are written in the banks above, which is what
-   makes them pass the gates those banks have learned, and `dxSplit()` lifts
-   them out before any round can reach them (SPEC 72). */
-var DXREG = [["wc-ac065","anal.use","B","altrue","developing","held",""],["wc-ac066","anal.use","*","altrue","challenge","held",""],["wc-ac067","anal.use","A","altrue","challenge","held",""],["wc-aw002","anal.know","B","aljob","foundation","taught",""],["wc-aw036","anal.know","A","aljob","secure","taught",""],["wc-aw046","anal.know","*","aljob","secure","taught",""],["wc-aw090","anal.know","*","aljob","challenge","taught",""],["wc-c110","wc.use","A","cloze","foundation","held",""],["wc-c111","wc.use","B","cloze","developing","held",""],["wc-c112","wc.use","*","cloze","secure","held",""],["wc-c113","wc.use","*","cloze","challenge","held",""],["wc-cm121","punc.use","B","commas","foundation","held",""],["wc-cm122","punc.use","A","commas","developing","held",""],["wc-cm123","punc.use","*","commas","secure","held",""],["wc-ei101","tech.apart","A","ei","developing","held","implied"],["wc-ei102","tech.apart","*","ei","secure","held","explicit"],["wc-ei103","tech.apart","B","ei","challenge","held","implied"],["wc-k131","wc.name","*","klass","foundation","held",""],["wc-k132","wc.name","*","klass","developing","held",""],["wc-k133","wc.name","A","klass","secure","held",""],["wc-k134","wc.name","B","klass","challenge","held",""],["wc-nx161","tech.know","*","ktname","foundation","held",""],["wc-nx162","tech.know","*","ktname","developing","held",""],["wc-nx163","tech.know","B","ktname","secure","held",""],["wc-nx164","tech.know","A","ktname","challenge","held",""],["wc-pn145","punc.find","*","punc","developing","held",""],["wc-pn146","punc.fix","*","pf","foundation","held",""],["wc-pn147","punc.find","B","punc","secure","held",""],["wc-pn148","punc.find","A","punc","developing","held",""],["wc-pn414","punc.fix","A","pf","developing","held",""],["wc-pn423","punc.fix","B","pf","secure","held",""],["wc-s366","wc.find","*","one","foundation","held","verb"],["wc-s367","wc.find","A","one","developing","held","adj"],["wc-s368","wc.find","B","one","challenge","held","adv"],["wc-tq725","techx.name","*","za","foundation","held",""],["wc-tq726","techx.name","B","za","developing","held",""],["wc-tq727","techx.name","A","za","challenge","held",""],["wc-tq728","techx.find","B","za","foundation","held",""],["wc-tq729","techx.find","A","za","secure","held",""],["wc-tq730","techx.find","*","za","challenge","held",""],["wc-vt161","tense.find","*","vt","secure","held",""],["wc-vt162","tense.find","A","vt","developing","held",""],["wc-vt163","tense.find","B","vt","foundation","held",""],["wc-vt164","tense.use","*","vf","challenge","held",""],["wc-vt165","tense.use","A","vf","secure","held",""],["wc-vt166","tense.use","B","vf","challenge","held",""],["wc-xt014","techx.know","A","xterm","foundation","taught",""],["wc-xt016","techx.know","*","xterm","developing","taught",""],["wc-xt018","techx.know","B","xterm","secure","taught",""]];
-/* The deep dive's REGISTER: [id, cell, level, ask, sub]. Same reason as the
+/* THE SCREENER'S REGISTER IS GONE (v0.97, SPEC 116) and so is the array. It held
+   a form column, which only a fixed two-form instrument needs, and the questions
+   it selected were released back into practice: 49 ids, recorded in
+   `dx_holdout.RELEASED_V097` so a response row from an earlier sitting can still
+   be read.
+
+   One register now. The deep dive's REGISTER: [id, cell, level, ask, sub]. Same reason as the
    screener's, and no form or mode because a pool has no form and its mode is
    always held (SPEC 73).
 
@@ -6546,7 +6556,7 @@ var STAMPMETA = {"fmt":1,"skip":["id","dx"],"strict":["secure","challenge"]};
 /* BANK_REV bumps when the banks change, and bumping it for a code change makes
    every pupil's record run the pruner for nothing. 44 at v0.78: twenty-eight items
    move from the end-mark chip to the boundary chip. */
-var APP = "wcc", VER = "v0.96", BANK_REV = 57;
+var APP = "wcc", VER = "v0.97", BANK_REV = 58;
 var BUG_FORM_URL = "";   /* paste the Office 365 form link to switch the report button on */
 
 /* ================= HELD OUT (v0.61, SPEC 72) ================================
@@ -7116,10 +7126,19 @@ var DX_OUTCOMES = {
 };
 /** A sitting. `form` is which screener form was used and `route` which
  *  deep dive was taken, both fixed for the whole sitting. */
-function dxSitting(form, route){
+function dxSitting(form, skill){
   return { id:"dx" + Date.now().toString(36) + Math.floor(Math.random()*1e6).toString(36),
            at:Math.floor(Date.now()/1000), app:VER, bank:BANK_REV, fmt:DX_ROW_V,
-           form:form || "", route:route || "", done:false, rows:[] };
+           /* TWO SHAPES COEXIST ON PURPOSE (v0.97, SPEC 113.7). A sitting taken
+              before v0.97 carries `route`, the deep-dive route the screener sent
+              the pupil down, and no `skill`. One taken after carries `skill`,
+              the domain whose battery it was, and no route. Neither is migrated
+              and neither is deleted: a sitting is a record of what a pupil
+              answered on a particular day, and an INSTRUMENT being replaced does
+              not un-answer it any more than a retired item does (v0.60). So
+              anything reading the history reads `skill || ""` and knows that a
+              sitting with a route and no skill is the older shape. */
+           form:form || "", route:"", skill:skill || "", done:false, rows:[] };
 }
 /* Every row the statistics script needs, and nothing optional. A row
    that is missing one of these is worse than a row that is absent,
@@ -7160,6 +7179,14 @@ function dxSave(sitting){
 function dxDone(){
   var st = store();
   return (st.dx || []).filter(function(s){ return s && s.done && (s.rows||[]).length; });
+}
+
+/* The finished sittings for one skill, oldest first. A pre-v0.97 sitting has no
+   `skill` and belongs to no battery, so it is never compared with one: it
+   measured a different instrument and saying otherwise would be the thing SPEC
+   72.2 warns about, two numbers that look comparable and are not. */
+function batDone(dom){
+  return dxDone().filter(function(s){ return s.skill === dom; });
 }
 
 /* v0.61: this was a second hand-kept list of the banks, one short of DX_BANKS
@@ -7415,20 +7442,40 @@ function go(id){
    for the same reason the banks are: one source, and a file long enough to
    have sections is easier to read on its own than buried in a template. */
 /* ====================================================================
-   THE DIAGNOSTIC (v0.64, SPEC 75)
+   THE PER-SKILL ASSESSMENT (v0.97, SPEC 113 and 116)
 
-   Stage one is a fixed screener on a blueprint: every pupil sits the same
-   questions every time, which is what makes two sittings comparable. Stage
-   two is the deep dive, a pool where the level moves and nothing is
-   compared with anything. This file is the RUNNER: it serves a plan, one
-   question at a time, through the rounds that own the questions.
+   A pupil opens a skill -- word classes, punctuation -- and chooses to
+   check what they know about THAT skill. One fixed blueprint per skill:
+   the same cells, the same number of questions in each, the same levels,
+   with the items drawn from a pool held out of practice. A fixed
+   blueprint is comparable with itself by construction, which is the
+   property the retired instrument needed two stages and a set of anchors
+   to rescue (SPEC 113.7).
 
-   Three properties it exists to hold, each of which has cost this project
-   something when it was absent:
+   WHAT THIS REPLACED, and why. Until v0.97 there was ONE sitting across
+   everything the app covers: a 49-question held-out screener over sixteen
+   reporting groups, then a 24-question deep dive routed into whichever
+   foundation looked weakest, then a report naming two strengths and two
+   weaknesses across six domains. Michael retired it on 2026-10-10: "it
+   tests too much and the skill level is too broad". A pupil who wanted to
+   know about punctuation answered thirty-four questions about other
+   things first, and two strengths out of sixteen groups says almost
+   nothing about any of them.
 
-   1. NO FEEDBACK UNTIL THE END (Michael, 2026-09-24). Not hidden by asking
-      each round nicely. Hidden by `body.dx`, so a round written next year
-      inherits it, which is the v0.61 lesson about filters and promises.
+   The parts that survived are the parts that were expensive, and they are
+   untouched below: the serving machinery that reaches a round through
+   DX_OPEN so there is no second renderer and no screen for a question,
+   the seeded shuffle that makes an id name the same question in every
+   sitting, the picker that spreads a cell across its sub-skills, the row
+   format, and the held-out pool itself.
+
+   Three properties it still exists to hold, each of which has cost this
+   project something when it was absent:
+
+   1. NO FEEDBACK UNTIL THE END (Michael, 2026-09-24). Not hidden by
+      asking each round nicely. Hidden by `body.dx`, so a round written
+      next year inherits it, which is the v0.61 lesson about filters and
+      promises.
    2. IT MUST NOT FEEL LIKE CHALLENGE. No timer, no running score, no
       penalty. Challenge is a game and is meant to be; this is a
       measurement, and a measurement that looks like the game is played
@@ -7440,13 +7487,8 @@ function go(id){
       marked unfinished rather than thrown away.
    ==================================================================== */
 var DX = { on:false, sit:null, plan:[], i:0, t0:0, item:null, q:null, wait:0,
-           stage:1, blocks:[], b:0, used:{}, route:null, n:0, at:-1, rep:null };
+           dom:"", used:{}, n:0, at:-1, rep:null };
 
-/* HOW EACH ROUND IS OPENED, and with what. The same map `dxrender.py` uses
-   to build the blind-review material: one list, two readers of it, so the
-   pupil's screen and the reviewer's page cannot come apart (SPEC 61). The
-   level pickers are set to `all` because the register, not the picker,
-   chooses which item is served. */
 var DX_OPEN = {
   one:    function(ask){ S.act = "one"; S.cls = ask; S.lvl = "all"; start("one"); },
   klass:  function(){ K.lvl = "all"; startKlass(); },
@@ -7477,27 +7519,19 @@ var DX_SCREEN = { one:"play", klass:"klass", cloze:"cloze", ktname:"kt", tech:"t
 /* ---------------------------------------------------------------- the plan */
 /* Stage one, from the register. A row is [id, group, form, act, level, mode,
    ask]; `*` in the form column is an anchor and is in every form. */
-function dxStage1(form){
-  var out = [], i, r;
-  for(i=0;i<DXREG.length;i++){
-    r = DXREG[i];
-    if(r[2] === "*" || r[2] === form)
-      out.push({ id:r[0], g:r[1], a:r[3], l:r[4], ask:r[6] || "", st:1 });
-  }
-  return dxInterleave(out);
-}
 
-/* Round-robin across the reporting groups, which is fixed rather than
-   shuffled on purpose: the screener is the thing compared between sittings,
-   and an order that changes is one more difference between two numbers that
-   are supposed to differ only by what the pupil knows. Fixed order, but not
-   the register's order, because that runs all of a group together and a
-   pupil who has just met four adverb questions answers the fifth
-   differently. */
-function dxInterleave(rows){
+function dxInterleave(rows, key){
   var by = {}, order = [], out = [], i, k, left = true;
   for(i=0;i<rows.length;i++){
-    k = rows[i].g;
+    /* WHAT A PUPIL EXPERIENCES AS A CHANGE OF TASK is the CELL, not the
+       sub-skill (v0.97). This keyed on `g` because the screener's `g` was a
+       reporting group; on a battery row `g` is the sub-skill underneath the
+       cell, so round-robin over it served all eight click-the-word questions
+       in a row and only then moved on. `dxruntest` caught it on the first run
+       of the battery: the unit a spreading rule counts over has to be the unit
+       the pupil is exposed to, which is the same sentence as SPEC 115's about
+       the unit a gate counts over. */
+    k = key ? key(rows[i]) : rows[i].g;
     if(!by[k]){ by[k] = []; order.push(k); }
     by[k].push(rows[i]);
   }
@@ -7512,85 +7546,13 @@ function dxInterleave(rows){
 /* Which form this sitting gets. The forms alternate per device so a pupil
    sitting twice does not answer the same 34 questions twice, and the
    anchors are in both, which is what keeps the two sittings on one scale. */
-function dxNextForm(){
-  var done = dxDone(), last = done.length ? done[done.length-1].form : "";
-  return last === "A" ? "B" : "A";
-}
 
-/* ------------------------------------------------------------- the runner */
-function dxOpen(){
-  var done = dxDone();
-  el("dxIntro").textContent =
-    "This is not a game and it is not marked against anybody else. It finds out " +
-    "what you can already do, so nothing here is meant to be easy all the way " +
-    "through. Answer as well as you can and guess rather than leaving a gap.";
-  el("dxRules").innerHTML =
-    "<li>There is <b>no timer</b> and no score while you work.</li>" +
-    "<li>You will <b>not be told</b> whether an answer was right until the end.</li>" +
-    "<li>It is about " + dxStage1(dxNextForm()).length + " questions at the moment.</li>" +
-    "<li>You can stop, but a sitting you stop is not a result.</li>";
-  el("dxPrev").textContent = done.length
-    ? "You have finished " + done.length + (done.length === 1 ? " sitting" : " sittings") +
-      " on this device."
-    : "";
-  go("dxStartS");
-}
-
-function dxBegin(){
-  var form = dxNextForm();
-  DX.sit = dxSitting(form, "");
-  DX.plan = dxStage1(form);
-  DX.i = 0; DX.on = true; DX.stage = 1;
-  DX.blocks = []; DX.b = 0; DX.used = {}; DX.route = null;
-  /* The total is known before the first question, which is what makes the
-     length fixed whatever the route, and what lets the bar be honest. */
-  DX.n = DX.plan.length + DX_DEEP_N;
-  document.body.classList.add("dx");
-  el("dxBar").style.display = "";
-  dxServe();
-}
-
-/* The next question, from the plan while stage one lasts and from the block
-   machinery afterwards. Stage two cannot be planned in advance: which item
-   comes next depends on how the last one went. */
+/* The next question. One fixed plan, walked in order: there is no stage
+   two to enter and nothing to decide from how the last answer went. */
 function dxNextQ(){
-  if(DX.stage === 1){
-    if(DX.i < DX.plan.length) return DX.plan[DX.i];
-    dxEnterStage2();
-  }
-  while(DX.b < DX.blocks.length){
-    var bl = DX.blocks[DX.b];
-    if(bl.done >= bl.want){ DX.b++; continue; }
-    var q = dxDeepPick(bl.cell, bl.lvl, DX.used, bl.subs);
-    if(!q){ bl.want = bl.done; DX.b++; continue; }   /* cell exhausted: move on */
-    return q;
-  }
-  return null;
+  return DX.i < DX.plan.length ? DX.plan[DX.i] : null;
 }
 
-function dxEnterStage2(){
-  var r = dxRoute(DX.sit.rows);
-  DX.stage = 2;
-  DX.route = r;
-  DX.sit.route = r.k;
-  DX.sit.secure = r.secure;      /* the report has to say this out loud */
-  DX.sit.wanted = r.wanted;
-  DX.sit.up = r.up;
-  DX.blocks = r.route ? dxBlocks(r.route) : [];
-  var start = dxStartLevel(dxScore(DX.sit.rows, r.route ? r.route.groups : []));
-  for(var i=0;i<DX.blocks.length;i++)
-    DX.blocks[i].lvl = dxCellFlat(DX.blocks[i].cell) ? "" : start;
-  DX.sit.start = start;
-  DX.sit.blocks = [];
-  DX.b = 0;
-  dxSave(DX.sit);
-}
-
-/* The one place an item is put back in its bank, and it is put back for the
-   length of one function call. A round computes its pool from the bank, so
-   an item that is not there means an empty pool and a round that never asks
-   the picker anything; leaving it there afterwards would undo the whole
-   held-out design (SPEC 72.4). */
 function dxServe(){
   var q = dxNextQ();
   if(!q) return dxFinish(true);
@@ -7654,29 +7616,30 @@ function dxChrome(){
 /* Every scored round already calls chRecord when an answer is committed, so
    the runner needs no hook in any round. Which is the point: a round added
    next year is in the diagnostic the moment it is in the register. */
+
+/* Every scored round already calls chRecord when an answer is committed, so
+   the runner needs no hook in any round. Which is the point: a round added
+   next year is in the assessment the moment it is in the register. */
 function dxRecord(ok, outcome){
   if(!DX.on || !DX.q) return;
   var q = DX.q, secs = (nowMs() - DX.t0) / 1000;
-  DX.sit.rows.push(dxRow(DX.sit.rows.length + 1, DX.item, q.g, q.a, q.st, q.l,
+  DX.sit.rows.push(dxRow(DX.sit.rows.length + 1, DX.item, q.g, q.a, 2, q.l,
                          ok, dxChose(q.a), secs, outcome));
-  if(q.st === 2 && DX.blocks[DX.b]){
-    var bl = DX.blocks[DX.b];
-    bl.done++;
-    dxMove(bl, ok);
-    /* WHAT THE LEVEL MOVEMENT CONCLUDED, recorded rather than worked out again
-       from the rows. A row carries the level of the ITEM that was served, which
-       is what step 12 needs; when a cell has run out of questions at the block's
-       level the picker serves the nearest one it has, and the two stop agreeing.
-       The report must say what the pupil reached, not what the pool happened to
-       have left, and re-deriving it would be a second copy of the rule. */
-    if(!DX.sit.blocks) DX.sit.blocks = [];
-    var rec = null, z;
-    for(z=0;z<DX.sit.blocks.length;z++) if(DX.sit.blocks[z].cell === bl.cell) rec = DX.sit.blocks[z];
-    if(!rec){ rec = { cell:bl.cell, start:bl.lvl, end:bl.lvl, top:bl.lvl, n:0, r:0 };
-              DX.sit.blocks.push(rec); }
-    rec.n++; rec.r += ok ? 1 : 0;
-    rec.end = bl.lvl;
-    if(LEVELS.indexOf(bl.lvl) > LEVELS.indexOf(rec.top)) rec.top = bl.lvl;
+  /* THE PER-CELL TALLY, kept as the sitting goes rather than re-derived from
+     the rows afterwards. The report bands a cell on the count it prints
+     (SPEC 113.3) and the certificate reads the same rows later, so the thing
+     that counts them has to be one thing. The level is the DECLARED one and
+     cannot drift from the pupil's, because nothing moves it any more: that
+     disagreement is what the retired instrument had to record a conclusion
+     for (SPEC 76.5), and a fixed blueprint removes it.  */
+  var rec = null, z;
+  if(!DX.sit.cells) DX.sit.cells = [];
+  for(z=0;z<DX.sit.cells.length;z++) if(DX.sit.cells[z].cell === q.a) rec = DX.sit.cells[z];
+  if(!rec){ rec = { cell:q.a, n:0, r:0, lvls:{} }; DX.sit.cells.push(rec); }
+  rec.n++; rec.r += ok ? 1 : 0;
+  if(q.l){
+    if(!rec.lvls[q.l]) rec.lvls[q.l] = { n:0, r:0 };
+    rec.lvls[q.l].n++; rec.lvls[q.l].r += ok ? 1 : 0;
   }
   dxSave(DX.sit);
   DX.i++;
@@ -7684,19 +7647,12 @@ function dxRecord(ok, outcome){
      changes. Long enough to feel deliberate, short enough that nobody
      reads anything into it.
 
-     NAMED, so the harness can set it to nothing (v0.71). A whole diagnostic is
-     58 questions, so at 450 each a suite that sits two of them spends 52
-     seconds of its minute waiting for this one number, which was a fifth of
-     the entire test run. Nothing asserted its value, which is why `dxruntest`
-     now pins the default: a constant a test is free to change is a constant
-     nobody is checking. */
+     NAMED, so the harness can set it to nothing (v0.71). Nothing asserted
+     its value, which is why `dxruntest` pins the default: a constant a test
+     is free to change is a constant nobody is checking. */
   DX.wait = setTimeout(dxServe, DX_PAUSE);
 }
 
-/* Which wrong option was chosen, read from the screen rather than passed in
-   by twenty-three rounds. Every option round marks the pupil's wrong choice
-   with the same class, and a round with no options returns nothing, which
-   is what the row format means by "where the round has options". */
 function dxChose(act){
   var s = el(DX_SCREEN[act] || ""), b;
   if(!s) return "";
@@ -7758,125 +7714,169 @@ function dxFinish(done){
    everywhere"). They were sub-skills, so a weak pupil was told they were
    patchy on apostrophes and left to find the door themselves. Every cell here
    is a button on the practise menu. */
-var DX_ROUTES = [
-  { k:"wc",   name:"word classes",     up:false, groups:["wc.find","wc.name","wc.use"],
-    cells:["one","klass","cloze"] },
-  { k:"punc", name:"punctuation",      up:false, groups:["punc.find","punc.fix"],
-    cells:["pf"] },
-  { k:"cm",   name:"commas",           up:false, groups:["punc.use"],
-    cells:["commas"] },
-  { k:"vt",   name:"verb tenses",      up:false, groups:["tense.find","tense.use"],
-    cells:["vt","vf"] },
-  { k:"tech", name:"techniques",       up:true,  groups:["tech.know","tech.apart"],
-    cells:["tech","ktname","xf","ei"] },
-  { k:"techx",name:"harder techniques",up:true,
-    groups:["techx.find","techx.name","techx.know"], cells:[] },
-  { k:"anal", name:"analytical language", up:true, groups:["anal.know","anal.use"], cells:[] }
-];
 
-/* The deep dive is the SAME LENGTH whatever the route. Otherwise the
-   weakest pupil sits the longest test, and they notice. */
-var DX_DEEP_N = 24;
-
-/* Above this, a foundation counts as secure and the pupil should be going
-   up rather than down. One number, declared here with its reason, to be
-   revisited the moment there is an upward pool to send them to: four of
-   five right on a domain's screener questions is the point past which
-   more foundation questions tell you nothing you did not know. */
-var DX_SECURE = 0.8;
-
-/* Where a block starts. The screener has already measured this domain, so
-   starting every block in the middle would spend the first two questions
-   finding out what stage one has just been told. */
-/* The pause between a diagnostic answer landing and the next question. See
-   dxRecord. The harness sets it to 0; the default is what a pupil meets. */
 var DX_PAUSE = 450;
 
-var DX_START = [[0.34, "foundation"], [0.67, "developing"], [0.90, "secure"], [2, "challenge"]];
 
-function dxScore(rows, groups){
-  var n = 0, r = 0, i;
-  for(i=0;i<rows.length;i++)
-    if(groups.indexOf(rows[i].g) >= 0){ n++; r += rows[i].r; }
-  return n ? r / n : 0;
-}
 
-/* The weakest foundation, and Michael's ruling of 2026-09-23 with it: where
-   two are weak the WHOLE deep dive goes to the weaker one, and the report
-   says plainly that the other was not examined closely. Splitting it would
-   give two answers too thin to act on, which is the failure the grain
-   decision in the plan exists to avoid. */
-function dxRoute(rows){
-  var best = null, i, s, r, secure = true, wanted = null, upto = null;
-  for(i=0;i<DX_ROUTES.length;i++){
-    r = DX_ROUTES[i];
-    if(!r.groups.length) continue;
-    s = dxScore(rows, r.groups);
-    if(!r.up){
-      if(s < DX_SECURE) secure = false;
-      if(!best || s < best.score) best = { k:r.k, score:s, route:r };
-    } else {
-      if(!wanted || s < wanted.score) wanted = { k:r.k, score:s, route:r };
-      /* AND THE WEAKEST UPWARD ROUTE THAT HAS SOMETHING IN IT, which is not
-         always the weakest upward route: two of the three are still empty
-         (step 9). A pupil is sent to the one that exists, and the report says
-         which one they would have been sent to if it had been built. */
-      if(r.cells.length && (!upto || s < upto.score)) upto = { k:r.k, score:s, route:r };
-    }
+/* ==================================================================
+   THE BLUEPRINT
+
+   Michael's four decisions of 2026-10-11 (SPEC 113.2) in the two numbers
+   below and in what they are divided by.
+   ================================================================== */
+
+/* About ten to twelve minutes, which is the back half of a lesson, and
+   the budget is in SCORED DECISIONS rather than in questions (SPEC
+   113.9). A paragraph round is one question carrying one to three
+   decisions and a sort round is one question carrying six, so counting
+   questions made the rounds that give the most evidence per minute look
+   like the most expensive ones. No cell is ever given fewer than two,
+   because one question is not a band. */
+var BAT_N = 22;
+var BAT_MIN_CELL = 2;
+
+/* Which cells a skill's battery asks about: the skill's own activities,
+   in the menu's order, that have questions registered. READ FROM THE APP
+   (`ACTIVITY_LIST`), never written down, because a list that describes
+   the app is a list that goes stale -- five of this project's shipped
+   bugs were exactly that, and one of them deleted pupil history.
+
+   An activity with no registered questions is simply absent here, and
+   the report SAYS SO rather than leaving a gap: a pupil must not read a
+   report on word classes and assume the two cells it names are the whole
+   skill (SPEC 113.6). */
+function batCells(dom){
+  var out = [], i, a;
+  for(i=0;i<ACTIVITY_LIST.length;i++){
+    a = ACTIVITY_LIST[i];
+    if(a[3] === dom && dxCellPool(a[0]) > 0) out.push(a[0]);
   }
-  /* A PUPIL WHOSE FOUNDATIONS ARE SECURE GOES UP (v0.70). Until this version
-     there was nothing up there, so the deep dive went back down into the
-     foundations and the report apologised for it. The SOAPMAPS pool exists
-     now, so the apology is only for a pupil whose weakest upward area is one
-     of the two that are still empty. */
-  var go = (secure && upto) ? upto : best;
-  return { k:go ? go.k : "", route:go ? go.route : null,
-           /* what the report has to say out loud */
-           secure:secure, up:!!(secure && upto),
-           wanted:secure && wanted ? wanted.k : "",
-           built:secure && upto ? upto.k : "" };
+  return out;
 }
 
-/* No cell is emptied by one sitting. Above this share of a cell's pool the
-   next sitting draws the same questions in the same cell, and a pupil who
-   recognises a question stops answering it. The deep dive is not the half
-   that is compared between sittings, so this is not about the numbers being
-   comparable; it is about the second sitting still measuring anything. */
-var DX_VARY = 0.75;
+/* The activities of a skill that have NO questions, with their names, so
+   the report can print what it did not look at. */
+function batUnasked(dom){
+  var out = [], i, a;
+  for(i=0;i<ACTIVITY_LIST.length;i++){
+    a = ACTIVITY_LIST[i];
+    if(a[3] === dom && !dxCellPool(a[0])) out.push([a[0], a[1]]);
+  }
+  return out;
+}
 
-/* How many questions each cell of a route gets. Fixed total, spread as evenly
-   as the cell count allows, and the remainder to the cells that come first in
-   the route's own order rather than anywhere clever: the screener reports by
-   ROUND and the deep dive by ACTIVITY, so stage one cannot rank one cell of a
-   route against another and a rule that pretended it could would be making the
-   numbers up.
+/* The levels a cell actually has, in order. A flat cell returns [""], so
+   one code path serves both and nothing has to ask which kind it is. */
+function batLevels(cell){
+  var seen = {}, out = [], i;
+  for(i=0;i<DEEPREG.length;i++)
+    if(DEEPREG[i][1] === cell && DEEPREG[i][2]) seen[DEEPREG[i][2]] = 1;
+  for(i=0;i<LEVELS.length;i++) if(seen[LEVELS[i]]) out.push(LEVELS[i]);
+  return out.length ? out : [""];
+}
 
-   Then each block is capped at DX_VARY of what its cell actually holds, and
-   whatever that frees goes to the cells with room. The verb-tense route is why:
-   `vt` holds twelve questions because two of the five tense sub-skills cannot
-   be asked as a tap at all, and an even split would have served every one of
-   them every time. The TOTAL never changes, which is the invariant that
-   matters: otherwise the weakest pupil sits the shortest test. */
-function dxBlocks(route){
-  var n = route.cells.length, base = Math.floor(DX_DEEP_N / n), extra = DX_DEEP_N % n,
-      out = [], i, cap, spare = 0;
-  for(i=0;i<n;i++) out.push({ cell:route.cells[i], want:base + (i < extra ? 1 : 0),
-                              lvl:"", run:0, miss:0, done:0, subs:{} });
+/* How many questions each cell gets. Derived from the cell count rather
+   than declared per skill, because six typed numbers are six chances to
+   go stale, and capped at DX_VARY of what the cell holds so that a
+   second sitting is not the same sitting. Whatever a cap frees goes to
+   the cells with room, so the LENGTH stays the same across skills: a
+   pupil comparing two reports is comparing two instruments of one size.*/
+function batWant(cells){
+  var n = cells.length, base = Math.floor(BAT_N / n), extra = BAT_N % n,
+      out = [], i, cap, spare = 0, room;
+  if(!n) return out;
+  for(i=0;i<n;i++) out.push({ cell:cells[i], want:Math.max(BAT_MIN_CELL, base + (i < extra ? 1 : 0)) });
   for(i=0;i<n;i++){
     cap = Math.floor(dxCellPool(out[i].cell) * DX_VARY);
     if(out[i].want > cap){ spare += out[i].want - cap; out[i].want = cap; }
   }
   for(i=0;i<n && spare > 0;i++){
     cap = Math.floor(dxCellPool(out[i].cell) * DX_VARY);
-    var room = Math.min(spare, cap - out[i].want);
+    room = Math.min(spare, cap - out[i].want);
     if(room > 0){ out[i].want += room; spare -= room; }
   }
   return out;
 }
 
-/* How many questions a cell holds, counted from the register rather than
-   written down anywhere: a number typed here would be the sixth stale copy of
-   a list the build already writes (CLAUDE.md). */
+/* THE PLAN. A cell's questions are a MINI-LADDER: one at each level the
+   cell has, cycling if it gets more questions than levels. That is not
+   decoration. It is the only thing that lets the report name a LEVEL as
+   well as an activity when it says what to practise, and SPEC 100 found
+   that a cell's levels are flat unless something is declared to climb.
+   The level is DECLARED here and never moves during the sitting: an
+   adaptive test is not comparable with itself, which is the whole reason
+   the retired instrument had to be split into two stages. */
+function batPlan(dom){
+  var want = batWant(batCells(dom)), rows = [], subs = {}, i, j, lv, q, got;
+  DX.used = {};
+  for(i=0;i<want.length;i++){
+    lv = batLevels(want[i].cell);
+    subs[want[i].cell] = {};
+    got = 0;
+    for(j=0;j<want[i].want;j++){
+      q = dxDeepPick(want[i].cell, lv[j % lv.length], DX.used, subs[want[i].cell]);
+      if(!q) break;
+      rows.push(q);
+      got++;
+    }
+  }
+  return dxInterleave(rows, function(r){ return r.a; });
+}
+
+/* ------------------------------------------------------------- opening */
+/* A skill's own intro, reached from that skill's screen. There is no card
+   on the front page any more, because "which skill?" is the question the
+   pupil has already answered by the time they are standing here. */
+function batOpen(dom){
+  var d = domainById(dom), cells = batCells(dom), plan, done = batDone(dom);
+  if(!d || !cells.length) return;
+  DX.dom = dom;
+  el("batTitle").textContent = "Check what you know: " + d.name;
+  plan = batPlan(dom);
+  el("batIntro").textContent =
+    "This is not a game and it is not marked against anybody else. It finds out " +
+    "what you can already do in " + d.name.toLowerCase() + ", so nothing here is " +
+    "meant to be easy all the way through. Answer as well as you can and guess " +
+    "rather than leaving a gap.";
+  el("batRules").innerHTML =
+    "<li>" + plan.length + " questions, about ten minutes, on " + cells.length +
+      (cells.length === 1 ? " part" : " different parts") + " of " + d.name.toLowerCase() + ".</li>" +
+    "<li>There is <b>no timer</b> and no score while you work.</li>" +
+    "<li>You will <b>not be told</b> whether an answer was right until the end.</li>" +
+    "<li>At the end you get a report saying what to practise next.</li>" +
+    "<li>You can sit it again whenever you like.</li>";
+  el("batPrev").textContent = done.length
+    ? "You have finished " + done.length + (done.length === 1 ? " sitting" : " sittings") +
+      " on this skill, on this device."
+    : "";
+  go("batStartS");
+}
+
+function batBegin(){
+  if(!DX.dom) return;
+  DX.sit = dxSitting("-", DX.dom);
+  DX.plan = batPlan(DX.dom);
+  DX.i = 0; DX.on = true;
+  DX.sit.cells = [];
+  /* The total is known before the first question, which is what makes the
+     bar honest and what a fixed blueprint means. */
+  DX.n = DX.plan.length;
+  document.body.classList.add("dx");
+  el("dxBar").style.display = "";
+  dxServe();
+}
+
+/* A cell is capped at this share of what it holds, so a second sitting is
+   not the first one again. The verb-tense cell is why a cap is needed at
+   all: `vt` holds twelve questions because two of the five tense
+   sub-skills cannot be asked as a tap, and an even split would have
+   served every one of them every time. Whatever the cap frees goes to the
+   cells with room, so the TOTAL never changes, which is the invariant
+   that matters: two reports on two skills have to be two readings of one
+   instrument. */
+var DX_VARY = 0.75;
+
 function dxCellPool(cell){
   var n = 0, i;
   for(i=0;i<DEEPREG.length;i++) if(DEEPREG[i][1] === cell) n++;
@@ -7897,37 +7897,7 @@ function dxCellFlat(cell){
   return any;
 }
 
-function dxStartLevel(score){
-  for(var i=0;i<DX_START.length;i++) if(score < DX_START[i][0]) return DX_START[i][1];
-  return "challenge";
-}
 
-/* Two wrong drops a level, three right raises one. The counters reset on a
-   move, so a pupil does not arrive at a level already one answer from
-   leaving it. */
-function dxMove(bl, right){
-  if(!bl.lvl) return;                 /* a flat cell has nowhere to move */
-  var at = LEVELS.indexOf(bl.lvl);
-  if(right){ bl.run++; bl.miss = 0; if(bl.run >= 3 && at < LEVELS.length - 1){
-    bl.lvl = LEVELS[at + 1]; bl.run = 0; } }
-  else { bl.miss++; bl.run = 0; if(bl.miss >= 2 && at > 0){
-    bl.lvl = LEVELS[at - 1]; bl.miss = 0; } }
-}
-
-/* An unserved item from this cell, at this level if there is one left and
-   at the nearest level there is otherwise. A block that ran out of items
-   at its level must not stop: the level is a description of the pupil, and
-   the cell floors (SPEC 73.3) make running out a shortage of questions
-   rather than a statement about them.
-
-   AND SPREAD ACROSS THE CELL'S SUB-SKILLS. This is the job the reporting
-   change handed to the picker. When a cell was `pn:apos` the pool could only
-   ask about apostrophes; now a cell is `pf` and holds all six punctuation
-   faults, and twenty-four draws at random from forty-eight come back lumpy
-   often enough to matter: a pupil could be told they are patchy at finding and
-   fixing punctuation on the strength of eighteen apostrophe questions. So the
-   least-served sub-skill wins, and chance only breaks the tie. `bl.subs` is
-   the count so far in this block. */
 function dxDeepPick(cell, lvl, used, subs){
   var here = [], near = [], i, r, d, best = 99;
   for(i=0;i<DEEPREG.length;i++){
@@ -7957,37 +7927,45 @@ function dxLeanest(pool, subs){
 }
 
 
+
 /* The report. Spliced from `dxreport.js`, same reason. */
 /* ====================================================================
-   THE DIAGNOSTIC REPORT (v0.65, SPEC 76)
+   THE REPORT (v0.97, SPEC 113.6)
 
-   Step 11. One report, two halves, built once and used twice: what is on
-   the screen and what is in the downloaded file are the same string, so
-   they cannot say different things.
+   What a pupil gets at the end of one skill's battery: a band for each
+   part of that skill, the number of questions the band rests on, what to
+   practise next as a button they can press, and a plain statement of what
+   the battery did not look at.
 
-   The hard part of this is not the layout. It is not saying more than
-   the questions support. A screener group is three or four questions, and
-   three out of four is not 75% of anything: it is one wrong answer. So
-   groups get a BAND and the count it rests on, the firmer statements are
-   made at domain level where there are eight to eighteen questions behind
-   them, and the two strengths and two weaknesses are named at group level
-   because that is the grain a pupil can act on.
+   WHAT CHANGED AT v0.97, and the gain is larger than the loss. The retired
+   report named two strengths and two weaknesses across six domains, and
+   compared only its screener half between sittings, because the deep dive
+   was adaptive and two sittings answered different questions in it. A
+   battery is a FIXED BLUEPRINT, so the whole of it is comparable with
+   itself by construction (SPEC 113.7) and every cell can be compared
+   rather than one half of one stage. The two-stage split existed to
+   rescue exactly that property, and the per-skill design gets it for
+   nothing.
 
-   Three things the report has to say out loud, all of them about what it
-   does NOT know:
-     - which foundation was not examined closely, because the whole deep
-       dive went to the weaker one (Michael, 2026-09-23);
-     - that a pupil whose foundations are secure should have been taken
-       upward, and that there is nothing up there yet;
-     - what the instrument cannot see at all (SPEC 74.7).
-   A report that only lists what it measured reads as though it measured
-   everything.
+   Four rules this file holds, each of which cost something when it was
+   absent:
+
+   1. A BAND IS THE BAND ITS OWN PRINTED COUNT GIVES (v0.65). The count is
+      beside every band, and below DX_THIN the report says so rather than
+      banding it.
+   2. ONE BUILDER, TWO DESTINATIONS. The screen and the downloaded file are
+      the same string, so they cannot come to say different things. The
+      first draft updated the name in the pupil's header and left the
+      teacher's half saying "(no name given)" on the same printout.
+   3. A SUGGESTION IS A BUTTON (SPEC 113.6). It names the activity's own
+      code at a level, which `openLink` has been able to open since v0.72,
+      so there is no second copy of the routing and a report cannot
+      recommend practice a pupil has no way to start.
+   4. IT SAYS WHAT IT DID NOT LOOK AT. A skill's activities with no
+      held-out questions are named, because a pupil reading a report on
+      two cells must not conclude that the skill has two parts.
    ==================================================================== */
 
-/* What the report calls each deep-dive cell. A cell is an ACTIVITY (SPEC 79),
-   so these are the names on the practise menu, written by the build out of the
-   app's own ACTIVITY_LIST. One list, two readers: a report that typed its own
-   names would be the sixth stale description of this app. */
 var DEEPMETA = {"cells":{"cloze":"Insert the word","commas":"Put the commas in","ei":"Said or suggested?","klass":"Which class fills the gap?","ktname":"Name the technique","one":"Click the word","pf":"Find it, then fix it","tech":"Find the technique","vf":"Put the right tense in","vt":"Spot the tense mistake","xf":"What does the image carry?"},"middle":{"tech":"close","techx":"close","xf":"close","one":"neutral"},"means":{"close":"the right place in the sentence, with the edges drawn wrongly","neutral":"true of the language, but not the thing this round asked for"}};
 var DX_CELL_NAME = DEEPMETA.cells || {};
 /* Which rounds end in something other than right or wrong, and what that
@@ -7996,15 +7974,7 @@ var DX_CELL_NAME = DEEPMETA.cells || {};
    validate time, so the two cannot drift. */
 var DX_MIDDLE = DEEPMETA.middle || {};
 var DX_MEANS = DEEPMETA.means || {};
-function DX_ROUTE_NAME_OF(k){
-  for(var i=0;i<DX_ROUTES.length;i++) if(DX_ROUTES[i].k === k) return DX_ROUTES[i].name;
-  return k;
-}
 
-/* "a, b and c", because "a; b; c" is a list a pupil skims. With one exception:
-   where an item already contains a comma, joining with "and" runs two lists
-   together. One of the comma cells is literally called "commas for names, yes
-   and no", which produced "... yes and no and reached Harder on ...". */
 function dxList(xs){
   if(!xs.length) return "";
   if(xs.length === 1) return xs[0];
@@ -8046,13 +8016,7 @@ function dxBand(r, n){
 /* Names come from the app's own structures. A report that types its own
    labels is a second description of the app, and this project has found
    five of those stale (CLAUDE.md). */
-function dxGroupName(g){
-  var bits = String(g).split("."), d = domainById(bits[0]), i;
-  if(!d) return g;
-  for(i=0;i<(d.groups||[]).length;i++)
-    if(d.groups[i][0] === bits[1]) return d.name + ": " + d.groups[i][1];
-  return d.name;
-}
+
 function dxDomainName(id){ var d = domainById(id); return d ? d.name : id; }
 /* A route's name reads inside a sentence ("went into commas") and as a row
    label in a table. Lower case is right in the first and looks like a typo in
@@ -8061,15 +8025,7 @@ function dxDomainName(id){ var d = domainById(id); return d ? d.name : id; }
 function dxCap(s){ return String(s).charAt(0).toUpperCase() + String(s).slice(1); }
 
 /* The first activity in a group, so a weakness can name somewhere to go. */
-function dxGroupAct(g){
-  var bits = String(g).split("."), i;
-  for(i=0;i<ACTIVITY_LIST.length;i++)
-    if(ACTIVITY_LIST[i][3] === bits[0] && ACTIVITY_LIST[i][4] === bits[1])
-      return { id:ACTIVITY_LIST[i][0], label:ACTIVITY_LIST[i][1], go:ACTIVITY_LIST[i][2] };
-  return null;
-}
 
-/* ---------------------------------------------------------- the counting */
 function dxTally(rows, key){
   var out = {}, i, k;
   for(i=0;i<rows.length;i++){
@@ -8080,74 +8036,87 @@ function dxTally(rows, key){
   }
   return out;
 }
-function dxStage(sit, st){
-  return (sit.rows || []).filter(function(r){ return r.st === st; });
-}
-/* Groups and domains are the SCREENER's grain. The deep dive reports by
-   cell and is never mixed in: one measures progress on a fixed blueprint
-   and the other explains it, and adding them together would give a number
-   that is neither. */
-function dxGroups(sit){
-  return dxTally(dxStage(sit, 1), function(r){ return r.g; });
-}
-function dxDomains(sit){
-  return dxTally(dxStage(sit, 1), function(r){ return String(r.g).split(".")[0]; });
-}
 
-/* Per cell: how many, how many right, and the levels the pupil started and
-   finished on. That last pair is the whole point of the deep dive, and it
-   is what turns a score into "reached Harder on nouns, stayed at Easiest
-   on adverbs". */
+/* ---------------------------------------------------------- the counting */
+/* Per cell, from the tally the runner kept as the sitting went (SPEC 113.3).
+   NOT re-derived from the rows: the report bands a cell on a count, the
+   certificate reads the same evidence later, and two things that count the
+   same questions are one thing or they eventually disagree. */
 function dxCells(sit){
-  /* From what the level movement CONCLUDED, which the runner records, and not
-     from the level printed on each row. A row says which item was served, and
-     when a cell has run out of questions at the block's level the picker
-     serves the nearest one it has: reading the rows would then report a pupil
-     as having reached a level the pool handed them. */
-  var out = {}, i, b;
-  for(i=0;i<(sit.blocks || []).length;i++){
-    b = sit.blocks[i];
-    out[b.cell] = { n:b.n, r:b.r, first:b.start, last:b.end, top:b.top };
+  var out = {}, i, c;
+  for(i=0;i<(sit.cells || []).length;i++){
+    c = sit.cells[i];
+    out[c.cell] = { n:c.n, r:c.r, lvls:c.lvls || {} };
   }
   return out;
 }
 
-/* The two best and the two worst, at group level. A group is only named as
-   a strength if it actually looks like one, and only as a weakness if it
-   actually looks like one: with four questions, ranking alone would always
-   produce two of each and the bottom two of a strong sitting would be
-   reported as weaknesses. Thin groups are ranked but never named. */
-function dxPickEnds(groups){
-  var keys = [], k;
-  for(k in groups) if(groups[k].n >= DX_THIN) keys.push(k);
-  keys.sort(function(a, b){
-    var pa = groups[a].r / groups[a].n, pb = groups[b].r / groups[b].n;
-    if(pa !== pb) return pb - pa;
-    return groups[b].n - groups[a].n;      /* a firmer result wins a tie */
-  });
-  var strong = [], weak = [], i;
-  for(i=0;i<keys.length && strong.length < 2;i++)
-    if(groups[keys[i]].r / groups[keys[i]].n >= 0.60) strong.push(keys[i]);
-  for(i=keys.length-1;i>=0 && weak.length < 2;i--)
-    if(groups[keys[i]].r / groups[keys[i]].n < 0.60 && strong.indexOf(keys[i]) < 0)
-      weak.push(keys[i]);
-  return { strong:strong, weak:weak, ranked:keys };
+/* The lowest level in a cell the pupil got something wrong at, which is where
+   a suggestion should send them. Lowest rather than highest on purpose: a
+   pupil who missed a foundation question and passed a challenge one has a hole
+   underneath them, and sending them to the harder level would paper over it. */
+function dxCellLevel(s){
+  var i, lv;
+  for(i=0;i<LEVELS.length;i++){
+    lv = (s.lvls || {})[LEVELS[i]];
+    if(lv && lv.r < lv.n) return LEVELS[i];
+  }
+  return "";
+}
+
+/* WHAT TO PRACTISE, as the activity's own code and a level. `readCode` has
+   parsed `W1A-3` since v0.48 and `openLink` has routed it since v0.72, so the
+   suggestion is the same path a teacher's note in a book takes. Returns null
+   where the cell is not an activity any more, and the caller says so rather
+   than printing a dead button. */
+function dxSuggest(cell, s){
+  var i, a = null, lv = dxCellLevel(s), code = codeOf(cell);
+  for(i=0;i<ACTIVITY_LIST.length;i++) if(ACTIVITY_LIST[i][0] === cell) a = ACTIVITY_LIST[i];
+  if(!a || !code) return null;
+  return { id:cell, label:a[1], code:code + (lv ? "-" + (LEVELS.indexOf(lv) + 1) : ""),
+           lvl:lv, lvlName:lv ? (LEVEL_LABEL[lv] || lv) : "" };
+}
+
+/* The cells worth naming as worth working on, weakest first. A cell is named
+   only if it has enough questions behind it to say anything (DX_THIN) and is
+   actually below the bar: ranking alone always produces a bottom, and the
+   bottom of a strong sitting is not a weakness. The retired report had to pick
+   exactly two because it ranked sixteen groups; a battery has four to eight
+   cells and can name however many are really short, which is the grain
+   Michael's complaint was about. */
+function dxWeakCells(cells){
+  var ks = [], k;
+  for(k in cells) if(cells[k].n >= DX_THIN && cells[k].r / cells[k].n < 0.60) ks.push(k);
+  ks.sort(function(a, b){ return (cells[a].r / cells[a].n) - (cells[b].r / cells[b].n); });
+  return ks;
+}
+function dxStrongCells(cells){
+  var ks = [], k;
+  for(k in cells) if(cells[k].n >= DX_THIN && cells[k].r / cells[k].n >= 0.85) ks.push(k);
+  ks.sort(function(a, b){ return (cells[b].r / cells[b].n) - (cells[a].r / cells[a].n); });
+  return ks;
 }
 
 /* ------------------------------------------------------------- comparison */
-/* ONLY THE SCREENER IS COMPARED. The deep dive is adaptive, so two sittings
-   answer different questions in it and a difference between them is mostly
-   a difference in routing. This is the trap the two-stage design exists to
-   avoid, and the report has to hold the line the design drew. */
+/* THE WHOLE SITTING IS COMPARABLE NOW, which is the v0.97 gain. The blueprint
+   is fixed -- the same cells, the same counts, the same levels -- so a
+   difference between two sittings of one skill is a difference in what the
+   pupil knew. The retired instrument could compare only its screener half,
+   because the deep dive routed a pupil by how they had done and a change
+   between sittings was mostly a change in routing (SPEC 72.2). A fixed
+   blueprint gets the property without the two-stage split that existed to
+   rescue it.
+   Only sittings of the SAME SKILL are compared, and a pre-v0.97 sitting has no
+   skill, so it is never one of them: it measured a different instrument. */
 function dxCompare(sit){
-  var done = dxDone(), prev = null, i;
+  var done = batDone(sit.skill), prev = null, i;
   for(i=done.length-1;i>=0;i--)
     if(done[i].id !== sit.id){ prev = done[i]; break; }
   if(!prev) return null;
-  var now = dxDomains(sit), was = dxDomains(prev), out = [], k;
+  var now = dxCells(sit), was = dxCells(prev), out = [], k;
   for(k in now){
     if(!was[k] || was[k].n < DX_THIN || now[k].n < DX_THIN) continue;
-    out.push({ dom:k, nowR:now[k].r, nowN:now[k].n, wasR:was[k].r, wasN:was[k].n,
+    out.push({ cell:k, nowR:now[k].r, nowN:now[k].n, wasR:was[k].r, wasN:was[k].n,
                d:(now[k].r / now[k].n) - (was[k].r / was[k].n) });
   }
   out.sort(function(a, b){ return b.d - a.d; });
@@ -8166,282 +8135,160 @@ function dxRow2(label, band, count){
          '</td><td class="c">' + esc(count) + '</td></tr>';
 }
 
-/* What the deep dive found, as a sentence per cell rather than a table,
-   because "reached Harder on Click the word" is the thing a pupil can repeat
-   to themselves and 4/6 is not. */
-function dxCellLine(cell, s){
-  var name = DX_CELL_NAME[cell] || cell;
-  if(!s.top) return s.r + " of " + s.n + " on " + name;   /* a flat cell */
-  var top = LEVEL_LABEL[s.top] || s.top, first = LEVEL_LABEL[s.first] || s.first;
-  if(s.top === s.first)
-    return "stayed at " + first + " on " + name;
-  return "reached " + top + " on " + name;
-}
-
-/* The cell to send a pupil to, or nothing. A cell is named only if it has
-   enough questions behind it to say anything (DX_THIN) and is clearly the
-   weakest: a tie, or a margin of one answer in eight, is not a recommendation
-   and a report that made one anyway would be guessing in a confident voice. */
-function dxWorstCell(cells){
-  var ks = [], k;
-  for(k in cells) if(cells[k].n >= DX_THIN) ks.push(k);
-  /* A route with one cell has nothing to choose between, and the paragraph
-     above has already named it. */
-  if(ks.length < 2) return "";
-  ks.sort(function(a, b){ return (cells[a].r / cells[a].n) - (cells[b].r / cells[b].n); });
-  var lo = cells[ks[0]].r / cells[ks[0]].n, next = cells[ks[1]].r / cells[ks[1]].n;
-  return (next - lo) >= 0.15 ? ks[0] : "";
+function dxCellName(cell){
+  var i;
+  for(i=0;i<ACTIVITY_LIST.length;i++) if(ACTIVITY_LIST[i][0] === cell) return ACTIVITY_LIST[i][1];
+  return DX_CELL_NAME[cell] || cell;
 }
 
 function dxReportBody(sit){
-  var groups = dxGroups(sit), doms = dxDomains(sit), cells = dxCells(sit);
-  var ends = dxPickEnds(groups), cmp = dxCompare(sit), h = "", k, i, s;
+  var cells = dxCells(sit), skill = dxDomainName(sit.skill),
+      weak = dxWeakCells(cells), strong = dxStrongCells(cells),
+      cmp = dxCompare(sit), unasked = batUnasked(sit.skill),
+      tot = 0, got = 0, h = "", k, i, s, sug, names;
 
-  h += '<h1>What you can already do</h1>';
-  h += '<p class="meta"><b class="nm">' + esc(sit.who || "") + '</b> &middot; ' +
-       esc(dxWhen(sit.at)) + ' &middot; ' + esc(sit.rows.length) + ' questions</p>';
-  h += '<p class="lead">This is not a mark and it is not a comparison with anybody else. ' +
-       'It is a map of what you can already do, so you know which two things are worth ' +
-       'your next few weeks.</p>';
+  for(k in cells){ tot += cells[k].n; got += cells[k].r; }
 
-  /* ---- the domains ---- */
-  h += '<h2>How each part went</h2>';
-  h += '<p class="note">Each line rests on the number of questions beside it. Where that ' +
-       'number is small, treat the line as a hint and not as a verdict.</p>';
-  h += '<table class="rep band"><tbody>';
-  for(i=0;i<DOMAINS.length;i++){
-    k = DOMAINS[i].id;
-    if(!doms[k]) continue;
-    s = dxBand(doms[k].r, doms[k].n);
-    h += dxRow2(DOMAINS[i].name, s.band, doms[k].r + " of " + doms[k].n);
+  h += '<h1>' + esc(skill) + ': what you can already do</h1>';
+  h += '<p class="meta">' + esc(sit.who || "(no name given)") + ' &middot; ' +
+       esc(dxWhen(sit.at)) + ' &middot; ' + tot + ' questions</p>';
+
+  /* THE LEAD IS WHAT TO DO, not a score. A pupil reads the first sentence and
+     some of them read nothing else, so the first sentence has to be the one
+     worth reading. */
+  if(weak.length){
+    names = [];
+    for(i=0;i<weak.length && i<3;i++) names.push(dxCellName(weak[i]));
+    h += '<p class="lead">The part of ' + esc(skill.toLowerCase()) + ' to work on next is <b>' +
+         esc(dxList(names)) + '</b>' + dxStop(names[names.length-1]) + '</p>';
+  } else if(strong.length) {
+    h += '<p class="lead">Nothing here came out weak. Every part of ' +
+         esc(skill.toLowerCase()) + ' this looked at was secure or close to it, so the ' +
+         'next useful thing is a harder level, or a different skill.</p>';
+  } else {
+    h += '<p class="lead">This sitting was too short to say much about any one part. ' +
+         'Sitting it again gives every part more questions.</p>';
+  }
+
+  /* ---- the table: one row per cell, with the count beside the band ---- */
+  h += '<h2>Each part of ' + esc(skill.toLowerCase()) + '</h2>';
+  /* The `band` class is how `dxreptest` finds the table whose rows are a band
+     and a count, so that it can check every band against its own count. The
+     progress table below prints two counts and no band, and a suite that read
+     both would be checking a claim neither of them makes. */
+  h += '<table class="rep band"><thead><tr><th scope="col">Part</th>' +
+       '<th scope="col">How it went</th><th scope="col">Out of</th></tr></thead><tbody>';
+  for(i=0;i<ACTIVITY_LIST.length;i++){
+    k = ACTIVITY_LIST[i][0];
+    if(!cells[k]) continue;
+    s = cells[k];
+    h += dxRow2(dxCellName(k), dxBand(s.r, s.n).band, s.r + " of " + s.n);
   }
   h += '</tbody></table>';
 
-  /* ---- the two and two ---- */
-  h += '<h2>The two to be pleased about</h2>';
-  if(ends.strong.length){
-    h += '<ul>';
-    for(i=0;i<ends.strong.length;i++){
-      k = ends.strong[i];
-      h += '<li><b>' + esc(dxGroupName(k)) + '</b>: ' +
-           groups[k].r + ' of ' + groups[k].n + '.</li>';
+  /* ---- what to do, as a code a pupil can type or a button they can press ---- */
+  if(weak.length){
+    h += '<h2>What to practise</h2><ul>';
+    for(i=0;i<weak.length;i++){
+      sug = dxSuggest(weak[i], cells[weak[i]]);
+      if(!sug) continue;
+      h += '<li><b>' + esc(sug.label) + '</b>' +
+           (sug.lvlName ? ' at ' + esc(sug.lvlName) : '') +
+           ' &middot; code <b>' + esc(sug.code) + '</b></li>';
     }
-    h += '</ul>';
-  } else {
-    h += '<p>Nothing stood out as a clear strength this time, which usually means the ' +
-         'whole thing was hard rather than that you have none.</p>';
+    h += '</ul><p class="note">The code opens that exercise at that level. Type it into ' +
+         'the box on the front page, or press the button under this report.</p>';
   }
 
-  h += '<h2>The two worth working on</h2>';
-  if(ends.weak.length){
-    h += '<ul>';
-    for(i=0;i<ends.weak.length;i++){
-      k = ends.weak[i];
-      var act = dxGroupAct(k);
-      h += '<li><b>' + esc(dxGroupName(k)) + '</b>: ' + groups[k].r + ' of ' + groups[k].n +
-           (act ? '. Practise it in <i>' + esc(act.label) + '</i>' + dxStop(act.label)
-                : '.') + '</li>';
-    }
-    h += '</ul>';
-  } else {
-    h += '<p>Nothing stood out as a clear weakness, which is a good sitting. Pick the ' +
-         'lowest line in the table above and go there.</p>';
-  }
-
-  /* ---- the deep dive ---- */
-  var route = DX_ROUTE_NAME_OF(sit.route);
-  h += '<h2>Where the second half went</h2>';
-  if(Object.keys(cells).length){
-    /* Grouped by what happened rather than listed one cell at a time. Four
-       sentences that all begin "stayed at Easier on" is a list a pupil stops
-       reading at the second one. */
-    /* One line per outcome rather than one sentence, because the cells are
-       named in words and some of those names contain a comma and an "and" of
-       their own: "commas for names, yes and no" inside a list joined with
-       "and" produces a sentence nobody can parse. Grouped by outcome so a
-       pupil is not reading "stayed at Easier on" four times. */
-    var by = {}, flat = [];
-    for(k in cells){
-      var c = cells[k];
-      /* A FLAT CELL HAS NO LEVEL TO REPORT. Two of the rounds the deep dive
-         uses have none: they ask what KIND of question to answer rather than
-         how hard it should be. Grouping them under "stayed at" would print a
-         level the activity does not have. */
-      if(!c.top){ flat.push(DX_CELL_NAME[k] || k); continue; }
-      var key = (c.top === c.first ? "stayed at " : "reached ") +
-                (LEVEL_LABEL[c.top] || c.top);
-      (by[key] = by[key] || []).push(DX_CELL_NAME[k] || k);
-    }
-    h += '<p>The second half of the questions all went into <b>' + esc(route) +
-         '</b>, because that is where the first half said you would learn the most. ' +
-         'Inside it you:</p><ul>';
-    for(k in by) h += '<li>' + esc(k) + ' on ' + esc(by[k].join("; ")) + '</li>';
-    for(i=0;i<flat.length;i++){
-      var fk = "", fj;
-      for(fj in cells) if((DX_CELL_NAME[fj] || fj) === flat[i]) fk = fj;
-      h += '<li>answered ' + cells[fk].r + ' of ' + cells[fk].n + ' on ' + esc(flat[i]) +
-           '</li>';
-    }
-    h += '</ul>';
-    if(flat.length)
-      h += '<p class="note">' + esc(dxList(flat)) + (flat.length === 1 ? ' has' : ' have') +
-           ' no easier and harder settings, so there is no level to report on ' +
-           (flat.length === 1 ? 'it' : 'them') + ', only how many you got right.</p>';
-    h += '<p class="note">The levels are ' +
-         esc(LEVELS.map(function(l){ return LEVEL_LABEL[l]; }).join(", ")) +
-         '. They move as you go: two wrong takes you down one, three right takes you up one.</p>';
-    /* WHERE TO GO, by name, because that is the whole reason a cell is an
-       activity (Michael, 2026-09-25). Named only where the sitting supports
-       it: one cell has to be clearly behind the others, or this is a coin
-       toss told in a confident voice. */
-    var pick = dxWorstCell(cells);
-    if(pick)
-      h += '<p><b>Start with ' + esc(DX_CELL_NAME[pick] || pick) + '</b>' + dxStop(DX_CELL_NAME[pick] || pick) +
-           ' It is on the practise menu under that name, and it is the one of those ' +
-           'that went least well.</p>';
-  } else {
-    h += '<p>No second half was recorded.</p>';
-  }
-
-  /* ---- the answers that were neither right nor wrong ----
-     Three rounds do not end in right or wrong. Selecting a span is Close when
-     the pupil found the right place and drew the edges wrongly; a tap that is
-     true of the language but not the thing asked for is Neutral. Both count as
-     not-right in every number above, which is the safe direction, and both are
-     worth a pupil knowing about because neither is the mistake the round is
-     about. A report that folded them into "wrong" would be telling a pupil who
-     very nearly had it that they did not. */
-  var mid = {};
-  for(i=0;i<sit.rows.length;i++)
-    if(sit.rows[i].o) mid[sit.rows[i].o] = (mid[sit.rows[i].o] || 0) + 1;
-  var midKeys = [];
-  for(k in mid) midKeys.push(k);
-  if(midKeys.length){
-    h += '<h2>Nearly, rather than wrong</h2><ul>';
-    for(i=0;i<midKeys.length;i++)
-      h += '<li><b>' + mid[midKeys[i]] +
-           (mid[midKeys[i]] === 1 ? ' answer</b> was ' : ' answers</b> were ') +
-           esc(DX_MEANS[midKeys[i]] || midKeys[i]) + '.</li>';
-    h += '</ul><p class="note">Those are counted with the wrong ones in every number ' +
-         'above, which is harsher than they deserve. They are here because neither of ' +
-         'them is the mistake the question was about.</p>';
-  }
-
-  /* ---- what was NOT looked at ---- */
-  h += '<h2>What this did not look at</h2><ul>';
-  for(i=0;i<DX_ROUTES.length;i++){
-    if(DX_ROUTES[i].up || DX_ROUTES[i].k === sit.route || !DX_ROUTES[i].cells.length) continue;
-    h += '<li>This only saw <b>' + esc(DX_ROUTES[i].name) + '</b> in the first half, so ' +
-         'it can say how that went and not much about why.</li>';
-  }
-  if(sit.secure && !sit.up)
-    h += '<li>Your foundations came out secure, so the second half should have gone ' +
-         '<b>upward</b> into the harder techniques and the analytical language instead. ' +
-         'Those questions are not written yet, so it went down into the foundations ' +
-         'anyway. Read that part of this report lightly.</li>';
-  else if(sit.secure && sit.wanted && sit.wanted !== sit.route)
-    h += '<li>Your foundations came out secure, so the second half went <b>upward</b>. ' +
-         'The area it would have chosen first is <b>' + esc(DX_ROUTE_NAME_OF(sit.wanted)) +
-         '</b>, and those questions are not written yet, so it went to <b>' +
-         esc(DX_ROUTE_NAME_OF(sit.route)) + '</b> instead.</li>';
-  else if(sit.secure)
-    h += '<li>Your foundations came out secure, so the second half went <b>upward</b> ' +
-         'rather than back over them. This report says nothing about how secure they are ' +
-         'beyond what the first half measured.</li>';
-  h += '<li>Some things are not in this test at all: verbs with helper words like ' +
-       '<i>has finished</i> or <i>was walking</i>, anything beyond the simple past and ' +
-       'simple present, and any sentence about <i>I</i> or <i>you</i>.</li>';
-  h += '</ul>';
-
-  /* ---- progress ---- */
+  /* ---- progress, which the fixed blueprint makes honest ---- */
   if(cmp && cmp.rows.length){
     h += '<h2>Since last time</h2>';
-    h += '<p>Compared with ' + esc(dxWhen(cmp.prev.at)) + '. Only the first half is ' +
-         'compared: everybody sits the same questions there, so the two numbers mean the ' +
-         'same thing. The second half is chosen for you and changes between sittings, so ' +
-         'comparing it would mostly measure the choosing.</p>';
-    h += '<table class="rep"><tbody>';
-    for(i=0;i<cmp.rows.length;i++){
-      var c = cmp.rows[i];
-      h += dxRow2(dxDomainName(c.dom),
-                  c.d > 0.001 ? "Up" : (c.d < -0.001 ? "Down" : "The same"),
-                  c.wasR + " of " + c.wasN + " then, " + c.nowR + " of " + c.nowN + " now");
-    }
+    h += '<p class="note">Compared with ' + esc(dxWhen(cmp.prev.at)) +
+         '. Every sitting of this skill asks about the same parts in the same ' +
+         'numbers, so these are comparable.</p>';
+    h += '<table class="rep"><thead><tr><th scope="col">Part</th>' +
+         '<th scope="col">Then</th><th scope="col">Now</th></tr></thead><tbody>';
+    for(i=0;i<cmp.rows.length;i++)
+      h += '<tr><th scope="row">' + esc(dxCellName(cmp.rows[i].cell)) + '</th>' +
+           '<td class="b">' + cmp.rows[i].wasR + ' of ' + cmp.rows[i].wasN + '</td>' +
+           '<td class="c">' + cmp.rows[i].nowR + ' of ' + cmp.rows[i].nowN + '</td></tr>';
     h += '</tbody></table>';
   }
+
+  /* ---- AND WHAT IT DID NOT LOOK AT (SPEC 113.6) ---- */
+  h += '<h2>What this did not look at</h2>';
+  if(unasked.length){
+    names = [];
+    for(i=0;i<unasked.length;i++) names.push(unasked[i][1]);
+    h += '<p>This looked at ' + Object.keys(cells).length + ' part' +
+         (Object.keys(cells).length === 1 ? '' : 's') + ' of ' + esc(skill.toLowerCase()) +
+         ' and not at ' + esc(dxList(names)) + dxStop(names[names.length-1]) +
+         ' Those are worth practising too; there are just no questions set aside for ' +
+         'checking them yet.</p>';
+  } else {
+    h += '<p>Every part of ' + esc(skill.toLowerCase()) + ' on the menu was asked about.</p>';
+  }
+  h += '<p class="note">And it cannot see how you write. It asks you to find things, name ' +
+       'things and choose between things, which is not the same as using them in a ' +
+       'paragraph of your own.</p>';
   return h;
 }
 
-/* ------------------------------------------------------- the teacher half */
 function dxTeacherBody(sit){
-  var groups = dxGroups(sit), cells = dxCells(sit), h = "", k, s, i;
+  var cells = dxCells(sit), h = '', k, i, s, lv, bits;
   h += '<h1 class="tpage">For the teacher</h1>';
-  h += '<p class="meta">' + esc(sit.who || "(no name given)") + ' &middot; ' +
-       esc(dxWhen(sit.at)) + ' &middot; form ' + esc(sit.form || "?") +
-       ' &middot; route ' + esc(sit.route ? DX_ROUTE_NAME_OF(sit.route) : "none") +
-       ' &middot; ' + esc(sit.app || "") + ' / bank ' + esc(sit.bank) + '</p>';
-
-  h += '<h2>Screener, by reporting group</h2>';
-  h += '<table class="rep band"><thead><tr><th>Group</th><th>Band</th><th>Score</th></tr></thead><tbody>';
-  var keys = [];
-  for(k in groups) keys.push(k);
-  keys.sort();
-  for(i=0;i<keys.length;i++){
-    s = dxBand(groups[keys[i]].r, groups[keys[i]].n);
-    h += dxRow2(dxGroupName(keys[i]), s.band, groups[keys[i]].r + " / " + groups[keys[i]].n);
-  }
-  h += '</tbody></table>';
-  h += '<p class="note">A screener group is two to four questions, by design: the blueprint ' +
-       'spends its length on covering everything rather than on settling any one group. ' +
-       'Most groups are therefore too thin to band, and they are here to be RANKED, which ' +
-       'is what picks the two strengths and the two weaknesses. The banded statements worth ' +
-       'quoting are the domain rows in the first half of this report.</p>';
-
-  h += '<h2>Deep dive, by activity</h2>';
-  var ck = [];
-  for(k in cells) ck.push(k);
-  if(ck.length){
-    ck.sort();
-    h += '<table class="rep"><thead><tr><th>Activity</th><th>Levels</th><th>Score</th></tr></thead><tbody>';
-    for(i=0;i<ck.length;i++){
-      s = cells[ck[i]];
-      h += dxRow2(DX_CELL_NAME[ck[i]] || ck[i],
-                  s.top ? ("started " + (LEVEL_LABEL[s.first] || s.first) +
-                           ", ended " + (LEVEL_LABEL[s.last] || s.last) +
-                           ", best " + (LEVEL_LABEL[s.top] || s.top))
-                        : "no levels in this activity",
-                  s.r + " / " + s.n);
+  h += '<p class="meta">' + esc(dxDomainName(sit.skill)) + ' &middot; ' +
+       esc(sit.who || "(no name given)") + ' &middot; ' + esc(dxWhen(sit.at)) +
+       ' &middot; app ' + esc(sit.app || "") + ', bank ' + esc(String(sit.bank)) +
+       ' &middot; sitting ' + esc(sit.id) + '</p>';
+  h += '<p class="note">One fixed blueprint per skill: the same activities, the same ' +
+       'number of questions in each, the same levels, drawn from questions held out of ' +
+       'practice. So two sittings of one skill are comparable, and a sitting of one skill ' +
+       'is not comparable with a sitting of another.</p>';
+  h += '<table class="rep"><thead><tr><th scope="col">Activity</th>' +
+       '<th scope="col">Code</th><th scope="col">Right</th>' +
+       '<th scope="col">By level</th></tr></thead><tbody>';
+  for(i=0;i<ACTIVITY_LIST.length;i++){
+    k = ACTIVITY_LIST[i][0];
+    if(!cells[k]) continue;
+    s = cells[k];
+    bits = [];
+    for(var j=0;j<LEVELS.length;j++){
+      lv = (s.lvls || {})[LEVELS[j]];
+      if(lv) bits.push((LEVEL_LABEL[LEVELS[j]] || LEVELS[j]) + " " + lv.r + "/" + lv.n);
     }
-    h += '</tbody></table>';
-  } else h += '<p>None recorded.</p>';
-
-  h += '<h2>How the route was chosen</h2><table class="rep"><tbody>';
-  for(i=0;i<DX_ROUTES.length;i++){
-    var R = DX_ROUTES[i], sc = dxScore(dxStage(sit, 1), R.groups);
-    h += dxRow2(dxCap(R.name) + (R.up ? " (upward, not built yet)" : ""),
-                R.k === sit.route ? "TAKEN" : "",
-                Math.round(100 * sc) + "% of its screener questions");
+    h += '<tr><th scope="row">' + esc(dxCellName(k)) + '</th>' +
+         '<td class="b">' + esc(codeOf(k)) + '</td>' +
+         '<td class="c">' + s.r + " of " + s.n + '</td>' +
+         '<td class="c">' + esc(bits.length ? bits.join(", ") : "no levels in this one") +
+         '</td></tr>';
   }
   h += '</tbody></table>';
-  h += '<p class="note">The whole deep dive goes to one route, so the other foundations ' +
-       'are screener-only. Splitting it would give several answers too thin to act on.</p>';
-
+  /* The outcomes that are neither right nor wrong, named rather than folded in
+     (SPEC 77). A tap that is true of the language but not of the class asked
+     for is not a wrong answer, and a span that overlaps the answer is not
+     either; counting them as wrong would understate the pupil and counting
+     them as right would overstate them. */
+  var mids = {}, any = false;
+  for(i=0;i<(sit.rows || []).length;i++)
+    if(sit.rows[i].o){ mids[sit.rows[i].o] = (mids[sit.rows[i].o] || 0) + 1; any = true; }
+  if(any){
+    h += '<h2>Answers that were neither right nor wrong</h2><ul>';
+    for(k in mids)
+      h += '<li><b>' + esc(k) + '</b> &times; ' + mids[k] + ' &mdash; ' +
+           esc(DX_MEANS[k] || "") + '</li>';
+    h += '</ul>';
+  }
   h += '<h2>What this instrument cannot see</h2><ul>' +
-       '<li>Every subject in the verb questions is third person, so it cannot report on ' +
-       '<i>I walks</i> or <i>you walks</i>.</li>' +
-       '<li>No question anywhere shows a verb group of more than one word.</li>' +
-       '<li>The tense scope is the simple present, the simple past and <i>be</i>: no ' +
-       'progressive, no perfect, no negatives and no questions.</li>' +
-       '<li>Paragraph rounds are out of the diagnostic on purpose: one takes a minute ' +
-       'and would spend a twentieth of the test on one data point.</li>' +
-       '</ul>';
+    '<li>Writing. Every question is a choice or a tap, so nothing here is evidence ' +
+      'about a paragraph the pupil composed.</li>' +
+    '<li>Any activity with no questions set aside for it. Those are named on the ' +
+      'pupil\'s half.</li>' +
+    '<li>A part answered on fewer than ' + DX_THIN + ' questions, which is reported as ' +
+      'too few to say rather than banded.</li></ul>';
   return h;
 }
 
-/* ------------------------------------------------------------ the styling */
-/* Inlined rather than shared with the app's stylesheet, because the
-   downloaded file has to open anywhere with no network and no app around
-   it. Light on purpose: this gets printed. */
 var DX_REP_CSS =
   'body{font:16px/1.5 Georgia,serif;color:#111;background:#fff;margin:0;padding:28px;' +
   'max-width:46em}' +
@@ -8490,17 +8337,21 @@ function dxReportFile(sit){
 /* One builder, two destinations. What is on the screen and what is in the
    file are the same string, so they cannot come to say different things,
    which is the fault this project has found in a hand-kept list five times. */
+
 function dxShowReport(sit){
   DX.rep = sit;
   el("dxName").value = sit.who || "";
   dxPaint();
-  /* Somewhere to go next, which the downloaded file cannot offer because it
-     has no app around it. The report names the activity in words either way;
-     on screen it is also a button. */
-  var ends = dxPickEnds(dxGroups(sit)), h = "", i, a;
-  for(i=0;i<ends.weak.length;i++){
-    a = dxGroupAct(ends.weak[i]);
-    if(a) h += '<button class="go" onclick="' + esc(a.go) + '">' + esc(a.label) + '</button> ';
+  /* Somewhere to go next, which the downloaded file cannot offer because it has
+     no app around it. The report names the activity and its code in words either
+     way; on screen it is also a button, and the button goes through `openLink`,
+     the same path a code written in a book takes (v0.72). One routing, not two. */
+  var cells = dxCells(sit), weak = dxWeakCells(cells), h = "", i, sug;
+  for(i=0;i<weak.length;i++){
+    sug = dxSuggest(weak[i], cells[weak[i]]);
+    if(sug)
+      h += '<button class="go" onclick="openLink(\'' + esc(sug.code) + '\')">' +
+           esc(sug.label) + (sug.lvlName ? ' (' + esc(sug.lvlName) + ')' : '') + '</button> ';
   }
   el("dxPractise").innerHTML = h;
   go("dxRepS");
@@ -8542,6 +8393,7 @@ function dxSave1(){
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
   setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
 }
+
 
 
 /* ==================== KEYS AS WELL AS TAPS (v0.53, SPEC 63) =================
@@ -11402,6 +11254,21 @@ function openDomain(id){
         '</button>' + (d.learn2 ? '<button class="menu-btn" onclick="' + d.learn2[1] + '">' +
         esc(d.learn2[0]) + '<span class="sub">' + esc(d.learn2[2]) + '</span></button>' : '') +
         '</div>' + h;
+  /* CHECK WHAT YOU KNOW (v0.97, SPEC 113). Michael, 2026-10-10: "students can go
+     into each of these sections and choose to run the assessment". So it is a
+     block at the END of the skill's own menu, after the practice it exists to
+     point at, and it is absent rather than disabled where the skill has no
+     questions registered yet: a button that explains why it does nothing is
+     still a button a pupil presses. */
+  var bc = batCells(id);
+  if(bc.length)
+    h += '<div class="group assess-group"><h3>Check what you know</h3>' +
+         '<p class="why">About ten minutes of questions across ' +
+         (bc.length === 1 ? 'this skill' : bc.length + ' different parts of this skill') +
+         ', with no score and nothing marked until the end. The report at the end says ' +
+         'which parts to practise next.</p>' +
+         '<button class="menu-btn" onclick="batOpen(\'' + id + '\')">Check what you know' +
+         '<span class="sub">Not a game and not marked against anybody else</span></button></div>';
   el("domGroups").innerHTML = h;
   /* WHICH MARK IS ON, AND HOW TO CHANGE IT (v0.76). This used to be a chip row
      prepended into `#domGroups`, which is a three-column grid, so each piece of
@@ -11719,8 +11586,12 @@ var NAV_UP = {
   challenge:   "go('splash')",
   blitzResult: "go('splash')",
   validate:    "go('splash')",
-  dxStartS:    "go('splash')",
-  dxRepS:      "go('splash')",
+  /* A battery belongs to its skill, so the way back is that skill's screen and
+     not the front page. Derived from the sitting's own domain rather than
+     typed, which is the v0.75 rule: a typed destination is a hand-written list
+     with one entry, and ten of the thirty-nine were wrong when it was measured. */
+  batStartS:   function(){ return DX.dom ? "openDomainOrMarks('" + DX.dom + "')" : "go('splash')"; },
+  dxRepS:      function(){ return DX.dom ? "openDomainOrMarks('" + DX.dom + "')" : "go('splash')"; },
 
   /* Learn pages. Not in any registry, so declared, and covered by the gate. */
   learn:      "openDomain('wc')",
@@ -16003,15 +15874,20 @@ function validate(){
   for(i=0;i<leak.length;i++)
     E.push("held out: "+leak[i]+" still contains a diagnostic item, so practice can serve it. "+
            "Add it to DX_BANKS (SPEC 72).");
-  for(i=0;i<DXREG.length;i++){
-    var rid = DXREG[i][0], held = DXREG[i][5] === "held";
-    if(!dxItem(rid)){
-      E.push("held out: "+rid+" is on the screener register but is not in any bank, "+
-             "so form "+DXREG[i][2]+" is a question short.");
-    } else if(held !== (dxPooled(rid) !== null)){
-      E.push("held out: "+rid+" is registered as "+DXREG[i][5]+" but is "+
-             (held ? "not " : "")+"in the held-out pool (SPEC 72).");
-    }
+  /* ONE REGISTER since v0.97. The claim is the same one the screener's loop
+     made: every registered question exists, and every registered question is in
+     the held-out pool rather than in a bank a round can draw from. Both halves
+     matter and they fail in opposite directions -- an id naming nothing is a
+     question the instrument thinks it has, and an id in a bank is a question
+     practice has already shown the pupil. */
+  for(i=0;i<DEEPREG.length;i++){
+    var rid = DEEPREG[i][0];
+    if(!dxItem(rid))
+      E.push("held out: "+rid+" is on the register and is not in any bank, so the "+
+             DEEPREG[i][1]+" cell is a question short.");
+    else if(dxPooled(rid) === null)
+      E.push("held out: "+rid+" is registered but is not in the held-out pool, so "+
+             "practice can serve it (SPEC 73).");
   }
 
   /* ---- THE DIAGNOSTIC CAN ACTUALLY RUN (v0.64, SPEC 75) ----------------
@@ -16033,7 +15909,6 @@ function validate(){
       E.push("diagnostic: the page knows the outcome '"+ok2+"' and the build does not "+
              "define what it means, so the report cannot name it.");
   var dxacts = {}, j2;
-  for(i=0;i<DXREG.length;i++) dxacts[DXREG[i][3]] = 1;
   for(i=0;i<DEEPREG.length;i++) dxacts[DEEPREG[i][1]] = 1;
   for(var act in dxacts){
     if(!DX_OPEN[act])
@@ -16042,50 +15917,78 @@ function validate(){
       E.push("diagnostic: '"+act+"' is not in DX_SCREEN, so a wrong answer there records "+
              "no wrong option and step 12 has nothing to analyse.");
   }
-  /* A DEEP-DIVE CELL IS AN ACTIVITY (v0.68). Every cell the deep register uses
-     must belong to exactly one route, or a question is in the pool and can
-     never be served. */
-  var inroute = {};
-  for(i=0;i<DX_ROUTES.length;i++)
-    for(j2=0;j2<DX_ROUTES[i].cells.length;j2++){
-      if(inroute[DX_ROUTES[i].cells[j2]])
-        E.push("diagnostic: cell "+DX_ROUTES[i].cells[j2]+" is in two routes.");
-      inroute[DX_ROUTES[i].cells[j2]] = DX_ROUTES[i].k;
-    }
-  var percell = {}, cellLvl = {};
+  /* A CELL IS AN ACTIVITY (v0.68), AND ITS SKILL IS DERIVED (v0.97).
+     Until v0.97 a hand-written route table said which cells belonged to which
+     skill, and the check was that no cell sat in two routes. The activity
+     registry already knows: `ACTIVITY_LIST[3]` is the domain. So the table is
+     gone and the question a cell belongs to is read from the app, which is this
+     project's own rule about every number that describes it. A cell added next
+     year lands in the right skill by existing. */
+  var percell = {}, cellLvl = {}, perskill = {};
   for(i=0;i<DEEPREG.length;i++){
-    percell[DEEPREG[i][1]] = (percell[DEEPREG[i][1]] || 0) + 1;
-    if(!inroute[DEEPREG[i][1]])
-      E.push("diagnostic: cell "+DEEPREG[i][1]+" has questions in it and no route reaches them.");
-    /* A cell either has levels or has none. Half a ladder means the runner
+    var cl0 = DEEPREG[i][1], dom0 = null;
+    for(j2=0;j2<ACTIVITY_LIST.length;j2++)
+      if(ACTIVITY_LIST[j2][0] === cl0) dom0 = ACTIVITY_LIST[j2][3];
+    if(!dom0)
+      E.push("assessment: cell "+cl0+" has questions in it and is not an activity on the "+
+             "menu, so no skill owns them and the report would name a button that is "+
+             "not there.");
+    else perskill[dom0] = (perskill[dom0] || 0) + 1;
+    percell[cl0] = (percell[cl0] || 0) + 1;
+    /* A cell either has levels or has none. Half a ladder means the picker
        moves a pupil to a rung some of the cell's questions cannot be on, and
        the report prints the move. The build gates this too: one rule, two
        readers, and this is the half that runs in front of a pupil. */
-    (cellLvl[DEEPREG[i][1]] = cellLvl[DEEPREG[i][1]] || {})[DEEPREG[i][2] ? "y" : "n"] = 1;
+    (cellLvl[cl0] = cellLvl[cl0] || {})[DEEPREG[i][2] ? "y" : "n"] = 1;
   }
   for(var cl in cellLvl)
     if(cellLvl[cl].y && cellLvl[cl].n)
-      E.push("diagnostic: some questions in the "+cl+" cell carry a level and some do not, "+
+      E.push("assessment: some questions in the "+cl+" cell carry a level and some do not, "+
              "so the cell has half a ladder.");
-  /* And a route must be able to fill a deep dive WITHOUT emptying a cell, or
-     the length stops being fixed and the weakest pupil sits the shortest test.
-     Counted at the cap the blocks actually use (DX_VARY), not at the raw pool
-     size: a route that can only reach twenty-four by serving every question it
-     has hands the same sitting back next term. */
-  for(i=0;i<DX_ROUTES.length;i++){
-    var R = DX_ROUTES[i], tot = 0;
-    for(j2=0;j2<R.cells.length;j2++)
-      tot += Math.floor((percell[R.cells[j2]] || 0) * DX_VARY);
-    if(R.cells.length && tot < DX_DEEP_N)
-      E.push("diagnostic: the "+R.name+" route can serve "+tot+" questions without "+
-             "emptying one of its cells, and a deep dive is "+DX_DEEP_N+", so its length "+
-             "would depend on the route.");
-    if(!R.cells.length && !R.up)
-      E.push("diagnostic: the "+R.name+" route has no cells and is not marked as an "+
-             "upward route, so a pupil sent there would sit nothing.");
-    if(!R.groups.length)
-      E.push("diagnostic: the "+R.name+" route has no screener groups, so nothing can "+
-             "route a pupil to it.");
+
+  /* ---- EVERY SKILL WITH QUESTIONS CAN ACTUALLY RUN ONE (v0.97) ------------
+     The battery's blueprint is derived: its cells are the skill's own
+     activities that have questions, its length is BAT_N spread over them, and
+     a cell is capped at DX_VARY of its pool so a second sitting is not the
+     first. Three things can therefore be wrong without anything throwing, and
+     all three look like data rather than like a fault.
+
+     A SKILL THAT CANNOT FILL ITS BLUEPRINT would hand a pupil a shorter
+     sitting than another skill does, and two reports of different lengths read
+     as two readings of one instrument when they are not. A CELL WITH ONE
+     QUESTION cannot be banded at all (SPEC 113.3: three questions support three
+     bands and nothing finer). And A CELL WHOSE QUESTIONS SIT AT ONE LEVEL
+     cannot tell the report which level to send the pupil to, which is half of
+     what a suggestion is for. */
+  var skills = {};
+  for(i=0;i<DEEPREG.length;i++){
+    var cl0 = DEEPREG[i][1], dom0 = null;
+    for(j2=0;j2<ACTIVITY_LIST.length;j2++)
+      if(ACTIVITY_LIST[j2][0] === cl0) dom0 = ACTIVITY_LIST[j2][3];
+    if(!dom0)
+      E.push("assessment: cell "+cl0+" has questions in it and is not an activity on the "+
+             "menu, so no skill owns them and the report would name a button that is "+
+             "not there.");
+    else skills[dom0] = 1;
+  }
+  for(var sk in skills){
+    var want = batWant(batCells(sk)), tot = 0, thin = [], flat = [];
+    for(i=0;i<want.length;i++){
+      tot += want[i].want;
+      if(want[i].want < BAT_MIN_CELL) thin.push(want[i].cell);
+      if(batLevels(want[i].cell).length < 2 && !dxCellFlat(want[i].cell)) flat.push(want[i].cell);
+    }
+    if(tot < BAT_N)
+      W.push("assessment: the "+dxDomainName(sk)+" battery can only fill "+tot+" of its "+
+             BAT_N+" questions without serving more than "+Math.round(100*DX_VARY)+"% of a "+
+             "cell, so a pupil sitting it twice would meet the same questions. "+
+             (BAT_N - tot)+" more held-out questions in that skill fixes it.");
+    for(i=0;i<thin.length;i++)
+      E.push("assessment: the "+thin[i]+" cell gets fewer than "+BAT_MIN_CELL+" questions in "+
+             "the "+dxDomainName(sk)+" battery, and one question is not a band.");
+    for(i=0;i<flat.length;i++)
+      W.push("assessment: every question in the "+flat[i]+" cell sits at one level, so the "+
+             "report cannot say which level to practise at (SPEC 113.5).");
   }
 
   return {E:E, W:W, info:INFO, floor:floorFails, lemmas:lm, shifty:hardShift, soft:softShift, levels:lc};
