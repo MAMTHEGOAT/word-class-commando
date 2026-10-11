@@ -197,31 +197,71 @@ body.dx .wbtn.res-ok, body.dx .wbtn.res-bad, body.dx .wbtn.res-neu,
 body.dx .wbtn.res-miss, body.dx .wbtn.res-part{background:var(--paper);
   border-color:var(--line);border-style:solid;color:inherit}
 #dxBar{position:sticky;top:0;z-index:5;background:var(--bg);padding:10px 0 8px}
-/* The report reads as a document, so it sits on the paper panel the app already
-   uses for language a pupil has to READ (v0.52), and the download carries its own
-   copy of these rules because it has to open with no app around it. */
-#dxRep{background:var(--paper);color:var(--ink);border-radius:10px;padding:18px 22px;
-  font:16px/1.55 Georgia,serif}
-#dxRep h1{font-size:1.5rem;margin:0 0 .2em}
-#dxRep h2{font-size:1.05rem;margin:1.5em 0 .4em;border-bottom:1px solid #cfc79c;
-  padding-bottom:.2em}
-#dxRep .meta{color:#5b5637;margin:.2em 0 1em;font-size:.95rem}
-#dxRep .note{color:#5b5637;font-size:.9rem}
-#dxRep table.rep{border-collapse:collapse;width:100%;margin:.6em 0}
-#dxRep table.rep th,#dxRep table.rep td{border-bottom:1px solid #ddd5a8;padding:.4em .5em;
+/* THE RECORD CARD (v0.98). Michael, 2026-10-11: the report screen should "look
+   different from the general quiz modes". The quiz modes read on cream paper in a
+   serif because what a pupil reads there is LANGUAGE; a report is a RECORD, so it
+   gets its own design language and nothing of the lesson panel. Slate band, the
+   app's own sans face, a verdict strip whose colour is the verdict, and a spine
+   down the left. Every rule here has a twin in DX_REP_CSS, because the download
+   has to open with no app around it (dxreport.js rule 2). */
+#dxRep{background:#fff;color:#15202b;border:1px solid #d4dbe3;border-radius:4px;
+  border-left:6px solid #2f6f8f;padding:0 22px 22px;
+  font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+#dxRep .rhead{margin:0 -22px 18px;padding:18px 22px 14px;background:#1f3341;color:#fff;
+  border-radius:0 3px 0 0}
+#dxRep .eyebrow{margin:0 0 .35em;font-size:.68rem;letter-spacing:.18em;
+  text-transform:uppercase;color:#9fb6c4}
+#dxRep h1{font-size:1.45rem;margin:0;font-weight:600;letter-spacing:-.01em;color:#fff}
+#dxRep h2{font-size:.78rem;margin:1.8em 0 .5em;letter-spacing:.14em;
+  text-transform:uppercase;color:#4a6b80;font-weight:600;border:none;padding:0}
+#dxRep .meta{color:#9fb6c4;margin:.5em 0 0;font-size:.85rem}
+#dxRep .lead{font-size:1.08rem;margin:0 0 1.2em;padding:.7em .9em;border-radius:3px;
+  border-left:4px solid #2f6f8f;background:#f4f7fa}
+#dxRep .lead.ok{border-left-color:#1f7a34;background:#eaf6ec}
+#dxRep .lead.work{border-left-color:#b07400;background:#fdf4e3}
+#dxRep .note{color:#5a6b78;font-size:.9rem}
+#dxRep table.rep{border-collapse:collapse;width:100%;margin:.4em 0}
+#dxRep table.rep th,#dxRep table.rep td{border-bottom:1px solid #e4e9ee;padding:.5em .6em;
   text-align:left;vertical-align:top}
-#dxRep table.rep thead th{border-bottom:2px solid #b9b083;font-size:.8rem;
-  text-transform:uppercase;letter-spacing:.04em}
-#dxRep td.b{width:10em;font-weight:bold}#dxRep td.c{width:13em;color:#5b5637}
-#dxRep .foot{margin-top:2em;color:#6a6448;font-size:.85rem;border-top:1px solid #cfc79c;
-  padding-top:.5em}
+#dxRep table.rep th[scope=row]{font-weight:600}
+#dxRep table.rep thead th{border-bottom:2px solid #c3ccd5;font-size:.74rem;
+  text-transform:uppercase;letter-spacing:.1em;color:#4a6b80}
+#dxRep table.band tr:last-child th,#dxRep table.band tr:last-child td{border-bottom:none}
+#dxRep td.b{width:10em;font-weight:600}#dxRep td.c{width:13em;color:#5a6b78}
+#dxRep ul{margin:.4em 0 .8em;padding-left:1.2em}#dxRep li{margin:.35em 0}
+#dxRep .foot{margin:2.2em -22px -22px;padding:.8em 22px;color:#5a6b78;font-size:.8rem;
+  background:#f4f7fa;border-top:1px solid #e4e9ee;border-radius:0 0 3px 3px}
+/* The certificate is the other document this app prints, and it is deliberately
+   the opposite of the record card: centred, brass-ruled, and nothing on it but
+   the claim it makes. */
+#batCert{background:#fffdf5;color:#1a1a1a;border:1px solid #c9b072;border-radius:4px;
+  padding:34px 30px;text-align:center;
+  font:16px/1.6 Georgia,"Times New Roman",serif}
+#batCert .cfr{border:2px solid #c9b072;border-radius:3px;padding:26px 22px}
+#batCert .ceye{margin:0 0 .6em;font-size:.72rem;letter-spacing:.26em;
+  text-transform:uppercase;color:#8a6f2a}
+#batCert h1{font-size:1.9rem;margin:0 0 .15em;font-weight:normal;letter-spacing:.01em}
+#batCert .cwho{font-size:1.5rem;margin:.9em 0 .1em;font-weight:bold}
+#batCert .csub{margin:.2em 0 1.2em;color:#5b5637}
+#batCert table.cert{border-collapse:collapse;margin:1.2em auto 0;font-size:.92rem}
+#batCert table.cert th,#batCert table.cert td{border-bottom:1px solid #e7dcb8;
+  padding:.4em .9em;text-align:left}
+#batCert table.cert thead th{border-bottom:2px solid #c9b072;font-size:.7rem;
+  letter-spacing:.12em;text-transform:uppercase;color:#8a6f2a;font-weight:normal}
+#batCert table.cert tr:last-child th,#batCert table.cert tr:last-child td{border-bottom:none}
+#batCert .cfoot{margin:1.6em 0 0;color:#6a6448;font-size:.8rem}
 @media print{
   body{background:#fff}
   .noprint,.topbar,#dxBar{display:none !important}
   .screen{display:none !important}.screen.on{display:block !important}
-  #dxRep{background:#fff;color:#000;padding:0;border-radius:0}
-  #dxRep h1.tpage{page-break-before:always}
-  #dxRep h2{page-break-after:avoid}#dxRep table.rep,#dxRep ul{page-break-inside:avoid}
+  #dxRep{border:none;border-left:none;padding:0;border-radius:0}
+  #dxRep .rhead{background:#fff;color:#000;margin:0 0 14px;padding:0 0 10px;
+    border-bottom:2px solid #1f3341;border-radius:0}
+  #dxRep h1{color:#000}#dxRep .eyebrow,#dxRep .meta{color:#444}
+  #dxRep h2{page-break-after:avoid}
+  #dxRep table.rep,#dxRep ul{page-break-inside:avoid}
+  #dxRep .foot{margin:2em 0 0;padding:.6em 0 0;background:none}
+  #batCert{border:none;padding:0}
 }
 #dxTrack{height:6px;border-radius:3px;background:rgba(255,255,255,.14);overflow:hidden}
 #dxFill{height:100%;width:0;border-radius:3px;background:var(--ink);transition:width .25s}
@@ -1608,15 +1648,27 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
     <input id="dxName" class="tin" maxlength="40" placeholder="so you know whose this is"
            oninput="dxSetName()">
   </div>
-  <div class="paper" id="dxRep"></div>
+  <div id="dxRep"></div>
+  <!-- ONE ROW OF BUTTONS, built by `dxAfter` from the verdict. There was a
+       second, fixed row here until v0.98 offering Save and Print whatever the
+       result was, so a pupil who had just failed a part met "Save a copy",
+       "Print or save as PDF" and "Print report" one under another. -->
+  <div class="bar noprint" id="dxPractise"></div>
+  <p class="dim small noprint" id="dxAfterNote"></p>
+</section>
+
+<!-- THE CERTIFICATE. One skill, every part of it carried. There is no route
+     here but the button on a report that earned it, and `batCert` re-checks
+     before it paints, so the screen cannot be reached by guessing its name. -->
+<section id="batCertS" class="screen">
+  <div class="topbar"><button class="back"></button><button class="tomenu" onclick="go('splash')">Menu</button><img alt="" class="tb-logo"></div>
+  <div id="batCert"></div>
   <div class="bar noprint">
-    <button class="go" onclick="dxSave1()">Save a copy</button>
+    <button class="go" onclick="batCertSave()">Save a copy</button>
     <button class="go" onclick="window.print()">Print or save as PDF</button>
   </div>
-  <p class="dim small noprint">The copy is one file that opens in any browser, works with no
-     internet, and carries your answers inside it so the next time you sit this it can show
-     you what changed. Nothing is sent anywhere.</p>
-  <div class="bar noprint" id="dxPractise"></div>
+  <p class="dim small noprint">The copy is one file that opens in any browser and needs no
+     internet. Nothing is sent anywhere.</p>
 </section>
 
 <!-- =========================== VALIDATE =========================== -->
@@ -6556,7 +6608,7 @@ var STAMPMETA = {"fmt":1,"skip":["id","dx"],"strict":["secure","challenge"]};
 /* BANK_REV bumps when the banks change, and bumping it for a code change makes
    every pupil's record run the pruner for nothing. 44 at v0.78: twenty-eight items
    move from the end-mark chip to the boundary chip. */
-var APP = "wcc", VER = "v0.97", BANK_REV = 58;
+var APP = "wcc", VER = "v0.98", BANK_REV = 58;
 var BUG_FORM_URL = "";   /* paste the Office 365 form link to switch the report button on */
 
 /* ================= HELD OUT (v0.61, SPEC 72) ================================
@@ -7487,7 +7539,7 @@ function go(id){
       marked unfinished rather than thrown away.
    ==================================================================== */
 var DX = { on:false, sit:null, plan:[], i:0, t0:0, item:null, q:null, wait:0,
-           dom:"", used:{}, n:0, at:-1, rep:null };
+           dom:"", stage:0, used:{}, n:0, at:-1, rep:null, cert:null };
 
 var DX_OPEN = {
   one:    function(ask){ S.act = "one"; S.cls = ask; S.lvl = "all"; start("one"); },
@@ -7677,6 +7729,13 @@ function dxFinish(done){
   el("dxBar").style.display = "none";
   if(DX.sit){
     DX.sit.done = !!done;
+    /* THE VERDICT IS WRITTEN ONTO THE SITTING, once, here. Not recomputed
+       wherever something wants to know: the report, the Next button and the
+       certificate all read one field, so they cannot come to disagree about
+       whether a pupil passed. An abandoned sitting never passes, whatever is
+       in its rows, because a part a pupil walked out of is not a part they
+       carried. */
+    DX.sit.pass = !!done && batPassed(DX.sit);
     dxSave(DX.sit);
   }
   var n = DX.sit ? DX.sit.rows.length : 0;
@@ -7726,15 +7785,46 @@ var DX_PAUSE = 450;
    below and in what they are divided by.
    ================================================================== */
 
-/* About ten to twelve minutes, which is the back half of a lesson, and
-   the budget is in SCORED DECISIONS rather than in questions (SPEC
-   113.9). A paragraph round is one question carrying one to three
-   decisions and a sort round is one question carrying six, so counting
-   questions made the rounds that give the most evidence per minute look
-   like the most expensive ones. No cell is ever given fewer than two,
-   because one question is not a band. */
-var BAT_N = 22;
+/* HOW MANY QUESTIONS A SUB-SKILL GETS (Michael, 2026-10-11, after sitting
+   one: "22 questions was very brief, we can easily increase it to 45 or
+   50"). A stage covers three sub-skills, so sixteen each is his 48.
+
+   PER CELL rather than per sitting, which is the change that makes the
+   tail honest: a skill whose last stage holds one sub-skill would
+   otherwise be served a whole battery's worth of questions about one
+   activity. Per cell, the evidence behind every band is the same
+   wherever it sits, and a stage is as long as it has sub-skills to ask
+   about.
+
+   The budget is in scored DECISIONS and not in questions (SPEC 113.9): a
+   paragraph round is one question carrying one to three decisions and a
+   sort round is one question carrying six, so counting questions made
+   the rounds that give the most evidence per minute look like the most
+   expensive ones. */
+var BAT_PER_CELL = 16;
 var BAT_MIN_CELL = 2;
+
+/* HOW MANY SUB-SKILLS IN A STAGE (Michael, same ruling): "if the student
+   seems competent in these first three areas, add a next button or
+   similar that allows the students to progress to the next three
+   skills."
+
+   So a battery is sat in parts. Three sub-skills at a time, in the order
+   the practise menu lists them, and a pupil who is competent in a part
+   is offered the next one rather than being handed a verdict on a skill
+   they have only half met. The remainder is its own final part rather
+   than being folded into the one before it: a part of one or two is
+   short, and a part of five is a test nobody finishes. */
+var BAT_STAGE = 3;
+
+/* WHAT COUNTS AS COMPETENT ENOUGH TO GO ON. Every sub-skill in the part
+   at three fifths or better, which is the bottom of the "Mostly there"
+   band the report already prints, so the button and the table agree.
+
+   EVERY sub-skill rather than an average over the part, because an
+   average lets a pupil who cannot do one of three walk past it, and
+   walking past it is the thing the report exists to stop. */
+var BAT_PASS = 0.60;
 
 /* Which cells a skill's battery asks about: the skill's own activities,
    in the menu's order, that have questions registered. READ FROM THE APP
@@ -7776,27 +7866,82 @@ function batLevels(cell){
   return out.length ? out : [""];
 }
 
-/* How many questions each cell gets. Derived from the cell count rather
-   than declared per skill, because six typed numbers are six chances to
-   go stale, and capped at DX_VARY of what the cell holds so that a
-   second sitting is not the same sitting. Whatever a cap frees goes to
-   the cells with room, so the LENGTH stays the same across skills: a
-   pupil comparing two reports is comparing two instruments of one size.*/
+/* How many questions each cell of a part gets: BAT_PER_CELL, capped at
+   DX_VARY of what the cell actually holds so that a second sitting is
+   not the first one again. Nothing is redistributed between cells any
+   more, because the budget is per cell: a short pool shortens its own
+   part and leaves every other band resting on the same evidence. The
+   build prints the shortfall so the authoring target is a number rather
+   than an impression. */
 function batWant(cells){
-  var n = cells.length, base = Math.floor(BAT_N / n), extra = BAT_N % n,
-      out = [], i, cap, spare = 0, room;
-  if(!n) return out;
-  for(i=0;i<n;i++) out.push({ cell:cells[i], want:Math.max(BAT_MIN_CELL, base + (i < extra ? 1 : 0)) });
-  for(i=0;i<n;i++){
-    cap = Math.floor(dxCellPool(out[i].cell) * DX_VARY);
-    if(out[i].want > cap){ spare += out[i].want - cap; out[i].want = cap; }
-  }
-  for(i=0;i<n && spare > 0;i++){
-    cap = Math.floor(dxCellPool(out[i].cell) * DX_VARY);
-    room = Math.min(spare, cap - out[i].want);
-    if(room > 0){ out[i].want += room; spare -= room; }
+  var out = [], i, cap;
+  for(i=0;i<cells.length;i++){
+    cap = Math.floor(dxCellPool(cells[i]) * DX_VARY);
+    out.push({ cell:cells[i], want:Math.max(BAT_MIN_CELL, Math.min(BAT_PER_CELL, cap)) });
   }
   return out;
+}
+
+/* THE PARTS. The skill's stocked cells, in the menu's order, in threes,
+   with the remainder as its own last part. A cell with no questions is
+   not in a part at all: the report used to carry a paragraph naming what
+   it had not looked at, and Michael's ruling of 2026-10-11 was to take
+   that out, so what says it instead is the part count. "Part 1 of 3" is
+   four words and tells a pupil the same thing. */
+function batStages(dom){
+  var cells = batCells(dom), out = [], i;
+  for(i=0;i<cells.length;i+=BAT_STAGE) out.push(cells.slice(i, i + BAT_STAGE));
+  /* A PART OF ONE IS NOT A PART. Four cells cut into threes leaves a last part
+     with a single activity in it, which gives a pupil a report that bands one
+     thing and calls it a part of a skill, and a Next button that leads to a
+     third of a sitting. The remainder joins the part before it instead, so a
+     skill with four cells runs one part of four rather than two parts of three
+     and one. Michael's number is three (2026-10-11); this keeps it wherever
+     three is a whole part. */
+  if(out.length > 1 && out[out.length - 1].length === 1){
+    out[out.length - 2] = out[out.length - 2].concat(out.pop());
+  }
+  return out;
+}
+
+/* Which part a pupil should be offered: the first they have not passed.
+   Derived from the sittings they have, not stored separately, because a
+   finished sitting is the evidence and a second copy of a verdict is a
+   second thing that can disagree with it (SPEC 113.7). */
+function batNextStage(dom){
+  var n = batStages(dom).length, i;
+  for(i=0;i<n;i++) if(!batStagePassed(dom, i)) return i;
+  return n;                       /* all of them passed */
+}
+
+function batStagePassed(dom, n){ return !!batStageSit(dom, n); }
+
+/* The sitting a part's pass RESTS ON, which is the latest one that carried
+   it. The certificate names it, so the claim on the certificate has a date
+   and a score behind it and is not a bare assertion. */
+function batStageSit(dom, n){
+  var done = batDone(dom), i, best = null;
+  for(i=0;i<done.length;i++)
+    if(done[i].stage === n && done[i].pass &&
+       (!best || (done[i].at || 0) > (best.at || 0))) best = done[i];
+  return best;
+}
+
+/* Did this sitting carry its part? Every sub-skill in it at BAT_PASS or
+   better. A cell with too few questions to band (SPEC 113.3) cannot
+   carry a pass either, because a pass is a claim and that cell does not
+   support one. */
+/* The fewest questions in a cell that support any claim at all. Three, for
+   the reason SPEC 113.3 gives: three questions support three bands and nothing
+   finer. The report's DX_THIN is this number and reads it from here, and the
+   build reads it out of this line, so there is one 3 in the project. */
+var BAT_BAND = 3;
+
+function batPassed(sit){
+  var cells = sit.cells || [], i, ok = cells.length > 0;
+  for(i=0;i<cells.length;i++)
+    if(cells[i].n < BAT_BAND || cells[i].r / cells[i].n < BAT_PASS) ok = false;
+  return ok;
 }
 
 /* THE PLAN. A cell's questions are a MINI-LADDER: one at each level the
@@ -7807,18 +7952,17 @@ function batWant(cells){
    The level is DECLARED here and never moves during the sitting: an
    adaptive test is not comparable with itself, which is the whole reason
    the retired instrument had to be split into two stages. */
-function batPlan(dom){
-  var want = batWant(batCells(dom)), rows = [], subs = {}, i, j, lv, q, got;
+function batPlan(dom, stage){
+  var cells = batStages(dom)[stage] || [], want = batWant(cells),
+      rows = [], subs = {}, i, j, lv, q;
   DX.used = {};
   for(i=0;i<want.length;i++){
     lv = batLevels(want[i].cell);
     subs[want[i].cell] = {};
-    got = 0;
     for(j=0;j<want[i].want;j++){
       q = dxDeepPick(want[i].cell, lv[j % lv.length], DX.used, subs[want[i].cell]);
       if(!q) break;
       rows.push(q);
-      got++;
     }
   }
   return dxInterleave(rows, function(r){ return r.a; });
@@ -7828,27 +7972,27 @@ function batPlan(dom){
 /* A skill's own intro, reached from that skill's screen. There is no card
    on the front page any more, because "which skill?" is the question the
    pupil has already answered by the time they are standing here. */
-function batOpen(dom){
-  var d = domainById(dom), cells = batCells(dom), plan, done = batDone(dom);
-  if(!d || !cells.length) return;
-  DX.dom = dom;
+function batOpen(dom, stage){
+  var d = domainById(dom), stages = batStages(dom), plan, names;
+  if(!d || !stages.length) return;
+  if(typeof stage !== "number") stage = batNextStage(dom);
+  if(stage >= stages.length) stage = stages.length - 1;
+  DX.dom = dom; DX.stage = stage;
+  plan = batPlan(dom, stage);
+  names = [];
+  for(var i=0;i<stages[stage].length;i++) names.push(dxCellName(stages[stage][i]));
   el("batTitle").textContent = "Check what you know: " + d.name;
-  plan = batPlan(dom);
   el("batIntro").textContent =
-    "This is not a game and it is not marked against anybody else. It finds out " +
-    "what you can already do in " + d.name.toLowerCase() + ", so nothing here is " +
-    "meant to be easy all the way through. Answer as well as you can and guess " +
-    "rather than leaving a gap.";
+    "A few things at a time, and nothing here is meant to be easy all the way " +
+    "through. Answer as well as you can and guess rather than leaving a gap.";
   el("batRules").innerHTML =
-    "<li>" + plan.length + " questions, about ten minutes, on " + cells.length +
-      (cells.length === 1 ? " part" : " different parts") + " of " + d.name.toLowerCase() + ".</li>" +
-    "<li>There is <b>no timer</b> and no score while you work.</li>" +
+    "<li><b>Part " + (stage + 1) + " of " + stages.length + "</b>: " +
+      esc(dxList(names)) + ".</li>" +
+    "<li>" + plan.length + " questions. No timer and no score while you work.</li>" +
     "<li>You will <b>not be told</b> whether an answer was right until the end.</li>" +
-    "<li>At the end you get a report saying what to practise next.</li>" +
-    "<li>You can sit it again whenever you like.</li>";
-  el("batPrev").textContent = done.length
-    ? "You have finished " + done.length + (done.length === 1 ? " sitting" : " sittings") +
-      " on this skill, on this device."
+    "<li>Do well enough and the next part opens. You can sit any part again.</li>";
+  el("batPrev").textContent = batStagePassed(dom, stage)
+    ? "You have already passed this part. Sitting it again replaces what it says."
     : "";
   go("batStartS");
 }
@@ -7856,7 +8000,9 @@ function batOpen(dom){
 function batBegin(){
   if(!DX.dom) return;
   DX.sit = dxSitting("-", DX.dom);
-  DX.plan = batPlan(DX.dom);
+  DX.sit.stage = DX.stage;
+  DX.sit.stages = batStages(DX.dom).length;
+  DX.plan = batPlan(DX.dom, DX.stage);
   DX.i = 0; DX.on = true;
   DX.sit.cells = [];
   /* The total is known before the first question, which is what makes the
@@ -7867,14 +8013,19 @@ function batBegin(){
   dxServe();
 }
 
-/* A cell is capped at this share of what it holds, so a second sitting is
-   not the first one again. The verb-tense cell is why a cap is needed at
-   all: `vt` holds twelve questions because two of the five tense
-   sub-skills cannot be asked as a tap, and an even split would have
-   served every one of them every time. Whatever the cap frees goes to the
-   cells with room, so the TOTAL never changes, which is the invariant
-   that matters: two reports on two skills have to be two readings of one
-   instrument. */
+/* Every part of a skill passed. What the certificate rests on (SPEC
+   113.4), and it is computed from the sittings rather than stored,
+   because a stored verdict is a second copy of what the evidence already
+   says. A skill with an activity nobody has written questions for cannot
+   be finished, and the report says which rather than implying it by an
+   absence. */
+function batAllPassed(dom){
+  var stages = batStages(dom), i;
+  if(!stages.length) return false;
+  for(i=0;i<stages.length;i++) if(!batStagePassed(dom, i)) return false;
+  return batUnasked(dom).length === 0;
+}
+
 var DX_VARY = 0.75;
 
 function dxCellPool(cell){
@@ -7930,12 +8081,21 @@ function dxLeanest(pool, subs){
 
 /* The report. Spliced from `dxreport.js`, same reason. */
 /* ====================================================================
-   THE REPORT (v0.97, SPEC 113.6)
+   THE REPORT (v0.98, SPEC 113.6)
 
-   What a pupil gets at the end of one skill's battery: a band for each
-   part of that skill, the number of questions the band rests on, what to
-   practise next as a button they can press, and a plain statement of what
-   the battery did not look at.
+   What a pupil gets at the end of one PART of one skill's battery: a band
+   for each activity in that part, the number of questions each band rests
+   on, and one road out of the page. It is short on purpose.
+
+   WHAT CHANGED AT v0.98. Michael sat a word-class battery and said the
+   page had "too much description", that "What this did not look at" was
+   "not necessary", and that the teacher half was "redundant and shows
+   basically the same info". All three are gone. In their place the page
+   has ONE verdict line and ONE row of buttons, and the buttons differ by
+   the verdict: carried the part, go on to the next part; carried the last
+   part, take the certificate; did not carry it, print the report and
+   practise. The page no longer explains itself, because a page that
+   explains itself is a page a pupil stops reading.
 
    WHAT CHANGED AT v0.97, and the gain is larger than the loss. The retired
    report named two strengths and two weaknesses across six domains, and
@@ -7955,15 +8115,17 @@ function dxLeanest(pool, subs){
       banding it.
    2. ONE BUILDER, TWO DESTINATIONS. The screen and the downloaded file are
       the same string, so they cannot come to say different things. The
-      first draft updated the name in the pupil's header and left the
-      teacher's half saying "(no name given)" on the same printout.
+      draft that patched one element updated the name in the header and
+      left the other half saying "(no name given)" on the same printout.
    3. A SUGGESTION IS A BUTTON (SPEC 113.6). It names the activity's own
       code at a level, which `openLink` has been able to open since v0.72,
       so there is no second copy of the routing and a report cannot
       recommend practice a pupil has no way to start.
-   4. IT SAYS WHAT IT DID NOT LOOK AT. A skill's activities with no
-      held-out questions are named, because a pupil reading a report on
-      two cells must not conclude that the skill has two parts.
+   4. THE VERDICT DECIDES THE BUTTONS, and nothing else does. `sit.pass` is
+      written once, by `dxFinish`, from `batPassed`. A Next button beside a
+      result that does not justify it is the app saying one thing and
+      meaning another, so the two cases are exclusive in the code and not
+      by the care of whoever next edits it.
    ==================================================================== */
 
 var DEEPMETA = {"cells":{"cloze":"Insert the word","commas":"Put the commas in","ei":"Said or suggested?","klass":"Which class fills the gap?","ktname":"Name the technique","one":"Click the word","pf":"Find it, then fix it","tech":"Find the technique","vf":"Put the right tense in","vt":"Spot the tense mistake","xf":"What does the image carry?"},"middle":{"tech":"close","techx":"close","xf":"close","one":"neutral"},"means":{"close":"the right place in the sentence, with the edges drawn wrongly","neutral":"true of the language, but not the thing this round asked for"}};
@@ -8001,7 +8163,9 @@ var DX_BANDS = [
   [0.35, "Patchy",          "some right and some wrong"],
   [0.00, "Worth working on", "more wrong than right"]
 ];
-var DX_THIN = 3;     /* below this, say so rather than banding it */
+/* Below this, say so rather than banding it. The runner's BAT_BAND, because the
+   number of questions that will not support a band is not two numbers. */
+var DX_THIN = BAT_BAND;
 
 function dxBand(r, n){
   if(!n) return { band:"Not asked", why:"no questions on this", thin:true };
@@ -8143,69 +8307,68 @@ function dxCellName(cell){
 
 function dxReportBody(sit){
   var cells = dxCells(sit), skill = dxDomainName(sit.skill),
-      weak = dxWeakCells(cells), strong = dxStrongCells(cells),
-      cmp = dxCompare(sit), unasked = batUnasked(sit.skill),
-      tot = 0, got = 0, h = "", k, i, s, sug, names;
+      weak = dxWeakCells(cells), cmp = dxCompare(sit),
+      tot = 0, h = "", k, i, s2, sug, names;
 
-  for(k in cells){ tot += cells[k].n; got += cells[k].r; }
+  for(k in cells) tot += cells[k].n;
 
-  h += '<h1>' + esc(skill) + ': what you can already do</h1>';
-  h += '<p class="meta">' + esc(sit.who || "(no name given)") + ' &middot; ' +
-       esc(dxWhen(sit.at)) + ' &middot; ' + tot + ' questions</p>';
+  /* A HEADER BAND, not a heading. Michael, 2026-10-11: this screen should
+     "look different from the general quiz modes". The quiz modes read on cream
+     paper in a serif, because what a pupil reads there is LANGUAGE. A report is
+     not language, it is a RECORD, so it is a record card: a slate band, the
+     app's own sans face, and a verdict strip whose colour is the verdict. The
+     same rules are carried in DX_REP_CSS so the downloaded copy is the same
+     object, which is this file's rule 2. */
+  h += '<div class="rhead"><p class="eyebrow">Skills record</p>';
+  h += '<h1>' + esc(skill) + '</h1>';
+  h += '<p class="meta">' + esc(sit.who || "(no name given)") +
+       ' &middot; ' + esc(dxWhen(sit.at)) +
+       (sit.stages ? ' &middot; part ' + ((sit.stage || 0) + 1) + ' of ' + sit.stages : '') +
+       ' &middot; ' + tot + ' questions</p></div>';
 
-  /* THE LEAD IS WHAT TO DO, not a score. A pupil reads the first sentence and
-     some of them read nothing else, so the first sentence has to be the one
-     worth reading. */
-  if(weak.length){
+  /* THE FIRST LINE IS THE VERDICT. Michael, 2026-10-11: there was too much
+     description on this page. A pupil reads the first sentence and some of
+     them read nothing else, so it says whether they carried the part and what
+     to do, in one line each, and everything that was explaining itself has
+     gone. */
+  if(sit.pass)
+    h += '<p class="lead ok">You carried this part.</p>';
+  else if(weak.length){
     names = [];
     for(i=0;i<weak.length && i<3;i++) names.push(dxCellName(weak[i]));
-    h += '<p class="lead">The part of ' + esc(skill.toLowerCase()) + ' to work on next is <b>' +
-         esc(dxList(names)) + '</b>' + dxStop(names[names.length-1]) + '</p>';
-  } else if(strong.length) {
-    h += '<p class="lead">Nothing here came out weak. Every part of ' +
-         esc(skill.toLowerCase()) + ' this looked at was secure or close to it, so the ' +
-         'next useful thing is a harder level, or a different skill.</p>';
+    h += '<p class="lead work">Work on <b>' + esc(dxList(names)) + '</b>' +
+         dxStop(names[names.length-1]) + '</p>';
   } else {
-    h += '<p class="lead">This sitting was too short to say much about any one part. ' +
-         'Sitting it again gives every part more questions.</p>';
+    h += '<p class="lead work">Too few questions here to say much. Sitting it again ' +
+         'gives every part more.</p>';
   }
 
-  /* ---- the table: one row per cell, with the count beside the band ---- */
-  h += '<h2>Each part of ' + esc(skill.toLowerCase()) + '</h2>';
-  /* The `band` class is how `dxreptest` finds the table whose rows are a band
-     and a count, so that it can check every band against its own count. The
-     progress table below prints two counts and no band, and a suite that read
-     both would be checking a claim neither of them makes. */
-  h += '<table class="rep band"><thead><tr><th scope="col">Part</th>' +
-       '<th scope="col">How it went</th><th scope="col">Out of</th></tr></thead><tbody>';
+  h += '<table class="rep band"><tbody>';
   for(i=0;i<ACTIVITY_LIST.length;i++){
     k = ACTIVITY_LIST[i][0];
     if(!cells[k]) continue;
-    s = cells[k];
-    h += dxRow2(dxCellName(k), dxBand(s.r, s.n).band, s.r + " of " + s.n);
+    s2 = cells[k];
+    h += dxRow2(dxCellName(k), dxBand(s2.r, s2.n).band, s2.r + " of " + s2.n);
   }
   h += '</tbody></table>';
 
-  /* ---- what to do, as a code a pupil can type or a button they can press ---- */
-  if(weak.length){
+  if(!sit.pass && weak.length){
     h += '<h2>What to practise</h2><ul>';
     for(i=0;i<weak.length;i++){
       sug = dxSuggest(weak[i], cells[weak[i]]);
-      if(!sug) continue;
-      h += '<li><b>' + esc(sug.label) + '</b>' +
-           (sug.lvlName ? ' at ' + esc(sug.lvlName) : '') +
-           ' &middot; code <b>' + esc(sug.code) + '</b></li>';
+      if(sug)
+        h += '<li><b>' + esc(sug.label) + '</b>' +
+             (sug.lvlName ? ' at ' + esc(sug.lvlName) : '') +
+             ' &middot; <b>' + esc(sug.code) + '</b></li>';
     }
-    h += '</ul><p class="note">The code opens that exercise at that level. Type it into ' +
-         'the box on the front page, or press the button under this report.</p>';
+    h += '</ul>';
   }
 
-  /* ---- progress, which the fixed blueprint makes honest ---- */
   if(cmp && cmp.rows.length){
-    h += '<h2>Since last time</h2>';
-    h += '<p class="note">Compared with ' + esc(dxWhen(cmp.prev.at)) +
-         '. Every sitting of this skill asks about the same parts in the same ' +
-         'numbers, so these are comparable.</p>';
+    h += '<h2>Since ' + esc(dxWhen(cmp.prev.at)) + '</h2>';
+    /* WITH COLUMN HEADINGS. Two counts side by side and nothing saying which is
+       which is not a comparison, it is a puzzle, and the reader who has to
+       guess is the one being told something about their own child. */
     h += '<table class="rep"><thead><tr><th scope="col">Part</th>' +
          '<th scope="col">Then</th><th scope="col">Now</th></tr></thead><tbody>';
     for(i=0;i<cmp.rows.length;i++)
@@ -8214,105 +8377,124 @@ function dxReportBody(sit){
            '<td class="c">' + cmp.rows[i].nowR + ' of ' + cmp.rows[i].nowN + '</td></tr>';
     h += '</tbody></table>';
   }
+  return h;
+}
 
-  /* ---- AND WHAT IT DID NOT LOOK AT (SPEC 113.6) ---- */
-  h += '<h2>What this did not look at</h2>';
-  if(unasked.length){
-    names = [];
-    for(i=0;i<unasked.length;i++) names.push(unasked[i][1]);
-    h += '<p>This looked at ' + Object.keys(cells).length + ' part' +
-         (Object.keys(cells).length === 1 ? '' : 's') + ' of ' + esc(skill.toLowerCase()) +
-         ' and not at ' + esc(dxList(names)) + dxStop(names[names.length-1]) +
-         ' Those are worth practising too; there are just no questions set aside for ' +
-         'checking them yet.</p>';
+/* WHAT HAPPENS NEXT, which is the page's other job and is a row of buttons
+   rather than a paragraph (Michael, 2026-10-11). A pupil who carried the part
+   is offered the next one; a pupil who did not is offered the report to take
+   away. The two are exclusive on purpose: a Next button beside a result that
+   does not justify it is the app saying one thing and meaning another. */
+function dxAfter(sit){
+  var dom = sit.skill, h = "", cells, weak, i, sug,
+      stages = batStages(dom), nxt = (sit.stage || 0) + 1, names = [];
+  /* THE LEAD BUTTON IS THE VERDICT. Exactly one of these three, never two. */
+  if(sit.pass && nxt < stages.length){
+    for(i=0;i<stages[nxt].length;i++) names.push(dxCellName(stages[nxt][i]));
+    h += '<button class="go" onclick="batOpen(\'' + dom + '\',' + nxt + ')">' +
+         'Next: ' + esc(dxList(names)) + '</button>';
+  } else if(sit.pass && batAllPassed(dom)){
+    h += '<button class="go" onclick="batCert(\'' + dom + '\')">Get your certificate</button>';
   } else {
-    h += '<p>Every part of ' + esc(skill.toLowerCase()) + ' on the menu was asked about.</p>';
+    /* Michael, 2026-10-11: "If students do not get enough points to get the
+       'Next' button, instead create a 'Print report' button so they can
+       download and send the report." It is also what a pupil who has carried
+       the last part there is gets, because there is nothing else to offer. */
+    h += '<button class="go" onclick="dxSave1()">Print report</button>';
   }
-  h += '<p class="note">And it cannot see how you write. It asks you to find things, name ' +
-       'things and choose between things, which is not the same as using them in a ' +
-       'paragraph of your own.</p>';
-  return h;
-}
-
-function dxTeacherBody(sit){
-  var cells = dxCells(sit), h = '', k, i, s, lv, bits;
-  h += '<h1 class="tpage">For the teacher</h1>';
-  h += '<p class="meta">' + esc(dxDomainName(sit.skill)) + ' &middot; ' +
-       esc(sit.who || "(no name given)") + ' &middot; ' + esc(dxWhen(sit.at)) +
-       ' &middot; app ' + esc(sit.app || "") + ', bank ' + esc(String(sit.bank)) +
-       ' &middot; sitting ' + esc(sit.id) + '</p>';
-  h += '<p class="note">One fixed blueprint per skill: the same activities, the same ' +
-       'number of questions in each, the same levels, drawn from questions held out of ' +
-       'practice. So two sittings of one skill are comparable, and a sitting of one skill ' +
-       'is not comparable with a sitting of another.</p>';
-  h += '<table class="rep"><thead><tr><th scope="col">Activity</th>' +
-       '<th scope="col">Code</th><th scope="col">Right</th>' +
-       '<th scope="col">By level</th></tr></thead><tbody>';
-  for(i=0;i<ACTIVITY_LIST.length;i++){
-    k = ACTIVITY_LIST[i][0];
-    if(!cells[k]) continue;
-    s = cells[k];
-    bits = [];
-    for(var j=0;j<LEVELS.length;j++){
-      lv = (s.lvls || {})[LEVELS[j]];
-      if(lv) bits.push((LEVEL_LABEL[LEVELS[j]] || LEVELS[j]) + " " + lv.r + "/" + lv.n);
+  /* Then the take-away, which every pupil gets whatever the verdict, and which
+     is second because it is not what the page is telling them to do. On a
+     failed part the lead button IS the download, so this is the paper copy. */
+  h += ' <button class="go alt" onclick="window.print()">Print or save as PDF</button>';
+  if(sit.pass && (nxt < stages.length || batAllPassed(dom)))
+    h += ' <button class="go alt" onclick="dxSave1()">Save a copy</button>';
+  /* And the practice, which only a pupil who did not carry the part is shown:
+     a report that sends a pupil who passed back to an easier level has told
+     them their result does not mean anything. */
+  if(!sit.pass){
+    cells = dxCells(sit); weak = dxWeakCells(cells);
+    for(i=0;i<weak.length;i++){
+      sug = dxSuggest(weak[i], cells[weak[i]]);
+      if(sug)
+        h += ' <button class="go alt" onclick="openLink(\'' + esc(sug.code) + '\')">' +
+             esc(sug.label) + (sug.lvlName ? ' (' + esc(sug.lvlName) + ')' : '') + '</button>';
     }
-    h += '<tr><th scope="row">' + esc(dxCellName(k)) + '</th>' +
-         '<td class="b">' + esc(codeOf(k)) + '</td>' +
-         '<td class="c">' + s.r + " of " + s.n + '</td>' +
-         '<td class="c">' + esc(bits.length ? bits.join(", ") : "no levels in this one") +
-         '</td></tr>';
   }
-  h += '</tbody></table>';
-  /* The outcomes that are neither right nor wrong, named rather than folded in
-     (SPEC 77). A tap that is true of the language but not of the class asked
-     for is not a wrong answer, and a span that overlaps the answer is not
-     either; counting them as wrong would understate the pupil and counting
-     them as right would overstate them. */
-  var mids = {}, any = false;
-  for(i=0;i<(sit.rows || []).length;i++)
-    if(sit.rows[i].o){ mids[sit.rows[i].o] = (mids[sit.rows[i].o] || 0) + 1; any = true; }
-  if(any){
-    h += '<h2>Answers that were neither right nor wrong</h2><ul>';
-    for(k in mids)
-      h += '<li><b>' + esc(k) + '</b> &times; ' + mids[k] + ' &mdash; ' +
-           esc(DX_MEANS[k] || "") + '</li>';
-    h += '</ul>';
-  }
-  h += '<h2>What this instrument cannot see</h2><ul>' +
-    '<li>Writing. Every question is a choice or a tap, so nothing here is evidence ' +
-      'about a paragraph the pupil composed.</li>' +
-    '<li>Any activity with no questions set aside for it. Those are named on the ' +
-      'pupil\'s half.</li>' +
-    '<li>A part answered on fewer than ' + DX_THIN + ' questions, which is reported as ' +
-      'too few to say rather than banded.</li></ul>';
   return h;
 }
 
+/* The one line under the buttons, which is the only place anything explains
+   itself now. It says what a pupil cannot work out from the page. */
+function dxAfterNote(sit){
+  var dom = sit.skill, stages = batStages(dom), nxt = (sit.stage || 0) + 1,
+      left = batUnasked(dom);
+  if(sit.pass && nxt < stages.length) return "";
+  if(sit.pass && batAllPassed(dom))
+    return "Every part of " + dxDomainName(dom).toLowerCase() + ", carried.";
+  if(sit.pass && left.length)
+    return "That is every part there is to check so far. " + left.length +
+           (left.length === 1 ? " activity in " : " activities in ") +
+           dxDomainName(dom).toLowerCase() +
+           (left.length === 1 ? " has" : " have") + " no questions set aside yet, " +
+           "so there is no certificate for it yet either.";
+  if(sit.pass) return "That is every part there is to check.";
+  return "The saved copy opens in any browser, needs no internet, and carries your " +
+         "answers inside it, so the next time you sit this part it can show you what " +
+         "changed. Nothing is sent anywhere.";
+}
+
+/* THE DOWNLOADED COPY'S OWN STYLESHEET. It has to open with no app around it,
+   so every rule the record card needs is here, and the app's #dxRep block in
+   template.html carries the same rules against the app's own tokens. Two
+   copies of a look is a cost this file pays knowingly: the alternative is a
+   report that is only legible inside the app that made it. */
 var DX_REP_CSS =
-  'body{font:16px/1.5 Georgia,serif;color:#111;background:#fff;margin:0;padding:28px;' +
-  'max-width:46em}' +
-  'h1{font-size:1.6rem;margin:0 0 .2em}h2{font-size:1.1rem;margin:1.6em 0 .4em;' +
-  'border-bottom:1px solid #ddd;padding-bottom:.2em}' +
-  '.meta{color:#555;margin:.2em 0 1.2em;font-size:.95rem}' +
-  '.lead{font-size:1.05rem}' +
-  '.note{color:#555;font-size:.9rem}' +
-  'table.rep{border-collapse:collapse;width:100%;margin:.6em 0}' +
-  'table.rep th,table.rep td{border-bottom:1px solid #e3e3e3;padding:.42em .5em;' +
+  'body{font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,' +
+  'sans-serif;color:#15202b;background:#eef1f5;margin:0;padding:24px}' +
+  '.rec{max-width:46em;margin:0 auto;background:#fff;border:1px solid #d4dbe3;' +
+  'border-radius:4px;border-left:6px solid #2f6f8f;padding:0 26px 26px;' +
+  'box-shadow:0 1px 3px rgba(21,32,43,.08)}' +
+  '.rhead{margin:0 -26px 18px;padding:20px 26px 16px;background:#1f3341;color:#fff;' +
+  'border-radius:0 3px 0 0}' +
+  '.eyebrow{margin:0 0 .35em;font-size:.68rem;letter-spacing:.18em;' +
+  'text-transform:uppercase;color:#9fb6c4}' +
+  'h1{font-size:1.5rem;margin:0;font-weight:600;letter-spacing:-.01em;color:#fff}' +
+  'h2{font-size:.78rem;margin:1.8em 0 .5em;letter-spacing:.14em;' +
+  'text-transform:uppercase;color:#4a6b80;font-weight:600}' +
+  '.meta{color:#9fb6c4;margin:.5em 0 0;font-size:.85rem}' +
+  '.lead{font-size:1.1rem;margin:0 0 1.2em;padding:.7em .9em;border-radius:3px;' +
+  'border-left:4px solid #2f6f8f;background:#f4f7fa}' +
+  '.lead.ok{border-left-color:#1f7a34;background:#eaf6ec}' +
+  '.lead.work{border-left-color:#b07400;background:#fdf4e3}' +
+  '.note{color:#5a6b78;font-size:.9rem}' +
+  'table.rep{border-collapse:collapse;width:100%;margin:.4em 0}' +
+  'table.rep th,table.rep td{border-bottom:1px solid #e4e9ee;padding:.5em .6em;' +
   'text-align:left;vertical-align:top}' +
-  'table.rep thead th{border-bottom:2px solid #bbb;font-size:.85rem;' +
-  'text-transform:uppercase;letter-spacing:.04em}' +
-  'table.rep td.b{width:10em;font-weight:bold}table.rep td.c{width:13em;color:#555}' +
-  'ul{margin:.4em 0 .8em;padding-left:1.2em}li{margin:.3em 0}' +
-  '.foot{margin-top:2.4em;color:#777;font-size:.85rem;border-top:1px solid #ddd;' +
-  'padding-top:.6em}' +
-  '@media print{body{padding:0;max-width:none;font-size:11.5pt}' +
-  'h1.tpage{page-break-before:always}h2{page-break-after:avoid}' +
-  'table.rep,ul{page-break-inside:avoid}.noprint{display:none}}';
+  'table.rep th[scope=row]{font-weight:600}' +
+  'table.rep thead th{border-bottom:2px solid #c3ccd5;font-size:.74rem;' +
+  'text-transform:uppercase;letter-spacing:.1em;color:#4a6b80}' +
+  'table.band tr:last-child th,table.band tr:last-child td{border-bottom:none}' +
+  'table.rep td.b{width:10em;font-weight:600}table.rep td.c{width:13em;color:#5a6b78}' +
+  'ul{margin:.4em 0 .8em;padding-left:1.2em}li{margin:.35em 0}' +
+  '.foot{margin:2.4em -26px -26px;padding:.8em 26px;color:#5a6b78;font-size:.8rem;' +
+  'background:#f4f7fa;border-top:1px solid #e4e9ee;border-radius:0 0 3px 3px}' +
+  '@media print{body{padding:0;background:#fff;font-size:11.5pt}' +
+  '.rec{border:none;box-shadow:none;max-width:none;border-left:none;padding:0}' +
+  '.rhead{background:#fff;color:#000;margin:0 0 14px;padding:0 0 10px;' +
+  'border-bottom:2px solid #1f3341}' +
+  'h1{color:#000}.eyebrow,.meta{color:#444}' +
+  'h2{page-break-after:avoid}table.rep,ul{page-break-inside:avoid}' +
+  '.foot{margin:2em 0 0;padding:.6em 0 0;background:none}' +
+  '.noprint{display:none}}';
 
 /* ---------------------------------------------------------- the two uses */
+/* ONE HALF, NOT TWO. The teacher half printed the same numbers a second time
+   under different headings, so a person reading the page read everything
+   twice and the two halves could drift apart. Michael, 2026-10-11: "Get rid
+   of the 'For the teacher' section; it is redundant and shows basically the
+   same info." The band table IS the teacher's view. */
 function dxReportHtml(sit){
-  return dxReportBody(sit) + dxTeacherBody(sit) +
+  return dxReportBody(sit) +
     '<p class="foot">Word Class Commando ' + esc(sit.app || "") +
     '. Everything here was worked out on the device this was sat on, and nothing ' +
     'was sent anywhere.</p>';
@@ -8327,7 +8509,7 @@ function dxReportFile(sit){
     '<meta name="viewport" content="width=device-width,initial-scale=1">' +
     '<title>' + esc((sit.who || "Diagnostic") + " " + dxWhen(sit.at)) + '</title>' +
     '<style>' + DX_REP_CSS + '</style></head><body>' +
-    dxReportHtml(sit) +
+    '<div class="rec">' + dxReportHtml(sit) + '</div>' +
     '\n<script type="application/json" id="wcc-dx">\n' +
     JSON.stringify(sit).replace(/<\//g, "<\\/") +
     '\n</' + 'script>\n</body></html>\n';
@@ -8343,17 +8525,13 @@ function dxShowReport(sit){
   el("dxName").value = sit.who || "";
   dxPaint();
   /* Somewhere to go next, which the downloaded file cannot offer because it has
-     no app around it. The report names the activity and its code in words either
-     way; on screen it is also a button, and the button goes through `openLink`,
-     the same path a code written in a book takes (v0.72). One routing, not two. */
-  var cells = dxCells(sit), weak = dxWeakCells(cells), h = "", i, sug;
-  for(i=0;i<weak.length;i++){
-    sug = dxSuggest(weak[i], cells[weak[i]]);
-    if(sug)
-      h += '<button class="go" onclick="openLink(\'' + esc(sug.code) + '\')">' +
-           esc(sug.label) + (sug.lvlName ? ' (' + esc(sug.lvlName) + ')' : '') + '</button> ';
-  }
-  el("dxPractise").innerHTML = h;
+     no app around it. One pupil, one road: a pupil who carried the part gets the
+     next part (or the certificate when there is no next part), and a pupil who
+     did not gets the report to take away and the activities to practise. The
+     practice buttons go through `openLink`, the same path a code written in a
+     book takes (v0.72). One routing, not two. */
+  el("dxPractise").innerHTML = dxAfter(sit);
+  el("dxAfterNote").textContent = dxAfterNote(sit);
   go("dxRepS");
 }
 
@@ -8368,10 +8546,10 @@ function dxSetName(){
   if(!DX.rep) return;
   DX.rep.who = (el("dxName").value || "").slice(0, 40);
   dxSave(DX.rep);
-  /* Repaint rather than patch the one element that shows it. The first draft
-     updated the student header and left the teacher half saying "(no name
-     given)" on the same page, which is exactly the kind of thing a person
-     notices on a printout and nothing else would. */
+  /* Repaint rather than patch the one element that shows it. The draft that
+     patched one element left the other saying "(no name given)" on the same
+     page, which is exactly the kind of thing a person notices on a printout
+     and nothing else would. */
   dxPaint();
 }
 
@@ -8394,6 +8572,138 @@ function dxSave1(){
   setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
 }
 
+
+/* ====================================================================
+   THE CERTIFICATE (v0.98, SPEC 113.4)
+
+   Michael, 2026-10-11: "Once all skills in a category have been mastered,
+   allow the generation of the certificate." A category is a SKILL, and
+   mastered means every part of it carried, which `batAllPassed` decides and
+   this file only prints.
+
+   Two rules, and both exist because a certificate is a CLAIM:
+
+   1. IT NAMES ITS EVIDENCE. Every part on it carries the date it was
+      carried and the score it was carried on. A certificate that says only
+      "mastered" is worth exactly as much as the reader's trust in whoever
+      printed it, and a pupil who hands one to a parent should be handing
+      over the working as well as the result.
+   2. IT CANNOT BE PRINTED EARLY. There is one way to this page and it is a
+      button `dxAfter` only emits when `batAllPassed` is true, and the page
+      re-checks on the way in. A certificate reachable by typing a screen
+      name into the address bar is not a certificate.
+
+   It looks nothing like the record card on purpose: centred, brass-ruled,
+   serif, and almost empty. The record card is a working document a pupil
+   reads; this is the one page they keep.
+   ==================================================================== */
+
+/* What the certificate rests on: one row per part, newest pass for each. */
+function batCertRows(dom){
+  var stages = batStages(dom), out = [], i, j, sit, cells, names, n = 0, r = 0, k;
+  for(i=0;i<stages.length;i++){
+    sit = batStageSit(dom, i);
+    if(!sit) return null;                /* not finished; nothing to print */
+    names = [];
+    for(j=0;j<stages[i].length;j++) names.push(dxCellName(stages[i][j]));
+    cells = dxCells(sit); n = 0; r = 0;
+    for(k in cells){ n += cells[k].n; r += cells[k].r; }
+    out.push({ part:i + 1, what:dxList(names), at:sit.at, n:n, r:r, who:sit.who || "" });
+  }
+  return out;
+}
+
+/* The name. Taken from the sittings rather than asked for again: the pupil
+   typed it on a report and a second field is a second chance to disagree
+   with the first. The newest non-empty one wins. */
+function batCertWho(rows){
+  var i, who = "";
+  for(i=0;i<rows.length;i++) if(rows[i].who) who = rows[i].who;
+  return who;
+}
+
+function batCertBody(dom){
+  var rows = batCertRows(dom), h, i, tn = 0, tr = 0, who, last = 0;
+  if(!rows) return "";
+  who = batCertWho(rows);
+  for(i=0;i<rows.length;i++){
+    tn += rows[i].n; tr += rows[i].r;
+    if((rows[i].at || 0) > last) last = rows[i].at;
+  }
+  h = '<div class="cfr">';
+  h += '<p class="ceye">Word Class Commando</p>';
+  h += '<h1>Certificate of mastery</h1>';
+  h += '<p class="cwho">' + esc(who || "(no name given)") + '</p>';
+  h += '<p class="csub">has carried every part of <b>' +
+       esc(dxDomainName(dom)) + '</b><br>on ' + esc(dxWhen(last)) + '</p>';
+  h += '<table class="cert"><thead><tr><th scope="col">Part</th>' +
+       '<th scope="col">What it covered</th><th scope="col">Score</th>' +
+       '<th scope="col">Carried on</th></tr></thead><tbody>';
+  for(i=0;i<rows.length;i++)
+    h += '<tr><th scope="row">Part ' + rows[i].part + '</th>' +
+         '<td>' + esc(rows[i].what) + '</td>' +
+         '<td>' + rows[i].r + ' of ' + rows[i].n + '</td>' +
+         '<td>' + esc(dxWhen(rows[i].at)) + '</td></tr>';
+  h += '</tbody></table>';
+  h += '<p class="cfoot">' + tr + ' of ' + tn + ' questions answered correctly across ' +
+       rows.length + (rows.length === 1 ? ' part' : ' parts') +
+       '. Every part was passed at ' + Math.round(BAT_PASS * 100) +
+       '% or better in every activity it covered.</p>';
+  h += '</div>';
+  return h;
+}
+
+/* The downloaded copy's stylesheet, self-contained for the same reason the
+   report's is: it has to open with no app around it. */
+var DX_CERT_CSS =
+  'body{font:16px/1.6 Georgia,"Times New Roman",serif;color:#1a1a1a;' +
+  'background:#f3efe2;margin:0;padding:28px}' +
+  '.cert-page{max-width:40em;margin:0 auto;background:#fffdf5;border:1px solid #c9b072;' +
+  'border-radius:4px;padding:34px 30px;text-align:center}' +
+  '.cfr{border:2px solid #c9b072;border-radius:3px;padding:26px 22px}' +
+  '.ceye{margin:0 0 .6em;font-size:.72rem;letter-spacing:.26em;' +
+  'text-transform:uppercase;color:#8a6f2a}' +
+  'h1{font-size:1.9rem;margin:0 0 .15em;font-weight:normal}' +
+  '.cwho{font-size:1.5rem;margin:.9em 0 .1em;font-weight:bold}' +
+  '.csub{margin:.2em 0 1.2em;color:#5b5637}' +
+  'table.cert{border-collapse:collapse;margin:1.2em auto 0;font-size:.92rem}' +
+  'table.cert th,table.cert td{border-bottom:1px solid #e7dcb8;padding:.4em .9em;' +
+  'text-align:left}' +
+  'table.cert thead th{border-bottom:2px solid #c9b072;font-size:.7rem;' +
+  'letter-spacing:.12em;text-transform:uppercase;color:#8a6f2a;font-weight:normal}' +
+  'table.cert tr:last-child th,table.cert tr:last-child td{border-bottom:none}' +
+  '.cfoot{margin:1.6em 0 0;color:#6a6448;font-size:.8rem}' +
+  '@media print{body{background:#fff;padding:0}' +
+  '.cert-page{border:none;max-width:none;padding:0}}';
+
+function batCertFile(dom){
+  return '<!doctype html>\n<html lang="en"><head><meta charset="utf-8">' +
+    '<meta name="viewport" content="width=device-width,initial-scale=1">' +
+    '<title>' + esc(dxDomainName(dom)) + ' certificate</title>' +
+    '<style>' + DX_CERT_CSS + '</style></head><body>' +
+    '<div class="cert-page">' + batCertBody(dom) + '</div>' +
+    '</body></html>\n';
+}
+
+/* RULE 2 IN CODE. The page checks for itself rather than trusting the button
+   that sent it, so there is no route to a certificate that is not earned. */
+function batCert(dom){
+  if(!batAllPassed(dom)) return;
+  DX.cert = dom;
+  el("batCert").innerHTML = batCertBody(dom);
+  go("batCertS");
+}
+
+function batCertSave(){
+  if(!DX.cert) return;
+  var blob = new Blob([batCertFile(DX.cert)], {type:"text/html;charset=utf-8"});
+  var url = URL.createObjectURL(blob), a = document.createElement("a");
+  a.href = url;
+  a.download = (dxDomainName(DX.cert) || "certificate")
+                 .replace(/[^A-Za-z0-9 _-]/g, "").replace(/\s+/g, "-") + "-certificate.html";
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
+}
 
 
 /* ==================== KEYS AS WELL AS TAPS (v0.53, SPEC 63) =================
@@ -11592,6 +11902,7 @@ var NAV_UP = {
      with one entry, and ten of the thirty-nine were wrong when it was measured. */
   batStartS:   function(){ return DX.dom ? "openDomainOrMarks('" + DX.dom + "')" : "go('splash')"; },
   dxRepS:      function(){ return DX.dom ? "openDomainOrMarks('" + DX.dom + "')" : "go('splash')"; },
+  batCertS:    function(){ return DX.cert ? "openDomainOrMarks('" + DX.cert + "')" : "go('splash')"; },
 
   /* Learn pages. Not in any registry, so declared, and covered by the gate. */
   learn:      "openDomain('wc')",
@@ -15946,20 +16257,26 @@ function validate(){
       E.push("assessment: some questions in the "+cl+" cell carry a level and some do not, "+
              "so the cell has half a ladder.");
 
-  /* ---- EVERY SKILL WITH QUESTIONS CAN ACTUALLY RUN ONE (v0.97) ------------
-     The battery's blueprint is derived: its cells are the skill's own
-     activities that have questions, its length is BAT_N spread over them, and
-     a cell is capped at DX_VARY of its pool so a second sitting is not the
-     first. Three things can therefore be wrong without anything throwing, and
-     all three look like data rather than like a fault.
+  /* ---- EVERY SKILL WITH QUESTIONS CAN ACTUALLY RUN ONE (v0.98) ------------
+     The battery's blueprint is derived: a skill's cells are its own activities
+     that have questions, those cells are cut into PARTS of BAT_STAGE, each cell
+     in a part is served BAT_PER_CELL questions, and a cell is capped at DX_VARY
+     of its pool so a second sitting is not the first. Four things can therefore
+     be wrong without anything throwing, and all four look like data rather than
+     like a fault.
 
-     A SKILL THAT CANNOT FILL ITS BLUEPRINT would hand a pupil a shorter
-     sitting than another skill does, and two reports of different lengths read
-     as two readings of one instrument when they are not. A CELL WITH ONE
-     QUESTION cannot be banded at all (SPEC 113.3: three questions support three
-     bands and nothing finer). And A CELL WHOSE QUESTIONS SIT AT ONE LEVEL
-     cannot tell the report which level to send the pupil to, which is half of
-     what a suggestion is for. */
+     A CELL THAT CANNOT BE PASSED is the worst of them and is new at v0.98.
+     `batPassed` needs three questions in every cell of a part, so a cell capped
+     below three makes its part unpassable, which makes the next part
+     unreachable and the certificate unreachable with it. The pupil would see a
+     report with no way forward and no statement of why.
+
+     A CELL SHORT OF ITS SHARE hands a pupil a shorter part than another skill
+     does, and two reports of different lengths read as two readings of one
+     instrument when they are not. A CELL WITH ONE QUESTION cannot be banded at
+     all (SPEC 113.3: three questions support three bands and nothing finer).
+     And A CELL WHOSE QUESTIONS SIT AT ONE LEVEL cannot tell the report which
+     level to send the pupil to, which is half of what a suggestion is for. */
   var skills = {};
   for(i=0;i<DEEPREG.length;i++){
     var cl0 = DEEPREG[i][1], dom0 = null;
@@ -15972,23 +16289,49 @@ function validate(){
     else skills[dom0] = 1;
   }
   for(var sk in skills){
-    var want = batWant(batCells(sk)), tot = 0, thin = [], flat = [];
-    for(i=0;i<want.length;i++){
-      tot += want[i].want;
-      if(want[i].want < BAT_MIN_CELL) thin.push(want[i].cell);
-      if(batLevels(want[i].cell).length < 2 && !dxCellFlat(want[i].cell)) flat.push(want[i].cell);
+    var stages = batStages(sk), st, want, lens = [], short2 = [], dead = [],
+        thin = [], flat = [], need;
+    for(st=0;st<stages.length;st++){
+      want = batWant(stages[st]);
+      var tot = 0;
+      for(i=0;i<want.length;i++){
+        tot += want[i].want;
+        /* ceil, so the number printed is a number that actually fixes it */
+        need = Math.ceil(BAT_PER_CELL / DX_VARY) - dxCellPool(want[i].cell);
+        if(want[i].want < BAT_BAND)
+          dead.push({cell:want[i].cell, part:st + 1, got:want[i].want,
+                     need:Math.ceil(BAT_BAND / DX_VARY) - dxCellPool(want[i].cell)});
+        else if(want[i].want < BAT_PER_CELL)
+          short2.push({cell:want[i].cell, got:want[i].want, need:need});
+        if(want[i].want < BAT_MIN_CELL) thin.push(want[i].cell);
+        if(batLevels(want[i].cell).length < 2 && !dxCellFlat(want[i].cell))
+          flat.push(want[i].cell);
+      }
+      lens.push(tot);
     }
-    if(tot < BAT_N)
-      W.push("assessment: the "+dxDomainName(sk)+" battery can only fill "+tot+" of its "+
-             BAT_N+" questions without serving more than "+Math.round(100*DX_VARY)+"% of a "+
-             "cell, so a pupil sitting it twice would meet the same questions. "+
-             (BAT_N - tot)+" more held-out questions in that skill fixes it.");
+    for(i=0;i<dead.length;i++)
+      E.push("assessment: the "+dead[i].cell+" cell can only be served "+dead[i].got+
+             " question"+(dead[i].got === 1 ? "" : "s")+" in part "+dead[i].part+" of the "+
+             dxDomainName(sk)+" battery, and a part cannot be passed with fewer than "+
+             BAT_BAND+" in any of its cells, so that part and every part after it are "+
+             "unreachable and "+
+             "so is the certificate. "+dead[i].need+" more held-out questions in "+
+             dead[i].cell+" fixes it.");
+    for(i=0;i<short2.length;i++)
+      W.push("assessment: the "+short2[i].cell+" cell is served "+short2[i].got+" of its "+
+             BAT_PER_CELL+" questions in the "+dxDomainName(sk)+" battery, because serving "+
+             "more would mean more than "+Math.round(100*DX_VARY)+"% of its pool and a pupil "+
+             "sitting it twice would meet the same questions. "+short2[i].need+
+             " more held-out questions in that cell fixes it.");
     for(i=0;i<thin.length;i++)
       E.push("assessment: the "+thin[i]+" cell gets fewer than "+BAT_MIN_CELL+" questions in "+
              "the "+dxDomainName(sk)+" battery, and one question is not a band.");
     for(i=0;i<flat.length;i++)
       W.push("assessment: every question in the "+flat[i]+" cell sits at one level, so the "+
              "report cannot say which level to practise at (SPEC 113.5).");
+    INFO.push("assessment: "+dxDomainName(sk)+" runs "+stages.length+
+              (stages.length === 1 ? " part, of " : " parts, of ") + lens.join(" and ") +
+              (lens.length === 1 && lens[0] === 1 ? " question." : " questions."));
   }
 
   return {E:E, W:W, info:INFO, floor:floorFails, lemmas:lm, shifty:hardShift, soft:softShift, levels:lc};
