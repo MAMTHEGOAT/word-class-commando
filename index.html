@@ -269,7 +269,16 @@ body.dx .wbtn.res-miss, body.dx .wbtn.res-part{background:var(--paper);
 #batCert table.cert tr:last-child th,#batCert table.cert tr:last-child td{border-bottom:none}
 #batCert .cfoot{margin:1.6em 0 0;color:#6a6448;font-size:.8rem}
 @media print{
-  body{background:#fff}
+  /* THE PAGE IS WHITE, AND `html` IS HALF OF THE PAGE (v0.99). `body` alone was
+     set white and `html` kept the app's near-black, so everything below the
+     content printed as a solid black rectangle: half an A4 sheet of toner on a
+     school printer, and a certificate that looks broken on the wall it was
+     pinned to. Found by rendering the print view to PDF and looking at it,
+     which is the fifth time opening the output has found what no suite could. */
+  html,body{background:#fff !important}
+  /* A small gutter, because a printer set to borderless would otherwise put
+     the first character on the paper's edge. The page box supplies the rest. */
+  .wrap{padding:0 6mm;max-width:none}
   .noprint,.topbar,#dxBar{display:none !important}
   .screen{display:none !important}.screen.on{display:block !important}
   #dxRep{border:none;border-left:none;padding:0;border-radius:0}
@@ -279,7 +288,13 @@ body.dx .wbtn.res-miss, body.dx .wbtn.res-part{background:var(--paper);
   #dxRep h2{page-break-after:avoid}
   #dxRep table.rep,#dxRep ul{page-break-inside:avoid}
   #dxRep .foot{margin:2em 0 0;padding:.6em 0 0;background:none}
-  #batCert{border:none;padding:0}
+  /* THE CERTIFICATE FILLS THE SHEET. It is the one thing this app produces
+     that gets pinned to a wall, and a document sitting in the top third of an
+     A4 page reads as a receipt. Centred in the page box rather than scaled up,
+     so nothing has to be guessed about the printer's margins. */
+  #batCert{border:none;padding:0;background:#fff}
+  #batCert .cfr{min-height:24cm;display:flex;flex-direction:column;
+    justify-content:center;page-break-inside:avoid}
 }
 #dxTrack{height:6px;border-radius:3px;background:rgba(255,255,255,.14);overflow:hidden}
 #dxFill{height:100%;width:0;border-radius:3px;background:var(--ink);transition:width .25s}
@@ -644,6 +659,44 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
 .vfix-o .qchip{font-size:.95rem}
 
 
+/* THE RECORD STRIP AND THE WALL (v0.99, SPEC 113.4a). The app's own dark card
+   language, not the report's record card: the record card is how a DOCUMENT
+   looks, and this is a screen. An earned slot is lit with the brass the app
+   already uses for a heading; an empty one is dashed, because a dashed outline
+   reads as a space waiting to be filled and a solid one reads as a thing that
+   is finished. That is the whole of the achievement design in one border
+   style. */
+.wl-strip{display:block;width:100%;text-align:left;margin-top:18px;
+  background:transparent;color:var(--txt);border:1px dashed var(--line);
+  border-radius:10px;padding:11px 14px;line-height:1.3}
+.wl-strip:hover{border-color:var(--brass);border-style:solid}
+.wl-strip-n{display:block;font-size:.95rem;font-weight:650}
+.wl-strip-d{display:block;color:var(--dim);font-size:.82rem;margin-top:4px}
+.wl-rank{text-align:center;border:1px solid var(--line);border-radius:12px;
+  padding:16px 14px;margin:0 0 16px;background:var(--bg2)}
+.wl-rk{margin:0;font-size:1.5rem;font-weight:650;letter-spacing:.04em;color:var(--brass)}
+.wl-rk0{color:var(--dim)}
+.wl-sum{margin:.35em 0 0;color:var(--txt);font-size:.92rem}
+.wl-nx{margin:.5em 0 0;color:var(--dim);font-size:.82rem}
+.wl-grid{display:grid;grid-template-columns:1fr;gap:10px}
+.wl-slot{border:1px dashed var(--line);border-radius:10px;padding:12px 14px;
+  background:transparent}
+.wl-slot.wl-done{border-style:solid;border-color:var(--brass);background:var(--bg2)}
+.wl-slot.wl-part{border-style:solid}
+.wl-slot.wl-none{opacity:.55}
+.wl-nm{margin:0;font-size:1rem;font-weight:650}
+.wl-done .wl-nm{color:var(--brass)}
+.wl-sub{margin:.3em 0 0;color:var(--dim);font-size:.82rem;line-height:1.35}
+.wl-go{margin-top:10px;background:var(--brass);color:#1b2430;border:0;
+  border-radius:8px;padding:7px 14px;font:inherit;font-size:.86rem;font-weight:650}
+.wl-go:hover{filter:brightness(1.08)}
+.wl-part .wl-go,.wl-open .wl-go{background:transparent;color:var(--txt);
+  border:1px solid var(--line)}
+.wl-part .wl-go:hover,.wl-open .wl-go:hover{border-color:var(--brass)}
+.wl-note{color:var(--dim);font-size:.8rem;line-height:1.45;margin:16px 0 0}
+.wl-dev{margin-top:8px}
+@media (min-width:640px){ .wl-grid{grid-template-columns:1fr 1fr} }
+
 /* the code box on the splash (v0.72) */
 .codego{margin-top:26px;text-align:left;max-width:340px;margin-left:auto;margin-right:auto}
 .codego-row{display:flex;gap:8px;margin-top:6px}
@@ -704,6 +757,17 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
          the pupil has already answered by the time they are standing in front of
          it. -->
   </div>
+
+  <!-- THE RECORD STRIP (v0.99, SPEC 113.4a). Not a third card: the third card
+       was removed at v0.97 because "which skill?" is a question the pupil has
+       already answered by the time they are standing in front of a skill. This
+       is different, and it is why it belongs here rather than on a skill's own
+       screen: its subject is ALL the skills at once, and the front page is the
+       only place in the app whose subject is the whole app. It is a strip and
+       not a card because it is a record rather than a mode, and because the
+       splash had two jobs and should not acquire a third of equal weight. It
+       draws nothing at all until some skill can be assessed. -->
+  <div id="wallStrip"></div>
 
   <!-- where the timetable is (v0.58). The week and the day come from the same
        two-week cycle the school runs on, so a pupil reads the same thing here
@@ -1673,6 +1737,21 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
        "Print or save as PDF" and "Print report" one under another. -->
   <div class="bar noprint" id="dxPractise"></div>
   <p class="dim small noprint" id="dxAfterNote"></p>
+</section>
+
+<!-- THE WALL (v0.99, SPEC 113.4a). Every skill at once: the earned ones
+     filled in, the rest as empty slots, which is the half that recruits. The
+     only screen in the app allowed to print a fraction of the skills, because
+     it re-renders every time it is opened and a printed certificate does not. -->
+<section id="batWallS" class="screen">
+  <div class="topbar"><button class="back"></button><button class="tomenu" onclick="go('splash')">Menu</button><img alt="" class="tb-logo"></div>
+  <h2>Your record</h2>
+  <p class="pl" style="margin-top:-4px">Every skill, and how far you have got in it.</p>
+  <div id="batWallBody"></div>
+  <p class="wl-note">New activities are added over time, so a skill you have mastered can
+     grow new ground to cover. Nothing you have earned is ever taken away.</p>
+  <p class="wl-note wl-dev">This record is kept on this device. If you use a different
+     phone or computer, it will have a record of its own.</p>
 </section>
 
 <!-- THE CERTIFICATE. One skill, every part of it carried. There is no route
@@ -6626,7 +6705,7 @@ var STAMPMETA = {"fmt":1,"skip":["id","dx"],"strict":["secure","challenge"]};
 /* BANK_REV bumps when the banks change, and bumping it for a code change makes
    every pupil's record run the pruner for nothing. 44 at v0.78: twenty-eight items
    move from the end-mark chip to the boundary chip. */
-var APP = "wcc", VER = "v0.98.3", BANK_REV = 58;
+var APP = "wcc", VER = "v0.99", BANK_REV = 58;
 var BUG_FORM_URL = "";   /* paste the Office 365 form link to switch the report button on */
 
 /* ================= HELD OUT (v0.61, SPEC 72) ================================
@@ -7505,6 +7584,11 @@ function go(id){
   el(id).classList.add("on");
   if(typeof paintCode === "function") paintCode(id);
   if(typeof paintNav === "function") paintNav(id);
+  /* The record is DERIVED from the sittings, so the two screens that show it
+     are repainted on the way in rather than when something changes. A pupil
+     who finishes a battery and presses Menu must not read a front page that
+     still says they have no certificates. */
+  if(typeof paintWall === "function") paintWall(id);
   window.scrollTo(0,0);
 }
 
@@ -7557,7 +7641,7 @@ function go(id){
       marked unfinished rather than thrown away.
    ==================================================================== */
 var DX = { on:false, sit:null, plan:[], i:0, t0:0, item:null, q:null, wait:0,
-           dom:"", stage:0, used:{}, n:0, at:-1, rep:null, cert:null };
+           dom:"", stage:0, used:{}, n:0, at:-1, rep:null, cert:null, certFrom:"" };
 
 var DX_OPEN = {
   one:    function(ask){ S.act = "one"; S.cls = ask; S.lvl = "all"; start("one"); },
@@ -8208,6 +8292,10 @@ function dxDomainName(id){ var d = domainById(id); return d ? d.name : id; }
    back to the menu name, so a domain that forgets to declare one prints
    sentence case rather than nothing; the validator makes that an error. */
 function dxDomainTitle(id){ var d = domainById(id); return (d && d.title) || dxDomainName(id); }
+/* Both DOCUMENTS use it, not just the certificate: the report is printed and
+   handed in too, and a report headed "Word classes" beside a certificate headed
+   "Word Classes" is the app using two names for one thing, which is the fault
+   the declared title exists to prevent. The MENU keeps its sentence case. */
 /* A route's name reads inside a sentence ("went into commas") and as a row
    label in a table. Lower case is right in the first and looks like a typo in
    the second, so the table asks for the capital rather than the name carrying
@@ -8332,7 +8420,7 @@ function dxCellName(cell){
 }
 
 function dxReportBody(sit){
-  var cells = dxCells(sit), skill = dxDomainName(sit.skill),
+  var cells = dxCells(sit), skill = dxDomainTitle(sit.skill),
       weak = dxWeakCells(cells), cmp = dxCompare(sit),
       tot = 0, h = "", k, i, s2, sug, names;
 
@@ -8786,8 +8874,10 @@ var DX_CERT_CSS =
   'letter-spacing:.12em;text-transform:uppercase;color:#8a6f2a;font-weight:normal}' +
   'table.cert tr:last-child th,table.cert tr:last-child td{border-bottom:none}' +
   '.cfoot{margin:1.6em 0 0;color:#6a6448;font-size:.8rem}' +
-  '@media print{body{background:#fff;padding:0}' +
-  '.cert-page{border:none;max-width:none;padding:0}}';
+  '@media print{html,body{background:#fff;padding:0}' +
+  '.cert-page{border:none;max-width:none;padding:0;background:#fff}' +
+  '.cfr{min-height:24cm;display:flex;flex-direction:column;justify-content:center;' +
+  'page-break-inside:avoid}}';
 
 function batCertFile(dom){
   return '<!doctype html>\n<html lang="en"><head><meta charset="utf-8">' +
@@ -8800,9 +8890,16 @@ function batCertFile(dom){
 
 /* RULE 2 IN CODE. The page checks for itself rather than trusting the button
    that sent it, so there is no route to a certificate that is not earned. */
-function batCert(dom){
+/* THE CERTIFICATE HAS TWO PARENTS (v0.99), the report it was earned from and
+   the wall it is kept on, so where the back button goes is a property of the
+   JOURNEY and not of the screen. Typing one destination into the screen is the
+   v0.75 fault, where ten of thirty-nine back buttons were wrong because each
+   had its parent typed into it; so the caller says where it came from and
+   `NAV_UP` reads that. */
+function batCert(dom, from){
   if(!batAllPassed(dom)) return;
   DX.cert = dom;
+  DX.certFrom = from === "wall" ? "batWallS" : "";
   el("batCert").innerHTML = batCertBody(dom);
   go("batCertS");
 }
@@ -8816,6 +8913,174 @@ function batCertSave(){
                  .replace(/[^A-Za-z0-9 _-]/g, "").replace(/\s+/g, "-") + "-certificate.html";
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
   setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
+}
+
+/* ====================================================================
+   THE WALL (v0.99, SPEC 113.4a)
+
+   The third layer of the achievement design, and the one that does the
+   motivating. The certificate is a claim about one skill and never changes;
+   the strip on it carries the collection; and this is the collection itself,
+   every skill at once, the earned ones filled in and the rest as empty slots.
+
+   Michael, 2026-10-11: "I want this to be a kind of achievement hunting
+   system whereby each certificate feels cumulative, building, rather than a
+   separate branch." THE EMPTY SLOTS ARE THE FEATURE. A page showing four
+   things you have done is a trophy cabinet; a page showing four done and two
+   waiting is a list of what to do next, and the second is what recruits
+   effort.
+
+   Four rules it holds:
+
+   1. **"X of Y" IS ALLOWED HERE AND NOWHERE ELSE.** A fraction on a printed
+      certificate goes stale, because both the number of skills and the number
+      of activities inside a skill will grow (Michael, 2026-10-11). This page
+      re-renders every time it is opened, so it is the one place that may say
+      how many there are.
+   2. **NOTHING EARNED IS EVER REVOKED**, and the page says so in words. A
+      skill that gains an activity shows new ground to cover, never a
+      certificate withdrawn.
+   3. **IT IS HONEST ABOUT THE DEVICE.** The record is what this device has
+      seen, and until there are accounts a pupil who changes device has two
+      records. That is a sentence on the page rather than a thing they find
+      out.
+   4. **EVERY SLOT IS A DOOR.** Earned opens the certificate, started opens
+      the next part, unstarted opens the first, unauthored opens nothing and
+      says why. A row that reports a state without offering the action for it
+      is a row a pupil reads twice and acts on never.
+   ==================================================================== */
+
+/* One row per skill, in menu order, which is the order a pupil already knows
+   from the front page. The STATE is derived, never stored. */
+function batWallRows(){
+  var out = [], i, d, cells, stages, nxt, rows, last, j;
+  for(i=0;i<DOMAINS.length;i++){
+    d = DOMAINS[i];
+    cells = batCells(d.id);
+    if(!cells.length){ out.push({ dom:d.id, state:"none" }); continue; }
+    stages = batStages(d.id).length;
+    if(batAllPassed(d.id)){
+      rows = batCertRows(d.id); last = 0;
+      if(rows) for(j=0;j<rows.length;j++) if((rows[j].at || 0) > last) last = rows[j].at;
+      out.push({ dom:d.id, state:"done", at:last, parts:stages,
+                 nth:batCertNth(d.id) });
+      continue;
+    }
+    nxt = batNextStage(d.id);
+    /* Every part passed and still not finished means the skill has activities
+       nobody has written questions for yet. That is a different state from
+       "keep going", and telling a pupil to keep going when there is nothing to
+       go at is the kind of thing that teaches them to ignore the page. */
+    if(nxt >= stages)
+      out.push({ dom:d.id, state:"waiting", parts:stages,
+                 left:batUnasked(d.id).length });
+    else
+      out.push({ dom:d.id, state:nxt > 0 ? "part" : "open", parts:stages,
+                 next:nxt, done:nxt });
+  }
+  return out;
+}
+
+function batWallBody(){
+  var rows = batWallRows(), h = "", i, r, earned = 0, rank, nm, sub, act, lbl,
+      left, notyet;
+  for(i=0;i<rows.length;i++) if(rows[i].state === "done") earned++;
+  rank = batRank(earned);
+
+  /* THE RANK, which is the cumulative half. It is a word derived from a
+     count, so it needs no artwork and cannot drift from one. */
+  h += '<div class="wl-rank">' +
+       (earned ? '<p class="wl-rk">' + esc(rank) + '</p>' : '<p class="wl-rk wl-rk0">Recruit</p>') +
+       '<p class="wl-sum">' +
+       (earned ? earned + ' of ' + rows.length + ' skills mastered'
+               : 'No skills mastered yet. The first certificate makes you a Recruit.') +
+       '</p>';
+  /* THE LINE THAT LOOKS AHEAD, and it must not promise what the app cannot
+     give. Two of the six skills have no held-out questions at all today, so
+     "4 skills to go for Commando" is true of the arithmetic and false of what
+     a pupil can actually do this term. It says both, or it says nothing.
+     It is also suppressed once the top rank is reached by a pupil who has not
+     mastered everything, which happens the day a seventh skill is added: the
+     ladder tops out and a line saying "1 skill to go for Commando" to somebody
+     who is already Commando is the app not reading its own page. */
+  if(earned >= rows.length)
+    h += '<p class="wl-nx">Every skill in the app. There is nothing above this.</p>';
+  else if(rank !== BAT_RANKS[BAT_RANKS.length - 1]){
+    left = rows.length - earned; notyet = 0;
+    for(i=0;i<rows.length;i++) if(rows[i].state === "none") notyet++;
+    h += '<p class="wl-nx">' + left + (left === 1 ? ' skill' : ' skills') +
+         ' to go for ' + esc(BAT_RANKS[BAT_RANKS.length - 1]) + '.' +
+         (notyet ? ' ' + notyet + (notyet === 1 ? ' of those is' : ' of those are') +
+                   ' still being written.' : '') + '</p>';
+  }
+  h += '</div>';
+
+  h += '<div class="wl-grid">';
+  for(i=0;i<rows.length;i++){
+    r = rows[i];
+    nm = esc(dxDomainTitle(r.dom));
+    if(r.state === "done"){
+      sub = 'Mastered ' + esc(dxWhen(r.at)) +
+            (r.nth ? ' &middot; your ' + esc(batOrdinal(r.nth)) + ' certificate' : '');
+      act = 'batCert(\'' + r.dom + '\', \'wall\')'; lbl = 'See the certificate';
+    } else if(r.state === "part"){
+      sub = r.done + ' of ' + r.parts + (r.parts === 1 ? ' part' : ' parts') + ' done';
+      act = 'batOpen(\'' + r.dom + '\')'; lbl = 'Part ' + (r.next + 1);
+    } else if(r.state === "open"){
+      sub = r.parts + (r.parts === 1 ? ' part' : ' parts') + ' to carry';
+      act = 'batOpen(\'' + r.dom + '\')'; lbl = 'Start';
+    } else if(r.state === "waiting"){
+      sub = 'Every part so far, carried. ' + r.left +
+            (r.left === 1 ? ' activity has' : ' activities have') +
+            ' no questions set aside yet.';
+      act = ''; lbl = '';
+    } else {
+      sub = 'No questions set aside for this one yet.';
+      act = ''; lbl = '';
+    }
+    h += '<div class="wl-slot wl-' + r.state + '">' +
+         '<p class="wl-nm">' + nm + '</p>' +
+         '<p class="wl-sub">' + sub + '</p>' +
+         (act ? '<button class="wl-go" onclick="' + act + '">' + esc(lbl) + '</button>' : '') +
+         '</div>';
+  }
+  h += '</div>';
+  return h;
+}
+
+/* The line on the front page, which is the only thing that brings a pupil
+   here. It carries the rank and the count, because a strip that says only
+   "Your record" is a link nobody presses. */
+function batWallStrip(){
+  var rows = batWallRows(), i, earned = 0, live = 0;
+  for(i=0;i<rows.length;i++){
+    if(rows[i].state === "done") earned++;
+    if(rows[i].state !== "none") live++;
+  }
+  if(!live) return "";
+  return '<button class="wl-strip" onclick="batWall()">' +
+         '<span class="wl-strip-n">Your record</span>' +
+         '<span class="wl-strip-d">' +
+         (earned ? esc(batRank(earned)) + ' &middot; ' + earned + ' of ' + rows.length +
+                   ' skills mastered'
+                 : 'No certificates yet. ' + live +
+                   (live === 1 ? ' skill is' : ' skills are') + ' ready to be checked.') +
+         '</span></button>';
+}
+
+function batWall(){
+  el("batWallBody").innerHTML = batWallBody();
+  go("batWallS");
+}
+
+/* Painted by `go`, beside `paintCode` and `paintNav`, so the two screens that
+   show a derived record cannot show a stale one. A pupil who finishes a
+   battery and presses Menu must not read a front page that still says they
+   have none. */
+function paintWall(id){
+  var s = el("wallStrip");
+  if(s && id === "splash") s.innerHTML = batWallStrip();
+  if(id === "batWallS") el("batWallBody").innerHTML = batWallBody();
 }
 
 
@@ -12023,7 +12288,11 @@ var NAV_UP = {
      with one entry, and ten of the thirty-nine were wrong when it was measured. */
   batStartS:   function(){ return DX.dom ? "openDomainOrMarks('" + DX.dom + "')" : "go('splash')"; },
   dxRepS:      function(){ return DX.dom ? "openDomainOrMarks('" + DX.dom + "')" : "go('splash')"; },
-  batCertS:    function(){ return DX.cert ? "openDomainOrMarks('" + DX.cert + "')" : "go('splash')"; },
+  batCertS:    function(){
+                 if(DX.certFrom) return "go('" + DX.certFrom + "')";
+                 return DX.cert ? "openDomainOrMarks('" + DX.cert + "')" : "go('splash')";
+               },
+  batWallS:    "go('splash')",
 
   /* Learn pages. Not in any registry, so declared, and covered by the gate. */
   learn:      "openDomain('wc')",
