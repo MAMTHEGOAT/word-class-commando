@@ -6626,7 +6626,7 @@ var STAMPMETA = {"fmt":1,"skip":["id","dx"],"strict":["secure","challenge"]};
 /* BANK_REV bumps when the banks change, and bumping it for a code change makes
    every pupil's record run the pruner for nothing. 44 at v0.78: twenty-eight items
    move from the end-mark chip to the boundary chip. */
-var APP = "wcc", VER = "v0.98.2", BANK_REV = 58;
+var APP = "wcc", VER = "v0.98.3", BANK_REV = 58;
 var BUG_FORM_URL = "";   /* paste the Office 365 form link to switch the report button on */
 
 /* ================= HELD OUT (v0.61, SPEC 72) ================================
@@ -13309,10 +13309,23 @@ function tqCheck(){
   /* "close" is deliberately neither: the student found the right place and drew
      the edges wrongly, which is not the mistake this round is about. */
   save(st);
-  /* In a challenge this round scores and moves on (v0.60). The tenor and
-     transfer steps are teaching and belong in practice; offering them against a
-     clock would stall the run on a button nobody meant to press. */
-  if(B.on){ chRecord(res.v === "exact", res.v === "close" ? "close" : null); return; }
+  /* THE RECORD IS UNCONDITIONAL (v0.98.3). It was inside `if(B.on)`, so this
+     round told a BATTERY nothing: `chRecord` routes to the sitting first and to
+     the challenge second, and gating the call on the challenge meant the
+     runner never heard that the question had been answered. The pupil pressed
+     Check, the round marked the answer, and the sitting sat there: the Next bar
+     is hidden inside a sitting, correctly, so there was nothing left to press
+     and the battery could not be finished. Every other round in the app calls
+     `chRecord` unqualified; this one was written for practice and had the
+     challenge branch bolted on at v0.60, before a battery could serve it.
+     Michael found it on a phone, mid-certificate, 2026-10-12.
+
+     Then the UI. A run and a sitting both own what happens next, so the round
+     stops here for both: the tenor and transfer steps are teaching and belong
+     in practice, and offering them against a clock or inside a measurement
+     would stall on a button nobody meant to press. */
+  chRecord(res.v === "exact", res.v === "close" ? "close" : null);
+  if(B.on || DX.on) return;
   if(tqSteps(it) > 1) tqOffer("Now the tenor");
   else el("tqNextBar").style.display = "";
 }
