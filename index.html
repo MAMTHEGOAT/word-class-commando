@@ -684,15 +684,23 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
 .wl-slot.wl-done{border-style:solid;border-color:var(--brass);background:var(--bg2)}
 .wl-slot.wl-part{border-style:solid}
 .wl-slot.wl-none{opacity:.55}
+/* Blocked is not the same as empty and must not look like it: the battery is
+   still worth sitting, so the slot stays lit enough to read and says why the
+   certificate is not coming. */
+.wl-slot.wl-blocked{border-style:solid;border-color:#6a5a2a}
 .wl-nm{margin:0;font-size:1rem;font-weight:650}
 .wl-done .wl-nm{color:var(--brass)}
 .wl-sub{margin:.3em 0 0;color:var(--dim);font-size:.82rem;line-height:1.35}
 .wl-go{margin-top:10px;background:var(--brass);color:#1b2430;border:0;
   border-radius:8px;padding:7px 14px;font:inherit;font-size:.86rem;font-weight:650}
 .wl-go:hover{filter:brightness(1.08)}
-.wl-part .wl-go,.wl-open .wl-go{background:transparent;color:var(--txt);
-  border:1px solid var(--line)}
-.wl-part .wl-go:hover,.wl-open .wl-go:hover{border-color:var(--brass)}
+/* Brass is reserved for a certificate. Every other button on this page is an
+   invitation to sit something, which is not the same act and must not look
+   like a reward. */
+.wl-part .wl-go,.wl-open .wl-go,.wl-blocked .wl-go{background:transparent;
+  color:var(--txt);border:1px solid var(--line)}
+.wl-part .wl-go:hover,.wl-open .wl-go:hover,.wl-blocked .wl-go:hover{
+  border-color:var(--brass)}
 .wl-note{color:var(--dim);font-size:.8rem;line-height:1.45;margin:16px 0 0}
 .wl-dev{margin-top:8px}
 @media (min-width:640px){ .wl-grid{grid-template-columns:1fr 1fr} }
@@ -6705,7 +6713,7 @@ var STAMPMETA = {"fmt":1,"skip":["id","dx"],"strict":["secure","challenge"]};
 /* BANK_REV bumps when the banks change, and bumping it for a code change makes
    every pupil's record run the pruner for nothing. 44 at v0.78: twenty-eight items
    move from the end-mark chip to the boundary chip. */
-var APP = "wcc", VER = "v0.99", BANK_REV = 58;
+var APP = "wcc", VER = "v1.0", BANK_REV = 58;
 var BUG_FORM_URL = "";   /* paste the Office 365 form link to switch the report button on */
 
 /* ================= HELD OUT (v0.61, SPEC 72) ================================
@@ -7125,7 +7133,17 @@ function _blankProfile(name){
      oldest first. It is deliberately NOT part of `seen` or `revisit` and is
      never touched by _pruneToBank: a sitting is a record of what happened, and
      a retired item does not un-happen. See dxKeep(). */
-  return { name: name || "Player 1", seen:{}, revisit:{}, err:{}, best:{}, tried:{}, dx:[] };
+  /* `awards` is the ISSUED certificates (v1.0, SPEC 113.4 and 113.4a). Like
+     `dx` it is EVIDENCE and not derived state, so _pruneToBank never touches
+     it, and unlike everything else in this record it is a claim the app has
+     already MADE to a pupil. SPEC 68's rule: when a computed boundary has
+     consequences that outlive it, store the boundary. Authoring re-cuts a
+     skill's parts, so a certificate recomputed live would be withdrawn from a
+     pupil who earned it in October by work done in November, and "nothing
+     earned is ever revoked" would be a sentence the app says and does not
+     keep. */
+  return { name: name || "Player 1", seen:{}, revisit:{}, err:{}, best:{}, tried:{},
+           dx:[], awards:[] };
 }
 function _blankRoot(){
   return { v:REC_VERSION, bankRev:BANK_REV, active:"p1",
@@ -7839,6 +7857,10 @@ function dxFinish(done){
        carried. */
     DX.sit.pass = !!done && batPassed(DX.sit);
     dxSave(DX.sit);
+    /* The award is issued HERE, on the sitting that completes a skill, not when
+       the certificate is opened: a pupil who closes the tab has still earned it
+       (SPEC 113.4). */
+    if(DX.sit.pass) batEarn(DX.sit.skill);
   }
   var n = DX.sit ? DX.sit.rows.length : 0;
   /* A finished sitting goes straight to its report. An abandoned one does not
@@ -7949,12 +7971,36 @@ function batCells(dom){
 
 /* The activities of a skill that have NO questions, with their names, so
    the report can print what it did not look at. */
+/* WHAT THIS SKILL IS STILL WAITING TO BE AUTHORED, and nothing else.
+   An activity DECLARED not to be an assessable cell is not waiting for
+   anything: `ACTS_OUT` holds the three SOAPMAPS rounds that cost too much per
+   data point, and `crules` is a menu of rule cards rather than a question
+   round. Until v1.0 this counted them, so SOAPMAPS was waiting on three rounds
+   it is declared never to use and punctuation on a menu, and NEITHER COULD EVER
+   BE CERTIFIED by any amount of authoring. The declarations existed on the
+   build side with their reasons; the page had simply never been given them.
+   That is this project's most-repeated fault, a rule reading the wrong list,
+   and it was invisible because it only bites on the day a pupil masters every
+   part of a skill. */
 function batUnasked(dom){
   var out = [], i, a;
   for(i=0;i<ACTIVITY_LIST.length;i++){
     a = ACTIVITY_LIST[i];
-    if(a[3] === dom && !dxCellPool(a[0])) out.push([a[0], a[1]]);
+    if(a[3] === dom && !dxCellPool(a[0]) && !DX_NOTCELL[a[0]]) out.push([a[0], a[1]]);
   }
+  return out;
+}
+
+/* THE CELLS IN THIS SKILL THAT CANNOT SUPPORT A CLAIM OF MASTERY (SPEC 115.3).
+   A cell answerable without the knowledge it is about measures the cue rather
+   than the skill, so no score in it evidences mastery and no length of battery
+   fixes that. The ruling sat in prose for four versions while the code went on
+   treating the cell as certifiable; it is a declaration the build writes and
+   the page reads now, with the measurement beside it so it can be retired on
+   evidence. */
+function batBlocked(dom){
+  var cells = batCells(dom), out = [], i;
+  for(i=0;i<cells.length;i++) if(DX_UNCERT[cells[i]]) out.push(cells[i]);
   return out;
 }
 
@@ -8020,13 +8066,35 @@ function batStagePassed(dom, n){ return !!batStageSit(dom, n); }
 
 /* The sitting a part's pass RESTS ON, which is the latest one that mastered
    it. The certificate names it, so the claim on the certificate has a date
-   and a score behind it and is not a bare assertion. */
+   and a score behind it and is not a bare assertion.
+
+   A PASS IS MATCHED BY WHAT IT COVERED, NOT BY ITS INDEX (v1.0). Parts are cut
+   from the skill's stocked activities, so authoring RE-CUTS them: word classes
+   is one part of three activities today and becomes three parts of three the
+   day its other five are authored. Matching on `stage` alone, a pupil who
+   passed `one, klass, cloze` was recorded as having passed `one, all, yesno`,
+   credited with two activities they had never seen, and sent to part 2 while
+   the one they really did pass sat in part 3 waiting to be sat again. Nothing
+   would have failed; the certificate would simply have been wrong.
+
+   So a part is passed when a passing sitting covered every activity now in it.
+   A part that has GROWN is new ground, which is what SPEC 113.4a already says
+   the app does, and the award below is what stops that taking anything away. */
 function batStageSit(dom, n){
-  var done = batDone(dom), i, best = null;
+  var done = batDone(dom), want = batStages(dom)[n] || [], i, best = null;
   for(i=0;i<done.length;i++)
-    if(done[i].stage === n && done[i].pass &&
+    if(done[i].pass && batCovers(done[i], want) &&
        (!best || (done[i].at || 0) > (best.at || 0))) best = done[i];
   return best;
+}
+
+/* Did this sitting ask about every one of these activities? Read off the
+   sitting's own tallies, which are the record of what it served. */
+function batCovers(sit, cells){
+  var have = {}, i;
+  for(i=0;i<(sit.cells || []).length;i++) have[sit.cells[i].cell] = 1;
+  for(i=0;i<cells.length;i++) if(!have[cells[i]]) return false;
+  return cells.length > 0;
 }
 
 /* Did this sitting MASTER its part? Every sub-skill in it at BAT_PASS or
@@ -8127,8 +8195,57 @@ function batBegin(){
 function batAllPassed(dom){
   var stages = batStages(dom), i;
   if(!stages.length) return false;
+  /* A cell that cannot evidence mastery blocks the claim whatever the scores
+     are, and does so BEFORE the parts are looked at, because no amount of
+     sitting fixes it (SPEC 115.3). */
+  if(batBlocked(dom).length) return false;
   for(i=0;i<stages.length;i++) if(!batStagePassed(dom, i)) return false;
   return batUnasked(dom).length === 0;
+}
+
+/* ------------------------------------------------- the award (SPEC 113.4) */
+/* ISSUED, NOT RECOMPUTED. `batAllPassed` is a live condition over a skill as
+   it stands today, and the skill does not stand still: authoring re-cuts its
+   parts and adds activities it is waiting on, so a certificate derived live
+   would be WITHDRAWN from a pupil who earned it in October by work done in
+   November. SPEC 113.4a's governing rule is that nothing earned is ever
+   revoked, and a rule the app only keeps while nothing changes is not a rule.
+
+   So the moment the condition is first true the award is written down with the
+   evidence it rested on, and from then on the certificate is PRINTED FROM THE
+   AWARD. A pupil who earned it keeps it, with the parts and scores it actually
+   covered, and the wall shows the new ground beside it rather than instead of
+   it. SPEC 68: when a computed boundary has consequences that outlive it,
+   store the boundary. */
+function batAward(dom){
+  var st = store(), aw = st.awards || [], i;
+  for(i=0;i<aw.length;i++) if(aw[i] && aw[i].dom === dom) return aw[i];
+  return null;
+}
+
+/* Earned at some point, which is what the wall and the certificate ask.
+   Deliberately NOT "earns it now": the two differ exactly when the skill has
+   grown, and that difference is the whole point of storing it. */
+function batHeld(dom){ return !!batAward(dom); }
+
+/* Called when a sitting finishes, so the award exists whether or not the pupil
+   ever opens the certificate. Issuing it on VIEW would mean a pupil who closed
+   the tab lost a certificate to the next batch of authoring. */
+function batEarn(dom){
+  if(!dom || batAward(dom) || !batAllPassed(dom)) return null;
+  var rows = batCertRows(dom);
+  if(!rows) return null;
+  var st = store(), i, who = "";
+  for(i=0;i<rows.length;i++) if(rows[i].who) who = rows[i].who;
+  if(!Array.isArray(st.awards)) st.awards = [];
+  /* The award carries its own evidence rather than pointing at the sittings,
+     because a sitting can be pushed out of the twenty the device keeps
+     (DX_KEEP) and a certificate must not become unprintable because its
+     evidence aged out. */
+  st.awards.push({ dom:dom, at:Math.floor(Date.now()/1000), who:who,
+                   app:VER, bank:BANK_REV, parts:rows });
+  save(st);
+  return batAward(dom);
 }
 
 var DX_VARY = 0.75;
@@ -8233,7 +8350,7 @@ function dxLeanest(pool, subs){
       by the care of whoever next edits it.
    ==================================================================== */
 
-var DEEPMETA = {"cells":{"cloze":"Insert the word","commas":"Put the commas in","ei":"Said or suggested?","klass":"Which class fills the gap?","ktname":"Name the technique","one":"Click the word","pf":"Find it, then fix it","tech":"Find the technique","vf":"Put the right tense in","vt":"Spot the tense mistake","xf":"What does the image carry?"},"middle":{"tech":"close","techx":"close","xf":"close","one":"neutral"},"means":{"close":"the right place in the sentence, with the edges drawn wrongly","neutral":"true of the language, but not the thing this round asked for"}};
+var DEEPMETA = {"cells":{"cloze":"Insert the word","commas":"Put the commas in","ei":"Said or suggested?","klass":"Which class fills the gap?","ktname":"Name the technique","one":"Click the word","pf":"Find it, then fix it","tech":"Find the technique","vf":"Put the right tense in","vt":"Spot the tense mistake","xf":"What does the image carry?"},"middle":{"tech":"close","techx":"close","xf":"close","one":"neutral"},"means":{"close":"the right place in the sentence, with the edges drawn wrongly","neutral":"true of the language, but not the thing this round asked for"},"notcell":{"ktdef":"the definition bank is eight rows, one per technique, and it IS the curriculum: holding one out would take a definition away from practice to ask about it once, which is SPEC 72.11's closed-vocabulary rule","ktsort":"one question is six examples sorted into two piles, so it scores partly right in a way no other cell does and takes as long as four questions","ktspot":"a passage round: one takes a minute and would spend a twentieth of the test on one data point, which is why the screener excludes it too","crules":"a menu of the six comma rule cards, not a question round: tapping a card opens `commas` filtered to that rule, and THAT round uses the picker"},"uncert":{"ei":"92% answerable without reading the quotation: a present auxiliary marks the implied statement, deciding 83% of items and right 100% of those, +42 over a computed floor of 50 (SPEC 115.3). The cause is one habit of English rather than of the authoring, so it needs the round rewritten and re-measured, not a batch. Retire this entry when the measured gap is inside the budget."},"uncertsay":"is being rebuilt, so this skill cannot be certified yet"};
 var DX_CELL_NAME = DEEPMETA.cells || {};
 /* Which rounds end in something other than right or wrong, and what that
    something means, written by the build from the same table the assembler
@@ -8241,6 +8358,16 @@ var DX_CELL_NAME = DEEPMETA.cells || {};
    validate time, so the two cannot drift. */
 var DX_MIDDLE = DEEPMETA.middle || {};
 var DX_MEANS = DEEPMETA.means || {};
+/* THE TWO LISTS THE PAGE USED TO DECIDE WITHOUT (v1.0). Both are declared on
+   the build side with their reasons written beside them, and both decide
+   whether a skill can ever be certified, so they are written into the same
+   file the cell labels come from rather than typed here. A sixth hand-written
+   description of the app is how every one of the first five went stale.
+     DX_NOTCELL  activity -> why it is deliberately not an assessable cell
+     DX_UNCERT   cell -> the measurement saying it cannot evidence mastery */
+var DX_NOTCELL = DEEPMETA.notcell || {};
+var DX_UNCERT = DEEPMETA.uncert || {};
+var DX_UNCERT_SAY = DEEPMETA.uncertsay || "cannot be certified yet";
 
 function dxList(xs){
   if(!xs.length) return "";
@@ -8513,8 +8640,9 @@ function dxAfter(sit){
     for(i=0;i<stages[nxt].length;i++) names.push(dxCellName(stages[nxt][i]));
     h += '<button class="go" onclick="batOpen(\'' + dom + '\',' + nxt + ')">' +
          'Next: ' + esc(dxList(names)) + '</button>';
-  } else if(sit.pass && batAllPassed(dom)){
-    h += '<button class="go" onclick="batCert(\'' + dom + '\')">Get your certificate</button>';
+  } else if(sit.pass && (batHeld(dom) || batAllPassed(dom))){
+    h += '<button class="go" onclick="batCert(\'' + dom + '\')">' +
+         (batHeld(dom) ? 'See your certificate' : 'Get your certificate') + '</button>';
   } else {
     /* Michael, 2026-10-11: "If students do not get enough points to get the
        'Next' button, instead create a 'Print report' button so they can
@@ -8550,8 +8678,16 @@ function dxAfterNote(sit){
   var dom = sit.skill, stages = batStages(dom), nxt = (sit.stage || 0) + 1,
       left = batUnasked(dom);
   if(sit.pass && nxt < stages.length) return "";
-  if(sit.pass && batAllPassed(dom))
+  if(sit.pass && (batHeld(dom) || batAllPassed(dom)))
     return "You have mastered every part of " + dxDomainName(dom).toLowerCase() + ".";
+  /* A skill blocked by a cell that cannot evidence mastery. The pupil is told
+     plainly that the certificate is not coming and that it is not about them,
+     because the alternative is a pupil who carries every part and is left
+     working out for themselves why nothing happened. */
+  if(batBlocked(dom).length)
+    return dxCellName(batBlocked(dom)[0]) + " " + DX_UNCERT_SAY +
+           ", so there is no certificate for " + dxDomainName(dom).toLowerCase() +
+           " yet. Everything else here still counts.";
   if(sit.pass && left.length)
     return "That is every part there is to check so far. " + left.length +
            (left.length === 1 ? " activity in " : " activities in ") +
@@ -8748,15 +8884,14 @@ function batCertWho(rows){
    was mastered. The ORDER is what the ordinal rests on, so it is computed from
    the sittings and not from the order DOMAINS happens to list them in. */
 function batEarned(){
-  var out = [], i, d, rows, last, j;
+  var out = [], i, d, aw;
   for(i=0;i<DOMAINS.length;i++){
     d = DOMAINS[i];
-    if(!batAllPassed(d.id)) continue;
-    rows = batCertRows(d.id);
-    if(!rows) continue;
-    last = 0;
-    for(j=0;j<rows.length;j++) if((rows[j].at || 0) > last) last = rows[j].at;
-    out.push({ dom:d.id, at:last });
+    aw = batAward(d.id);
+    /* READ FROM THE AWARDS, not recomputed. The ordinal and the rank are a
+       property of the collection a pupil HOLDS, and a skill that has grown new
+       activities since is still held. */
+    if(aw) out.push({ dom:d.id, at:aw.at });
   }
   out.sort(function(a, b){ return a.at - b.at; });
   return out;
@@ -8800,10 +8935,17 @@ function batRank(n){
   return BAT_RANKS[Math.min(n, BAT_RANKS.length) - 1];
 }
 
+/* PRINTED FROM THE AWARD, not from today's sittings (v1.0). The award froze
+   the parts and scores at the moment the skill was finished, so a certificate
+   reprinted next year says what it said when it was earned, even though the
+   skill has grown activities since. A certificate that changes is not a
+   record. Falls back to the live rows only for a skill that qualifies and has
+   somehow not been issued, which `batCert` then issues. */
 function batCertBody(dom){
-  var rows = batCertRows(dom), h, i, tn = 0, tr = 0, who, last = 0, nth, rank;
+  var aw = batAward(dom), rows = aw ? aw.parts : batCertRows(dom),
+      h, i, tn = 0, tr = 0, who, last = 0, nth, rank;
   if(!rows) return "";
-  who = batCertWho(rows);
+  who = (aw && aw.who) || batCertWho(rows);
   for(i=0;i<rows.length;i++){
     tn += rows[i].n; tr += rows[i].r;
     if((rows[i].at || 0) > last) last = rows[i].at;
@@ -8897,7 +9039,11 @@ function batCertFile(dom){
    had its parent typed into it; so the caller says where it came from and
    `NAV_UP` reads that. */
 function batCert(dom, from){
-  if(!batAllPassed(dom)) return;
+  /* HELD or EARNABLE. The first is a pupil who has one; the second issues it.
+     A pupil who has one keeps it when the skill grows, which is the whole
+     reason the award is stored. */
+  if(!batHeld(dom)) batEarn(dom);
+  if(!batHeld(dom)) return;
   DX.cert = dom;
   DX.certFrom = from === "wall" ? "batWallS" : "";
   el("batCert").innerHTML = batCertBody(dom);
@@ -8953,17 +9099,34 @@ function batCertSave(){
 /* One row per skill, in menu order, which is the order a pupil already knows
    from the front page. The STATE is derived, never stored. */
 function batWallRows(){
-  var out = [], i, d, cells, stages, nxt, rows, last, j;
+  var out = [], i, d, cells, stages, nxt, held, more;
   for(i=0;i<DOMAINS.length;i++){
     d = DOMAINS[i];
     cells = batCells(d.id);
     if(!cells.length){ out.push({ dom:d.id, state:"none" }); continue; }
     stages = batStages(d.id).length;
-    if(batAllPassed(d.id)){
-      rows = batCertRows(d.id); last = 0;
-      if(rows) for(j=0;j<rows.length;j++) if((rows[j].at || 0) > last) last = rows[j].at;
-      out.push({ dom:d.id, state:"done", at:last, parts:stages,
-                 nth:batCertNth(d.id) });
+    held = batAward(d.id);
+    if(held){
+      /* HELD, and possibly with new ground. The skill may have gained
+         activities since the award was issued, in which case the pupil keeps
+         the certificate and the app offers the new part. It never reads as a
+         certificate withdrawn (SPEC 113.4a). */
+      nxt = batNextStage(d.id);
+      more = nxt < stages || batUnasked(d.id).length > 0;
+      out.push({ dom:d.id, state:"done", at:held.at, parts:stages,
+                 nth:batCertNth(d.id), more:more,
+                 next:(nxt < stages ? nxt : -1) });
+      continue;
+    }
+    /* A cell that cannot evidence mastery blocks the skill whatever a pupil
+       does, so it is its own state: the battery is still worth sitting and the
+       certificate is not coming, and saying only one of those would be a lie
+       by omission either way. */
+    if(batBlocked(d.id).length){
+      nxt = batNextStage(d.id);
+      out.push({ dom:d.id, state:"blocked", parts:stages,
+                 next:(nxt < stages ? nxt : -1),
+                 cell:dxCellName(batBlocked(d.id)[0]) });
       continue;
     }
     nxt = batNextStage(d.id);
@@ -9021,8 +9184,14 @@ function batWallBody(){
     nm = esc(dxDomainTitle(r.dom));
     if(r.state === "done"){
       sub = 'Mastered ' + esc(dxWhen(r.at)) +
-            (r.nth ? ' &middot; your ' + esc(batOrdinal(r.nth)) + ' certificate' : '');
+            (r.nth ? ' &middot; your ' + esc(batOrdinal(r.nth)) + ' certificate' : '') +
+            (r.more ? '<br>There is new ground in this one since you earned it.' : '');
       act = 'batCert(\'' + r.dom + '\', \'wall\')'; lbl = 'See the certificate';
+    } else if(r.state === "blocked"){
+      sub = '<b>' + esc(r.cell) + '</b> ' + esc(DX_UNCERT_SAY) +
+            '. You can still sit it and get a report.';
+      act = r.next >= 0 ? 'batOpen(\'' + r.dom + '\')' : '';
+      lbl = r.next >= 0 ? (r.next > 0 ? 'Part ' + (r.next + 1) : 'Start') : '';
     } else if(r.state === "part"){
       sub = r.done + ' of ' + r.parts + (r.parts === 1 ? ' part' : ' parts') + ' done';
       act = 'batOpen(\'' + r.dom + '\')'; lbl = 'Part ' + (r.next + 1);
