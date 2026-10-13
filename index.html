@@ -186,8 +186,21 @@ body.dx h2{display:none !important}
    told, and the sitting is no longer blind. The classes stay on the elements,
    because the report at the end is built from the rows and not from the screen,
    and a round that stopped setting them would break in practice instead. */
-body.dx .qchip.q-ok, body.dx .qchip.q-bad{background:var(--paper);
-  border-color:var(--line);color:inherit}
+/* AND THE DECLARED EXCEPTION (v1.6). `body.dxmark` is set by the runner for
+   the rounds `LIVE_MARK` names, which are the find-them-all ones: their
+   mistake is a convention rather than a fact, so a pupil who is not shown
+   which tick was wrong repeats it on every question in the cell. Michael did
+   exactly that on 2026-10-13, five times out of five, and asked for this.
+   `q-miss` is in the list now as well, which it never was: the state means
+   "this one carried across and you left it out", it was added with the
+   find-them-all rounds AFTER v0.64 enumerated the two marking vocabularies,
+   and so it was showing a slice of the answer inside every sitting since.
+   v0.64's own lesson, the third time: when you suppress a category, enumerate
+   what is IN it against the app rather than against your memory of it. */
+body.dx:not(.dxmark) .qchip.q-ok, body.dx:not(.dxmark) .qchip.q-bad,
+body.dx:not(.dxmark) .qchip.q-miss, body.dx:not(.dxmark) .qchip.q-neu{
+  background:var(--paper);border-color:var(--line);color:inherit;
+  border-style:solid;text-decoration:none}
 /* Two vocabularies mark an option in this app: `.q-ok`/`.q-bad` on the chip
    rows and `.o-ok`/`.o-bad` on the block options. Both, or the diagnostic
    tells a pupil the answer in the two rounds that use the second one. */
@@ -4749,7 +4762,7 @@ var TECHDEFS = [
 {"id":"wc-td008","name":"Hyperbole","def":"Exaggeration so large it is not meant to be believed."}
 ];
 var NAMEEX = [
-{"text":"The snow lay as soft as a feather over the fields.","mark":"as soft as a feather","tech":"Simile","also":["Senses"],"why":"It compares the snow to a feather using 'as ... as'.","id":"wc-nx001"},
+{"text":"The snow lay as soft as a feather over the fields.","mark":"as soft as a feather","tech":"Simile","also":["Senses","Alliteration"],"why":"It compares the snow to a feather using 'as ... as'.","id":"wc-nx001"},
 {"text":"He ran like the wind down the empty track.","mark":"like the wind","tech":"Simile","also":["Hyperbole"],"why":"It compares his running to the wind using 'like'.","id":"wc-nx002"},
 {"text":"Her eyes sparkled like polished glass.","mark":"like polished glass","tech":"Simile","also":[],"why":"It compares her eyes to glass using 'like'.","id":"wc-nx003"},
 {"text":"The old soldier was as tough as leather.","mark":"as tough as leather","tech":"Simile","also":[],"why":"It compares him to leather using 'as ... as'.","id":"wc-nx004"},
@@ -4768,10 +4781,10 @@ var NAMEEX = [
 {"text":"She stepped into the velvety darkness.","mark":"velvety","tech":"Senses","also":["Metaphor"],"why":"'Velvety' is a describing word that appeals to touch.","id":"wc-nx017"},
 {"text":"He sipped the bitter, scalding coffee.","mark":"bitter","tech":"Senses","also":[],"why":"'Bitter' is a describing word that appeals to taste.","id":"wc-nx018"},
 {"text":"The crisp autumn leaves covered the path.","mark":"crisp","tech":"Senses","also":[],"why":"'Crisp' is a describing word that appeals to sound and touch.","id":"wc-nx019"},
-{"text":"A foul, rotten smell filled the room.","mark":"foul","tech":"Senses","also":[],"why":"'Foul' is a describing word that appeals to smell.","id":"wc-nx020"},
+{"text":"A foul, rotten smell filled the room.","mark":"foul","tech":"Senses","also":["Alliteration"],"why":"'Foul' is a describing word that appeals to smell.","id":"wc-nx020"},
 {"text":"The bacon sizzled in the hot pan.","mark":"sizzled","tech":"Onomatopoeia","also":["Powerful verb","Senses"],"why":"'Sizzled' imitates the actual sound the bacon makes.","id":"wc-nx021"},
 {"text":"The fireworks banged and crackled overhead.","mark":"crackled","tech":"Onomatopoeia","also":["Powerful verb","Senses"],"why":"'Crackled' imitates the sound of the fireworks.","id":"wc-nx022"},
-{"text":"The bee buzzed past my ear.","mark":"buzzed","tech":"Onomatopoeia","also":["Powerful verb","Senses"],"why":"'Buzzed' imitates the sound a bee makes.","id":"wc-nx023"},
+{"text":"The bee buzzed past my ear.","mark":"buzzed","tech":"Onomatopoeia","also":["Powerful verb","Alliteration","Senses"],"why":"'Buzzed' imitates the sound a bee makes.","id":"wc-nx023"},
 {"text":"The dry leaves crunched underfoot.","mark":"crunched","tech":"Onomatopoeia","also":["Powerful verb","Senses"],"why":"'Crunched' imitates the sound of the leaves.","id":"wc-nx024"},
 {"text":"The slippery snake slithered silently away.","mark":"slippery snake slithered silently","tech":"Alliteration","also":["Powerful verb","Senses"],"why":"The 's' sound is repeated at the start of nearby words.","id":"wc-nx025"},
 {"text":"The big brown bear bounded down the bank.","mark":"big brown bear bounded","tech":"Alliteration","also":["Powerful verb","Senses"],"why":"The 'b' sound is repeated at the start of nearby words.","id":"wc-nx026"},
@@ -4786,7 +4799,7 @@ var NAMEEX = [
 {"text":"He was as brave as a lion in the storm.","mark":"as brave as a lion","tech":"Simile","also":[],"why":"It compares him to a lion using 'as ... as'.","id":"wc-nx035"},
 {"text":"The car shot off like a rocket.","mark":"like a rocket","tech":"Simile","also":["Hyperbole"],"why":"It compares the car to a rocket using 'like'.","id":"wc-nx036"},
 {"text":"The night was a black blanket over the town.","mark":"a black blanket","tech":"Metaphor","also":["Alliteration"],"why":"It says the night IS a blanket, with no 'like' or 'as'.","id":"wc-nx037"},
-{"text":"His bedroom was a battlefield of clothes.","mark":"a battlefield","tech":"Metaphor","also":["Hyperbole"],"why":"It calls the room a battlefield directly, with no 'like' or 'as'.","id":"wc-nx038"},
+{"text":"His bedroom was a battlefield of clothes.","mark":"a battlefield","tech":"Metaphor","also":["Hyperbole","Alliteration"],"why":"It calls the room a battlefield directly, with no 'like' or 'as'.","id":"wc-nx038"},
 {"text":"The teacher was a dragon when she was angry.","mark":"a dragon","tech":"Metaphor","also":[],"why":"It says the teacher IS a dragon, a direct comparison without 'like' or 'as'.","id":"wc-nx039"},
 {"text":"Laughter was the music of the playground.","mark":"the music of the playground","tech":"Metaphor","also":[],"why":"It calls laughter music directly, with no 'like' or 'as'.","id":"wc-nx040"},
 {"text":"The waves tugged at the sandy shore.","mark":"tugged","tech":"Personification","also":["Metaphor","Powerful verb"],"why":"It gives the waves a pulling, human action.","id":"wc-nx041"},
@@ -4823,16 +4836,16 @@ var NAMEEX = [
 {"text":"Her cluttered bedroom was a maze of clothes and books.","mark":"a maze","tech":"Metaphor","also":[],"why":"It says the bedroom IS a maze, with no 'like' or 'as'.","id":"wc-nx072"},
 {"text":"His words were a knife that cut deep into her confidence.","mark":"a knife","tech":"Metaphor","also":[],"why":"It says his words ARE a knife, with no 'like' or 'as'.","id":"wc-nx073"},
 {"text":"The old library was a treasure chest of forgotten stories.","mark":"a treasure chest","tech":"Metaphor","also":[],"why":"It says the library IS a treasure chest, with no 'like' or 'as'.","id":"wc-nx074"},
-{"text":"The lake at dawn was a mirror holding the mountains.","mark":"a mirror","tech":"Metaphor","also":[],"why":"It says the lake IS a mirror, with no 'like' or 'as'.","id":"wc-nx075"},
+{"text":"The lake at dawn was a mirror holding the mountains.","mark":"a mirror","tech":"Metaphor","also":["Alliteration"],"why":"It says the lake IS a mirror, with no 'like' or 'as'.","id":"wc-nx075"},
 {"text":"My grandmother's kitchen was a warm blanket on a cold day.","mark":"a warm blanket","tech":"Metaphor","also":["Senses"],"why":"It says the kitchen IS a warm blanket, with no 'like' or 'as'.","id":"wc-nx076"},
 {"text":"The old engine coughed and refused to start on the freezing morning.","mark":"coughed","tech":"Personification","also":["Onomatopoeia","Powerful verb","Metaphor"],"why":"It gives the engine the human action of coughing.","id":"wc-nx077"},
 {"text":"The fog wrapped its arms around the sleeping village.","mark":"wrapped its arms around","tech":"Personification","also":["Metaphor"],"why":"It gives the fog human arms to hug the village.","id":"wc-nx078"},
 {"text":"The sun smiled down on the children in the park.","mark":"smiled","tech":"Personification","also":["Powerful verb","Metaphor"],"why":"It gives the sun the human expression of smiling.","id":"wc-nx079"},
 {"text":"My alarm clock screamed at me until I finally woke up.","mark":"screamed","tech":"Personification","also":["Onomatopoeia","Powerful verb","Metaphor"],"why":"It gives the alarm clock the human action of screaming.","id":"wc-nx080"},
-{"text":"The autumn wind whispered secrets through the empty street.","mark":"whispered secrets","tech":"Personification","also":["Onomatopoeia","Metaphor"],"why":"It gives the wind the human action of whispering secrets.","id":"wc-nx081"},
+{"text":"The autumn wind whispered secrets through the empty street.","mark":"whispered secrets","tech":"Personification","also":["Onomatopoeia","Alliteration","Metaphor"],"why":"It gives the wind the human action of whispering secrets.","id":"wc-nx081"},
 {"text":"The stubborn door groaned every time anyone pushed it open.","mark":"groaned","tech":"Personification","also":["Onomatopoeia","Powerful verb","Metaphor"],"why":"It gives the door the human action of groaning in complaint.","id":"wc-nx082"},
-{"text":"The lioness lunged at the fleeing gazelle.","mark":"lunged","tech":"Powerful verb","also":[],"why":"'lunged' is a strong, vivid verb showing a sudden, forceful move.","id":"wc-nx083"},
-{"text":"The firefighter hauled the heavy hose up the stairs.","mark":"hauled","tech":"Powerful verb","also":[],"why":"'hauled' conveys the great effort of dragging something heavy.","id":"wc-nx084"},
+{"text":"The lioness lunged at the fleeing gazelle.","mark":"lunged","tech":"Powerful verb","also":["Alliteration"],"why":"'lunged' is a strong, vivid verb showing a sudden, forceful move.","id":"wc-nx083"},
+{"text":"The firefighter hauled the heavy hose up the stairs.","mark":"hauled","tech":"Powerful verb","also":["Alliteration"],"why":"'hauled' conveys the great effort of dragging something heavy.","id":"wc-nx084"},
 {"text":"The chef sliced the onion into thin rings.","mark":"sliced","tech":"Powerful verb","also":[],"why":"'sliced' is a sharp, vivid verb for a clean, deliberate cut.","id":"wc-nx085"},
 {"text":"The soldier seized the rope before it slipped away.","mark":"seized","tech":"Powerful verb","also":[],"why":"'seized' shows he grabbed it quickly and firmly.","id":"wc-nx086"},
 {"text":"The bull charged across the dusty field.","mark":"charged","tech":"Powerful verb","also":[],"why":"'charged' shows the bull rushed forward with great force.","id":"wc-nx087"},
@@ -4843,7 +4856,7 @@ var NAMEEX = [
 {"text":"A thunderous roar echoed through the empty valley.","mark":"thunderous","tech":"Senses","also":[],"why":"'thunderous' appeals to hearing, an extremely loud sound.","id":"wc-nx092"},
 {"text":"The garden glowed under the golden light of the setting sun.","mark":"golden","tech":"Senses","also":[],"why":"'golden' appeals to sight, the warm colour of the light.","id":"wc-nx093"},
 {"text":"She wrapped herself in the woolly blanket beside the fire.","mark":"woolly","tech":"Senses","also":[],"why":"'woolly' appeals to touch, a soft, fuzzy texture.","id":"wc-nx094"},
-{"text":"The fireworks fizzed before exploding above the rooftops.","mark":"fizzed","tech":"Onomatopoeia","also":["Powerful verb","Senses"],"why":"'fizzed' imitates the soft hissing sound of the burning fuse.","id":"wc-nx095"},
+{"text":"The fireworks fizzed before exploding above the rooftops.","mark":"fizzed","tech":"Onomatopoeia","also":["Powerful verb","Alliteration","Senses"],"why":"'fizzed' imitates the soft hissing sound of the burning fuse.","id":"wc-nx095"},
 {"text":"The coins jingled in his pocket.","mark":"jingled","tech":"Onomatopoeia","also":["Powerful verb","Senses"],"why":"'jingled' imitates the light, ringing sound of coins knocking together.","id":"wc-nx096"},
 {"text":"Rain began to splash against the dusty window pane.","mark":"splash","tech":"Onomatopoeia","also":["Powerful verb","Senses"],"why":"'splash' imitates the sound of water striking the glass.","id":"wc-nx097"},
 {"text":"The bees gave a faint hum as they drifted past the flowers.","mark":"hum","tech":"Onomatopoeia","also":["Powerful verb","Senses"],"why":"'hum' imitates the steady droning sound the bees make.","id":"wc-nx098"},
@@ -4857,24 +4870,24 @@ var NAMEEX = [
 {"text":"Her daring dog dashed down the dusty drive.","mark":"daring dog dashed down the dusty drive","tech":"Alliteration","also":["Powerful verb"],"why":"The repeated 'd' sound runs through 'daring dog dashed down the dusty drive'.","id":"wc-nx106"},
 {"text":"My backpack weighs a thousand tonnes after I packed all my textbooks.","mark":"a thousand tonnes","tech":"Hyperbole","also":[],"why":"A backpack cannot really weigh that much; it is a deliberate exaggeration.","id":"wc-nx107"},
 {"text":"I waited forever for the bus to finally arrive this morning.","mark":"forever","tech":"Hyperbole","also":[],"why":"The wait was not literally endless; it is an exaggeration of time.","id":"wc-nx108"},
-{"text":"This bag is so heavy it is breaking my back.","mark":"breaking my back","tech":"Hyperbole","also":[],"why":"The bag is not really breaking any bones; it is an overstatement.","id":"wc-nx109"},
+{"text":"This bag is so heavy it is breaking my back.","mark":"breaking my back","tech":"Hyperbole","also":["Alliteration"],"why":"The bag is not really breaking any bones; it is an overstatement.","id":"wc-nx109"},
 {"text":"There were a billion people queuing outside the canteen at lunch.","mark":"a billion people","tech":"Hyperbole","also":[],"why":"There were nowhere near that many; it is an exaggeration of amount.","id":"wc-nx110"},
 {"text":"I am so hungry I could faint right here on the floor.","mark":"could faint right here on the floor","tech":"Hyperbole","also":[],"why":"Hunger would not really make you collapse; it is an exaggeration.","id":"wc-nx111"},
 {"text":"My mum will absolutely kill me if I come home late again.","mark":"absolutely kill me","tech":"Hyperbole","also":[],"why":"Nobody is going to be killed; it is a deliberate exaggeration.","id":"wc-nx112"},
 {"text":"The morning fog drifted across the valley like smoke from a campfire.","mark":"like smoke from a campfire","tech":"Simile","also":[],"why":"It compares the fog to campfire smoke using 'like'.","id":"wc-nx113"},
 {"text":"Her laughter rang out as bright as a bell in the empty hall.","mark":"as bright as a bell","tech":"Simile","also":["Alliteration","Senses"],"why":"It compares her laughter to a bell using 'as ... as'.","id":"wc-nx114"},
-{"text":"The old map felt as fragile as a dried autumn leaf in my hands.","mark":"as fragile as a dried autumn leaf","tech":"Simile","also":[],"why":"It compares the map to a dried leaf using 'as ... as'.","id":"wc-nx115"},
+{"text":"The old map felt as fragile as a dried autumn leaf in my hands.","mark":"as fragile as a dried autumn leaf","tech":"Simile","also":["Alliteration"],"why":"It compares the map to a dried leaf using 'as ... as'.","id":"wc-nx115"},
 {"text":"He sprinted down the corridor like a greyhound chasing a hare.","mark":"like a greyhound chasing a hare","tech":"Simile","also":[],"why":"It compares him to a greyhound using 'like'.","id":"wc-nx116"},
 {"text":"The lake at dawn was as still as a held breath.","mark":"as still as a held breath","tech":"Simile","also":[],"why":"It compares the lake to a held breath using 'as ... as'.","id":"wc-nx117"},
 {"text":"The crowded train carriage was as cramped as a tin of sardines.","mark":"as cramped as a tin of sardines","tech":"Simile","also":["Hyperbole"],"why":"It compares the carriage to a tin of sardines using 'as ... as'.","id":"wc-nx118"},
 {"text":"The dusty attic was a museum of forgotten things.","mark":"a museum of forgotten things","tech":"Metaphor","also":[],"why":"It says the attic IS a museum, with no 'like' or 'as'.","id":"wc-nx119"},
 {"text":"The empty warehouse was a cavern of echoes.","mark":"a cavern of echoes","tech":"Metaphor","also":[],"why":"It says the warehouse IS a cavern, with no 'like' or 'as'.","id":"wc-nx120"},
 {"text":"His words were ice in the silent room.","mark":"ice","tech":"Metaphor","also":[],"why":"It says his words ARE ice, with no 'like' or 'as'.","id":"wc-nx121"},
-{"text":"His old laptop was a brick that barely switched on.","mark":"a brick","tech":"Metaphor","also":["Hyperbole"],"why":"It says the laptop IS a brick, with no 'like' or 'as'.","id":"wc-nx122"},
-{"text":"The motorway at dawn was a ribbon of red and white light.","mark":"a ribbon of red and white light","tech":"Metaphor","also":[],"why":"It says the motorway IS a ribbon of light, with no 'like' or 'as'.","id":"wc-nx123"},
+{"text":"His old laptop was a brick that barely switched on.","mark":"a brick","tech":"Metaphor","also":["Hyperbole","Alliteration"],"why":"It says the laptop IS a brick, with no 'like' or 'as'.","id":"wc-nx122"},
+{"text":"The motorway at dawn was a ribbon of red and white light.","mark":"a ribbon of red and white light","tech":"Metaphor","also":["Alliteration"],"why":"It says the motorway IS a ribbon of light, with no 'like' or 'as'.","id":"wc-nx123"},
 {"text":"The library was an island of calm in the busy school.","mark":"an island of calm","tech":"Metaphor","also":[],"why":"It says the library IS an island of calm, with no 'like' or 'as'.","id":"wc-nx124"},
 {"text":"The old wind sighed as it pushed against the shutters.","mark":"sighed","tech":"Personification","also":["Onomatopoeia","Powerful verb","Metaphor"],"why":"It gives the wind the human action of sighing.","id":"wc-nx125"},
-{"text":"The candle flame trembled with fear when the door opened.","mark":"trembled with fear","tech":"Personification","also":["Metaphor"],"why":"It gives the flame the human emotion of fear.","id":"wc-nx126"},
+{"text":"The candle flame trembled with fear when the door opened.","mark":"trembled with fear","tech":"Personification","also":["Alliteration","Metaphor"],"why":"It gives the flame the human emotion of fear.","id":"wc-nx126"},
 {"text":"The stubborn old clock refused to keep the right time.","mark":"refused","tech":"Personification","also":["Powerful verb","Metaphor"],"why":"It gives the clock the human action of refusing.","id":"wc-nx127"},
 {"text":"The morning sun stretched lazily across the empty fields.","mark":"stretched lazily","tech":"Personification","also":["Metaphor"],"why":"It gives the sun the human action of stretching lazily.","id":"wc-nx128"},
 {"text":"The waves marched towards the shore in a steady line.","mark":"marched","tech":"Personification","also":["Powerful verb","Metaphor"],"why":"It gives the waves the human action of marching in line.","id":"wc-nx129"},
@@ -4891,11 +4904,11 @@ var NAMEEX = [
 {"text":"The icy wind bit at our faces on the hilltop.","mark":"icy","tech":"Senses","also":[],"why":"'icy' appeals to touch, the freezing cold of the wind.","id":"wc-nx140"},
 {"text":"A dazzling light burst from the stage as the curtain rose.","mark":"dazzling","tech":"Senses","also":[],"why":"'dazzling' appeals to sight, a brightness that overwhelms the eyes.","id":"wc-nx141"},
 {"text":"He pulled on the scratchy woollen jumper his aunt had knitted.","mark":"scratchy","tech":"Senses","also":[],"why":"'scratchy' appeals to touch, a rough, irritating texture.","id":"wc-nx142"},
-{"text":"The hungry snake hissed at the approaching mouse.","mark":"hissed","tech":"Onomatopoeia","also":["Powerful verb","Senses"],"why":"'hissed' imitates the sharp sibilant sound a snake makes.","id":"wc-nx143"},
+{"text":"The hungry snake hissed at the approaching mouse.","mark":"hissed","tech":"Onomatopoeia","also":["Powerful verb","Alliteration","Senses"],"why":"'hissed' imitates the sharp sibilant sound a snake makes.","id":"wc-nx143"},
 {"text":"The old gate squeaked as the wind pushed it open.","mark":"squeaked","tech":"Onomatopoeia","also":["Powerful verb","Senses"],"why":"'squeaked' imitates the high, thin sound of the moving gate.","id":"wc-nx144"},
-{"text":"A fat raindrop plopped into the puddle.","mark":"plopped","tech":"Onomatopoeia","also":["Powerful verb","Senses"],"why":"'plopped' imitates the sound of a raindrop dropping into water.","id":"wc-nx145"},
+{"text":"A fat raindrop plopped into the puddle.","mark":"plopped","tech":"Onomatopoeia","also":["Powerful verb","Alliteration","Senses"],"why":"'plopped' imitates the sound of a raindrop dropping into water.","id":"wc-nx145"},
 {"text":"The kitchen tap gurgled as the water ran.","mark":"gurgled","tech":"Onomatopoeia","also":["Powerful verb","Senses"],"why":"'gurgled' imitates the bubbling sound of water running from the tap.","id":"wc-nx146"},
-{"text":"The bee's wings whirred as it hovered over the flower.","mark":"whirred","tech":"Onomatopoeia","also":["Powerful verb","Senses"],"why":"'whirred' imitates the low, continuous sound of beating wings.","id":"wc-nx147"},
+{"text":"The bee's wings whirred as it hovered over the flower.","mark":"whirred","tech":"Onomatopoeia","also":["Powerful verb","Alliteration","Senses"],"why":"'whirred' imitates the low, continuous sound of beating wings.","id":"wc-nx147"},
 {"text":"The whip cracked and snapped sharply through the cold air.","mark":"snapped","tech":"Onomatopoeia","also":["Powerful verb","Senses"],"why":"'snapped' imitates the sudden, sharp sound of the whip.","id":"wc-nx148"},
 {"text":"The lively lions lounged lazily by the lake.","mark":"lively lions lounged lazily","tech":"Alliteration","also":["Powerful verb"],"why":"The repeated 'l' sound runs through 'lively lions lounged lazily'.","id":"wc-nx149"},
 {"text":"Round the ruined ranch the riders raced at dawn.","mark":"ruined ranch the riders raced","tech":"Alliteration","also":["Powerful verb"],"why":"The repeated 'r' sound links 'ruined ranch the riders raced'.","id":"wc-nx150"},
@@ -4914,7 +4927,7 @@ var NAMEEX = [
 {"text":"My school bag weighs a hundred kilos on a Monday.","mark":"weighs a hundred kilos","tech":"Hyperbole","also":["Senses"],"why":"Nobody is meant to believe the bag really weighs that. The size of it is the point.","id":"wc-nx163"},
 {"text":"The examiner's questions were a series of locked doors.","mark":"a series of locked doors","tech":"Metaphor","also":["Senses"],"why":"It says the questions ARE locked doors, a direct comparison with no 'like' or 'as'.","id":"wc-nx164"},
 {"text":"He wrenched the door open against the wind.","mark":"wrenched","tech":"Powerful verb","also":[],"why":"Wrenched is a far stronger word than opened, chosen for the effort it carries.","id":"wc-nx165"},
-{"text":"The kitchen smelled of butter and warm bread.","mark":"smelled of butter and warm bread","tech":"Senses","also":[],"why":"It appeals to smell and to touch.","id":"wc-nx166"},
+{"text":"The kitchen smelled of butter and warm bread.","mark":"smelled of butter and warm bread","tech":"Senses","also":["Alliteration"],"why":"It appeals to smell and to touch.","id":"wc-nx166"},
 {"text":"The lorry crawled up the hill in the heat.","mark":"crawled","tech":"Powerful verb","also":["Personification"],"why":"Crawled is a much stronger word than moved, chosen for how slow it makes the lorry seem.","id":"wc-nx167"},
 {"text":"The runway shimmered like a sheet of water in the heat.","mark":"like a sheet of water","tech":"Simile","also":["Senses"],"why":"It compares the shimmering runway to water using 'like'.","id":"wc-nx168","dx":true},
 {"text":"The queue at the gate was as long as a train.","mark":"as long as a train","tech":"Simile","also":["Hyperbole","Senses"],"why":"It compares the queue to a train using 'as ... as'.","id":"wc-nx169","dx":true},
@@ -4922,7 +4935,6 @@ var NAMEEX = [
 {"text":"Her patience was a thin thread by Friday afternoon.","mark":"a thin thread","tech":"Metaphor","also":["Alliteration"],"why":"It says her patience IS a thread, a direct comparison without 'like' or 'as'.","id":"wc-nx171","dx":true},
 {"text":"The old lift complained all the way to the fourth floor.","mark":"complained","tech":"Personification","also":["Powerful verb","Metaphor"],"why":"It gives the lift the human action of complaining.","id":"wc-nx172","dx":true},
 {"text":"The monsoon clouds refused to move off the hills all morning.","mark":"refused to move","tech":"Personification","also":["Metaphor"],"why":"It gives the clouds the human act of refusing.","id":"wc-nx173","dx":true},
-{"text":"Rain drummed on the metal roof of the canteen.","mark":"drummed","tech":"Onomatopoeia","also":["Powerful verb","Senses"],"why":"'Drummed' imitates the sound of the rain on the metal.","id":"wc-nx175","dx":true},
 {"text":"He hurled his bag onto the back seat.","mark":"hurled","tech":"Powerful verb","also":[],"why":"'Hurled' is a strong, vivid action word, far stronger than 'threw'.","id":"wc-nx176","dx":true},
 {"text":"The rice was starchy and heavy on the tongue.","mark":"starchy","tech":"Senses","also":[],"why":"'Starchy' is a describing word that appeals to taste.","id":"wc-nx179","dx":true},
 {"text":"A bunch of keys jangled at his hip.","mark":"jangled","tech":"Onomatopoeia","also":["Powerful verb","Senses"],"why":"'Jangled' imitates the sound the keys make.","id":"wc-nx180","dx":true},
@@ -4931,7 +4943,8 @@ var NAMEEX = [
 {"text":"Six sacks of sand sat by the gate.","mark":"Six sacks of sand sat","tech":"Alliteration","also":[],"why":"The 's' sound is repeated at the start of nearby words.","id":"wc-nx183","dx":true},
 {"text":"The damp day dragged towards its end.","mark":"damp day dragged","tech":"Alliteration","also":["Senses"],"why":"The 'd' sound is repeated at the start of nearby words.","id":"wc-nx184","dx":true},
 {"text":"This homework will take me a hundred years.","mark":"a hundred years","tech":"Hyperbole","also":[],"why":"'A hundred years' is a deliberate exaggeration of how long it will take.","id":"wc-nx185","dx":true},
-{"text":"The queue at the canteen was a mile long.","mark":"a mile long","tech":"Hyperbole","also":[],"why":"'A mile long' is a deliberate exaggeration of the length of the queue.","id":"wc-nx186","dx":true}
+{"text":"The queue at the canteen was a mile long.","mark":"a mile long","tech":"Hyperbole","also":[],"why":"'A mile long' is a deliberate exaggeration of the length of the queue.","id":"wc-nx186","dx":true},
+{"text":"Rain clattered on the metal roof of the canteen.","mark":"clattered","tech":"Onomatopoeia","also":["Powerful verb","Senses"],"why":"'Clattered' imitates the hard, rattling sound of rain hitting metal.","id":"wc-nx187","dx":true}
 ];
 var SPOT = [
 {"id":"wc-sp001","text":"The storm was a beast that night. The wind screamed around the chimneys. Lightning lit the sky as bright as day, and rain fell as hard as gravel against the glass. Cold, cruel gusts rattled the doors. I was so frightened I nearly jumped out of my skin.","items":[{"phrase":"a beast","tech":"Metaphor","also":[]},{"phrase":"screamed","tech":"Personification","also":["Powerful verb","Onomatopoeia","Metaphor"]},{"phrase":"as bright as day","tech":"Simile","also":[]},{"phrase":"as hard as gravel","tech":"Simile","also":[]},{"phrase":"Cold, cruel","tech":"Alliteration","also":[]},{"phrase":"jumped out of my skin","tech":"Hyperbole","also":[]}]},
@@ -5154,26 +5167,26 @@ var KTSORT = [
 {"id":"wc-ks040","pair":["Personification","Powerful verb"],"ex":["wc-nx126","wc-nx128","wc-nx078","wc-nx135","wc-nx136","wc-nx165"]},
 {"id":"wc-ks041","pair":["Personification","Powerful verb"],"ex":["wc-nx128","wc-nx078","wc-nx081","wc-nx136","wc-nx165","wc-nx013"]},
 {"id":"wc-ks042","pair":["Personification","Powerful verb"],"ex":["wc-nx078","wc-nx081","wc-nx126","wc-nx165","wc-nx013","wc-nx014"]},
-{"id":"wc-ks043","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx021","wc-nx022","wc-nx023","wc-nx025","wc-nx026","wc-nx027"]},
-{"id":"wc-ks044","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx022","wc-nx023","wc-nx024","wc-nx026","wc-nx027","wc-nx057"]},
-{"id":"wc-ks045","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx023","wc-nx024","wc-nx053","wc-nx027","wc-nx057","wc-nx058"]},
-{"id":"wc-ks046","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx024","wc-nx053","wc-nx054","wc-nx057","wc-nx058","wc-nx059"]},
-{"id":"wc-ks047","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx053","wc-nx054","wc-nx055","wc-nx058","wc-nx059","wc-nx060"]},
-{"id":"wc-ks048","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx054","wc-nx055","wc-nx056","wc-nx059","wc-nx060","wc-nx101"]},
-{"id":"wc-ks049","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx055","wc-nx056","wc-nx095","wc-nx060","wc-nx101","wc-nx102"]},
-{"id":"wc-ks050","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx056","wc-nx095","wc-nx096","wc-nx101","wc-nx102","wc-nx103"]},
-{"id":"wc-ks051","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx095","wc-nx096","wc-nx097","wc-nx102","wc-nx103","wc-nx104"]},
-{"id":"wc-ks052","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx096","wc-nx097","wc-nx098","wc-nx103","wc-nx104","wc-nx105"]},
-{"id":"wc-ks053","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx097","wc-nx098","wc-nx099","wc-nx104","wc-nx105","wc-nx106"]},
-{"id":"wc-ks054","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx098","wc-nx099","wc-nx100","wc-nx105","wc-nx106","wc-nx149"]},
-{"id":"wc-ks055","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx099","wc-nx100","wc-nx143","wc-nx106","wc-nx149","wc-nx150"]},
-{"id":"wc-ks056","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx100","wc-nx143","wc-nx144","wc-nx149","wc-nx150","wc-nx151"]},
-{"id":"wc-ks057","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx143","wc-nx144","wc-nx145","wc-nx150","wc-nx151","wc-nx152"]},
-{"id":"wc-ks058","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx144","wc-nx145","wc-nx146","wc-nx151","wc-nx152","wc-nx153"]},
-{"id":"wc-ks059","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx145","wc-nx146","wc-nx147","wc-nx152","wc-nx153","wc-nx154"]},
-{"id":"wc-ks060","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx146","wc-nx147","wc-nx148","wc-nx153","wc-nx154","wc-nx162"]},
-{"id":"wc-ks061","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx147","wc-nx148","wc-nx021","wc-nx154","wc-nx162","wc-nx025"]},
-{"id":"wc-ks062","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx148","wc-nx021","wc-nx022","wc-nx162","wc-nx025","wc-nx026"]},
+{"id":"wc-ks043","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx021","wc-nx022","wc-nx024","wc-nx025","wc-nx026","wc-nx027"]},
+{"id":"wc-ks044","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx022","wc-nx024","wc-nx053","wc-nx026","wc-nx027","wc-nx057"]},
+{"id":"wc-ks045","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx024","wc-nx053","wc-nx054","wc-nx027","wc-nx057","wc-nx058"]},
+{"id":"wc-ks046","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx053","wc-nx054","wc-nx055","wc-nx057","wc-nx058","wc-nx059"]},
+{"id":"wc-ks047","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx054","wc-nx055","wc-nx056","wc-nx058","wc-nx059","wc-nx060"]},
+{"id":"wc-ks048","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx055","wc-nx056","wc-nx096","wc-nx059","wc-nx060","wc-nx101"]},
+{"id":"wc-ks049","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx056","wc-nx096","wc-nx097","wc-nx060","wc-nx101","wc-nx102"]},
+{"id":"wc-ks050","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx096","wc-nx097","wc-nx098","wc-nx101","wc-nx102","wc-nx103"]},
+{"id":"wc-ks051","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx097","wc-nx098","wc-nx099","wc-nx102","wc-nx103","wc-nx104"]},
+{"id":"wc-ks052","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx098","wc-nx099","wc-nx100","wc-nx103","wc-nx104","wc-nx105"]},
+{"id":"wc-ks053","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx099","wc-nx100","wc-nx144","wc-nx104","wc-nx105","wc-nx106"]},
+{"id":"wc-ks054","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx100","wc-nx144","wc-nx146","wc-nx105","wc-nx106","wc-nx149"]},
+{"id":"wc-ks055","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx144","wc-nx146","wc-nx148","wc-nx106","wc-nx149","wc-nx150"]},
+{"id":"wc-ks056","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx146","wc-nx148","wc-nx021","wc-nx149","wc-nx150","wc-nx151"]},
+{"id":"wc-ks057","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx148","wc-nx021","wc-nx022","wc-nx150","wc-nx151","wc-nx152"]},
+{"id":"wc-ks058","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx021","wc-nx022","wc-nx024","wc-nx151","wc-nx152","wc-nx153"]},
+{"id":"wc-ks059","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx022","wc-nx024","wc-nx053","wc-nx152","wc-nx153","wc-nx154"]},
+{"id":"wc-ks060","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx024","wc-nx053","wc-nx054","wc-nx153","wc-nx154","wc-nx162"]},
+{"id":"wc-ks061","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx053","wc-nx054","wc-nx055","wc-nx154","wc-nx162","wc-nx025"]},
+{"id":"wc-ks062","pair":["Onomatopoeia","Alliteration"],"ex":["wc-nx054","wc-nx055","wc-nx056","wc-nx162","wc-nx025","wc-nx026"]},
 {"id":"wc-ks063","pair":["Metaphor","Hyperbole"],"ex":["wc-nx006","wc-nx007","wc-nx008","wc-nx029","wc-nx030","wc-nx031"]},
 {"id":"wc-ks064","pair":["Metaphor","Hyperbole"],"ex":["wc-nx007","wc-nx008","wc-nx037","wc-nx030","wc-nx031","wc-nx032"]},
 {"id":"wc-ks065","pair":["Metaphor","Hyperbole"],"ex":["wc-nx008","wc-nx037","wc-nx039","wc-nx031","wc-nx032","wc-nx061"]},
@@ -6783,7 +6796,7 @@ var AMBIG = ["answer","answers","back","bark","barks","book","books","brush","br
    the picker spreads a block across it so a cell of twenty-four punctuation
    repairs is not eighteen apostrophes, and a stored row keeps it so step 12
    can still count at that grain. */
-var DEEPREG = [["wc-c114","cloze","foundation","","wc:noun"],["wc-c115","cloze","developing","","wc:noun"],["wc-c116","cloze","secure","","wc:noun"],["wc-c117","cloze","challenge","","wc:noun"],["wc-c118","cloze","foundation","","wc:verb"],["wc-c119","cloze","developing","","wc:verb"],["wc-c120","cloze","secure","","wc:verb"],["wc-c121","cloze","challenge","","wc:verb"],["wc-c122","cloze","foundation","","wc:adj"],["wc-c123","cloze","developing","","wc:adj"],["wc-c124","cloze","secure","","wc:adj"],["wc-c125","cloze","challenge","","wc:adj"],["wc-c126","cloze","foundation","","wc:adv"],["wc-c127","cloze","developing","","wc:adv"],["wc-c128","cloze","secure","","wc:adv"],["wc-c129","cloze","challenge","","wc:adv"],["wc-cm124","commas","foundation","","cm:list"],["wc-cm125","commas","foundation","","cm:list"],["wc-cm126","commas","developing","","cm:list"],["wc-cm127","commas","developing","","cm:list"],["wc-cm128","commas","secure","","cm:list"],["wc-cm129","commas","secure","","cm:list"],["wc-cm130","commas","challenge","","cm:list"],["wc-cm131","commas","challenge","","cm:list"],["wc-cm132","commas","foundation","","cm:drop"],["wc-cm133","commas","foundation","","cm:drop"],["wc-cm134","commas","developing","","cm:drop"],["wc-cm135","commas","developing","","cm:drop"],["wc-cm136","commas","secure","","cm:drop"],["wc-cm137","commas","secure","","cm:drop"],["wc-cm138","commas","challenge","","cm:drop"],["wc-cm139","commas","challenge","","cm:drop"],["wc-cm140","commas","foundation","","cm:address"],["wc-cm141","commas","foundation","","cm:address"],["wc-cm142","commas","developing","","cm:address"],["wc-cm143","commas","developing","","cm:address"],["wc-cm144","commas","secure","","cm:address"],["wc-cm145","commas","secure","","cm:address"],["wc-cm146","commas","challenge","","cm:address"],["wc-cm147","commas","challenge","","cm:address"],["wc-cm148","commas","foundation","","cm:subj"],["wc-cm149","commas","foundation","","cm:subj"],["wc-cm150","commas","developing","","cm:subj"],["wc-cm151","commas","developing","","cm:subj"],["wc-cm152","commas","secure","","cm:subj"],["wc-cm153","commas","secure","","cm:subj"],["wc-cm154","commas","challenge","","cm:subj"],["wc-cm155","commas","challenge","","cm:subj"],["wc-ei104","ei","","explicit","ei:said"],["wc-ei105","ei","","explicit","ei:said"],["wc-ei106","ei","","explicit","ei:said"],["wc-ei107","ei","","explicit","ei:said"],["wc-ei108","ei","","explicit","ei:said"],["wc-ei109","ei","","explicit","ei:said"],["wc-ei110","ei","","implied","ei:sugg"],["wc-ei111","ei","","implied","ei:sugg"],["wc-ei112","ei","","implied","ei:sugg"],["wc-ei113","ei","","implied","ei:sugg"],["wc-ei114","ei","","implied","ei:sugg"],["wc-ei115","ei","","implied","ei:sugg"],["wc-im138","xf","foundation","","tech:meta"],["wc-im139","xf","developing","","tech:meta"],["wc-im140","xf","secure","","tech:meta"],["wc-im141","xf","challenge","","tech:meta"],["wc-im142","xf","foundation","","tech:sim"],["wc-im143","xf","developing","","tech:sim"],["wc-im144","xf","secure","","tech:sim"],["wc-im145","xf","challenge","","tech:sim"],["wc-im146","xf","foundation","","tech:pers"],["wc-im147","xf","developing","","tech:pers"],["wc-im148","xf","secure","","tech:pers"],["wc-im149","xf","challenge","","tech:pers"],["wc-k135","klass","foundation","","wc:noun"],["wc-k136","klass","developing","","wc:noun"],["wc-k137","klass","secure","","wc:noun"],["wc-k138","klass","challenge","","wc:noun"],["wc-k139","klass","foundation","","wc:verb"],["wc-k140","klass","developing","","wc:verb"],["wc-k141","klass","secure","","wc:verb"],["wc-k142","klass","challenge","","wc:verb"],["wc-k143","klass","foundation","","wc:adj"],["wc-k144","klass","developing","","wc:adj"],["wc-k145","klass","secure","","wc:adj"],["wc-k146","klass","challenge","","wc:adj"],["wc-k147","klass","foundation","","wc:adv"],["wc-k148","klass","developing","","wc:adv"],["wc-k149","klass","secure","","wc:adv"],["wc-k150","klass","challenge","","wc:adv"],["wc-nx168","ktname","","","tech:sim"],["wc-nx169","ktname","","","tech:sim"],["wc-nx170","ktname","","","tech:meta"],["wc-nx171","ktname","","","tech:meta"],["wc-nx172","ktname","","","tech:pers"],["wc-nx173","ktname","","","tech:pers"],["wc-nx175","ktname","","","tech:onom"],["wc-nx176","ktname","","","tech:pverb"],["wc-nx179","ktname","","","tech:sense"],["wc-nx180","ktname","","","tech:onom"],["wc-nx181","ktname","","","tech:pverb"],["wc-nx182","ktname","","","tech:sense"],["wc-nx183","ktname","","","tech:allit"],["wc-nx184","ktname","","","tech:allit"],["wc-nx185","ktname","","","tech:hyp"],["wc-nx186","ktname","","","tech:hyp"],["wc-pn010","punc","developing","punc","pn:cap"],["wc-pn061","pf","secure","pf","pn:splice"],["wc-pn087","pf","foundation","pf","pn:speech"],["wc-pn120","pf","developing","pf","pn:apos"],["wc-pn136","pf","challenge","pf","pn:splice"],["wc-pn151","punc","foundation","punc","pn:cap"],["wc-pn152","punc","foundation","punc","pn:cap"],["wc-pn159","pf","foundation","pf","pn:end"],["wc-pn160","pf","foundation","pf","pn:end"],["wc-pn161","pf","developing","pf","pn:end"],["wc-pn162","pf","developing","pf","pn:end"],["wc-pn163","pf","secure","pf","pn:end"],["wc-pn164","pf","secure","pf","pn:end"],["wc-pn165","pf","challenge","pf","pn:end"],["wc-pn166","pf","challenge","pf","pn:end"],["wc-pn167","pf","foundation","pf","pn:apos"],["wc-pn168","pf","foundation","pf","pn:apos"],["wc-pn169","pf","secure","pf","pn:apos"],["wc-pn170","pf","developing","pf","pn:apos"],["wc-pn171","pf","challenge","pf","pn:apos"],["wc-pn172","pf","secure","pf","pn:apos"],["wc-pn173","pf","foundation","pf","pn:apos"],["wc-pn174","pf","challenge","pf","pn:apos"],["wc-pn175","pf","developing","pf","pn:splice"],["wc-pn176","pf","foundation","pf","pn:splice"],["wc-pn177","pf","developing","pf","pn:splice"],["wc-pn178","pf","foundation","pf","pn:splice"],["wc-pn179","pf","foundation","pf","pn:splice"],["wc-pn180","pf","foundation","pf","pn:splice"],["wc-pn181","pf","developing","pf","pn:splice"],["wc-pn182","pf","secure","pf","pn:splice"],["wc-pn191","pf","developing","pf","pn:speech"],["wc-pn194","pf","developing","pf","pn:speech"],["wc-pn195","pf","secure","pf","pn:speech"],["wc-pn196","pf","secure","pf","pn:speech"],["wc-pn197","pf","secure","pf","pn:speech"],["wc-pn198","pf","secure","pf","pn:speech"],["wc-pn215","punc","secure","punc","pn:cap"],["wc-pn217","punc","secure","punc","pn:cap"],["wc-pn218","punc","challenge","punc","pn:cap"],["wc-pn220","punc","challenge","punc","pn:cap"],["wc-pn225","punc","challenge","punc","pn:cap"],["wc-pn227","punc","developing","punc","pn:cap"],["wc-pn228","punc","foundation","punc","pn:cap"],["wc-pn230","punc","challenge","punc","pn:cap"],["wc-pn235","punc","secure","punc","pn:cap"],["wc-pn253","pf","challenge","pf","pn:splice"],["wc-pn352","pf","secure","pf","pn:speech"],["wc-pn356","pf","challenge","pf","pn:speech"],["wc-pn397","pf","challenge","pf","pn:speech"],["wc-pn398","pf","foundation","pf","pn:speech"],["wc-pn422","pf","secure","pf","pn:speech"],["wc-pn442","punc","foundation","punc","pn:cap"],["wc-pn443","punc","foundation","punc","pn:cap"],["wc-pn448","punc","developing","punc","pn:cap"],["wc-pn449","punc","developing","punc","pn:cap"],["wc-pn450","punc","developing","punc","pn:cap"],["wc-pn453","punc","developing","punc","pn:cap"],["wc-pn458","punc","secure","punc","pn:cap"],["wc-pn459","punc","secure","punc","pn:cap"],["wc-pn462","punc","challenge","punc","pn:cap"],["wc-pn464","punc","challenge","punc","pn:cap"],["wc-pn465","punc","challenge","punc","pn:cap"],["wc-pn467","punc","challenge","punc","pn:cap"],["wc-pn473","punc","challenge","punc","pn:cap"],["wc-pn476","punc","challenge","punc","pn:cap"],["wc-pn484","punc","secure","punc","pn:cap"],["wc-pn486","punc","secure","punc","pn:cap"],["wc-pn496","punc","challenge","punc","pn:cap"],["wc-pn499","punc","secure","punc","pn:cap"],["wc-pn509","punc","secure","punc","pn:cap"],["wc-pn510","punc","secure","punc","pn:cap"],["wc-pn512","punc","challenge","punc","pn:cap"],["wc-pn518","punc","challenge","punc","pn:cap"],["wc-pp003","pp","foundation","","pn:proof"],["wc-pp006","pp","foundation","","pn:proof"],["wc-pp013","pp","developing","","pn:proof"],["wc-pp014","pp","developing","","pn:proof"],["wc-pp034","pp","secure","","pn:proof"],["wc-pp036","pp","secure","","pn:proof"],["wc-pp039","pp","challenge","","pn:proof"],["wc-pp045","pp","challenge","","pn:proof"],["wc-pp051","pp","foundation","","pn:proof"],["wc-pp054","pp","developing","","pn:proof"],["wc-pp055","pp","secure","","pn:proof"],["wc-pp058","pp","challenge","","pn:proof"],["wc-s369","one","foundation","noun","wc:noun"],["wc-s370","one","developing","noun","wc:noun"],["wc-s371","one","secure","noun","wc:noun"],["wc-s372","one","challenge","noun","wc:noun"],["wc-s373","one","foundation","verb","wc:verb"],["wc-s374","one","developing","verb","wc:verb"],["wc-s375","one","secure","verb","wc:verb"],["wc-s376","one","challenge","verb","wc:verb"],["wc-s377","one","foundation","adj","wc:adj"],["wc-s378","one","developing","adj","wc:adj"],["wc-s379","one","secure","adj","wc:adj"],["wc-s380","one","challenge","adj","wc:adj"],["wc-s381","one","foundation","adv","wc:adv"],["wc-s382","one","developing","adv","wc:adv"],["wc-s383","one","secure","adv","wc:adv"],["wc-s384","one","challenge","adv","wc:adv"],["wc-tq732","tech","secure","","tech:sim"],["wc-tq734","tech","challenge","","tech:meta"],["wc-tq735","tech","developing","","tech:pers"],["wc-tq736","tech","challenge","","tech:pers"],["wc-tq737","tech","foundation","","tech:onom"],["wc-tq738","tech","developing","","tech:onom"],["wc-tq743","tech","foundation","","tech:sim"],["wc-tq744","tech","foundation","","tech:meta"],["wc-tq745","tech","developing","","tech:pverb"],["wc-tq746","tech","secure","","tech:pverb"],["wc-tq747","tech","secure","","tech:sense"],["wc-tq748","tech","challenge","","tech:sense"],["wc-vt167","vt","foundation","vt","vt:sform"],["wc-vt168","vf","foundation","vf","vt:sform"],["wc-vt169","vt","developing","vt","vt:sform"],["wc-vt170","vf","developing","vf","vt:sform"],["wc-vt171","vt","secure","vt","vt:sform"],["wc-vt172","vf","secure","vf","vt:sform"],["wc-vt173","vt","challenge","vt","vt:sform"],["wc-vt174","vf","challenge","vf","vt:sform"],["wc-vt175","vf","foundation","vf","vt:regpast"],["wc-vt176","vf","foundation","vf","vt:regpast"],["wc-vt177","vf","developing","vf","vt:regpast"],["wc-vt178","vf","developing","vf","vt:regpast"],["wc-vt179","vf","secure","vf","vt:regpast"],["wc-vt180","vf","secure","vf","vt:regpast"],["wc-vt181","vf","challenge","vf","vt:regpast"],["wc-vt182","vf","challenge","vf","vt:regpast"],["wc-vt183","vf","foundation","vf","vt:irrpast"],["wc-vt184","vf","foundation","vf","vt:irrpast"],["wc-vt185","vf","developing","vf","vt:irrpast"],["wc-vt186","vf","developing","vf","vt:irrpast"],["wc-vt187","vf","secure","vf","vt:irrpast"],["wc-vt188","vf","secure","vf","vt:irrpast"],["wc-vt189","vf","challenge","vf","vt:irrpast"],["wc-vt190","vf","challenge","vf","vt:irrpast"],["wc-vt191","vt","foundation","vt","vt:be"],["wc-vt192","vf","foundation","vf","vt:be"],["wc-vt193","vt","developing","vt","vt:be"],["wc-vt194","vf","developing","vf","vt:be"],["wc-vt195","vt","secure","vt","vt:be"],["wc-vt196","vf","secure","vf","vt:be"],["wc-vt197","vt","challenge","vt","vt:be"],["wc-vt198","vf","challenge","vf","vt:be"],["wc-vt199","vt","foundation","vt","vt:mixed"],["wc-vt200","vf","foundation","vf","vt:mixed"],["wc-vt201","vt","developing","vt","vt:mixed"],["wc-vt202","vf","developing","vf","vt:mixed"],["wc-vt203","vt","secure","vt","vt:mixed"],["wc-vt204","vf","secure","vf","vt:mixed"],["wc-vt205","vt","challenge","vt","vt:mixed"],["wc-vt206","vf","challenge","vf","vt:mixed"]];
+var DEEPREG = [["wc-c114","cloze","foundation","","wc:noun"],["wc-c115","cloze","developing","","wc:noun"],["wc-c116","cloze","secure","","wc:noun"],["wc-c117","cloze","challenge","","wc:noun"],["wc-c118","cloze","foundation","","wc:verb"],["wc-c119","cloze","developing","","wc:verb"],["wc-c120","cloze","secure","","wc:verb"],["wc-c121","cloze","challenge","","wc:verb"],["wc-c122","cloze","foundation","","wc:adj"],["wc-c123","cloze","developing","","wc:adj"],["wc-c124","cloze","secure","","wc:adj"],["wc-c125","cloze","challenge","","wc:adj"],["wc-c126","cloze","foundation","","wc:adv"],["wc-c127","cloze","developing","","wc:adv"],["wc-c128","cloze","secure","","wc:adv"],["wc-c129","cloze","challenge","","wc:adv"],["wc-cm124","commas","foundation","","cm:list"],["wc-cm125","commas","foundation","","cm:list"],["wc-cm126","commas","developing","","cm:list"],["wc-cm127","commas","developing","","cm:list"],["wc-cm128","commas","secure","","cm:list"],["wc-cm129","commas","secure","","cm:list"],["wc-cm130","commas","challenge","","cm:list"],["wc-cm131","commas","challenge","","cm:list"],["wc-cm132","commas","foundation","","cm:drop"],["wc-cm133","commas","foundation","","cm:drop"],["wc-cm134","commas","developing","","cm:drop"],["wc-cm135","commas","developing","","cm:drop"],["wc-cm136","commas","secure","","cm:drop"],["wc-cm137","commas","secure","","cm:drop"],["wc-cm138","commas","challenge","","cm:drop"],["wc-cm139","commas","challenge","","cm:drop"],["wc-cm140","commas","foundation","","cm:address"],["wc-cm141","commas","foundation","","cm:address"],["wc-cm142","commas","developing","","cm:address"],["wc-cm143","commas","developing","","cm:address"],["wc-cm144","commas","secure","","cm:address"],["wc-cm145","commas","secure","","cm:address"],["wc-cm146","commas","challenge","","cm:address"],["wc-cm147","commas","challenge","","cm:address"],["wc-cm148","commas","foundation","","cm:subj"],["wc-cm149","commas","foundation","","cm:subj"],["wc-cm150","commas","developing","","cm:subj"],["wc-cm151","commas","developing","","cm:subj"],["wc-cm152","commas","secure","","cm:subj"],["wc-cm153","commas","secure","","cm:subj"],["wc-cm154","commas","challenge","","cm:subj"],["wc-cm155","commas","challenge","","cm:subj"],["wc-ei104","ei","","explicit","ei:said"],["wc-ei105","ei","","explicit","ei:said"],["wc-ei106","ei","","explicit","ei:said"],["wc-ei107","ei","","explicit","ei:said"],["wc-ei108","ei","","explicit","ei:said"],["wc-ei109","ei","","explicit","ei:said"],["wc-ei110","ei","","implied","ei:sugg"],["wc-ei111","ei","","implied","ei:sugg"],["wc-ei112","ei","","implied","ei:sugg"],["wc-ei113","ei","","implied","ei:sugg"],["wc-ei114","ei","","implied","ei:sugg"],["wc-ei115","ei","","implied","ei:sugg"],["wc-im138","xf","foundation","","tech:meta"],["wc-im139","xf","developing","","tech:meta"],["wc-im140","xf","secure","","tech:meta"],["wc-im141","xf","challenge","","tech:meta"],["wc-im142","xf","foundation","","tech:sim"],["wc-im143","xf","developing","","tech:sim"],["wc-im144","xf","secure","","tech:sim"],["wc-im145","xf","challenge","","tech:sim"],["wc-im146","xf","foundation","","tech:pers"],["wc-im147","xf","developing","","tech:pers"],["wc-im148","xf","secure","","tech:pers"],["wc-im149","xf","challenge","","tech:pers"],["wc-k135","klass","foundation","","wc:noun"],["wc-k136","klass","developing","","wc:noun"],["wc-k137","klass","secure","","wc:noun"],["wc-k138","klass","challenge","","wc:noun"],["wc-k139","klass","foundation","","wc:verb"],["wc-k140","klass","developing","","wc:verb"],["wc-k141","klass","secure","","wc:verb"],["wc-k142","klass","challenge","","wc:verb"],["wc-k143","klass","foundation","","wc:adj"],["wc-k144","klass","developing","","wc:adj"],["wc-k145","klass","secure","","wc:adj"],["wc-k146","klass","challenge","","wc:adj"],["wc-k147","klass","foundation","","wc:adv"],["wc-k148","klass","developing","","wc:adv"],["wc-k149","klass","secure","","wc:adv"],["wc-k150","klass","challenge","","wc:adv"],["wc-nx168","ktname","","","tech:sim"],["wc-nx169","ktname","","","tech:sim"],["wc-nx170","ktname","","","tech:meta"],["wc-nx171","ktname","","","tech:meta"],["wc-nx172","ktname","","","tech:pers"],["wc-nx173","ktname","","","tech:pers"],["wc-nx176","ktname","","","tech:pverb"],["wc-nx179","ktname","","","tech:sense"],["wc-nx180","ktname","","","tech:onom"],["wc-nx181","ktname","","","tech:pverb"],["wc-nx182","ktname","","","tech:sense"],["wc-nx183","ktname","","","tech:allit"],["wc-nx184","ktname","","","tech:allit"],["wc-nx185","ktname","","","tech:hyp"],["wc-nx186","ktname","","","tech:hyp"],["wc-nx187","ktname","","","tech:onom"],["wc-pn010","punc","developing","punc","pn:cap"],["wc-pn061","pf","secure","pf","pn:splice"],["wc-pn087","pf","foundation","pf","pn:speech"],["wc-pn120","pf","developing","pf","pn:apos"],["wc-pn136","pf","challenge","pf","pn:splice"],["wc-pn151","punc","foundation","punc","pn:cap"],["wc-pn152","punc","foundation","punc","pn:cap"],["wc-pn159","pf","foundation","pf","pn:end"],["wc-pn160","pf","foundation","pf","pn:end"],["wc-pn161","pf","developing","pf","pn:end"],["wc-pn162","pf","developing","pf","pn:end"],["wc-pn163","pf","secure","pf","pn:end"],["wc-pn164","pf","secure","pf","pn:end"],["wc-pn165","pf","challenge","pf","pn:end"],["wc-pn166","pf","challenge","pf","pn:end"],["wc-pn167","pf","foundation","pf","pn:apos"],["wc-pn168","pf","foundation","pf","pn:apos"],["wc-pn169","pf","secure","pf","pn:apos"],["wc-pn170","pf","developing","pf","pn:apos"],["wc-pn171","pf","challenge","pf","pn:apos"],["wc-pn172","pf","secure","pf","pn:apos"],["wc-pn173","pf","foundation","pf","pn:apos"],["wc-pn174","pf","challenge","pf","pn:apos"],["wc-pn175","pf","developing","pf","pn:splice"],["wc-pn176","pf","foundation","pf","pn:splice"],["wc-pn177","pf","developing","pf","pn:splice"],["wc-pn178","pf","foundation","pf","pn:splice"],["wc-pn179","pf","foundation","pf","pn:splice"],["wc-pn180","pf","foundation","pf","pn:splice"],["wc-pn181","pf","developing","pf","pn:splice"],["wc-pn182","pf","secure","pf","pn:splice"],["wc-pn191","pf","developing","pf","pn:speech"],["wc-pn194","pf","developing","pf","pn:speech"],["wc-pn195","pf","secure","pf","pn:speech"],["wc-pn196","pf","secure","pf","pn:speech"],["wc-pn197","pf","secure","pf","pn:speech"],["wc-pn198","pf","secure","pf","pn:speech"],["wc-pn215","punc","secure","punc","pn:cap"],["wc-pn217","punc","secure","punc","pn:cap"],["wc-pn218","punc","challenge","punc","pn:cap"],["wc-pn220","punc","challenge","punc","pn:cap"],["wc-pn225","punc","challenge","punc","pn:cap"],["wc-pn227","punc","developing","punc","pn:cap"],["wc-pn228","punc","foundation","punc","pn:cap"],["wc-pn230","punc","challenge","punc","pn:cap"],["wc-pn235","punc","secure","punc","pn:cap"],["wc-pn253","pf","challenge","pf","pn:splice"],["wc-pn352","pf","secure","pf","pn:speech"],["wc-pn356","pf","challenge","pf","pn:speech"],["wc-pn397","pf","challenge","pf","pn:speech"],["wc-pn398","pf","foundation","pf","pn:speech"],["wc-pn422","pf","secure","pf","pn:speech"],["wc-pn442","punc","foundation","punc","pn:cap"],["wc-pn443","punc","foundation","punc","pn:cap"],["wc-pn448","punc","developing","punc","pn:cap"],["wc-pn449","punc","developing","punc","pn:cap"],["wc-pn450","punc","developing","punc","pn:cap"],["wc-pn453","punc","developing","punc","pn:cap"],["wc-pn458","punc","secure","punc","pn:cap"],["wc-pn459","punc","secure","punc","pn:cap"],["wc-pn462","punc","challenge","punc","pn:cap"],["wc-pn464","punc","challenge","punc","pn:cap"],["wc-pn465","punc","challenge","punc","pn:cap"],["wc-pn467","punc","challenge","punc","pn:cap"],["wc-pn473","punc","challenge","punc","pn:cap"],["wc-pn476","punc","challenge","punc","pn:cap"],["wc-pn484","punc","secure","punc","pn:cap"],["wc-pn486","punc","secure","punc","pn:cap"],["wc-pn496","punc","challenge","punc","pn:cap"],["wc-pn499","punc","secure","punc","pn:cap"],["wc-pn509","punc","secure","punc","pn:cap"],["wc-pn510","punc","secure","punc","pn:cap"],["wc-pn512","punc","challenge","punc","pn:cap"],["wc-pn518","punc","challenge","punc","pn:cap"],["wc-pp003","pp","foundation","","pn:proof"],["wc-pp006","pp","foundation","","pn:proof"],["wc-pp013","pp","developing","","pn:proof"],["wc-pp014","pp","developing","","pn:proof"],["wc-pp034","pp","secure","","pn:proof"],["wc-pp036","pp","secure","","pn:proof"],["wc-pp039","pp","challenge","","pn:proof"],["wc-pp045","pp","challenge","","pn:proof"],["wc-pp051","pp","foundation","","pn:proof"],["wc-pp054","pp","developing","","pn:proof"],["wc-pp055","pp","secure","","pn:proof"],["wc-pp058","pp","challenge","","pn:proof"],["wc-s369","one","foundation","noun","wc:noun"],["wc-s370","one","developing","noun","wc:noun"],["wc-s371","one","secure","noun","wc:noun"],["wc-s372","one","challenge","noun","wc:noun"],["wc-s373","one","foundation","verb","wc:verb"],["wc-s374","one","developing","verb","wc:verb"],["wc-s375","one","secure","verb","wc:verb"],["wc-s376","one","challenge","verb","wc:verb"],["wc-s377","one","foundation","adj","wc:adj"],["wc-s378","one","developing","adj","wc:adj"],["wc-s379","one","secure","adj","wc:adj"],["wc-s380","one","challenge","adj","wc:adj"],["wc-s381","one","foundation","adv","wc:adv"],["wc-s382","one","developing","adv","wc:adv"],["wc-s383","one","secure","adv","wc:adv"],["wc-s384","one","challenge","adv","wc:adv"],["wc-tq732","tech","secure","","tech:sim"],["wc-tq734","tech","challenge","","tech:meta"],["wc-tq735","tech","developing","","tech:pers"],["wc-tq736","tech","challenge","","tech:pers"],["wc-tq737","tech","foundation","","tech:onom"],["wc-tq738","tech","developing","","tech:onom"],["wc-tq743","tech","foundation","","tech:sim"],["wc-tq744","tech","foundation","","tech:meta"],["wc-tq745","tech","developing","","tech:pverb"],["wc-tq746","tech","secure","","tech:pverb"],["wc-tq747","tech","secure","","tech:sense"],["wc-tq748","tech","challenge","","tech:sense"],["wc-vt167","vt","foundation","vt","vt:sform"],["wc-vt168","vf","foundation","vf","vt:sform"],["wc-vt169","vt","developing","vt","vt:sform"],["wc-vt170","vf","developing","vf","vt:sform"],["wc-vt171","vt","secure","vt","vt:sform"],["wc-vt172","vf","secure","vf","vt:sform"],["wc-vt173","vt","challenge","vt","vt:sform"],["wc-vt174","vf","challenge","vf","vt:sform"],["wc-vt175","vf","foundation","vf","vt:regpast"],["wc-vt176","vf","foundation","vf","vt:regpast"],["wc-vt177","vf","developing","vf","vt:regpast"],["wc-vt178","vf","developing","vf","vt:regpast"],["wc-vt179","vf","secure","vf","vt:regpast"],["wc-vt180","vf","secure","vf","vt:regpast"],["wc-vt181","vf","challenge","vf","vt:regpast"],["wc-vt182","vf","challenge","vf","vt:regpast"],["wc-vt183","vf","foundation","vf","vt:irrpast"],["wc-vt184","vf","foundation","vf","vt:irrpast"],["wc-vt185","vf","developing","vf","vt:irrpast"],["wc-vt186","vf","developing","vf","vt:irrpast"],["wc-vt187","vf","secure","vf","vt:irrpast"],["wc-vt188","vf","secure","vf","vt:irrpast"],["wc-vt189","vf","challenge","vf","vt:irrpast"],["wc-vt190","vf","challenge","vf","vt:irrpast"],["wc-vt191","vt","foundation","vt","vt:be"],["wc-vt192","vf","foundation","vf","vt:be"],["wc-vt193","vt","developing","vt","vt:be"],["wc-vt194","vf","developing","vf","vt:be"],["wc-vt195","vt","secure","vt","vt:be"],["wc-vt196","vf","secure","vf","vt:be"],["wc-vt197","vt","challenge","vt","vt:be"],["wc-vt198","vf","challenge","vf","vt:be"],["wc-vt199","vt","foundation","vt","vt:mixed"],["wc-vt200","vf","foundation","vf","vt:mixed"],["wc-vt201","vt","developing","vt","vt:mixed"],["wc-vt202","vf","developing","vf","vt:mixed"],["wc-vt203","vt","secure","vt","vt:mixed"],["wc-vt204","vf","secure","vf","vt:mixed"],["wc-vt205","vt","challenge","vt","vt:mixed"],["wc-vt206","vf","challenge","vf","vt:mixed"]];
 /* What the content stamp ignores, written by the build so the two copies of the
    rule cannot drift (SPEC 70, 72). */
 var STAMPMETA = {"fmt":1,"skip":["id","dx"],"strict":["secure","challenge"]};
@@ -6799,7 +6812,7 @@ var STAMPMETA = {"fmt":1,"skip":["id","dx"],"strict":["secure","challenge"]};
 /* BANK_REV bumps when the banks change, and bumping it for a code change makes
    every pupil's record run the pruner for nothing. 44 at v0.78: twenty-eight items
    move from the end-mark chip to the boundary chip. */
-var APP = "wcc", VER = "v1.5", BANK_REV = 63;
+var APP = "wcc", VER = "v1.6", BANK_REV = 64;
 var BUG_FORM_URL = "";   /* paste the Office 365 form link to switch the report button on */
 
 /* ================= HELD OUT (v0.61, SPEC 72) ================================
@@ -7303,8 +7316,20 @@ function _blankRoot(){
    wrong, which is the safe direction for anything that forgets `o`
    exists; the report and the statistics script read both. No sitting
    has been recorded anywhere yet, which is why this is free today and
-   would not have been in a month. */
-var DX_ROW_V = 2;
+   would not have been in a month.
+
+   v1.6 BUMPS IT TO 3, and the reason is the one above arriving a second
+   time. Michael sat the SOAPMAPS battery on 2026-10-13, was banded Patchy
+   on `What does the image carry?`, and NOTHING IN THE RECORD COULD SAY WHY.
+   Every one of his five misses was Close, which in a find-them-all round
+   covers two opposite pupils: one who found every quality that transfers
+   and ticked one extra, and one who found a single quality out of three.
+   The first needs telling to stop over-claiming and the second needs
+   teaching. `o` cannot tell them apart and `w` keeps only the FIRST wrong
+   tick, so the question he actually asked of this app could not be
+   answered from its own data. `d` is that answer, and it is free today for
+   exactly as long as nobody has sat a sitting that needed it. */
+var DX_ROW_V = 3;
 
 /* FNV-1a, 32 bits, as eight hex characters. Chosen because it is four
    lines in both JavaScript and Python and gives the same answer in
@@ -7361,14 +7386,16 @@ function itemStamp(item){
  *    l  the level served       r  1 FULLY right, 0 otherwise
  *    o  the middle outcome: "close", "neutral", or "" for neither
  *    w  the wrong option chosen, where the round has options; "" otherwise
+ *    d  what the pupil did, for a round that can be partly right; "" otherwise
  *    s  seconds, to one decimal
  *  The FORM and the ROUTE are properties of the sitting and are recorded
  *  once there rather than 95 times here; a row is always read with its
  *  sitting. */
-function dxRow(n, item, group, act, stage, level, right, chose, secs, outcome){
+function dxRow(n, item, group, act, stage, level, right, chose, secs, outcome, detail){
   return { n:n, id:(item && item.id) || "", v:itemStamp(item), g:group, a:act,
            st:stage, l:level, r:right ? 1 : 0, o:DX_OUTCOMES[outcome] ? outcome : "",
-           w:chose || "", s:Math.round((secs || 0) * 10) / 10 };
+           w:chose || "", d:dxDetailOk(detail) ? detail : "",
+           s:Math.round((secs || 0) * 10) / 10 };
 }
 /* The middle outcomes a round may report, with what each one MEANS, so a
    round cannot invent a third by passing a new string and have it land
@@ -7377,6 +7404,37 @@ var DX_OUTCOMES = {
   close:   "the right place in the sentence, with the edges drawn wrongly",
   neutral: "true of the language, but not the thing this round asked for"
 };
+/* WHAT THE PUPIL ACTUALLY DID, beyond right, wrong and the middle.
+   Declared by KIND rather than as a free-for-all, for the reason
+   DX_OUTCOMES is: a round cannot invent a fourth shape by passing a new
+   object and have it land silently in the data, and anything reading a
+   row knows which fields it may trust. `keys` are the numbers that kind
+   must carry and `say` is what they mean in a sentence, which the report
+   prints rather than inventing its own wording.
+
+   Two kinds, because this app has two ways of being partly right:
+     all   a find-them-all round. f of the t that count were found, and x
+           were ticked that should not have been. f<t is a pupil who has
+           not finished; x>0 is one who has over-claimed; both at once is
+           both. A row with f===t and x===0 is fully right.
+     span  a span round. The pupil's first and last word, then the keyed
+           span's, as word positions. Equal pairs are an exact hit; a
+           pupil one word out at one edge is what TQ_EDGE forgives, and
+           the numbers are kept so that forgiveness stays auditable
+           rather than becoming invisible. */
+var DX_DETAIL = {
+  all:  { keys: ["f", "t", "x"],
+          say: "found %f of %t, and marked %x that do not count" },
+  span: { keys: ["a", "b", "ka", "kb"],
+          say: "selected words %a to %b, where the answer is %ka to %kb" }
+};
+function dxDetailOk(d){
+  if(!d || typeof d !== "object" || !DX_DETAIL[d.k]) return false;
+  var keys = DX_DETAIL[d.k].keys, i;
+  for(i=0;i<keys.length;i++)
+    if(typeof d[keys[i]] !== "number") return false;
+  return true;
+}
 /** A sitting. `form` is which screener form was used and `route` which
  *  deep dive was taken, both fixed for the whole sitting. */
 function dxSitting(form, skill){
@@ -7396,7 +7454,7 @@ function dxSitting(form, skill){
 /* Every row the statistics script needs, and nothing optional. A row
    that is missing one of these is worse than a row that is absent,
    because it looks like data. */
-var DX_ROW_KEYS = ["n","id","v","g","a","st","l","r","o","w","s"];
+var DX_ROW_KEYS = ["n","id","v","g","a","st","l","r","o","w","d","s"];
 function dxRowOk(r){
   if(!r || typeof r !== "object") return false;
   for(var i=0;i<DX_ROW_KEYS.length;i++)
@@ -7405,6 +7463,11 @@ function dxRowOk(r){
          typeof r.v === "string" && r.v.length === 8 &&
          (r.r === 0 || r.r === 1) && (r.st === 1 || r.st === 2) &&
          (r.o === "" || !!DX_OUTCOMES[r.o]) &&
+         (r.d === "" || dxDetailOk(r.d)) &&
+         /* A find-them-all row cannot claim more found than there were to
+            find, and cannot be fully right while something is outstanding. */
+         !(r.d && r.d.k === "all" && (r.d.f > r.d.t || r.d.f < 0 || r.d.x < 0)) &&
+         !(r.r === 1 && r.d && r.d.k === "all" && (r.d.f !== r.d.t || r.d.x)) &&
          /* A row cannot be fully right AND something in between. */
          !(r.r === 1 && r.o) &&
          typeof r.s === "number" && r.s >= 0;
@@ -7822,6 +7885,13 @@ function dxServe(){
      test that waits on `i` reads the screen it has just left, which is the
      v0.20 race that once reported a perfect run as 39 of 40. */
   DX.q = q; DX.item = it; DX.t0 = nowMs(); DX.at = DX.i;
+  /* LIVE MARKING, PER ROUND (v1.6, Michael's ruling). `body.dx` blanks every
+     mark; `body.dxmark` is the declared exception and goes on and off with the
+     question rather than with the sitting, so one round keeping its colours
+     cannot uncover the next round's answer. The list comes from the build via
+     deepmeta, never from a copy here (SPEC 118: the page had three such lists
+     it had never been given). */
+  document.body.classList.toggle("dxmark", !!DX_LIVE_MARK[q.a]);
   var home = DXHOME[q.id], added = false;
   if(home && home.indexOf(it) < 0){ home.unshift(it); added = true; }
   DX_PICK = it;
@@ -7879,11 +7949,11 @@ function dxChrome(){
 /* Every scored round already calls chRecord when an answer is committed, so
    the runner needs no hook in any round. Which is the point: a round added
    next year is in the assessment the moment it is in the register. */
-function dxRecord(ok, outcome){
+function dxRecord(ok, outcome, detail){
   if(!DX.on || !DX.q) return;
   var q = DX.q, secs = (nowMs() - DX.t0) / 1000;
   DX.sit.rows.push(dxRow(DX.sit.rows.length + 1, DX.item, q.g, q.a, 2, q.l,
-                         ok, dxChose(q.a), secs, outcome));
+                         ok, dxChose(q.a), secs, outcome, detail));
   /* THE PER-CELL TALLY, kept as the sitting goes rather than re-derived from
      the rows afterwards. The report bands a cell on the count it prints
      (SPEC 113.3) and the certificate reads the same rows later, so the thing
@@ -8448,13 +8518,19 @@ function dxLeanest(pool, subs){
       by the care of whoever next edits it.
    ==================================================================== */
 
-var DEEPMETA = {"cells":{"cloze":"Insert the word","commas":"Put the commas in","ei":"Said or suggested?","klass":"Which class fills the gap?","ktname":"Name the technique","one":"Click the word","pf":"Find it, then fix it","pp":"Proofread a paragraph","punc":"Spot the mistake","tech":"Find the technique","vf":"Put the right tense in","vt":"Spot the tense mistake","xf":"What does the image carry?"},"middle":{"tech":"close","techx":"close","xf":"close","one":"neutral","pp":"close"},"means":{"close":"the right place in the sentence, with the edges drawn wrongly","neutral":"true of the language, but not the thing this round asked for"},"notcell":{"ktdef":"the definition bank is eight rows, one per technique, and it IS the curriculum: holding one out would take a definition away from practice to ask about it once, which is SPEC 72.11's closed-vocabulary rule","crules":"a menu of the six comma rule cards, not a question round: tapping a card opens `commas` filtered to that rule, and THAT round uses the picker"},"uncert":{"punc":"65% answerable without reading, against a computed floor of 26% (+39 over the 22-point budget), by the rule a third blind reader found at v1.4: A RUN OF TWO OR MORE CAPITALS IS INNOCENT AND A LONE MID-SENTENCE CAPITAL IS THE SUSPECT, then the content word standing in the same kind of slot as a lone capital. They answered 29 of 31 with it and 26 of 31 using only branches they would defend, against a chance baseline of 3, with four of those points added on 2026-10-12 by Michael's ruling that a title keeps its full stop: `Mrs.` puts a mid-sentence stop in front of a name, and the cascade's first branch reads the word after a stop. Rule 1 decides that trade and the number carries the cost rather than hiding it (v0.93). Ninth version running that a reader has beaten this family, and the feature is new every time. What v1.4's forty-two items DID buy, and it is most of the way: the practice chip is inside the budget for the first time (40% against a floor of 20% over the 131 questions a change can reach), the ladder inversion is retired, and the three rungs that were decided by a fact about English rather than by the bank are declared in PUNC_CERTAIN instead of authored against. Retire this entry when the chip carries the two shapes that make the new rule wrong: a FAULTY capital standing next to a correct one, so that a run can be guilty (`last Friday Morning`, `every Monday Evening`), and a CORRECT lone capital standing EARLIER in the sentence than the fault, so that 'the first lone capital' points at a sound word. About sixteen items, eight of each.","ei":"92% answerable without reading the quotation: a present auxiliary marks the implied statement, deciding 83% of items and right 100% of those, +42 over a computed floor of 50 (SPEC 115.3). The cause is one habit of English rather than of the authoring, so it needs the round rewritten and re-measured, not a batch. Retire this entry when the measured gap is inside the budget."},"uncertsay":"is being rebuilt, so this skill cannot be certified yet","cellcap":{"pp":4}};
+var DEEPMETA = {"cells":{"cloze":"Insert the word","commas":"Put the commas in","ei":"Said or suggested?","klass":"Which class fills the gap?","ktname":"Name the technique","one":"Click the word","pf":"Find it, then fix it","pp":"Proofread a paragraph","punc":"Spot the mistake","tech":"Find the technique","vf":"Put the right tense in","vt":"Spot the tense mistake","xf":"What does the image carry?"},"middle":{"tech":"close","techx":"close","xf":"close","one":"neutral","pp":"close","ktspot":"close"},"means":{"close":"the right place in the sentence, with the edges drawn wrongly","neutral":"true of the language, but not the thing this round asked for"},"livemark":["ktspot","pp","tech","xf"],"notcell":{"ktdef":"the definition bank is eight rows, one per technique, and it IS the curriculum: holding one out would take a definition away from practice to ask about it once, which is SPEC 72.11's closed-vocabulary rule","crules":"a menu of the six comma rule cards, not a question round: tapping a card opens `commas` filtered to that rule, and THAT round uses the picker"},"uncert":{"punc":"65% answerable without reading, against a computed floor of 26% (+39 over the 22-point budget), by the rule a third blind reader found at v1.4: A RUN OF TWO OR MORE CAPITALS IS INNOCENT AND A LONE MID-SENTENCE CAPITAL IS THE SUSPECT, then the content word standing in the same kind of slot as a lone capital. They answered 29 of 31 with it and 26 of 31 using only branches they would defend, against a chance baseline of 3, with four of those points added on 2026-10-12 by Michael's ruling that a title keeps its full stop: `Mrs.` puts a mid-sentence stop in front of a name, and the cascade's first branch reads the word after a stop. Rule 1 decides that trade and the number carries the cost rather than hiding it (v0.93). Ninth version running that a reader has beaten this family, and the feature is new every time. What v1.4's forty-two items DID buy, and it is most of the way: the practice chip is inside the budget for the first time (40% against a floor of 20% over the 131 questions a change can reach), the ladder inversion is retired, and the three rungs that were decided by a fact about English rather than by the bank are declared in PUNC_CERTAIN instead of authored against. Retire this entry when the chip carries the two shapes that make the new rule wrong: a FAULTY capital standing next to a correct one, so that a run can be guilty (`last Friday Morning`, `every Monday Evening`), and a CORRECT lone capital standing EARLIER in the sentence than the fault, so that 'the first lone capital' points at a sound word. About sixteen items, eight of each.","ei":"92% answerable without reading the quotation: a present auxiliary marks the implied statement, deciding 83% of items and right 100% of those, +42 over a computed floor of 50 (SPEC 115.3). The cause is one habit of English rather than of the authoring, so it needs the round rewritten and re-measured, not a batch. Retire this entry when the measured gap is inside the budget."},"uncertsay":"is being rebuilt, so this skill cannot be certified yet","cellcap":{"pp":4}};
 var DX_CELL_NAME = DEEPMETA.cells || {};
 /* Which rounds end in something other than right or wrong, and what that
    something means, written by the build from the same table the assembler
    gates against. The page's own DX_OUTCOMES is checked against this at
    validate time, so the two cannot drift. */
 var DX_MIDDLE = DEEPMETA.middle || {};
+/* The rounds that keep their marking visible inside a sitting (v1.6). An
+   ARRAY from the build, turned into a lookup here, because the runner asks
+   "is this activity one of them" on every question. An empty list is the
+   old behaviour: nothing is marked until the end. */
+var DX_LIVE_MARK = {};
+(DEEPMETA.livemark || []).forEach(function(a){ DX_LIVE_MARK[a] = 1; });
 var DX_MEANS = DEEPMETA.means || {};
 /* THE TWO LISTS THE PAGE USED TO DECIDE WITHOUT (v1.0). Both are declared on
    the build side with their reasons written beside them, and both decide
@@ -8557,6 +8633,68 @@ function dxCells(sit){
     out[c.cell] = { n:c.n, r:c.r, lvls:c.lvls || {} };
   }
   return out;
+}
+
+/* WHAT THE ROWS KNOW AND THE TALLY DOES NOT (v1.6, SPEC 131).
+   `dxCells` reads `sit.cells`, which the runner keeps as it goes and which
+   holds n and r only. So every report this app has printed has counted a
+   Close as a plain wrong answer, and `o` has been stored and validated since
+   v0.66 with nothing ever reading it.
+
+   Michael found it by sitting the thing: five of his nine image questions were
+   Close, the band said "Patchy, 4 of 9", and the two sentences a teacher would
+   write from those are opposite. So this walks the rows and brings back, per
+   cell: how many were close, how many neutral, and for a find-them-all round
+   what the details add up to. `over` is ticks that do not count and `short` is
+   answers left out, which are the two ways of being partly right and want
+   different advice.
+
+   It reads `d` DEFENSIVELY, because a sitting taken before v1.6 has no such
+   field and a sitting is evidence that is never migrated (v0.60): a missing
+   detail means this report says less about that sitting, never that it
+   throws. */
+function dxPartly(sit){
+  var out = {}, i, r, g;
+  for(i=0;i<(sit.rows || []).length;i++){
+    r = sit.rows[i];
+    if(!r || !r.a) continue;
+    g = out[r.a] || (out[r.a] = {close:0, neutral:0, over:0, short:0, detailed:0});
+    if(r.o === "close") g.close++;
+    else if(r.o === "neutral") g.neutral++;
+    if(r.d && r.d.k === "all"){
+      g.detailed++;
+      if(r.d.x > 0) g.over++;
+      if(r.d.f < r.d.t) g.short++;
+    }
+  }
+  return out;
+}
+
+/* The count column. "4 of 9" where nothing was partly right, and the three
+   numbers where something was, because a pupil who was close five times has
+   not failed five times and the single fraction said they had. */
+function dxCount(s, part){
+  var n = s.r + " of " + s.n;
+  if(!part) return n;
+  if(part.close) n += ", " + part.close + " close";
+  if(part.neutral) n += ", " + part.neutral + " neither";
+  return n;
+}
+
+/* And the sentence that says WHICH way a cell was partly right, which is the
+   whole point of keeping the detail. Over-claiming and under-finding are
+   opposite mistakes and the practice for them is not the same: sending a pupil
+   who ticks one too many down to the easiest level teaches them nothing,
+   which is what this report did to Michael on 2026-10-13. */
+function dxPartlyWhy(part){
+  if(!part || !part.detailed) return "";
+  if(part.over && !part.short)
+    return "You are finding what carries across and marking extra things that do not.";
+  if(part.short && !part.over)
+    return "You are right about what you find and you are stopping too early.";
+  if(part.over && part.short)
+    return "Some of what you marked does not carry across, and some of what does was left out.";
+  return "";
 }
 
 /* The lowest level in a cell the pupil got something wrong at, which is where
@@ -8682,17 +8820,26 @@ function dxReportBody(sit){
     for(i=0;i<weak.length && i<3;i++) names.push(dxCellName(weak[i]));
     h += '<p class="lead work">Work on <b>' + esc(dxList(names)) + '</b>' +
          dxStop(names[names.length-1]) + '</p>';
+    /* AND HOW it was wrong, where the rows can say. One sentence, under the
+       verdict, only for the weakest cell and only when the detail supports
+       it: the page's rule is that a line earns its place by changing what the
+       pupil does next (v0.98), and "stop adding the ones that stay behind" is
+       a different instruction from "go back to the easiest level". */
+    var why1 = dxPartlyWhy(dxPartly(sit)[weak[0]]);
+    if(why1) h += '<p class="note">' + esc(why1) + '</p>';
   } else {
     h += '<p class="lead work">Too few questions here to say much. Sitting it again ' +
          'gives every part more.</p>';
   }
 
+  var partly = dxPartly(sit);
   h += '<table class="rep band"><tbody>';
   for(i=0;i<ACTIVITY_LIST.length;i++){
     k = ACTIVITY_LIST[i][0];
     if(!cells[k]) continue;
     s2 = cells[k];
-    h += dxRow2(dxCellName(k), dxBand(s2.r, s2.n).band, s2.r + " of " + s2.n);
+    h += dxRow2(dxCellName(k), dxBand(s2.r, s2.n).band,
+                dxCount(s2, partly[k]));
   }
   h += '</tbody></table>';
 
@@ -8707,6 +8854,22 @@ function dxReportBody(sit){
     }
     h += '</ul>';
   }
+
+  /* THE REASONS, HELD BACK FROM THE SITTING AND PRINTED HERE (v1.6).
+     Michael's ruling of 2026-10-13 split the feedback: the colours appear the
+     moment a pupil presses Check, so nobody repeats one mistake nine times,
+     and the written explanations wait for this page. That keeps the sitting
+     from becoming a lesson it has not finished measuring, and it puts the
+     teaching on the artefact that gets printed and taken home.
+
+     Only the questions a pupil did not get fully right, and only the rounds
+     LIVE_MARK names, because those are the ones whose mistake is a convention
+     rather than a fact. An item whose id has since been RETIRED prints nothing
+     but its own absence: a sitting is a record of what was answered on a day
+     and a retired question does not un-answer it (v0.60), so the honest thing
+     is a line saying the question has gone rather than a blank or a throw. */
+  var told = dxToldHtml(sit);
+  if(told) h += '<h2>Why those answers</h2>' + told;
 
   if(cmp && cmp.rows.length){
     h += '<h2>Since ' + esc(dxWhen(cmp.prev.at)) + '</h2>';
@@ -8853,6 +9016,65 @@ var DX_REP_CSS =
    twice and the two halves could drift apart. Michael, 2026-10-11: "Get rid
    of the 'For the teacher' section; it is redundant and shows basically the
    same info." The band table IS the teacher's view. */
+/* ---- the written teaching for a question, by round ----------------------
+   One formatter per live-marking round, because each one's teaching lives in a
+   different shape and a generic version would print the union of three. A
+   round not listed falls through to the sentence alone, which is still worth
+   printing: it says which question is being talked about. */
+var DX_TOLD = {
+  xf: function(it){
+    var k, out = "";
+    if(it.tr && it.tr.length)
+      out += '<li>What carries across: <b>' + it.tr.map(esc).join('</b>, <b>') + '</b>.</li>';
+    for(k=0;k<(it.dq || []).length;k++)
+      out += '<li class="dim"><b>' + esc(it.dq[k]) + '</b>: ' +
+             esc((it.dw || [])[k] || "true of the image, and it carries nothing across") +
+             '</li>';
+    if(it.mod) out += '<li><b>Writing it up.</b> ' + esc(it.mod) + '</li>';
+    return out;
+  },
+  tech: function(it){
+    var k, spans = [];
+    for(k=0;k<(it.spans || []).length;k++)
+      if(it.spans[k].t === it.tech)
+        spans.push((it.words || []).slice(it.spans[k].a, it.spans[k].b + 1).join(" "));
+    if(!spans.length) return "";
+    return '<li>The ' + esc(techName(it.tech)) + ' is <b>' +
+           spans.map(esc).join('</b> and <b>') + '</b>, all of it.</li>';
+  },
+  pp: function(it){
+    var k, out = "";
+    for(k=0;k<(it.errors || []).length;k++)
+      out += '<li><b>' + esc(it.errors[k].wrong) + '</b> should be <b>' +
+             esc(it.errors[k].right) + '</b>. ' + esc(it.errors[k].why) + '</li>';
+    return out;
+  }
+};
+
+function dxToldHtml(sit){
+  var i, r, it, body, h = "", n = 0;
+  for(i=0;i<(sit.rows || []).length;i++){
+    r = sit.rows[i];
+    if(!r || r.r === 1 || !DX_LIVE_MARK[r.a]) continue;
+    n++;
+    it = (typeof dxItem === "function") ? dxItem(r.id) : null;
+    if(!it){
+      h += '<p class="note">Question ' + r.n + ' is no longer in the app, so there is ' +
+           'nothing left to explain. What you answered on the day still counts.</p>';
+      continue;
+    }
+    body = (DX_TOLD[r.a] || function(){ return ""; })(it);
+    h += '<p class="note"><b>Question ' + r.n + '.</b> ' + esc(it.text || "") + '</p>';
+    if(r.d && r.d.k === "all")
+      h += '<p class="note">You found ' + r.d.f + ' of ' + r.d.t +
+           (r.d.x ? ' and marked ' + r.d.x +
+                    (r.d.x === 1 ? ' that does not count' : ' that do not count') : '') +
+           '.</p>';
+    if(body) h += '<ul>' + body + '</ul>';
+  }
+  return n ? h : "";
+}
+
 function dxReportHtml(sit){
   return dxReportBody(sit) +
     '<p class="foot">Word Class Commando ' + esc(sit.app || "") +
@@ -11678,8 +11900,8 @@ function blitzStopNow(){
    the fun taken out, and nobody chose it. What survives is the one-line hook
    every activity's check function calls, which now only feeds Challenge.
    Renamed from testRecord at v0.44 so the name says what it does. */
-function chRecord(ok, outcome){
-  if(DX.on) return dxRecord(ok, outcome);
+function chRecord(ok, outcome, detail){
+  if(DX.on) return dxRecord(ok, outcome, detail);
   if(B.on) return blitzRecord(ok, outcome);
 }
 
@@ -13781,17 +14003,57 @@ function tqInSpan(it, i){
   return -1;
 }
 
-/* exact = the selection IS one of the marked spans.
-   close = it overlaps one without matching it.
-   Close is neither credited nor penalised, which is the ruling the verb groups
-   already run on at SPEC 9.3: a student who found the right place and drew the
-   edges wrongly has not made the mistake this round is about. */
+/* HOW CLOSE COUNTS AS RIGHT (v1.6, SPEC 129). Michael's ruling, and the
+   project had already written the argument for it and not acted on it: SPEC
+   72.9 says a span round cannot sit in a right-or-wrong instrument because
+   "four readers all chose different boundaries". He became the fifth,
+   highlighting a fair part of the technique and being banded on it. If
+   expert readers do not agree on the edges, then marking the exact edges
+   is measuring agreement with one author's boundary, not knowledge.
+
+   So a selection within TQ_EDGE words of a keyed span AT BOTH EDGES is
+   RIGHT. The bound is what makes it affordable, and it has to be a bound
+   rather than the raw overlap `close` already computes: measured over all
+   742 items, crediting any overlap means SELECTING THE WHOLE SENTENCE IS
+   CORRECT ON EVERY QUESTION IN THE BANK, and a random drag pays 69%. At
+   one word it is 0% and 12%, against 1.6% for exact edges and 25% for a
+   four-option round, so a blind drag still fails. At two words a random
+   drag pays 28%, which is why the bound is one and not two: the sentences
+   are a median ten words long, and two words either side of a four-word
+   answer is most of the sentence. Michael's other half of the fix, longer
+   paragraphs, is what would pay for a wider bound later; `tq_edge_floor`
+   in the build is the measurement that would have to say so first.
+
+   The forgiveness stays AUDITABLE rather than becoming invisible: the row
+   records the pupil's edges and the keyed ones (DX_DETAIL `span`), so a
+   report can tell an exact hit from a forgiven one, and `near` below is
+   what makes the feedback still teach the whole phrase. */
+var TQ_EDGE = 1;
+
+/* exact = the selection is one of the marked spans, or is within TQ_EDGE
+            words of one at both edges, in which case `near` is set.
+   close = it overlaps one without being near it.
+   Close is still neither credited nor penalised in practice, which is the
+   ruling the verb groups already run on at SPEC 9.3: a student who found the
+   right place and drew the edges wrongly has not made the mistake this round
+   is about. */
+function tqNear(a, b, sp, tol){
+  return Math.abs(a - sp.a) <= tol && Math.abs(b - sp.b) <= tol;
+}
 function tqJudge(it){
   var k, sp;
   for(k=0;k<it.spans.length;k++){
     sp = it.spans[k];
     if(sp.t !== it.tech) continue;
     if(sp.a === TQ.a && sp.b === TQ.b) return {v:"exact", sp:sp};
+  }
+  /* The forgiven band, tested only after every exact match has been tried, so
+     an item with two keyed spans cannot have a near miss on one beat an exact
+     hit on the other. */
+  for(k=0;k<it.spans.length;k++){
+    sp = it.spans[k];
+    if(sp.t !== it.tech) continue;
+    if(tqNear(TQ.a, TQ.b, sp, TQ_EDGE)) return {v:"exact", sp:sp, near:true};
   }
   for(k=0;k<it.spans.length;k++){
     sp = it.spans[k];
@@ -13801,9 +14063,12 @@ function tqJudge(it){
   return {v:"miss", sp:null};
 }
 
-/* the same three-way judgement against any one span, not only the technique's */
+/* the same three-way judgement against any one span, not only the technique's.
+   It takes the same tolerance, because the tenor is a span too and the reason
+   for forgiving an edge is a fact about readers rather than about one step. */
 function tqJudgeSpan(sp){
   if(TQ.a === sp[0] && TQ.b === sp[1]) return "exact";
+  if(tqNear(TQ.a, TQ.b, {a:sp[0], b:sp[1]}, TQ_EDGE)) return "exact";
   if(TQ.a <= sp[1] && TQ.b >= sp[0])   return "close";
   return "miss";
 }
@@ -13832,7 +14097,10 @@ function tqCheck(){
       span.push(tqPhrase(it, it.spans[k].a, it.spans[k].b));
   var fb = '<li><b>' + esc(techName(it.tech)) + '</b>: ' + techDef(it.tech) + '.</li>' +
            '<li>Here it is <b>' + esc(span.join("</b> and <b>")) + '</b>.</li>';
-  if(res.v === "close")
+  if(res.near)
+    fb += '<li class="dim">Your edges were a word out, which still counts. The whole '
+        + 'phrase is <b>' + esc(tqPhrase(it, res.sp.a, res.sp.b)) + '</b>.</li>';
+  else if(res.v === "close")
     fb += '<li class="dim">You found the right part of the sentence, but not the whole '
         + 'phrase. The technique is all of <b>'
         + esc(tqPhrase(it, res.sp.a, res.sp.b)) + '</b>.</li>';
@@ -13865,7 +14133,8 @@ function tqCheck(){
      stops here for both: the tenor and transfer steps are teaching and belong
      in practice, and offering them against a clock or inside a measurement
      would stall on a button nobody meant to press. */
-  chRecord(res.v === "exact", res.v === "close" ? "close" : null);
+  chRecord(res.v === "exact", res.v === "close" ? "close" : null,
+           res.sp ? { k:"span", a:TQ.a, b:TQ.b, ka:res.sp.a, kb:res.sp.b } : null);
   if(B.on || DX.on) return;
   if(tqSteps(it) > 1) tqOffer("Now the tenor");
   else el("tqNextBar").style.display = "";
@@ -14328,7 +14597,8 @@ function xfCheck(){
   save(st);
   el("xfCheck").style.display = "none";
   el("xfNextBar").style.display = "";
-  chRecord(right, close ? "close" : null);
+  chRecord(right, close ? "close" : null,
+           { k:"all", f:found, t:it.tr.length, x:over });
 }
 
 /* ============ KNOW THE TECHNIQUES (SPEC 46, from Analysis Acrobat) ==========
@@ -14449,7 +14719,7 @@ function ktSort(j, c){
   el("kts"+j+"b").setAttribute("aria-pressed", c===1 ? "true" : "false");
   el("ktCheck").disabled = Object.keys(KT.assign).length < KT.opts.length;
 }
-function ktFinish(right, key, fb, close){
+function ktFinish(right, key, fb, close, detail){
   KT.done = true;
   close = !right && !!close;
   el("ktScore").textContent = right ? "Right" : (close ? "Close" : "Not that one");
@@ -14460,7 +14730,7 @@ function ktFinish(right, key, fb, close){
   save(st);
   el("ktCheck").style.display = "none";
   el("ktNextBar").style.display = "";
-  chRecord(right, close ? "close" : null);
+  chRecord(right, close ? "close" : null, detail);
 }
 function ktPick(i){
   if(KT.done) return;
@@ -14492,7 +14762,7 @@ function ktCheck(){
   if(KT.done) return;
   var i, b, right = true;
   if(KT.mode === "spot"){
-    var T = KT.T, found = 0, total = 0;
+    var T = KT.T, found = 0, total = 0, over = 0;
     /* Analysis Acrobat's ruling, kept: personification is a kind of metaphor,
        so a personification counts during a Metaphor round, never the reverse. */
     var hit = function(t){ return t === T || (T === "Metaphor" && t === "Personification"); };
@@ -14508,7 +14778,7 @@ function ktCheck(){
       if(isT && sel){ b.className = "qchip q-ok"; found++; }
       else if(isT && !sel){ b.className = "qchip q-miss"; right = false; }
       else if(isN && sel){ b.className = "qchip q-neu"; neu.push('"'+esc(KT.opts[i].phrase)+'"'); }
-      else if(!isT && sel){ b.className = "qchip q-bad"; right = false; }
+      else if(!isT && sel){ b.className = "qchip q-bad"; right = false; over++; }
     }
     var list = KT.opts.filter(function(x){ return hit(x.tech); }).map(function(x){ return '"'+esc(x.phrase)+'"'; });
     ktFinish(right, "kt:spot", '<li>'+(right ? 'All '+total+' found, and nothing else.' :
@@ -14516,7 +14786,8 @@ function ktCheck(){
       '</li><li><b>'+esc(T)+' here:</b> '+list.join(', ')+
       (T === "Metaphor" ? ' <span class="dim">(personification is a kind of metaphor, so it counts too)</span>' : '')+'</li>'+
       (neu.length ? '<li class="dim">'+neu.join(', ')+' can also count as '+esc(T)+', so tapping it is neither right nor wrong.</li>' : ''),
-      found > 0);   /* partly found is Close, as in every other find-them-all round */
+      found > 0,    /* partly found is Close, as in every other find-them-all round */
+      { k:"all", f:found, t:total, x:over });
   } else if(KT.mode === "sort"){
     var ok = 0;
     for(i=0;i<KT.opts.length;i++){
@@ -14693,7 +14964,8 @@ function ppCheck(){
   recordSeen("pp:"+PP.lvl, it.id, score === "Right");
   save(st);
   el("ppNextBar").style.display = "";
-  chRecord(score === "Right", score === "Close" ? "close" : null);
+  chRecord(score === "Right", score === "Close" ? "close" : null,
+           { k:"all", f:found, t:n, x:extra.length });
 }
 
 /* ============ SPOT THE MISTAKES IN A PARAGRAPH (SPEC 48) ====================
@@ -16894,6 +17166,28 @@ function validate(){
     if(!DX_MEANS[ok2])
       E.push("diagnostic: the page knows the outcome '"+ok2+"' and the build does not "+
              "define what it means, so the report cannot name it.");
+  /* And the live-marking exception, read back from the build (v1.6). The CSS
+     blanks a mark for every round except these, so an activity named here that
+     the page cannot open is an exception granted to nothing, and one that has
+     no middle outcome is the stale case the build gates on its own side. Two
+     readers of one list, which is the arrangement this project reaches for
+     wherever two things have to stay in step. */
+  var dxreg = {};
+  for(i=0;i<DEEPREG.length;i++) dxreg[DEEPREG[i][1]] = 1;
+  for(var lm in DX_LIVE_MARK){
+    /* Only for a round a sitting actually SERVES. A declaration written before
+       its cell exists is the order this project works in on purpose, so
+       `ktspot` naming itself here while nothing is registered to it is
+       foresight and not a fault; the day it becomes a cell this fires if the
+       runner cannot open it. The build gates the other half, that the round
+       has something partial to show at all. */
+    if(dxreg[lm] && !DX_OPEN[lm])
+      E.push("diagnostic: '"+lm+"' is declared to keep its marking inside a sitting, is "+
+             "registered, and is not a round the sitting can open.");
+    if(!DX_MIDDLE[lm])
+      E.push("diagnostic: '"+lm+"' keeps its marking inside a sitting and has no middle "+
+             "outcome, so there is nothing partial for the colour to show.");
+  }
   var dxacts = {}, j2;
   for(i=0;i<DEEPREG.length;i++) dxacts[DEEPREG[i][1]] = 1;
   for(var act in dxacts){
