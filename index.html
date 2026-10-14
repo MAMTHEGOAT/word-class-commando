@@ -1658,8 +1658,8 @@ details.aa-theory summary{cursor:pointer;font-weight:700}
   <p class="prompt" id="cyPrompt"></p>
   <div class="sent" id="cySent"></div>
   <div class="bar">
-    <span class="kb"><button class="go yn keep" onclick="cyAnswer(true)" id="cyYes">Yes, something is wrong</button>
-    <button class="ghost yn keep" onclick="cyAnswer(false)" id="cyNo">No, it is correct</button></span>
+    <span class="kb"><button class="go yn keep" onclick="cyAnswer(true)" id="cyYes">Yes, a capital is wrong</button>
+    <button class="ghost yn keep" onclick="cyAnswer(false)" id="cyNo">No, the capitals are right</button></span>
     <span class="score" id="cyScore"></span>
   </div>
   <ul class="fb" id="cyFb"></ul>
@@ -3970,7 +3970,7 @@ var PUNCT = [
 ];
 var PUNCMETA = {"types":{"cap":"Capital letters","end":"Asking or telling","splice":"Where sentences end","apos":"Apostrophes","comma":"Commas","speech":"Speech punctuation"},"order":["cap","end","splice","apos","comma","speech"],"asks":{"cap":"Which words in this sentence need a capital letter?","end":"Does this sentence ask you something or tell you something, and so which mark belongs at the end of it?","apos":"Does this word need an apostrophe, and where does it go?","splice":"Where does one sentence end and the next one begin? A group of words that cannot stand alone is not a sentence however it is punctuated, and a comma is not strong enough to hold together two that can.","comma":"Does this sentence need a comma, and is it in the right place?","speech":"Where do the marks go around what somebody said?"},"tells":{"cap":["One word here needs a capital letter, or has one it should not have.","Tap that word."],"end":["One sentence here ends with the wrong mark, or with no mark at all.","Tap the word carrying the mistake."],"apos":["One word here needs an apostrophe, has one it does not need, or has one in the wrong place.","Tap that word."],"splice":["One place where two groups of words meet has the wrong mark, or no mark where it needs one.","Tap the word just before that place."],"comma":["One place in this sentence has a comma missing, or a comma it does not need.","Tap the word carrying the mistake."],"speech":["The punctuation around what somebody said has gone wrong in one place, or a mark is missing inside the speech.","Tap the word carrying the mistake, or the word just in front of a missing mark."]},"posok":{"ask":"the fault IS the final mark of a one-sentence item, so its position is the round's shape rather than the bank's, and no item of this skill can put it anywhere else. The boundary skill, where the position does vary and is gated, is its own chip from v0.78 and runs in both directions: a stop that has to go and a boundary that has to arrive (SPEC 92.4, SPEC 93)."},"authored":[],"fams":[{"id":"fullstop","name":"Full stops","sel":["end.where","end.stop","splice"],"why":null,"blurb":"Where one sentence ends and the next begins, including a comma trying to do a full stop's job."},{"id":"comma","name":"Commas","sel":["comma","splice"],"why":null,"blurb":"Lists, dropped-in information, opening clauses, speaking to someone, and the comma that joins two sentences when it should not."},{"id":"semi","name":"Semicolons","sel":[],"why":"Not written yet, wanted, and PARKED. Michael ruled on 2026-10-02 that the various uses of the semicolon are to be taught, because the exam boards count it as complex punctuation and it lifts a writing mark. A first design was drafted and blind-read, and he parked it as too narrow: it tested the semicolon against the round shapes this app already has, which is the wrong question, when a new activity is allowed and the platform is not fixed. The readers' findings on the twenty-eight drafted items stand as evidence; the verdicts do not. SPEC 87 carries both, with the brief for whoever picks it up.","blurb":"Joining two sentences with a mark stronger than a comma."},{"id":"question","name":"Question marks","sel":["end.ask"],"why":null,"blurb":"Does this sentence ask something, or does it tell you something?"},{"id":"cap","name":"Capital letters","sel":["cap"],"why":null,"blurb":"Names and sentence starts, and the capitals that should not be there at all."},{"id":"apos","name":"Apostrophes","sel":["apos"],"why":null,"blurb":"Who owns what, and where the apostrophe goes when they do."},{"id":"speech","name":"Speech punctuation","sel":["speech"],"why":null,"blurb":"The marks that go around what somebody said, and the capital that starts it."},{"id":"combined","name":"Mixed punctuation","sel":["para.mixed"],"why":null,"blurb":"Whole paragraphs with more than one kind of mistake in them, the way your own writing arrives."}]};
 var YNMETA = {"buckets":{"noun:f":794,"noun:y":530,"noun:c":880,"verb:f":831,"verb:c":1005,"verb:y":470,"adv:f":360,"adv:c":447,"adv:y":181,"adj:f":378,"adj:y":245,"adj:c":540},"total":6661};
-var CAPYNMETA = {"total":124,"faulty":67,"levels":{"foundation":[13,13],"developing":[12,8],"secure":[25,19],"challenge":[17,17]}};
+var CAPYNMETA = {"total":119,"faulty":64,"levels":{"foundation":[13,13],"developing":[11,7],"secure":[25,19],"challenge":[15,16]}};
 /* >>> BANK:PUNCTUATION END >>> */
 
 /* >>> BANK:COMMAS START >>> */
@@ -6878,7 +6878,7 @@ var STAMPMETA = {"fmt":1,"skip":["id","dx"],"strict":["secure","challenge"]};
 /* BANK_REV bumps when the banks change, and bumping it for a code change makes
    every pupil's record run the pruner for nothing. 44 at v0.78: twenty-eight items
    move from the end-mark chip to the boundary chip. */
-var APP = "wcc", VER = "v1.8", BANK_REV = 65;
+var APP = "wcc", VER = "v1.8.1", BANK_REV = 65;
 /* v1.7 did NOT bump BANK_REV, and that was the rule above being followed rather
    than forgotten: 75 option texts were rewritten inside items that kept their ids,
    nothing was retired and nothing moved chip, so no stored record was orphaned and
@@ -13588,12 +13588,43 @@ function pnCheck(){
    The coin is `_fnv1a` of the item's id, which is the same function the stamps
    use and has a Python twin, so the build and the page choose the same half. */
 var CAPYN = [];
+/** Does the sentence answer the yes/no question by itself? (v1.8.1, SPEC 134.6)
+ *
+ *  A blind reader on the candidate register found the largest weakness the
+ *  round had: where a MISSING capital sits in a slot parallel to one that is
+ *  correctly there, a pupil sees the mismatch without knowing which of the two
+ *  is right. `He speaks french at home and English at school.` is free.
+ *
+ *  In the TAP round those are good questions, because the pupil still has to
+ *  say WHICH word is wrong, and the contrast is the teaching. Here there is
+ *  nothing left to decide, so the item leaves THIS round's pool and keeps
+ *  serving that one. Same content, two rounds, opposite verdicts.
+ *
+ *  This is the twin of `capyn_self_answering` in the build, and the two have
+ *  to agree or the counts disagree -- which is what the validator compares,
+ *  and what it caught within a minute of the build side landing alone. */
+function cySelfAnswering(it){
+  var w = it.words || [], e = it.err, i, j, lo, hi, prev, that;
+  var bare = function(x){ return String(x).replace(/[^A-Za-z']/g, ""); };
+  if(typeof e !== "number" || e >= w.length) return false;
+  if(!/^[a-z]/.test(bare(w[e]))) return false;      /* add-a-capital only */
+  prev = e > 0 ? bare(w[e - 1]).toLowerCase() : "";
+  for(i=1;i<w.length;i++){
+    if(i === e || !/^[A-Z]/.test(bare(w[i]))) continue;
+    that = i > 0 ? bare(w[i - 1]).toLowerCase() : "";
+    if(prev && prev === that) return true;
+    lo = Math.min(i, e); hi = Math.max(i, e);
+    for(j=lo+1;j<hi;j++) if(bare(w[j]).toLowerCase() === "and") return true;
+  }
+  return false;
+}
 function cyBuild(){
   CAPYN.length = 0;
   if(typeof PUNCT === "undefined") return 0;
   for(var i=0;i<PUNCT.length;i++){
     var it = PUNCT[i];
     if(it.type !== "cap" || typeof it.err !== "number" || !it.fixed) continue;
+    if(cySelfAnswering(it)) continue;
     /* The coin: the low bit of the id's hash. Faulty when it is 1. */
     var faulty = (parseInt(_fnv1a(it.id).slice(-1), 16) % 2) === 1;
     CAPYN.push({ id: it.id + ":yn", s: it.id, level: it.level, faulty: faulty,
@@ -13631,7 +13662,15 @@ function cyServe(rec){
   /* ONE instruction over every item, never composed per item. v0.63: a true
      instruction that varies IS a cue, because what it leaves out is printed
      exactly when the answer can vary. */
-  el("cyPrompt").textContent = "Does this sentence have a capital-letter mistake in it?";
+  /* SAY WHAT THE ROUND MARKS, not only what it asks (v0.62, applied here at
+     v1.8.1). Both blind readers pressed, or said a pupil would press, on the
+     comma in `Our teacher, Mrs. Patel, marked all the books`, on the unquoted
+     sign text in another, and on `Mrs.` carrying a full stop -- which is
+     Michael's own v1.5 ruling and correct, and which a button saying "something
+     is wrong" invites a sharp pupil to flag. None of those is what this round
+     marks. The buttons name capitals and so does the question. */
+  el("cyPrompt").textContent =
+    "Are the capital letters right in this sentence? Only the capitals count here.";
   el("cySent").textContent = rec.text;
   el("cyScore").textContent = "";
   el("cyFb").innerHTML = "";
