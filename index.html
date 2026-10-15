@@ -6890,7 +6890,7 @@ var STAMPMETA = {"fmt":1,"skip":["id","dx"],"strict":["secure","challenge"]};
 /* BANK_REV bumps when the banks change, and bumping it for a code change makes
    every pupil's record run the pruner for nothing. 44 at v0.78: twenty-eight items
    move from the end-mark chip to the boundary chip. */
-var APP = "wcc", VER = "v1.9.1", BANK_REV = 67;
+var APP = "wcc", VER = "v1.9.2", BANK_REV = 67;
 /* v1.7 did NOT bump BANK_REV, and that was the rule above being followed rather
    than forgotten: 75 option texts were rewritten inside items that kept their ids,
    nothing was retired and nothing moved chip, so no stored record was orphaned and
@@ -8505,6 +8505,42 @@ function batEarn(dom){
   return batAward(dom);
 }
 
+/* THE NAME FOLLOWS THE SITTING INTO THE AWARD (v1.9.2).
+
+   The name box is on the REPORT and the award is issued when the sitting
+   FINISHES, so every pupil meets the two in that order and the frozen copy of
+   `who` is empty for the part that completed the skill. Punctuation is one
+   part, so the first certificate this app is able to issue said "(no name
+   given)" to everybody, on the one page a pupil keeps and hands to a parent.
+   It could not be seen before v1.9.1, because no skill could be certified and
+   the suite's synthetic one writes `who` straight onto its rigged sittings.
+
+   Nothing earned is revoked and no evidence moves: the parts, the scores and
+   the dates stay exactly as the award froze them, which is what SPEC 113.4
+   stores them for. A NAME IS NOT EVIDENCE. It is the label on the document,
+   it lives on the sitting because a pupil who hands one report in under a
+   nickname has not renamed every report they ever sat, and the award's copy
+   of it therefore follows the sitting rather than being a second value that
+   can disagree with it (v0.53). */
+function batName(sit){
+  if(!sit || !sit.skill) return null;
+  var aw = batAward(sit.skill), parts, i, who = "";
+  if(!aw) return null;
+  store();                          /* the award is a reference into the store */
+  parts = aw.parts || [];
+  /* Matched on the DATE the part was mastered, which is what the award row
+     carries. An award row points at no sitting id, and adding one would be a
+     second way of saying what `at` already says. */
+  for(i=0;i<parts.length;i++)
+    if((parts[i].at || 0) === (sit.at || 0)) parts[i].who = sit.who || "";
+  /* The newest non-empty one wins, the same rule `batCertWho` prints by, so
+     the stored name and the printed name cannot differ. */
+  for(i=0;i<parts.length;i++) if(parts[i].who) who = parts[i].who;
+  aw.who = who;
+  save();
+  return aw;
+}
+
 var DX_VARY = 0.75;
 
 function dxCellPool(cell){
@@ -9217,6 +9253,10 @@ function dxSetName(){
   if(!DX.rep) return;
   DX.rep.who = (el("dxName").value || "").slice(0, 40);
   dxSave(DX.rep);
+  /* And through to the award, if this sitting is part of the evidence one
+     rests on: the certificate is printed from the award and the name is typed
+     after the award is issued (v1.9.2). */
+  batName(DX.rep);
   /* Repaint rather than patch the one element that shows it. The draft that
      patched one element left the other saying "(no name given)" on the same
      page, which is exactly the kind of thing a person notices on a printout
