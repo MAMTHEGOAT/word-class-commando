@@ -6906,7 +6906,7 @@ var STAMPMETA = {"fmt":1,"skip":["id","dx"],"strict":["secure","challenge"]};
 /* BANK_REV bumps when the banks change, and bumping it for a code change makes
    every pupil's record run the pruner for nothing. 44 at v0.78: twenty-eight items
    move from the end-mark chip to the boundary chip. */
-var APP = "wcc", VER = "v1.9.12", BANK_REV = 68;
+var APP = "wcc", VER = "v1.9.13", BANK_REV = 68;
 /* v1.7 did NOT bump BANK_REV, and that was the rule above being followed rather
    than forgotten: 75 option texts were rewritten inside items that kept their ids,
    nothing was retired and nothing moved chip, so no stored record was orphaned and
@@ -6944,7 +6944,15 @@ var APP = "wcc", VER = "v1.9.12", BANK_REV = 68;
    pupil can hold one of these: a registered item is lifted out of the bank at load,
    so nobody has ever been served one and nobody's `seen` list can name one. Three
    more items were corrected in place (wc-ei109, wc-ei112, wc-ei115) and that is the
-   v1.9.8 case, already ruled: the ids go on asking about the same quoted phrases. */
+   v1.9.8 case, already ruled: the ids go on asking about the same quoted phrases.
+   v1.9.13 does NOT bump it, and it is the clearest case of the rule so far: NOT ONE
+   QUESTION CHANGED. The version's product is a measurement and two refusals. Three
+   sort pairs were appended to SORT_PAIRS mid-version and withdrawn before anything
+   shipped, so the derived sort bank is byte for byte the 83 questions v1.9.12 left,
+   and twelve register rows were written and withdrawn, which cannot orphan a stored id
+   either way: a registered item is lifted out of the bank at load, so no pupil was ever
+   served one. A declaration about what is ASSESSED is not a change to what the banks
+   SERVE, and bumping would cost every pupil a pruner pass for no gain. */
 var BUG_FORM_URL = "";   /* paste the Office 365 form link to switch the report button on */
 
 /* ================= HELD OUT (v0.61, SPEC 72) ================================
