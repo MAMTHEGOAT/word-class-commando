@@ -7204,7 +7204,11 @@ var STAMPMETA = {"fmt":1,"skip":["id","dx"],"strict":["secure","challenge"]};
 /* BANK_REV bumps when the banks change, and bumping it for a code change makes
    every pupil's record run the pruner for nothing. 44 at v0.78: twenty-eight items
    move from the end-mark chip to the boundary chip. */
-var APP = "wcc", VER = "v1.9.17", BANK_REV = 72;
+var APP = "wcc", VER = "v1.9.18", BANK_REV = 72;
+/* v1.9.18 does NOT bump it. Nothing in the banks changed: the version is one
+   engine fix (the challenge dispatcher) and its gates, and bumping the bank
+   revision for a code change runs the pruner over every pupil's record for
+   nothing. */
 /* v1.9.17 DOES bump it, to 72, and the reason is v1.9.12's rather than v1.7.1's:
    nothing is retired, nothing is newly held out and nothing moves chip, so no stored
    id is orphaned -- and this version changes what live items ACCEPT, which is the
@@ -12271,80 +12275,126 @@ function blitzNext(){
   document.body.appendChild(el("blitzBar"));
 }
 
-/* Put one question of this type on screen. Seen lists are ignored on purpose:
-   students replay this a great deal and it must not decay into a memory test.
-   Type filters are set back to All, so a Practice choice never narrows a run. */
+/* ---- WHICH ROUND SERVES WHICH ACT: A TABLE, NOT AN IF-CHAIN (v1.9.18) ----
+   A Year 10 emailed on 2026-11-24: in the Verb tenses challenge, "when you
+   answer the second question you can no longer continue as the questions do not
+   change". He was right and it was not his internet. The cycle is
+   vt, vf, VB, vt, vf, vp, `vb` joined it at v0.94, and this dispatcher was an
+   if-chain with no branch for it -- so the third question of every tense run
+   fell off the end of the chain, served NOTHING, and left the pupil looking at
+   the question they had just answered with nothing left to press. The only way
+   on was to wait out two minutes of clock. Ultimate died the same way at its
+   thirteenth question, which is the tense discipline's third turn.
+
+   v1.9.14 added the missing branch and v1.9.17 is what the student should have
+   been playing; the build he was playing is v1.9.13, four commits behind the
+   device, because `deploy.bat` had not been run. So the instance was already
+   fixed and the CLASS was not, and the class is what this table is for.
+
+   THE PROPERTY A TABLE HAS THAT AN IF-CHAIN CANNOT. An if-chain's coverage is
+   invisible: nothing can be asked which acts it handles, so an act in a cycle
+   with no branch reads exactly like one with a branch until a pupil meets it.
+   A table can be ASKED, so `validate()` checks both ways -- every act any cycle
+   names has a server here, and every server here is named by some cycle -- and
+   a missing one is an error before it ships rather than a dead end in a lesson.
+   Same move as v0.53's keybinds: when two things have to stay in step, prefer
+   the arrangement where they are one thing over the one where they are checked
+   against each other.
+
+   Each entry also declares the SCREEN its round opens, which is what lets a
+   suite assert that serving an act really put a question up without needing an
+   answerer for that round (the sweep in `chtest.py`). That is the hole the old
+   coverage had: `chtest` answers every act it knows and falls back to calling
+   `blitzRecord` for the rest, which advances the run with no question on screen,
+   so the cycle-order assertion passed and "every answer control is on screen"
+   was vacuous for exactly the round that was broken. A declaration the page
+   holds, read by the suite rather than typed into it (v0.46).
+
+   Seen lists are ignored on purpose: students replay this a great deal and it
+   must not decay into a memory test. Type filters are set back to All, so a
+   Practice choice never narrows a run. */
+var BZ_SERVE = {
+  one:    { scr:"play", go:function(lvl){
+             S.act = "one"; S.cls = SCORED[Math.floor(Math.random() * SCORED.length)];
+             if(!LIVE[S.cls]) S.cls = "noun";
+             S.lvl = lvl; go("play"); renderChips(); next(); } },
+  yesno:  { scr:"yesno", go:function(lvl){
+             Y.cls = SCORED[Math.floor(Math.random() * SCORED.length)];
+             if(!LIVE[Y.cls]) Y.cls = "noun";
+             go("yesno"); ynChips(); ynNext(); } },
+  klass:  { scr:"klass", go:function(lvl){
+             K.lvl = lvl; go("klass"); lvlChips("kLevels", KLASS, K.lvl, "kLvl"); kNext(); } },
+  frames: { scr:"frames", go:function(lvl){
+             F.lvl = lvl; go("frames"); frChips(); frNext(); } },
+  cloze:  { scr:"cloze", go:function(lvl){
+             C.lvl = lvl; go("cloze"); lvlChips("czLevels", CLOZE, C.lvl, "czLvl"); czNext(); } },
+  trans:  { scr:"trans", go:function(lvl){
+             R.lvl = lvl; go("trans"); lvlChips("trLevels", TRANSFORM, R.lvl, "trLvl"); trNext(); } },
+  pn:     { scr:"punc", go:function(){
+             PN.type = "all"; PN.lvl = bzLvl(PUNCT); go("punc"); pnNext(); } },
+  pf:     { scr:"pf", go:function(){
+             PF.type = "all";
+             PF.lvl = bzLvl(PUNCT.filter(function(r){ return r.fix && r.fix.length >= 2; }));
+             go("pf"); pfNext(); } },
+  cs:     { scr:"cs", go:function(){
+             CS.lvl = bzLvl(SPLICE); go("cs"); csNext(); } },
+  cm:     { scr:"commas", go:function(){
+             cmPlain(); CM.type = "all"; CM.lvl = bzLvl(COMMAS); go("commas"); cmNext(); } },
+  pp:     { scr:"pp", go:function(){
+             PP.lvl = bzLvl(PUNCPARAS); go("pp"); ppNext(); } },
+  vt:     { scr:"vt", go:function(){
+             VT.type = "all"; VT.lvl = bzLvl(TENSES); go("vt"); vtNext(); } },
+  vf:     { scr:"vf", go:function(){
+             VF.type = "all"; VF.lvl = bzLvl(TENSES); go("vf"); vfNext(); } },
+  vp:     { scr:"vp", go:function(){
+             VP.lvl = bzLvl(TENSEPARAS); go("vp"); vpNext(); } },
+  /* THE ROUND THE STUDENT COULD NOT GET PAST. In the cycle since v0.94 and
+     served by nothing until v1.9.14. */
+  vb:     { scr:"vb", go:function(){
+             VB.lvl = bzLvl(VERBFIND); go("vb"); vbNext(); } },
+  ktname: { scr:"kt", go:function(){ KT.mode = "name"; go("kt"); ktNext(); } },
+  ktdef:  { scr:"kt", go:function(){ KT.mode = "def"; go("kt"); ktNext(); } },
+  ktspot: { scr:"kt", go:function(){ KT.mode = "spot"; go("kt"); ktNext(); } },
+  eiclass:{ scr:"ei", go:function(){ EIX.mode = "classify"; go("ei"); eiNext(); } },
+  eipick: { scr:"ei", go:function(){ EIX.mode = "pick"; go("ei"); eiNext(); } },
+  xf:     { scr:"xf", go:function(){
+             XF.type = "all"; XF.lvl = bzLvl(xfPool("all", "all")); go("xf"); xfNext(); } },
+  /* The harder techniques, through the same screen the practice round uses.
+     tqEnter keeps its own section, so the seen ids do not mix with SOAPMAPS
+     (see tqKey). TQ.sec is set FIRST so tqEnter does not reset the level it was
+     just given: it resets tech and level only when the section changes. */
+  techx:  { scr:"tech", go:function(){
+             TQ.sec = "exp"; TQ.tech = "all"; TQ.lvl = bzLvl(techPool("all", "all", "exp"));
+             tqEnter("exp", "techx"); } },
+  za:     { scr:"za", go:function(){ ZA.lvl = bzLvl(zaPool("all")); startZA(); } },
+  xterm:  { scr:"xt", go:function(){ startXT(); } },
+  semf:   { scr:"sf", go:function(){ SF.lvl = bzLvl(SEMF); startSF(); } }
+};
+
+/* Every act any cycle can name, derived from CHALLENGES and CH_DISC rather than
+   written out, because a hand-kept list of the acts is the stale list this
+   project has paid for five times. Ultimate has no cycle of its own: it draws
+   from the disciplines', which is why both are read here. */
+function bzActs(){
+  var out = {}, b, i, cyc;
+  for(b in CHALLENGES){
+    cyc = CHALLENGES[b].cycle;
+    if(!cyc) continue;
+    for(i=0;i<cyc.length;i++) out[cyc[i]] = true;
+  }
+  for(i=0;i<CH_DISC.length;i++){
+    cyc = CHALLENGES[CH_DISC[i]] && CHALLENGES[CH_DISC[i]].cycle;
+    if(cyc) for(var k=0;k<cyc.length;k++) out[cyc[k]] = true;
+  }
+  return Object.keys(out).sort();
+}
+
+/* Put one question of this type on screen. */
 function blitzServe(act){
   var lvl = blitzLevel();
   B.act = act;
-  if(act === "one"){
-    S.act = "one"; S.cls = SCORED[Math.floor(Math.random() * SCORED.length)];
-    if(!LIVE[S.cls]) S.cls = "noun";
-    S.lvl = lvl; go("play"); renderChips(); next();
-  } else if(act === "yesno"){
-    Y.cls = SCORED[Math.floor(Math.random() * SCORED.length)];
-    if(!LIVE[Y.cls]) Y.cls = "noun";
-    go("yesno"); ynChips(); ynNext();
-  } else if(act === "klass"){
-    K.lvl = lvl; go("klass"); lvlChips("kLevels", KLASS, K.lvl, "kLvl"); kNext();
-  } else if(act === "frames"){
-    F.lvl = lvl; go("frames"); frChips(); frNext();
-  } else if(act === "cloze"){
-    C.lvl = lvl; go("cloze"); lvlChips("czLevels", CLOZE, C.lvl, "czLvl"); czNext();
-  } else if(act === "trans"){
-    R.lvl = lvl; go("trans"); lvlChips("trLevels", TRANSFORM, R.lvl, "trLvl"); trNext();
-  } else if(act === "pn"){
-    PN.type = "all"; PN.lvl = bzLvl(PUNCT); go("punc"); pnNext();
-  } else if(act === "pf"){
-    PF.type = "all"; PF.lvl = bzLvl(PUNCT.filter(function(r){ return r.fix && r.fix.length >= 2; }));
-    go("pf"); pfNext();
-  } else if(act === "cs"){
-    CS.lvl = bzLvl(SPLICE); go("cs"); csNext();
-  } else if(act === "cm"){
-    cmPlain(); CM.type = "all"; CM.lvl = bzLvl(COMMAS); go("commas"); cmNext();
-  } else if(act === "pp"){
-    PP.lvl = bzLvl(PUNCPARAS); go("pp"); ppNext();
-  } else if(act === "vt"){
-    VT.type = "all"; VT.lvl = bzLvl(TENSES); go("vt"); vtNext();
-  } else if(act === "vf"){
-    VF.type = "all"; VF.lvl = bzLvl(TENSES); go("vf"); vfNext();
-  } else if(act === "vp"){
-    VP.lvl = bzLvl(TENSEPARAS); go("vp"); vpNext();
-  } else if(act === "vb"){
-    /* ---- `vb` HAS BEEN IN THE TENSE CYCLE SINCE v0.94 WITH NO BRANCH HERE ----
-       So the third question of every tense challenge served NOTHING: `blitzServe`
-       fell off the end of its chain, the screen stayed on the question the pupil
-       had just answered, and the only way on was to wait out the clock. Live
-       since v0.94 (v1.9.14 found it).
-       Why no suite caught it: `chtest` drives every type in every cycle, and for
-       any act it has no answerer for it falls back to calling `blitzRecord`
-       directly, which advances the challenge without a question on screen. So the
-       cycle-order assertion passed, the "every answer control is on screen"
-       assertion was vacuous for this round, and the harness supplied by hand the
-       one thing the live route never supplied (v1.9.2). The answerer went into
-       `chtest` first and this is what it found on its first run. */
-    VB.lvl = bzLvl(VERBFIND); go("vb"); vbNext();
-  } else if(act === "ktname" || act === "ktdef" || act === "ktspot"){
-    KT.mode = act.slice(2); go("kt"); ktNext();
-  } else if(act === "eiclass" || act === "eipick"){
-    EIX.mode = act === "eiclass" ? "classify" : "pick"; go("ei"); eiNext();
-  } else if(act === "xf"){
-    XF.type = "all"; XF.lvl = bzLvl(xfPool("all", "all")); go("xf"); xfNext();
-  } else if(act === "techx"){
-    /* The harder techniques, through the same screen the practice round uses.
-       tqEnter keeps its own section, so the seen ids do not mix with SOAPMAPS
-       (see tqKey). */
-    /* TQ.sec is set FIRST so tqEnter does not reset the level it was just
-       given: it resets tech and level only when the section changes. */
-    TQ.sec = "exp"; TQ.tech = "all"; TQ.lvl = bzLvl(techPool("all", "all", "exp"));
-    tqEnter("exp", "techx");
-  } else if(act === "za"){
-    ZA.lvl = bzLvl(zaPool("all")); startZA();
-  } else if(act === "xterm"){
-    startXT();
-  } else if(act === "semf"){
-    SF.lvl = bzLvl(SEMF); startSF();
-  }
+  var e = BZ_SERVE[act];
+  if(e) e.go(lvl);
 }
 
 function blitzRecord(ok, outcome){
@@ -17874,6 +17924,41 @@ function validate(){
     for(var k in ACT_CODES)
       if(!ACTIVITY_LIST.some(function(a){ return a[0] === k; }))
         E.push("activity codes: " + ACT_CODES[k] + " points at '" + k + "', which is not an activity");
+  })();
+
+  /* ---- EVERY ACT A CYCLE NAMES HAS A ROUND THAT SERVES IT (v1.9.18) ----
+     The fault a Year 10 reported on 2026-11-24, made unshippable. `vb` joined
+     the tense cycle at v0.94 and `blitzServe` had no branch for it, so the
+     third question of every Verb tenses run served nothing and the pupil was
+     left looking at the question they had just answered with nothing to press.
+     Live from v0.94 to v1.9.13 inclusive, which is twenty versions, and no
+     suite saw it: `chtest` answers the acts it knows and falls back to calling
+     `blitzRecord` for the rest, which advances a run with no question on screen.
+
+     Gated BOTH WAYS, as every declaration in this project is: an act in a cycle
+     with no server strands a pupil mid-run, and a server no cycle names is a
+     round nobody can reach, which is the v1.0 rule (a declaration that names
+     nothing exempts nothing and says so to no one). The act list is derived
+     from CHALLENGES and CH_DISC by `bzActs()` rather than typed here, so a sixth
+     discipline is covered the day it is added. */
+  (function(){
+    var acts = bzActs(), i, a, e;
+    for(i=0;i<acts.length;i++){
+      a = acts[i]; e = BZ_SERVE[a];
+      if(!e){
+        E.push("challenge: a cycle names '" + a + "' and BZ_SERVE has no round for it, so " +
+               "that question of the run would serve nothing and the pupil would be left on " +
+               "the one they had just answered (v1.9.18)");
+      } else if(!e.scr || !document.getElementById(e.scr)){
+        E.push("challenge: BZ_SERVE['" + a + "'] declares the screen '" + e.scr +
+               "' and no such screen exists, so a suite cannot check that serving it put a " +
+               "question up");
+      }
+    }
+    for(a in BZ_SERVE)
+      if(acts.indexOf(a) < 0)
+        E.push("challenge: BZ_SERVE has a round for '" + a + "' and no cycle names it, so " +
+               "nothing can reach it (v1.0)");
   })();
 
   /* pool floor */
