@@ -7285,7 +7285,7 @@ var STAMPMETA = {"fmt":1,"skip":["id","dx"],"strict":["secure","challenge"]};
 /* BANK_REV bumps when the banks change, and bumping it for a code change makes
    every pupil's record run the pruner for nothing. 44 at v0.78: twenty-eight items
    move from the end-mark chip to the boundary chip. */
-var APP = "wcc", VER = "v1.9.23", BANK_REV = 73;
+var APP = "wcc", VER = "v1.9.24", BANK_REV = 73;
 /* v1.9.22 does NOT bump it either, and for the same reason as v1.9.21: no bank
    changed. The version is two more cue rules of a kind the family had none of,
    a frame census in the checker, and a declaration. The twenty sentences
@@ -12502,6 +12502,17 @@ function bzActs(){
 /* Put one question of this type on screen. */
 function blitzServe(act){
   var lvl = blitzLevel();
+  /* A MONOTONIC COUNT OF QUESTIONS SERVED (v1.9.24). `blitzRecord` advances the
+     run on a 260ms timer, and `chtest` used to answer, sleep 300ms and read the
+     screen, which is a 40ms margin: under a parallel suite run it read the
+     question it had just answered, the same act came round twice and a green
+     build reported as red. v1.9.18's own comment in that suite records the
+     flake and the sleep stayed. A counter is the arrangement where the two
+     things are one thing (v0.53): the harness waits for THIS to move instead of
+     guessing how long serving takes, and a run that never advances -- which is
+     the fault a Year 10 reported on 2026-11-24 -- fails loudly instead of
+     passing by luck. */
+  B.served = (B.served || 0) + 1;
   B.act = act;
   var e = BZ_SERVE[act];
   if(e) e.go(lvl);
