@@ -7285,7 +7285,14 @@ var STAMPMETA = {"fmt":1,"skip":["id","dx"],"strict":["secure","challenge"]};
 /* BANK_REV bumps when the banks change, and bumping it for a code change makes
    every pupil's record run the pruner for nothing. 44 at v0.78: twenty-eight items
    move from the end-mark chip to the boundary chip. */
-var APP = "wcc", VER = "v1.9.20", BANK_REV = 73;
+var APP = "wcc", VER = "v1.9.21", BANK_REV = 73;
+/* v1.9.21 does NOT bump it. No bank changes at all: the version is seven rules
+   in the word-class cue family, a wider adverb inventory inside that family, a
+   declaration, and a checker. The twenty-five sentences drafted for it were
+   taken out again before the commit, so not one live item asks a different
+   question or accepts a different answer, and running the pruner over every
+   pupil's record for a measurement change costs them a load for nothing
+   (v1.9.3). */
 /* v1.9.20 DOES bump it, to 73, and on the half of the rule that is about what a
    live item ACCEPTS rather than about orphaned ids. Every correction row in the
    tense paragraphs changes: the printed wrong form is no longer among the options
